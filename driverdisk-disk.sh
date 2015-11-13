@@ -26,7 +26,7 @@ prepare_disks() {
     echo "${diskdir}/disk-a.img"
 
     # driverdisk image
-    ${KSTESTDIR}/../lib/mkdud.py -k -b -L "TEST_DD" ${diskdir}/dd.iso >/dev/null
+    ${KSTESTDIR}/lib/mkdud.py -k -b -L "TEST_DD" ${diskdir}/dd.iso >/dev/null
     echo "${diskdir}/dd.iso,device=cdrom,readonly=on"
 }
 

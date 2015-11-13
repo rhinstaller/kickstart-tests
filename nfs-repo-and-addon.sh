@@ -28,7 +28,7 @@ prepare() {
     scriptdir=$PWD/scripts
 
     # Create the test repo
-    PYTHONPATH=$PWD/lib:$PYTHONPATH ${scriptdir}/make-addon-pkgs.py $tmpdir
+    PYTHONPATH=${KSTESTDIR}/lib:$PYTHONPATH ${scriptdir}/make-addon-pkgs.py $tmpdir
 
     # Start a http server to serve the test repo
     start_httpd ${tmpdir}/http ${tmpdir}

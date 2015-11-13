@@ -51,7 +51,7 @@ cleanup_tmp() {
 runone() {
     t=$1
 
-    export KSTESTDIR=$(pwd)/kickstart_tests
+    export KSTESTDIR=$(pwd)
 
     ks=${t/.sh/.ks}
     . $t

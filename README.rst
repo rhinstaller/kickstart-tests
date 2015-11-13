@@ -21,10 +21,9 @@ kickstart file, the target of a substitution is any string starting with
 
 Configuration parameters may also come from special shell scripts that are
 sourced during run_kickstart_tests.sh.  It will first look at the defaults in
-kickstart_tests/scripts/defaults.sh.  It will then look at any user-specific
-defaults in ~/.kstests.defaults.sh.  These take precedence over the local
-environment.  Environment variables set on the command line have the highest
-priority.
+scripts/defaults.sh.  It will then look at any user-specific defaults in
+~/.kstests.defaults.sh.  These take precedence over the local environment.
+Environment variables set on the command line have the highest priority.
 
 Note that not every test needs every setting.  You can determine which are
 required for the test you are running by simply running "grep KSTEST_" on it.
@@ -69,5 +68,5 @@ The following environment variables are currently supported:
 
 - KSTEST_URL - This variable is used by all tests that don't test installation
   method and instead just use the default.  It is set to the Fedora mirrors in
-  kickstart_tests/scripts/defaults.sh.  This is potentially slow if you are
-  running a lot of tests, and you may want to point it at a local mirror.
+  scripts/defaults.sh.  This is potentially slow if you are running a lot of
+  tests, and you may want to point it at a local mirror.

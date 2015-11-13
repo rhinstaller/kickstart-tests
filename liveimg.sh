@@ -29,7 +29,7 @@ prepare() {
     ks=$1
     tmpdir=$2
 
-    scriptdir=$PWD/kickstart_tests/scripts
+    scriptdir=$PWD/scripts
 
     # Copy the install.img to the tmpdir
     mkdir ${tmpdir}/liveimg

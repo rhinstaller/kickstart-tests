@@ -97,8 +97,8 @@ shift $((OPTIND - 1))
 # directory for settings that are potentially useful to everyone, and then
 # in the user's home directory for settings that are site-specific and thus
 # can't be put into source control.
-if [[ -e kickstart_tests/scripts/defaults.sh ]]; then
-    . kickstart_tests/scripts/defaults.sh
+if [[ -e scripts/defaults.sh ]]; then
+    . scripts/defaults.sh
 fi
 
 if [[ -e $HOME/.kstests.defaults.sh ]]; then
@@ -116,12 +116,12 @@ sed_args=$(printenv | while read line; do
 # We get the list of tests from one of two places:
 # (1) From the command line, all the other arguments.
 # (2) By applying any TESTTYPE given on the command line.
-# (3) From finding all scripts in kickstart_tests/ that are executable and are
-#     not support files.
+# (3) From finding all scripts in . that are executable and are not support
+#     files.
 if [[ $# != 0 ]]; then
     tests="$*"
 else
-    tests=$(find kickstart_tests -maxdepth 1 -name '*sh' -a -perm -o+x)
+    tests=$(find . -maxdepth 1 -name '*sh' -a -perm -o+x)
 
     newtests=""
     for f in ${tests}; do
@@ -150,7 +150,7 @@ if [[ -z "${sed_args}" ]]; then
     exit 77
 fi
 
-export KSTESTDIR=${PWD}/kickstart_tests
+export KSTESTDIR=$(pwd)
 
 # Now do all the substitutions on the kickstart files matching up with one of
 # the test cases we are going to run.
@@ -174,18 +174,19 @@ done | sort | uniq)
 
 if [ -n "$prereq_list" ] ; then
     make IMAGE="${IMAGE}" KSTESTDIR="${KSTESTDIR}" \
-        -C kickstart_tests/scripts -f Makefile.prereqs $prereq_list
+        -C scripts -f Makefile.prereqs $prereq_list
 fi
 
 if [[ "$TEST_REMOTES" != "" ]]; then
-    _IMAGE=kickstart_tests/$(basename ${IMAGE})
+    _IMAGE=$(basename ${IMAGE})
 
     # (1) Copy everything to the remote systems.  We do this ourselves because
     # parallel doesn't like globs, and we need to put the boot image somewhere
     # that qemu on the remote systems can read.
     for remote in ${TEST_REMOTES}; do
-        scp -r kickstart_tests kstest@${remote}:
-        scp ${IMAGE} kstest@${remote}:kickstart_tests/
+        ssh kstest@${remote} mkdir kickstart-tests
+        scp -r . kstest@${remote}:kickstart-tests/
+        scp ${IMAGE} kstest@${remote}:kickstart-tests/
     done
 
     # (1a) We also need to copy the provided image to under kickstart_tests/ on
@@ -202,7 +203,7 @@ if [[ "$TEST_REMOTES" != "" ]]; then
     done
 
     parallel --no-notice ${remote_args} --jobs ${TEST_JOBS:-2} \
-             sudo PYTHONPATH=$PYTHONPATH kickstart_tests/scripts/run_one_ks.sh -i ${_IMAGE} -k ${KEEPIT} {} ::: ${tests}
+             sudo PYTHONPATH=$PYTHONPATH scripts/run_one_ks.sh -i ${_IMAGE} -k ${KEEPIT} {} ::: ${tests}
     rc=$?
 
     # (3) Get all the results back from the remote systems, which will have already
@@ -218,7 +219,7 @@ if [[ "$TEST_REMOTES" != "" ]]; then
             scp -r kstest@${remote}:/var/tmp/kstest-\* /var/tmp/
         fi
 
-        ssh kstest@${remote} sudo rm -rf kickstart_tests /var/tmp/kstest-\*
+        ssh kstest@${remote} sudo rm -rf kickstart-tests /var/tmp/kstest-\*
     done
 
     # (3a) And then also remove the copy of the image we made earlier.
@@ -229,7 +230,7 @@ if [[ "$TEST_REMOTES" != "" ]]; then
     exit ${rc}
 else
     parallel --no-notice --jobs ${TEST_JOBS:-2} \
-        sudo PYTHONPATH=$PYTHONPATH kickstart_tests/scripts/run_one_ks.sh -i ${IMAGE} -k ${KEEPIT} {} ::: ${tests}
+        sudo PYTHONPATH=$PYTHONPATH scripts/run_one_ks.sh -i ${IMAGE} -k ${KEEPIT} {} ::: ${tests}
 
     # For future expansion - any cleanup code can go in between the variable
     # setting and the exit, like in the other branch of the if-else above.

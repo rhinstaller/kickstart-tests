@@ -75,7 +75,7 @@ start_httpd() {
     # written to $tmpdir/httpd-pid, and the URL for the server will be set in
     # $httpd_url
 
-    local scriptdir=${PWD}/kickstart_tests/scripts
+    local scriptdir=${PWD}/scripts
     local httpd_info="$(${scriptdir}/httpd.py "${httpd_root}")"
 
     # Parse out the port and PID

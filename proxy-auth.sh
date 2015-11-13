@@ -29,7 +29,7 @@ prepare() {
     ks=$1
     tmpdir=$2
 
-    scriptdir=$PWD/kickstart_tests/scripts
+    scriptdir=$PWD/scripts
 
     # Create the test repo
     PYTHONPATH=$PWD/lib:$PYTHONPATH ${scriptdir}/make-addon-pkgs.py $tmpdir

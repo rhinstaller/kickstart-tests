@@ -91,6 +91,11 @@ if [[ ! -e "${IMAGE}" ]]; then
     exit 77
 fi
 
+# Check for required programs and exit if missing.
+for p in livemedia-creator parallel scp; do
+    hash ${p} 2>/dev/null || { echo "Required program ${p} missing; aborting." ; exit 1; }
+done
+
 shift $((OPTIND - 1))
 
 # Get default settings from a couple different places - under the source

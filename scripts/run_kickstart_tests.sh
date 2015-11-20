@@ -124,7 +124,16 @@ sed_args=$(printenv | while read line; do
 # (3) From finding all scripts in . that are executable and are not support
 #     files.
 if [[ $# != 0 ]]; then
-    tests="$*"
+    tests=""
+
+    # Allow people to leave off the .sh.
+    for t in $*; do
+        if [[ "${t}" == *.sh ]]; then
+            tests+="${t}"
+        else
+            tests+="${t}.sh"
+        fi
+    done
 else
     tests=$(find . -maxdepth 1 -name '*sh' -a -perm -o+x)
 

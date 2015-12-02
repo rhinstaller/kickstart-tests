@@ -118,10 +118,12 @@ sed_args=$(printenv | while read line; do
     [[ "${key}" =~ ^KSTEST_ ]] && echo -n " -e s#@${key}@#${val}#"
  done)
 
-# We get the list of tests from one of two places:
+# We get the list of tests from one of several places:
 # (1) From the command line, all the other arguments.
 # (2) By applying any TESTTYPE given on the command line.
-# (3) From finding all scripts in . that are executable and are not support
+# (3) If ${ghprbActualCommit} is in the environment, the tests changed by
+#     that commit.
+# (4) From finding all scripts in . that are executable and are not support
 #     files.
 if [[ $# != 0 ]]; then
     tests=""
@@ -134,6 +136,34 @@ if [[ $# != 0 ]]; then
             tests+="${t}.sh"
         fi
     done
+elif [[ "${ghprbActualCommit}" != "" ]]; then
+    files="$(git show --pretty=format: --name-only ${ghprbActualCommit})"
+    tests=""
+
+    candidates="$(for f in ${files}; do
+        # Only accept files that are .sh or .ks.in files in this top-level directory.
+        # Those are the tests.  If either file for a particular test changed, we want
+        # to run the test.  The first step of figuring this out is stripping off
+        # the file extension.
+        if [[ ! "${f}" == */* && ("${f}" == *sh || "${f}" == *ks.in) ]]; then
+            echo "${f%%.*} "
+        fi
+     done | uniq)"
+
+    # And then add the .sh suffix back on to everything in $candidates.  That will
+    # give us the list of tests to be run.
+    for c in ${candidates}; do
+        tests+="${c}.sh "
+    done
+
+    # But then, these tests can take an awful long time to run.  If the commit contained
+    # too many changes (for instance, it tweaked some value in every file) then we do not
+    # want to run them all.  In fact we probably only ever want to run just a few for more
+    # timely feedback.  Enforce that here.
+    if (( $(echo "${tests}" | wc -w) > 3 )); then
+        echo "More than three tests provided; skipping."
+        exit 77
+    fi
 else
     tests=$(find . -maxdepth 1 -name '*sh' -a -perm -o+x)
 

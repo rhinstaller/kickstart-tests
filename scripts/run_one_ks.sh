@@ -104,7 +104,7 @@ runone() {
                        --ks ${ksfile} \
                        --tmp ${tmpdir} \
                        --logfile ${tmpdir}/livemedia.log \
-                       --ram 2048 \
+                       --ram 1024 \
                        --vnc vnc \
                        --timeout 60 \
                        ${disk_args}

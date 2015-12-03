@@ -28,8 +28,8 @@
 # A boot ISO is required, which should be specified with TEST_BOOT_ISO=.
 #
 # The number of jobs corresponds to the number of VMs that will be started
-# simultaneously.  Each one wants about 2 GB of memory.  The default is
-# two simultaneous jobs, but you can control this with TEST_JOBS=.  It is
+# simultaneously.  Each one wants about 1 GB of memory.  The default is
+# four simultaneous jobs, but you can control this with TEST_JOBS=.  It is
 # suggested you not run out of memory.
 #
 # You can control what logs are held onto after the test is complete via the
@@ -246,7 +246,7 @@ if [[ "$TEST_REMOTES" != "" ]]; then
         remote_args="${remote_args} --sshlogin kstest@${remote}"
     done
 
-    parallel --no-notice ${remote_args} --jobs ${TEST_JOBS:-2} \
+    parallel --no-notice ${remote_args} --jobs ${TEST_JOBS:-4} \
              sudo PYTHONPATH=$PYTHONPATH scripts/run_one_ks.sh -i ${_IMAGE} -k ${KEEPIT} {} ::: ${tests}
     rc=$?
 
@@ -273,7 +273,7 @@ if [[ "$TEST_REMOTES" != "" ]]; then
     # code will be caught outside and converted into the overall exit code.
     exit ${rc}
 else
-    parallel --no-notice --jobs ${TEST_JOBS:-2} \
+    parallel --no-notice --jobs ${TEST_JOBS:-4} \
         sudo PYTHONPATH=$PYTHONPATH scripts/run_one_ks.sh -i ${IMAGE} -k ${KEEPIT} {} ::: ${tests}
 
     # For future expansion - any cleanup code can go in between the variable

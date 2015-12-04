@@ -29,22 +29,22 @@ else
    exit 0
 fi
 
-grep -q '^DEVICE=bond0$' $IF_FILE
+grep -q '^DEVICE="bond0"$' $IF_FILE
 if [[ $? -ne 0 ]]; then
    echo '*** DEVICE is not present' >> /root/RESULT
 fi
 
-grep -q '^TYPE=Bond$' $IF_FILE
+grep -q '^TYPE="Bond"$' $IF_FILE
 if [[ $? -ne 0 ]]; then
    echo '*** TYPE is not present' >> /root/RESULT
 fi
 
-grep -q '^ONBOOT=yes$' $IF_FILE
+grep -q '^ONBOOT="yes"$' $IF_FILE
 if [[ $? -ne 0 ]]; then
    echo '*** ONBOOT is not present' >> /root/RESULT
 fi
 
-grep -q '^BOOTPROTO=dhcp$' $IF_FILE
+grep -q '^BOOTPROTO="dhcp"$' $IF_FILE
 if [[ $? -ne 0 ]]; then
    echo '*** BOOTPROTO is not present' >> /root/RESULT
 fi

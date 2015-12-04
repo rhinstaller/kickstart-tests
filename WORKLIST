@@ -1,0 +1,83 @@
+EASY TESTS
+==========
+* authconfig (kickstart.py)
+    - No existing test uses the authconfig command.  It supports an awful lot of options, and it's just a pass through to /usr/sbin/authconfig
+      so we don't need to be comprehensive.  It would be sufficient to pick a couple options that are easy to verify and make sure they work.
+      It would also be good to look through anaconda git history for any time we've had trouble with authconfig and make sure we don't repeat
+      the same mistakes.
+* bootloader (bootloader.py, kickstart.py)
+    - Test --append= and --location=none (as separate tests).  Perhaps also test encryption options.  Verify bootloader package is installed.
+    - Note that this is architecture-specific.
+* default to non-graphical runlevel (desktop.py)
+    - If the skipx command is used, verify the installed system defaults to a non-graphical runlevel.  This should also mean that firstboot
+      is disabled.  It should not affect what packages are installed.
+* install from cdrom (image.py)
+    - Attach a DVD image to the VM and use that as the installation source.  Perhaps try to disable the network to ensure it's not
+      accidentally used.  Confirm in %post that the DVD was used, likely by scraping logs.
+* --fsoptions
+    - This option exists for btrfs, logvol, part, and raid.
+    - Use this option to specify some options that should be passed through to the target system's /etc/fstab.  We don't have to be
+      comprehensive since this is just a pass through.  It should suffice to know that any text appears.
+    - Add to existing tests that do custom partitioning.
+* --mkfsoptions
+    - This option exists for btrfs, logvol, part, and raid.
+    - Use this option to specify some options that should be used when running mkfs.  Specify one that is easy to test for.  We don't have
+      to be comprehensive since this is just a pass through.
+    - Add to an existing test that does custom partitioning.
+* realm (install.py, kickstart.py)
+    - FIXME: I don't know anything about these options.
+* SIGUSR2 dumping
+    - anaconda will drop a /tmp/anaconda-tb-* file when it receives a SIGUSR2.  Send this from a %post, wait a bit, and see if the file
+      shows up.  It could take several seconds.
+    - This may trigged LMC's traceback detection, though.  Work there may be needed.
+
+MEDIUM TESTS
+============
+* audit tests to make them architecture-aware
+    - Tests are currently only run on x86_64, but that's just because that's the hardware we've got.
+    - Tests should be modified to make sure they work equally well on other architectures (at least arm and ppc, maybe s390).
+* hdiso protected source partition
+    - Create a disk ahead of time and fetch a DVD image into it.  This may require environment variables or other tricks to make sure it is
+      useful in jenkins.
+    - Attach this disk image to the VM and use that as the installation source.  Perhaps try to disable the network to ensure it's not
+      accidentally used.  Confirm in %post that the HDISO source was used, likely by scraping logs.
+    - anaconda will prevent using the partition with the HDISO source on it, even with autopart, so verify the disk has not been touched.
+* ipv6 (network.py)
+    - FIXME: I don't know anything about how to do this.
+* noformat/useexisting
+    - Create partitions on the input disk before starting the VM, and add sentinel files (or specify unique FS labels) to them.  Then use these
+      options to tell anaconda to not format the device, but create a mount point for it on the target system.
+    - Verify the sentinel files exist afterwards (or that the labels haven't changed) and that the filesystems will be mounted.
+* recommended swap size
+    - If given "part --fstype=swap --recommended swap", anaconda will make a swap partition based on the amount of memory and storage.  We should
+      be able to calculate that ahead of time given control over the VM and verify the created partition matches.
+    - Tweaking the amount of memory/disk in the VM to be numbers that fall on boundaries of the recommended size algorithm can also be useful.
+    - Add this to an existing test that does custom partitioning.
+* volgroup --reserved-space/--reserved-percent
+    - These options specify that space should be left free in a volgroup.  This can likely be verified somehow.
+
+HARD TESTS
+==========
+* bridges (network.py)
+    - FIXME: I don't know anything about how to do this.
+* teaming (network.py)
+    - FIXME: I don't know anything about how to do this.
+
+IMPOSSIBLE TESTS (?)
+====================
+* fips (bootloader.py)
+    - The kernel in the image we are testing is not necessarily signed, which is required for fips mode.
+* kexec (install.py, kexec.py)
+    - How to reboot and test that it works?
+* text and cmdline modes
+    - It may require work to LMC/kstest-runner to support running in non-graphical mode.
+    - Should this be possible, our test infrastructure should be changed to randomly pick a UI mode.  We're not testing UIs directly, but it
+      is helpful to just run through all the code paths.  Random assignment should suffice.
+    - We would also need to change run_kickstart_tests.sh to allow the user to specify a UI Mode.
+
+INFRASTRUCTURE CHANGES
+======================
+* support running on multiple architectures
+    - Add a TESTTYPE for specifying architecture?
+    - Are some tests inherently architecture-specific? 
+    - Add options to run_kickstart_tests.sh to run on a given architecture.

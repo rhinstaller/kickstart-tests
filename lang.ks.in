@@ -9,7 +9,7 @@ clearpart --all --initlabel
 autopart
 
 keyboard us
-lang cs_CZ.UTF-8
+lang cs_CZ.UTF-8 --addsupport=ru_RU
 timezone America/New_York --utc
 rootpw testcase
 shutdown
@@ -25,6 +25,17 @@ INSTLANG=`cat /etc/locale.conf | awk -F\" '{ print $2 }'`
 
 if [[ "$INSTLANG" != "$LANG" ]]; then
     echo '*** specified language was not set' >> /root/RESULT
+fi
+
+# Check that the langpacks metapackages were installed
+if ! rpm -q langpacks-cs langpacks-ru ; then
+    echo '*** langpacks packages were not installed' >> /root/RESULT
+fi
+
+# there is one langonly group for ru, which contains one non-optional package.
+# check that it got installed
+if ! rpm -q paratype-pt-sans-fonts ; then
+    echo '*** langonly group for ru not installed' >> /root/RESULT
 fi
 
 if [[ ! -e /root/RESULT ]]; then

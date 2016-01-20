@@ -66,6 +66,10 @@ The following environment variables are currently supported:
   needed if you are testing the ostreesetup command and installation method.
   You will need to set up your own repo.
 
+- KSTEST_FTP_URL - This variable is used by FTP tests. It is set to a Fedora
+  mirror in Texas, USA in scripts/defaults.sh. This is potentially slow and
+  you may want to point it at a local mirror.
+
 - KSTEST_URL - This variable is used by all tests that don't test installation
   method and instead just use the default.  It is set to the Fedora mirrors in
   scripts/defaults.sh.  This is potentially slow if you are running a lot of

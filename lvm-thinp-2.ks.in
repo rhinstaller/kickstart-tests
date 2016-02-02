@@ -39,8 +39,8 @@ if [ $root_fstype != "ext4" ]; then
 fi
 
 # verify root entry in /etc/fstab is correct
-root_lv_entry="$(grep ^$root_lv\\s/\\s /etc/fstab)"
-root_uuid_entry="$(grep ^$root_uuid\\s/\\s /etc/fstab)"
+root_lv_entry="$(grep ^$root_lv\\s\\+/\\s /etc/fstab)"
+root_uuid_entry="$(grep ^$root_uuid\\s\\+/\\s /etc/fstab)"
 if [ -z "$root_lv_entry" -a -z "$root_uuid_entry" ] ; then
     echo "*** root lv is not the root entry in /etc/fstab" >> /root/RESULT
 fi
@@ -66,8 +66,8 @@ if [ $home_fstype != "ext4" ]; then
 fi
 
 # verify home entry in /etc/fstab is correct
-home_lv_entry="$(grep ^$home_lv\\s/home\\s /etc/fstab)"
-home_uuid_entry="$(grep ^$home_uuid\\s/home\\s /etc/fstab)"
+home_lv_entry="$(grep ^$home_lv\\s\\+/home\\s /etc/fstab)"
+home_uuid_entry="$(grep ^$home_uuid\\s\\+/home\\s /etc/fstab)"
 if [ -z "$home_lv_entry" -a -z "$home_uuid_entry" ] ; then
     echo "*** home lv is not the home entry in /etc/fstab" >> /home/RESULT
 fi
@@ -87,8 +87,8 @@ if ! grep -q $swap_dm /proc/swaps ; then
 fi
 
 # verify swap entry in /etc/fstab is correct
-swap_lv_entry="$(grep ^$swap_lv\\sswap\\s /etc/fstab)"
-swap_uuid_entry="$(grep ^$swap_uuid\\sswap\\s /etc/fstab)"
+swap_lv_entry="$(grep ^$swap_lv\\s\\+swap\\s /etc/fstab)"
+swap_uuid_entry="$(grep ^$swap_uuid\\s\\+swap\\s /etc/fstab)"
 if [ -z "$swap_lv_entry" -a -z "$swap_uuid_entry" ] ; then
     echo "*** swap lv is not in /etc/fstab" >> /root/RESULT
 fi

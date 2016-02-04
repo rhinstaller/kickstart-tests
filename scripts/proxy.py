@@ -3,9 +3,6 @@
 # Start a super-simple proxy server on localhost
 # A list of proxied requests will be saved to /tmp/proxy.log
 
-# Ignore any interruptible calls
-# pylint: disable=interruptible-system-call
-
 from http.server import SimpleHTTPRequestHandler
 import socket
 import select

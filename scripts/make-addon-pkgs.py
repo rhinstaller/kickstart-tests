@@ -29,9 +29,6 @@
 # This script imports things from tests/lib/mkdud.py, so tests/lib needs to be
 # in $PYTHONPATH.
 
-# Ignore interuptible calls
-# pylint: disable=interruptible-system-call, ignorable-system-call
-
 import os
 from subprocess import check_call
 from mkdud import make_rpm

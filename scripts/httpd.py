@@ -42,7 +42,6 @@ if pid == 0:
     os.chdir(sys.argv[1])
 
     # dup the standard file descriptors to /dev/null
-    # pylint: disable=interruptible-system-call, ignorable-system-call
     os.dup2(os.open(os.devnull, os.O_RDONLY), 0)
     os.dup2(os.open(os.devnull, os.O_WRONLY), 1)
     os.dup2(os.open(os.devnull, os.O_WRONLY), 2)

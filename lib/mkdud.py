@@ -18,9 +18,6 @@
 #
 # Author: Will Woods <wwoods@redhat.com>
 
-# Ignore any interruptible calls
-# pylint: disable=interruptible-system-call
-
 import os
 import rpmfluff
 import subprocess

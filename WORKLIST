@@ -15,10 +15,7 @@ EASY TESTS
     - Attach a DVD image to the VM and use that as the installation source.  Perhaps try to disable the network to ensure it's not
       accidentally used.  Confirm in %post that the DVD was used, likely by scraping logs.
 * --fsoptions
-    - This option exists for btrfs, logvol, part, and raid.
-    - Use this option to specify some options that should be passed through to the target system's /etc/fstab.  We don't have to be
-      comprehensive since this is just a pass through.  It should suffice to know that any text appears.
-    - Add to existing tests that do custom partitioning.
+    - This option does not exist for btrfs - should it?
 * --mkfsoptions
     - This option exists for btrfs, logvol, part, and raid.
     - Use this option to specify some options that should be used when running mkfs.  Specify one that is easy to test for.  We don't have

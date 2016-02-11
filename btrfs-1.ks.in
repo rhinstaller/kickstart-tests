@@ -8,7 +8,7 @@ clearpart --all
 
 part --fstype=ext4 --size=500 /boot
 part --fstype=swap --size=500 swap
-part btrfs.10 --fstype="btrfs" --size=4400
+part btrfs.10 --fstype="btrfs" --size=4400 --fsoptions=loud,noatime
 
 btrfs none --label=fedora-btrfs btrfs.10
 
@@ -36,9 +36,19 @@ if [[ $? != 0 ]]; then
     echo "*** root subvol is not mounted at /" >> /root/RESULT
 fi
 
+grep "\s/\s" /etc/fstab | grep loud,noatime
+if [[ $? != 0 ]]; then
+    echo "*** root subvol did not preserve --fsoptions" >> /root/RESULT
+fi
+
 grep "\s/home\s" /etc/fstab | grep "subvol=home"
 if [[ $? != 0 ]]; then
     echo "*** home subvol is not mounted at /home" >> /root/RESULT
+fi
+
+grep "\s/home\s" /etc/fstab | grep loud,noatime
+if [[ $? != 0 ]]; then
+    echo "*** home subvol did not preserve --fsoptions" >> /root/RESULT
 fi
 
 # No error was written to /root/RESULT file, everything is OK

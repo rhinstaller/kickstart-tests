@@ -14,8 +14,6 @@ EASY TESTS
 * install from cdrom (image.py)
     - Attach a DVD image to the VM and use that as the installation source.  Perhaps try to disable the network to ensure it's not
       accidentally used.  Confirm in %post that the DVD was used, likely by scraping logs.
-* --fsoptions
-    - This option does not exist for btrfs - should it?
 * --mkfsoptions
     - This option exists for btrfs, logvol, part, and raid.
     - Use this option to specify some options that should be used when running mkfs.  Specify one that is easy to test for.  We don't have

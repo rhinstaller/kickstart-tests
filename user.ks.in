@@ -28,67 +28,105 @@ sshkey --username=kosieh "this is a bogus ssh key"
 
 shutdown
 
+# Make sure we get the kind of awk that can deal with the unicode crud we're going to hand it
 %packages
+gawk
 %end
 
 %post
+cat - > /tmp/passwd-test.awk << "EOF"
+BEGIN {
+    FS = ":";
+    userfound = 0;
+}
 
-## TEST CREATE USER CHECK
-# Check group
-grep 5001 /etc/group
-if [[ $? -ne 0 ]]; then
-    echo "*** Group failed to create." >> /root/RESULT
-fi
+$1 == "kosieh" {
+    userfound++;
 
-# Check group name
-grep kosygroup /etc/group
-if [[ $? -ne 0 ]]; then
-    echo "*** Group name not present." >> /root/RESULT
-fi
+    # Check GECOS: real name
+    # Also check that the unicode made it through ok. The escape sequences are
+    # U+2603 encoded as UTF-8, which is lovingly hand-encoded here instead of
+    # just using the character to make sure the character did not just get mangled
+    # the same way twice.
+    if ($5 != "Kosieh Barter \xe2\x98\x83") {
+        print "*** User is present, but not all detials: REAL NAME (GECOS)" >> /root/RESULT;
+    }
 
-# Check find username
-grep kosieh /etc/passwd
-if [[ $? -ne 0 ]]; then
-    echo "*** User is not present in system." >> /root/RESULT
-fi
+    # Check if the user has his/her bash
+    if ($7 != "/bin/bash") {
+        print "*** User is present, but /bin/bash is not set" >> /root/RESULT;
+    }
 
-# Check GECOS: real name
-# Also check that the unicode made it through ok. The escape sequences are
-# U+2603 encoded as UTF-8, which is lovingly hand-encoded here instead of
-# just using the character to make sure the character didn't just get mangled
-# the same way twice.
-grep kosieh /etc/passwd | grep "Kosieh Barter $(echo -ne '\xe2\x98\x83')"
-if [[ $? -ne 0 ]]; then
-    echo "*** User is present, but not all details: REAL NAME (GEDOS)" >> /root/RESULT
-fi
+    # Check if the user is in the correct group
+    if ($4 != "5001") {
+        print "*** User is present, but group assignment is incorrect" >> /root/RESULT;
+    }
 
-# Check if the user has his/her bash
-grep kosieh /etc/passwd | grep "/bin/bash"
-if [[ $? -ne 0 ]]; then
-    echo "*** User is present, but /bin/bash is not set" >> /root/RESULT
-fi
+    # Check for home dir in /etc/passwd
+    if ($6 != "/home/kbarter") {
+        print "*** Home directory not in passwd file" >> /root/RESULT;
+    }
+}
 
-# Check if the user has encrypted password
-grep kosieh /etc/shadow | grep "$6$QsJCB9E6geIjWNvn$UZLEtnHYgKmFgrPo0fY1qNBc/aRi9b01f19w9mpdFm9.MPblckUuFYvpRLSzeYeR/6lO/2uY4WtjhbryC0k2L/"
-if [[ $? -ne 0 ]]; then
-    echo "*** User is present, passwords DO NOT match" >> /root/RESULT
-fi
+# If the user was not found at all, (or was found more than once) that is a
+# problem
+END {
+    if (userfound != 1) {
+        print "*** User is not present in system." >> /root/RESULT;
+    }
+}
+EOF
 
-# Check if the user is in correct group
-grep kosieh /etc/passwd | grep 5001
-if [[ $? -ne 0 ]]; then
-    echo "*** User is present, group assignment" >> /root/RESULT
-fi
+cat - > /tmp/group-test.awk << "EOF"
+BEGIN {
+    FS = ":";
+    groupfound = 0;
+}
+
+$1 == "kosygroup" {
+    groupfound++;
+    
+    # Check the GID
+    if ($3 != "5001") {
+        print "*** Group created with wrong GID" >> /root/RESULT;
+    }
+}
+
+# If the group is not there exactly once, that's a problem
+END {
+    if (groupfound != 1) {
+        print "*** Group was not created." >> /root/RESULT;
+    }
+}
+EOF
+
+cat - > /tmp/shadow-test.awk << "EOF"
+BEGIN {
+    FS = ":";
+    userfound = 0;
+}
+
+$1 == "kosieh" {
+    userfound++;
+    if ($2 != "$6$QsJCB9E6geIjWNvn$UZLEtnHYgKmFgrPo0fY1qNBc/aRi9b01f19w9mpdFm9.MPblckUuFYvpRLSzeYeR/6lO/2uY4WtjhbryC0k2L/") {
+        print "*** User is present, passwords DO NOT match" >> /root/RESULT;
+    }
+}
+
+END {
+    if (userfound != 1) {
+        print "*** User not found in /etc/shadow" >> /root/RESULT;
+    }
+}
+EOF
+
+gawk -f /tmp/passwd-test.awk /etc/passwd
+gawk -f /tmp/group-test.awk /etc/group
+gawk -f /tmp/shadow-test.awk /etc/shadow
 
 # Check if the user has PHYSICAL home dir
 if [[ ! -d /home/kbarter ]]; then
     echo "*** Home directory not found" >> /root/RESULT
-fi
-
-# Check for home dir in /etc/passwd
-grep /home/kbarter /etc/passwd
-if [[ $? -ne 0 ]]; then
-    echo "*** Home directory not in passwd file" >> /root/RESULT
 fi
 
 # Check that an ssh key was added.

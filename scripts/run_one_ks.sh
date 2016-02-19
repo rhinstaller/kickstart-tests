@@ -123,7 +123,7 @@ runone() {
             echo RESULT:${name}:FAILED:Kernel panic.
             cleanup ${tmpdir}
             cleanup_tmp ${tmpdir}
-            return 3
+            return 0
         fi
 
         result=$(validate ${tmpdir})

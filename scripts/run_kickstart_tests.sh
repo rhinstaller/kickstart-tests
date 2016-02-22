@@ -155,15 +155,6 @@ elif [[ "${ghprbActualCommit}" != "" ]]; then
     for c in ${candidates}; do
         tests+="${c}.sh "
     done
-
-    # But then, these tests can take an awful long time to run.  If the commit contained
-    # too many changes (for instance, it tweaked some value in every file) then we do not
-    # want to run them all.  In fact we probably only ever want to run just a few for more
-    # timely feedback.  Enforce that here.
-    if (( $(echo "${tests}" | wc -w) > 3 )); then
-        echo "More than three tests provided; skipping."
-        exit 77
-    fi
 else
     tests=$(find . -maxdepth 1 -name '*sh' -a -perm -o+x)
 

@@ -1,0 +1,37 @@
+#version=DEVEL
+url @KSTEST_URL@
+install
+network --bootproto=dhcp
+
+# test timezone in text mode
+# --nontp and -chrony
+text
+timezone --utc --nontp Europe/Prague
+
+bootloader --timeout=1
+zerombr
+clearpart --all --initlabel
+autopart
+
+keyboard us
+lang en_US.UTF-8
+rootpw testcase
+shutdown
+
+%packages --default
+-chrony
+%end
+
+%post
+if [ -e /usr/bin/chronyc ]; then
+    echo '*** Chrony should not be installed but it is!' >> /root/RESULT
+fi
+
+if [ -e /etc/chrony.conf ]; then
+    echo '*** Chrony configuration file is installed!' >> /root/RESULT
+fi
+
+if [ ! -e /root/RESULT ]; then
+   echo SUCCESS > /root/RESULT
+fi
+%end

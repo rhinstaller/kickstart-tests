@@ -20,10 +20,12 @@ shutdown
 
 # Something ought to pull in python for %post, but ask for it just in case
 %packages
-python3
+python
 %end
 
-%post --interpreter=/usr/bin/python3
+%post --interpreter=/usr/bin/python
+from __future__ import print_function
+
 import sys
 import crypt
 

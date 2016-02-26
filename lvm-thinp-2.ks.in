@@ -51,13 +51,13 @@ if [ $root_lv_size != "6000.00" ]; then
     echo "*** root lv has incorrect size" >> /root/RESULT
 fi
 
-root_lv="/dev/mapper/fedora-root"
-root_uuid="UUID=$(blkid -o value -s UUID $root_lv)"
+home_lv="/dev/mapper/fedora-home"
+home_uuid="UUID=$(blkid -o value -s UUID $home_lv)"
 
-# verify root lv is mounted at /mnt/sysimage
-root_mount="$(grep ^$root_lv\\s/\\s /proc/mounts)"
-if [ -z  "$root_mount" ]; then
-    echo "*** lvm lv 'fedora-root' is not mounted at /" >> /root/RESULT
+# verify home lv is mounted at /mnt/sysimage/home
+home_mount="$(grep ^$home_lv\\s/home\\s /proc/mounts)"
+if [ -z  "$home_mount" ]; then
+    echo "*** lvm lv 'fedora-home' is not mounted at /" >> /root/RESULT
 fi
 
 home_fstype="$(echo $home_mount | cut -d' ' -f3)"

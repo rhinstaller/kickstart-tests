@@ -38,7 +38,7 @@ fi
 molist="$(find /usr/share/locale \( -name 'fr' -type d -prune \) -o \
           \( -name 'es' -type d -prune \) -o \
           \( -name 'it' -type d -prune \) -o \
-	  -o \( -name 'blivet.mo' -print \) )"
+          \( -name 'blivet.mo' -print \) )"
 if [ -n "$molist" ]; then
     echo "*** unrequested .mo files were installed" >> /root/RESULT
 fi

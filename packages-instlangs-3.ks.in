@@ -17,7 +17,7 @@ shutdown
 # Install a short list of languages
 # Use ones with translations in blivet to make them easy to find.
 %packages --instLangs=es:fr:it
-python3-blivet
+python-blivet
 %end
 
 %post

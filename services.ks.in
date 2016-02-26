@@ -14,7 +14,7 @@ timezone America/New_York --utc
 rootpw testcase
 
 # Test services
-services --disabled=sshd --enabled=systemd-timesyncd
+services --disabled=sshd --enabled=systemd-bootchart
 
 # Test SELinux
 selinux --enforcing
@@ -27,9 +27,9 @@ shutdown
 %post
 
 # Test enabled
-systemctl is-enabled systemd-timesyncd
+systemctl is-enabled systemd-bootchart
 if [[ $? -ne 0 ]]; then
-    echo "*** systemd-timesyncd is disabled, not enabled" >> /root/RESULT
+    echo "*** systemd-bootchart is disabled, not enabled" >> /root/RESULT
 fi
 
 # Test disabled
@@ -39,9 +39,9 @@ if [[ $? -eq 0 ]]; then
 fi
 
 # Test disabled - W/out change
-systemctl is-enabled systemd-networkd
+systemctl is-enabled rdisc
 if [[ $? -eq 0 ]]; then
-    echo "*** systemd-networkd is enabled, should be disabled" >> /root/RESULT
+    echo "*** rdisc is enabled, should be disabled" >> /root/RESULT
 fi
 
 # SELinux test

@@ -25,12 +25,6 @@ if [ -n "$molist" ]; then
     echo "*** .mo files were installed" >> /root/RESULT
 fi
 
-# Check that no locales were installed.
-other_locales="$(localedef --list-archive)"
-if [ -n "$other_locales" ]; then
-    echo "*** locales were installed" >> /root/RESULT
-fi
-
 if [ ! -f /root/RESULT ]; then
     echo SUCCESS > /root/RESULT
 fi

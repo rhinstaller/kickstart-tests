@@ -9,15 +9,22 @@ clearpart --all --initlabel
 autopart
 
 keyboard us
-lang en_US.UTF-8
+
+# Use a language that overlaps with the --instLangs list below so that
+# additional langpacks packages don't confuse the locale test
+lang fr_FR.UTF-8
+
 timezone America/New_York --utc
 rootpw testcase
 shutdown
 
 # Install a short list of languages
 # Use ones with translations in blivet to make them easy to find.
+# Add glibc-all-langpacks to install locale data separately from
+# lang --addsupport.
 %packages --instLangs=es:fr:it
 python-blivet
+glibc-all-langpacks
 %end
 
 %post
@@ -44,17 +51,17 @@ if [ -n "$molist" ]; then
 fi
 
 # Check that the requested locales were installed
-localedef --list-archive | grep -a -q '^es_'
+locale -a | grep -a -q '^es_'
 if [ $? != 0 ]; then
     echo "*** es locales were not installed" >> /root/RESULT
 fi
 
-localedef --list-archive | grep -a -q '^fr_'
+locale -a | grep -a -q '^fr_'
 if [ $? != 0 ]; then
     echo "*** fr locales were not installed" >> /root/RESULT
 fi
 
-localedef --list-archive | grep -a -q '^it_'
+locale -a | grep -a -q '^it_'
 if [ $? != 0 ]; then
     echo "*** it locales were not installed" >> /root/RESULT
 fi
@@ -62,7 +69,7 @@ fi
 # Check that only the requested locales were installed
 # Use grep -a to force text mode, since sometimes a character will end up in the
 # output that makes grep think it's binary
-other_locales="$(localedef --list-archive | grep -a -v -E '^(fr_|es_|it_|french|italian|spanish)')"
+other_locales="$(locale -a | grep -a -v -E '^(fr_|es_|it_|french|italian|spanish|POSIX|C(.*)?)')"
 if [ -n "$other_locales" ]; then
     echo "*** unrequested locales were installed" >> /root/RESULT
 fi

@@ -26,15 +26,16 @@ if [ -n "$molist" ]; then
 fi
 
 # Check that the en_US locale was installed
-localedef --list-archive | grep -a -q '^en_US$'
+locale -a | grep -a -q '^en_US$'
 if [ $? != 0 ]; then
     echo "*** en_US was not installed" >> /root/RESULT
 fi
 
-# Check that only the en_US locale and related encodings were installed
+# Check that the only locales available are the en_ ones, along with C (and
+# C.UTF-8) and POSIX.
 # Use grep -a to force text mode, since sometimes a character will end up in the
 # output that makes grep think it's binary
-other_locales="$(localedef --list-archive | grep -a -v '^en_US$' | grep -a -v '^en_US\.')"
+other_locales="$(locale -a | egrep -a -v '^(POSIX|C(.*)?|en_.*)$')"
 if [ -n "$other_locales" ]; then
     echo "*** non-en locales were installed" >> /root/RESULT
 fi

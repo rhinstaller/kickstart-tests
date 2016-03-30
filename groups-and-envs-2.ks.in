@@ -48,11 +48,11 @@ if [[ $? == 0 ]]; then
     exit 1
 fi
 
-# Testing #3 - docker-registry is only part of container-management, where
+# Testing #3 - fedora-dockerfiles is only part of container-management, where
 # it is optional, so it should be installed.
-rpm -q docker-registry
+rpm -q fedora-dockerfiles
 if [[ $? != 0 ]]; then
-    echo '*** docker-registry was not installed' > /root/RESULT
+    echo '*** fedora-dockerfiles was not installed' > /root/RESULT
     exit 1
 fi
 

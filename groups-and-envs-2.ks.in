@@ -40,9 +40,9 @@ if [[ $? == 0 ]]; then
     exit 1
 fi
 
-# Testing #2 - RepetierHost is only part of 3d-printing, and should not
+# Testing #2 - meshlab is only part of 3d-printing, and should not
 # be installed.
-rpm -q RepetierHost
+rpm -q meshlab
 if [[ $? == 0 ]]; then
     echo '*** 3d-printing group should not have been installed' > /root/RESULT
     exit 1

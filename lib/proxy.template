@@ -1,0 +1,31 @@
+URL_LINE
+REPO_LINE
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+# Install @core, which will also pull in testpkg-http-core from the addon repo
+%packages
+%end
+
+%pre --erroronfail
+PROXY_PASSWORD_LINE
+cat - << "EOF" > /tmp/proxy-test.py
+PROXY_PYTHON
+EOF
+python3 /tmp/proxy-test.py > /dev/null 2>&1 &
+%end
+
+%post --nochroot
+PROXY_TESTS
+%end

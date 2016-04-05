@@ -75,6 +75,10 @@ class ProxyHandler(SimpleHTTPRequestHandler):
         # of a URL.
         host, port = self.path.split(':')
 
+        # Log the host and port. This is the best we can do for proxied
+        # TLS logging.
+        log.info('CONNECT {0} {1}'.format(host, port))
+
         # Open a socket to the requested location
         target = socket.create_connection((host, port))
 

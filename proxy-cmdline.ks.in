@@ -23,17 +23,26 @@ shutdown
 %post --nochroot
 # Look for the following as evidence that a proxy was used:
 # a .treeinfo request
-# primary.xml from the repodata
-# a package. Let's say kernel, there should definitely have been a kernel
+grep -q '\.treeinfo$' /tmp/proxy.log
+if [[ $? -ne 0 ]]; then
+    echo '.treeinfo request was not proxied' >> $ANA_INSTALL_PATH/root/RESULT
+fi
 
-if ! grep -q '\.treeinfo$' /tmp/proxy.log; then
-    result='.treeinfo request was not proxied'
-elif ! grep -q 'repodata/.*primary.xml' /tmp/proxy.log; then
-    result='repodata requests were not proxied'
-elif ! grep -q 'kernel-.*\.rpm' /tmp/proxy.log; then
-    result='package requests were not proxied'
-else
-    result='SUCCESS'
+# primary.xml from the repodata
+grep -q 'repodata/.*primary.xml' /tmp/proxy.log
+if [[ $? -ne 0 ]]; then
+    echo 'repodata requests were not provxied' >> $ANA_INSTALL_PATH/root/RESULT
+fi
+
+# the kernel package from the Fedora repo
+grep -q 'kernel-.*\.rpm' /tmp/proxy.log
+if [[ $? -ne 0 ]]; then
+    echo 'base repo package requests were not proxied' >> $ANA_INSTALL_PATH/root/RESULT
+fi
+
+# If nothing was written to RESULT, it worked
+if [[ ! -f $ANA_INSTALL_PATH/root/RESULT ]]; then
+    echo 'SUCCESS' > $ANA_INSTALL_PATH/root/RESULT
 fi
 
 # Write the result to the installed /root

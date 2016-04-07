@@ -22,12 +22,12 @@ shutdown
 %end
 
 %post
-root_fstype=$(blkid -o value -t LABEL=root -s TYPE)
+root_fstype=$(blkid -o value -t LABEL=root -s TYPE -l)
 if [ $root_fstype != "ext4" ]; then
     echo "default fstype is incorrect (got $root_fstype; expected ext4)" >> /root/RESULT
 fi
 
-boot_fstype=$(blkid -o value -t LABEL=boot -s TYPE)
+boot_fstype=$(blkid -o value -t LABEL=boot -s TYPE -l)
 if [ $boot_fstype != "ext4" ]; then
     echo "default boot fstype is incorrect (got $boot_fstype; expected ext4)" >> /root/RESULT
 fi

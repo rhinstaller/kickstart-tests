@@ -110,6 +110,9 @@ if [[ -e $HOME/.kstests.defaults.sh ]]; then
     . $HOME/.kstests.defaults.sh
 fi
 
+# Build Makefile-driven ks.ins.
+make -s all
+
 # Build up a list of substitutions to perform on kickstart files.
 sed_args=$(printenv | while read line; do
     key="$(echo $line | cut -d'=' -f1)"

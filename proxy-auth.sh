@@ -21,10 +21,6 @@ TESTTYPE="method proxy"
 
 . ${KSTESTDIR}/functions.sh
 
-prereqs() {
-    echo proxy-common.ks
-}
-
 prepare() {
     ks=$1
     tmpdir=$2
@@ -37,10 +33,7 @@ prepare() {
     # Start a http server to serve the test repo
     start_httpd ${tmpdir}/http $tmpdir
 
-    # Flatten the kickstart to include the proxy %pre script
-    ( cd "$(dirname ${ks})" && ksflatten -o ${tmpdir}/kickstart.ks -c "$(basename $ks)" )
-
-    sed -e "/^repo/ s|HTTP-ADDON-REPO|${httpd_url}|" ${tmpdir}/kickstart.ks > ${tmpdir}/kickstart-repo.ks
+    ( cd "$(dirname ${ks})" && sed -e "/^repo/ s|HTTP-ADDON-REPO|${httpd_url}|" "$(basename $ks)" > ${tmpdir}/kickstart-repo.ks )
     echo ${tmpdir}/kickstart-repo.ks
 }
 

@@ -27,29 +27,67 @@ echo 'anaconda:qweqwe' > /tmp/proxy.password
 %end
 
 %post --nochroot
-# Look for the following as evidence that a proxy was used:
-# a .treeinfo request
-grep -q '\.treeinfo$' /tmp/proxy.log
-if [[ $? -ne 0 ]]; then
-    echo '.treeinfo request was not proxied' >> $ANA_INSTALL_PATH/root/RESULT
+# Checks must differ depending on the form of KSTEST_URL
+# HTTP mirror list; we find the hostname with the cuts
+httplist=$(echo "@KSTEST_URL@" | grep -e '--mirrorlist="\?http:' | cut -d'=' -f2 | cut -d'/' -f3)
+# HTTPS mirror list; ditto
+httpslist=$(echo "@KSTEST_URL@" | grep -e '--mirrorlist="\?https:' | cut -d'=' -f2 | cut -d'/' -f3)
+# HTTP direct mirror; ditto
+httpdir=$(echo "@KSTEST_URL@" | grep -e '--url="\?http:' | cut -d'=' -f2 | cut -d'/' -f3)
+# HTTPS direct mirror; we don't need to capture hostname here
+httpsdir=$(echo "@KSTEST_URL@" | grep -e '--url="\?https:')
+
+if [ "$httpslist" ]; then
+    # check for CONNECT request to mirrorlist host
+    grep -q "CONNECT $httpslist " /tmp/proxy.log
+    if [[ $? -ne 0 ]]; then
+        echo 'Connection to TLS mirrorlist server was not proxied' >> $ANA_INSTALL_PATH/root/RESULT
+    fi
+elif [ "$httplist" ]; then
+    # check for GET request to mirrorlist host (we can't really guess
+    # any path component, even 'mirrorlist' isn't guaranteed). There's
+    # a potential 'false pass' here if the mirror list and repo are on
+    # the same server and the repo requests are proxied but mirror
+    # requests are not.
+    grep -q "$httplist" /tmp/proxy.log
+    if [[ $? -ne 0 ]]; then
+        echo 'Mirror list server request was not proxied' >> $ANA_INSTALL_PATH/root/RESULT
+    fi
+elif [ "$httpsdir" ]; then
+    # check for CONNECT request to mirror
+    grep -q "CONNECT $httpsdir " /tmp/proxy.log
+    if [[ $? -ne 0 ]]; then
+        echo 'Connection to TLS repository server was not proxied' >> $ANA_INSTALL_PATH/root/RESULT
+    fi
+elif [ "$httpdir" ]; then
+    # check for .treeinfo request
+    grep -q '\.treeinfo$' /tmp/proxy.log
+    if [[ $? -ne 0 ]]; then
+        echo '.treeinfo request to repository server was not proxied' >> $ANA_INSTALL_PATH/root/RESULT
+    fi
+else
+    result='Could not parse url line!'
 fi
 
-# primary.xml from the repodata
-grep -q 'repodata/.*primary.xml' /tmp/proxy.log
-if [[ $? -ne 0 ]]; then
-    echo 'repodata requests were not provxied' >> $ANA_INSTALL_PATH/root/RESULT
-fi
+# unless direct https URL was used, also check for:
+if [ ! "$httpsdir" ]; then
+    # primary.xml from the repodata
+    grep -q 'repodata/.*primary.xml' /tmp/proxy.log
+    if [[ $? -ne 0 ]]; then
+        echo 'repodata requests were not proxied' >> $ANA_INSTALL_PATH/root/RESULT
+    fi
 
-# the kernel package from the Fedora repo
-grep -q 'kernel-.*\.rpm' /tmp/proxy.log
-if [[ $? -ne 0 ]]; then
-    echo 'base repo package requests were not proxied' >> $ANA_INSTALL_PATH/root/RESULT
-fi
+    # the kernel package from the Fedora repo
+    grep -q 'kernel-.*\.rpm' /tmp/proxy.log
+    if [[ $? -ne 0 ]]; then
+        echo 'package requests were not proxied' >> $ANA_INSTALL_PATH/root/RESULT
+    fi
 
-# testpkg-http-core from the addon repo
-grep -q 'testpkg-http-core.*\.rpm' /tmp/proxy.log
-if [[ $? -ne 0 ]]; then
-    echo 'addon repo package requests were not proxied' >> $ANA_INSTALL_PATH/root/RESULT
+    # testpkg-http-core from the addon repo
+    grep -q 'testpkg-http-core.*\.rpm' /tmp/proxy.log
+    if [[ $? -ne 0 ]]; then
+        echo 'addon repo package requests were not proxied' >> $ANA_INSTALL_PATH/root/RESULT
+    fi
 fi
 
 # Check that the addon repo file was installed
@@ -73,15 +111,22 @@ if [[ $? -ne 0 ]]; then
     echo 'unable to query kstest-http repo' >> $ANA_INSTALL_PATH/root/RESULT
 fi
 
-# Finally, check that the repoquery used the proxy
-tail -1 /tmp/proxy.log | grep -q repodata
-if [[ $? -ne 0 ]]; then
-    echo 'repoquery on installed system was not proxied' >> $ANA_INSTALL_PATH/root/RESULT
+# again unless direct https URL was used:
+if [ ! "$httpsdir" ]; then
+    # Finally, check that the repoquery used the proxy
+    tail -1 /tmp/proxy.log | grep -q repodata
+    if [[ $? -ne 0 ]]; then
+        echo 'repoquery on installed system was not proxied' >> $ANA_INSTALL_PATH/root/RESULT
+    fi
 fi
 
 # If nothing was written to RESULT, it worked
 if [[ ! -f $ANA_INSTALL_PATH/root/RESULT ]]; then
-    echo 'SUCCESS' > $ANA_INSTALL_PATH/root/RESULT
+    if [ "$httpsdir" ]; then
+        echo 'SUCCESS but limited testing for TLS repository server' > $ANA_INSTALL_PATH/root/RESULT
+    else
+        echo 'SUCCESS' > $ANA_INSTALL_PATH/root/RESULT
+    fi
 fi
 
 %end

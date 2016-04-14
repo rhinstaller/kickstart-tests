@@ -8,7 +8,7 @@ zerombr
 clearpart --all --initlabel
 autopart
 
-keyboard en
+keyboard us
 lang en
 timezone America/New_York --utc
 rootpw testcase

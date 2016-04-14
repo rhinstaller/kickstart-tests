@@ -47,7 +47,9 @@ The following environment variables are currently supported:
   specified on the command line.  There is no need to specify this variable.
 
 - KSTEST_NFS_ADDON_REPO - This variable points to an NFS server and path where
-  an addon repository can be found.  This is different from KSTEST_NFS_PATH
+  an addon repository can be found. It is only needed if you are testing that
+  functionality. If not specified it will be set up for you automatically with
+  an NFS export and auto-generated packages. It is different from KSTEST_NFS_PATH
   and KSTEST_NFS_SERVER.  Those are used with the nfs command.  This variable
   is used with the repo command, and its format is different.  Here, it takes
   the form of nfs://<server>:<path>.  See the kickstart documentation.  You

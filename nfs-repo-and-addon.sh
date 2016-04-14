@@ -34,10 +34,36 @@ prepare() {
     start_httpd ${tmpdir}/http ${tmpdir}
 
     sed -e "s|@KSTEST_HTTP_ADDON_REPO@|${httpd_url}|" ${ks} > ${tmpdir}/kickstart.ks
+
+    # if NFS_ADDON_REPO isn't specified export it from the local system
+    if [ -z "$KSTEST_NFS_ADDON_REPO" ]; then
+        local scriptdir=${PWD}/scripts
+
+        systemctl status nfs >/dev/null
+        nfs_running=$?
+        nfs_exported=0
+
+        if [ "$nfs_running" == "0" ]; then
+            nfs_exported=`showmount -e --no-headers | grep -c "$tmpdir/nfs"`
+        fi
+
+        if [ "$nfs_exported" == "0" ]; then
+            cp /etc/exports /etc/exports.backup
+            echo "$tmpdir/nfs   *(ro)" >> /etc/exports
+            systemctl restart nfs >/dev/null
+        fi
+
+        nfs_url="nfs://$($scriptdir/find-ip):$tmpdir/nfs"
+        sed -i "s|@KSTEST_NFS_ADDON_REPO@|$nfs_url|" $tmpdir/kickstart.ks
+    fi
+
     echo ${tmpdir}/kickstart.ks
 }
 
 cleanup() {
+    mv /etc/exports.backup /etc/exports
+    systemctl restart nfs >/dev/null
+
     tmpdir=$1
 
     if [ -f ${tmpdir}/httpd-pid ]; then

@@ -1,0 +1,41 @@
+#version=DEVEL
+url @KSTEST_URL@
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+clearpart --all --initlabel
+autopart
+
+keyboard us
+lang en_US.UTF-8
+timezone America/New_York --utc
+rootpw testcase
+shutdown
+
+# Install gnupg2 and make sure the packages it recommends are skipped
+%packages --excludeWeakdeps
+gnupg2
+%end
+
+%post
+# Make sure the --recommends packages from gnupg2 are not installed
+if rpm -q gnupg2-smime ; then
+    echo "gnupg2-smime was installed" >> /root/RESULT
+fi
+
+if rpm -q pinentry ; then
+    echo "pinentry was installed" >> /root/RESULT
+fi
+
+# Check that gnupg2's --recommends did not change unexpectedly
+if ! ( rpm -q --recommends gnupg2 | grep -q gnupg2-smime ) || \
+   ! ( rpm -q --recommends gnupg2 | grep -q pinentry ) ; then
+    echo "gnupg2 --recommends has changed, test needs to be updated" >> /root/RESULT
+fi
+
+if [ ! -f /root/RESULT ]; then
+    echo SUCCESS > /root/RESULT
+fi
+%end

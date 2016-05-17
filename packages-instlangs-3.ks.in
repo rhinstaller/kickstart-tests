@@ -23,7 +23,7 @@ shutdown
 # Add glibc-all-langpacks to install locale data separately from
 # lang --addsupport.
 %packages --instLangs=es:fr:it
-python-blivet
+python3-blivet
 glibc-all-langpacks
 %end
 

@@ -1,0 +1,93 @@
+#version=DEVEL
+url @KSTEST_URL@
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+clearpart --all --initlabel
+part /boot --fstype=ext4 --size=500 --ondisk=sda
+part / --size=4000 --fstype=ext4 --fsoptions=loud,noatime --ondisk=sda --label=rootfs
+
+# Create three encrypted swap partitions. First, a regular partition
+part swap --fstype=swap --size=500 --encrypted --passphrase=TestCase --ondisk=sda --label=part_swap
+
+# LVM
+part pv.1 --fstype=lvmpv --size=500 --ondisk=sda
+volgroup fedora pv.1
+logvol swap --name=swap --vgname=fedora --size=400 --grow --fstype=swap --encrypted --passphrase=TestCase
+
+# RAID
+part raid.01 --size=500 --ondisk=sdb
+part raid.02 --size=500 --ondisk=sdc
+raid swap --level=1 --device=0 --fstype=swap --encrypted --label=md_swap --passphrase=TestCase raid.01 raid.02
+
+keyboard us
+lang en_US.UTF-8
+timezone America/New_York --utc
+rootpw testcase
+shutdown
+
+%packages
+%end
+
+%post
+# verify that the regular partition is active
+swap_part_luks="$(blkid -L part_swap)"
+swap_part_dm="$(basename $(readlink $swap_part_luks))"
+if ! grep -q "$swap_part_dm" /proc/swaps ; then
+    echo "*** encrypted swap partition not active" >> /root/RESULT
+fi
+
+# verify that the swap entry in /etc/fstab is correct
+swap_part_regular_entry="^${swap_part_luks}\\s\\+swap\\s"
+swap_part_uuid_entry="^UUID=$(blkid -o value -s UUID $swap_part_luks)\\s\\+swap\\s"
+if ! ( grep -q "$swap_part_regular_entry" /etc/fstab || grep -q "$swap_part_uuid_entry" /etc/fstab ) ; then
+    echo "*** encrypted swap partition not found in /etc/fstab" >> /root/RESULT
+fi
+
+# Find the LUKS device created for the swap on LVM
+swap_lv="/dev/mapper/fedora-swap"
+swap_lv_uuid="$(blkid -o value -s UUID "$swap_lv")"
+swap_lv_luks=/dev/mapper/luks-"$swap_lv_uuid"
+
+if [ ! -e "$swap_lv_luks" ]; then
+    echo "*** encrypted swap LV device not found" >> /root/RESULT
+fi
+
+# verify that the swap is active
+swap_lv_dm="$(basename $(readlink $swap_lv_luks))"
+if ! grep -q "$swap_lv_dm" /proc/swaps ; then
+    echo "*** encrypted swap LV is not active" >> /root/RESULT
+fi
+
+# verify that the swap entry in /etc/fstab is correct
+swap_lv_regular_entry="^${swap_lv_luks}\\s\\+swap\\s"
+swap_lv_uuid_entry="^UUID=$(blkid -o value -s UUID $swap_lv_luks)\\s\\+swap\\s"
+if ! ( grep -q "$swap_lv_regular_entry" /etc/fstab || grep -q "$swap_lv_uuid_entry" /etc/fstab ) ; then
+    echo "*** encrypted swap LV is not in /etc/fstab" >> /root/RESULT
+fi
+
+# One more time, for RAID
+# Look for the LUKS device using the --label in the raid command
+swap_md_luks="$(blkid -L md_swap)"
+if [ ! -e "$swap_md_luks" ]; then
+    echo "*** encrypted swap MD device not found" >> /root/RESULT
+fi
+
+swap_md_dm="$(basename $(readlink $swap_md_luks))"
+if ! grep -q "$swap_md_dm" /proc/swaps ; then
+    echo "*** encrypted swap MD is not active" >> /root/RESULT
+fi
+
+swap_md_regular_entry="^${swap_md_luks}\\s\\+swap\\s"
+swap_md_uuid_entry="^UUID=$(blkid -o value -s UUID $swap_md_luks)\\s\\+swap\\s"
+if ! ( grep -q "$swap_md_regular_entry" /etc/fstab || grep -q "$swap_md_uuid_entry" /etc/fstab ) ; then
+    echo "*** encrypted swap MD is not in /etc/fstab" >> /root/RESULT
+fi
+
+if [ ! -e /root/RESULT ]; then
+    echo SUCCESS > /root/RESULT
+fi
+
+%end

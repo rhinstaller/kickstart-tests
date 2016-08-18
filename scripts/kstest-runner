@@ -43,7 +43,8 @@ from pylorax.mount import IsoMountpoint
 import libvirt
 
 class InstallError(Exception):
-    pass
+    def __str__(self):
+        return super().__str__().replace("#012", "\n")
 
 class VirtualInstall(object):
     """
@@ -148,6 +149,7 @@ class VirtualInstall(object):
         subprocess.call(["virsh", "undefine", self.virt_name])
         subprocess.call(["virsh", "pool-destroy", poolName])
         subprocess.call(["virsh", "pool-undefine", poolName])
+
 
 def virt_install(opts, install_log):
     """

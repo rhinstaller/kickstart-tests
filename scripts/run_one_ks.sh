@@ -108,6 +108,8 @@ runone() {
                        --vnc vnc \
                        --timeout 60 \
                        ${disk_args}
+    cp ${tmpdir}/virt-install.log ${tmpdir}/virt-install-human.log
+    sed -i 's/#012/\n/g' ${tmpdir}/virt-install-human.log
     echo
     if [[ -f ${tmpdir}/virt-install.log && "$(grep CRIT ${tmpdir}/virt-install.log)" != "" ]]; then
         echo "RESULT:${name}:FAILED:\n$(grep CRIT ${tmpdir}/virt-install.log | sed 's/#012/\n/g')"

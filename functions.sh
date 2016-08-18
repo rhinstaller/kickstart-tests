@@ -48,6 +48,9 @@ validate() {
     # exists.
     virt-copy-out ${args} /root/anaconda.coverage ${disksdir}
 
+    # Grab logs from Anaconda installation
+    virt-copy-out ${args} /var/log/anaconda/*.log ${disksdir} 2>/dev/null
+
     # There should be a /root/RESULT file with results in it.  Check
     # its contents and decide whether the test finally succeeded or
     # not.

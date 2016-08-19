@@ -30,22 +30,22 @@ else
    exit 0
 fi
 
-grep -q '^TYPE=Vlan$' $IF_FILE
+egrep -q '^TYPE="?Vlan"?$' $IF_FILE
 if [[ $? -ne 0 ]]; then
    echo '*** TYPE=Vlan is not present' >> /root/RESULT
 fi
 
-grep -q '^BOOTPROTO=dhcp$' $IF_FILE
+egrep -q '^BOOTPROTO="?dhcp"?$' $IF_FILE
 if [[ $? -ne 0 ]]; then
    echo '*** BOOTPROTO is not present' >> /root/RESULT
 fi
 
-grep -q "^NAME=${DEVICE}$" $IF_FILE
+egrep -q "^NAME=\"?${DEVICE}\"?$" $IF_FILE
 if [[ $? -ne 0 ]]; then
    echo '*** NAME is not present' >> /root/RESULT
 fi
 
-grep -q "^DEVICE=${DEVICE}$" $IF_FILE
+egrep -q "^DEVICE=\"?${DEVICE}\"?$" $IF_FILE
 if [[ $? -ne 0 ]]; then
    echo '*** DEVICE is not present' >> /root/RESULT
 fi

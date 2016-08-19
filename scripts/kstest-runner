@@ -43,7 +43,8 @@ from pylorax.mount import IsoMountpoint
 import libvirt
 
 class InstallError(Exception):
-    pass
+    def __str__(self):
+        return super().__str__().replace("#012", "\n")
 
 class VirtualInstall(object):
     """
@@ -72,9 +73,9 @@ class VirtualInstall(object):
         # add --graphics none later
         # add whatever serial cmds are needed later
         args = ["-n", self.virt_name,
-                 "-r", str(memory),
-                 "--noreboot",
-                 "--noautoconsole"]
+                "-r", str(memory),
+                "--noreboot",
+                "--noautoconsole"]
 
         args.append("--graphics")
         if vnc:
@@ -115,6 +116,7 @@ class VirtualInstall(object):
         args.append(channel_args)
 
         log.info("Running virt-install.")
+        log.info("virt-install %s", args)
         try:
             execWithRedirect("virt-install", args, raise_err=True)
         except subprocess.CalledProcessError as e:
@@ -147,6 +149,7 @@ class VirtualInstall(object):
         subprocess.call(["virsh", "undefine", self.virt_name])
         subprocess.call(["virsh", "pool-destroy", poolName])
         subprocess.call(["virsh", "pool-undefine", poolName])
+
 
 def virt_install(opts, install_log):
     """

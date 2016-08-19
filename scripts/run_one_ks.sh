@@ -108,19 +108,22 @@ runone() {
                        --vnc vnc \
                        --timeout 60 \
                        ${disk_args}
+    cp ${tmpdir}/virt-install.log ${tmpdir}/virt-install-human.log
+    sed -i 's/#012/\n/g' ${tmpdir}/virt-install-human.log
+    echo
     if [[ -f ${tmpdir}/virt-install.log && "$(grep CRIT ${tmpdir}/virt-install.log)" != "" ]]; then
-        echo RESULT:${name}:FAILED:$(grep CRIT ${tmpdir}/virt-install.log)
+        echo "RESULT:${name}:FAILED:\n$(grep CRIT ${tmpdir}/virt-install.log | sed 's/#012/\n/g')"
         cleanup ${tmpdir}
         cleanup_tmp ${tmpdir}
         return 1
     elif [[ -f ${tmpdir}/livemedia.log ]]; then
         if [[ "$(grep 'due to timeout' ${tmpdir}/livemedia.log)" != "" ]]; then
-            echo RESULT:${name}:FAILED:Test timed out.
+            echo "RESULT:${name}:FAILED:Test timed out."
             cleanup ${tmpdir}
             cleanup_tmp ${tmpdir}
             return 2
         elif [[ "$(grep 'Call Trace' ${tmpdir}/livemedia.log)" != "" ]]; then
-            echo RESULT:${name}:FAILED:Kernel panic.
+            echo "RESULT:${name}:FAILED:Kernel panic."
             cleanup ${tmpdir}
             cleanup_tmp ${tmpdir}
             return 0
@@ -128,7 +131,7 @@ runone() {
 
         result=$(validate ${tmpdir})
         if [[ $? != 0 ]]; then
-            echo RESULT:${name}:FAILED:"${result}"
+            echo "RESULT:${name}:FAILED:${result}"
             cleanup ${tmpdir}
             cleanup_tmp ${tmpdir}
             return 1

@@ -259,22 +259,14 @@ if [[ "$TEST_REMOTES" != "" ]]; then
 
     # (3a) And then also remove the copy of the image we made earlier.
     rm ${_IMAGE}
-
-    # (4) Exit the subshell defined by "find ... | " way up at the top.  The exit
-    # code will be caught outside and converted into the overall exit code.
-    exit ${rc}
 else
     parallel --no-notice --jobs ${TEST_JOBS:-4} \
         sudo PYTHONPATH=$PYTHONPATH scripts/run_one_ks.sh -i ${IMAGE} -k ${KEEPIT} {} ::: ${tests}
 
-    # For future expansion - any cleanup code can go in between the variable
-    # setting and the exit, like in the other branch of the if-else above.
     rc=$?
-    exit ${rc}
 fi
 
-# Catch the exit code of the subshell and return it.  This is structured for
-# future expansion, too.  Any extra global cleanup code can go in between the
-# variable setting and the exit.
-rc=$?
+# Return exit code from above.  This is structure for future improvement,
+# you can do a cleaning here.
+
 exit ${rc}

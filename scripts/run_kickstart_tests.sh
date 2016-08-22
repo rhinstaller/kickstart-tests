@@ -131,9 +131,9 @@ if [[ $# != 0 ]]; then
     # Allow people to leave off the .sh.
     for t in $*; do
         if [[ "${t}" == *.sh ]]; then
-            tests+="${t}"
+            tests+="${t} "
         else
-            tests+="${t}.sh"
+            tests+="${t}.sh "
         fi
     done
 elif [[ "${ghprbActualCommit}" != "" ]]; then

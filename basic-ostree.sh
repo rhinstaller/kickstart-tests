@@ -18,6 +18,7 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="method"
+#TESTTYPE="method"
+TESTTYPE="knownfailure"
 
 . ${KSTESTDIR}/functions.sh

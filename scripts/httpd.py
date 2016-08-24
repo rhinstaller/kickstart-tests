@@ -32,8 +32,18 @@ if len(sys.argv) != 2:
     print("Usage: httpd.py <directory>", file=sys.stderr)
     sys.exit(1)
 
+server=None
 # Bind to any free port
-server = HTTPServer(('', 0), SimpleHTTPRequestHandler)
+for port in range(40000, 41000):
+    try:
+        server = HTTPServer(('', port), SimpleHTTPRequestHandler)
+    except OSError:
+        continue
+    else:
+        break
+
+if server is None:
+    print("Can't create httpd server!")
 
 # Fork to the background
 pid = os.fork()

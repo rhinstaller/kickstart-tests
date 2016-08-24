@@ -1,3 +1,4 @@
+#test name: user
 url @KSTEST_URL@
 
 install

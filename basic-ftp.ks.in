@@ -1,3 +1,4 @@
+#test name: basic-ftp
 url --url=@KSTEST_FTP_URL@
 install
 network --bootproto=dhcp

@@ -1,3 +1,4 @@
+#test name: nfs-repo-and-addon
 nfs --server=@KSTEST_NFS_SERVER@ --dir=@KSTEST_NFS_PATH@
 
 # The addon repos are setup with the following packages:

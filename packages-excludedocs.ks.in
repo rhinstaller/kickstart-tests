@@ -1,4 +1,5 @@
 #version=DEVEL
+#test name: packages-excludedocs
 url @KSTEST_URL@
 install
 network --bootproto=dhcp

@@ -1,3 +1,4 @@
+#test name: vlan
 url @KSTEST_URL@
 install
 network --device=link --bootproto=dhcp

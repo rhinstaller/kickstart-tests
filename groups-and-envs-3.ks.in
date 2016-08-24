@@ -1,4 +1,5 @@
 #version=DEVEL
+#test name: groups-and-envs-3
 url @KSTEST_URL@
 install
 network --bootproto=dhcp

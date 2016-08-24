@@ -1,4 +1,5 @@
 #version=DEVEL
+#test name: ntp-nontp-without-chrony-gui
 url @KSTEST_URL@
 install
 network --bootproto=dhcp

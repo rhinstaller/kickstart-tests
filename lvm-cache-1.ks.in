@@ -1,4 +1,5 @@
 #version=DEVEL
+#test name: lvm-cache-1
 url @KSTEST_URL@
 install
 network --bootproto=dhcp

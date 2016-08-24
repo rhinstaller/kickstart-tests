@@ -1,3 +1,4 @@
+#test name: pre-install
 url @KSTEST_URL@
 
 install

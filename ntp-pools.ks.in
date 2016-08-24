@@ -1,4 +1,5 @@
 #version=DEVEL
+#test name: ntp-pools
 url @KSTEST_URL@
 install
 network --bootproto=dhcp

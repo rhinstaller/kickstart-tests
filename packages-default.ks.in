@@ -1,4 +1,5 @@
 #version=DEVEL
+#test name: packages-default
 url @KSTEST_URL@
 install
 network --bootproto=dhcp

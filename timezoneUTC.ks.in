@@ -1,4 +1,5 @@
 #version=DEVEL
+#test name: timezoneUTC
 url @KSTEST_URL@
 install
 network --bootproto=dhcp

@@ -99,11 +99,11 @@ if [ $? != 0 ]; then
     echo "*** home LV is not cached" >> /root/RESULT
 fi
 
-# verify size of root LV's cache
+# verify size of root LV's cache (1500 - 8 [pmspare])
 root_cache_size=$(lvs --noheadings -o size --unit=m --nosuffix fedora/root_cache | sed -r 's/\s*([0-9]+)\..*/\1/')
 root_cache_md_size=$(lvs --noheadings -o size --unit=m --nosuffix fedora/root_cache_cmeta | sed -r 's/\s*([0-9]+)\..*/\1/')
 root_cache_all=$(($root_cache_size + $root_cache_md_size))
-if [ "$root_cache_all" != "1500" ]; then
+if [ "$root_cache_all" != "1492" ]; then
     echo "*** root LV's cache has incorrect size" >> /root/RESULT
 fi
 

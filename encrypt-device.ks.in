@@ -1,3 +1,4 @@
+#test name: encrypt-device
 url @KSTEST_URL@
 install
 network --bootproto=dhcp

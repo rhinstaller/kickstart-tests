@@ -1,3 +1,4 @@
+#test name: liveimg
 install
 liveimg --url=@KSTEST_LIVEIMG_URL@ --checksum=@KSTEST_LIVEIMG_CHECKSUM@
 

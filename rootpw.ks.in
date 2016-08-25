@@ -1,3 +1,4 @@
+#test name: rootpw
 url @KSTEST_URL@
 
 install

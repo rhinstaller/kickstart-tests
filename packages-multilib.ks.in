@@ -1,4 +1,5 @@
 #version=DEVEL
+#test name: packages-multilib
 url @KSTEST_URL@
 install
 network --bootproto=dhcp

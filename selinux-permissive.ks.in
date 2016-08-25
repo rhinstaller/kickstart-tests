@@ -1,4 +1,5 @@
 #version=DEVEL
+#test name: selinux-permissive
 url @KSTEST_URL@
 install
 network --bootproto=dhcp

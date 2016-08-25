@@ -1,3 +1,4 @@
+#test name: btrfs-1
 url @KSTEST_URL@
 install
 network --bootproto=dhcp

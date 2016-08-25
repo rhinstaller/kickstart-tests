@@ -1,4 +1,5 @@
 #version=DEVEL
+#test name: driverdisk-disk
 url @KSTEST_URL@
 install
 network --bootproto=dhcp

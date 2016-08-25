@@ -24,8 +24,8 @@ IF_FILE=$(ls /etc/sysconfig/network-scripts/*.150)
 DEVICE=$(sed 's/.*-//g' <<< "$IF_FILE")
 
 if [[ -e $IF_FILE ]]; then
-   cp $IF_FILE /root/
-   echo "$DEVICE" >> /root/device
+   cp $IF_FILE /var/log/anaconda/
+   echo "$DEVICE" >> /var/log/anaconda/device
 else
    echo '*** ifcfg file for vlan missing' >> /root/RESULT
    exit 0

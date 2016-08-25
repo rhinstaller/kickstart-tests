@@ -44,17 +44,21 @@ validate() {
     disksdir=$1
     args=$(for d in ${disksdir}/disk-*img; do echo -a ${d}; done)
 
-    # Grab the coverage results out of the installed system while it still
-    # exists.
-    virt-copy-out ${args} /root/anaconda.coverage ${disksdir}
+    # Grab files out of the installed system while it still exists.
+    # Grab these files:
+    #
+    # logs from Anaconda - whole /var/log/anaconda/ directory is copied out,
+    #                      this can be used for saving specific test output
+    # anaconda.coverage
+    # RESULT file from the test
+    virt-copy-out ${args} /root/anaconda.coverage \
+                          /var/log/anaconda/      \
+                          /root/RESULT            \
+                  ${disksdir}
 
-    # Grab logs from Anaconda installation
-    virt-copy-out ${args} /var/log/anaconda/*.log ${disksdir} 2>/dev/null
-
-    # There should be a /root/RESULT file with results in it.  Check
-    # its contents and decide whether the test finally succeeded or
-    # not.
-    result=$(virt-cat ${args} -m /dev/mapper/fedora-root /root/RESULT)
+    # The /root/RESULT file was saved from the VM.  Check its contents
+    # and decide whether the test finally succeeded or not.
+    result=$(cat ${disksdir}/RESULT)
     if [[ $? != 0 ]]; then
         status=1
         echo '*** /root/RESULT does not exist in VM image.'

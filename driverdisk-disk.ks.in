@@ -25,8 +25,17 @@ SYSROOT=${ANA_INSTALL_PATH:-/mnt/sysimage}
 RESULTFILE=$SYSROOT/root/RESULT
 fail() { echo "*** $*" >> $RESULTFILE; }
 
+
+# Module version folder is created by the RPM with driver disk. The RPM is
+# created by the script in lib/mkdud.py. The kernel version is 3.0.0 if
+# version parameter is not explicitly set. Because the tests are run on a
+# boot.iso, we don't know which kernel version is there in time of the script
+# execution.
+# TODO: This can be improved by grabbing logs from Lorax when building this iso
+# or by running the boot.iso in some pre-testing phase.
+
 # check the installer environment
-[ -f /lib/modules/`uname -r`/updates/fake-dd.ko ] || fail "kmod not loaded"
+[ -f /usr/lib/modules/3.0.0/extra/fake-dd.ko ] || fail "kmod not loaded"
 [ -f /usr/bin/fake-dd-bin ] || fail "installer-enhancement not loaded"
 
 # check the installed system

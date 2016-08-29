@@ -16,7 +16,7 @@ part --fstype=ext4 --size=500 --encrypted --passphrase='passphrase' --escrowcert
 
 keyboard us
 lang en
-timezone America/New_York
+timezone America/New_York --nontp
 rootpw qweqwe
 shutdown
 

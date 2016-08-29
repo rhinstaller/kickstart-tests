@@ -18,7 +18,7 @@ logvol /home --name=home --vgname=fedora --size=2000 --fstype=ext4 --cachepvs=pv
 
 keyboard us
 lang en_US.UTF-8
-timezone America/New_York --utc
+timezone America/New_York --nontp --utc
 rootpw testcase
 shutdown
 

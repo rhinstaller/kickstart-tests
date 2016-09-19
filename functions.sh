@@ -51,10 +51,12 @@ validate() {
     #                      this can be used for saving specific test output
     # anaconda.coverage
     # RESULT file from the test
-    virt-copy-out ${args} /root/anaconda.coverage \
-                          /var/log/anaconda/      \
-                          /root/RESULT            \
-                  ${disksdir}
+    for item in /root/anaconda.coverage \
+                /var/log/anaconda/      \
+                /root/RESULT
+    do
+        virt-copy-out ${args} ${item} ${disksdir}
+    done
 
     # The /root/RESULT file was saved from the VM.  Check its contents
     # and decide whether the test finally succeeded or not.

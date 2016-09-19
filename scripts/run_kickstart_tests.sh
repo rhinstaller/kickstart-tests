@@ -118,11 +118,36 @@ sed_args=$(printenv | while read line; do
     [[ "${key}" =~ ^KSTEST_ ]] && echo -n " -e s#@${key}@#${val}#"
  done)
 
+
+# Find all tests in the . folder. These tests will be filtered by TESTTYPE parameter
+# if specified.
+function find_tests() {
+    local tests=$(find . -maxdepth 1 -name '*sh' -a -perm -o+x)
+
+    local newtests=""
+    for f in ${tests}; do
+        if [[ "$TESTTYPE" != "" && "$(grep TESTTYPE= ${f})" =~ "${TESTTYPE}" ]]; then
+            newtests+="${f} "
+        elif [[ "$TESTTYPE" == "" && ! "$(grep TESTTYPE= ${f})" =~ knownfailure ]]; then
+            # Skip any test with the type "knownfailure".  If you want to run these (to
+            # see if they are still failing, for instance) you can add "-t knownfailure"
+            # on the command line.
+            newtests+="${f} "
+        else
+            continue
+        fi
+    done
+
+    echo ${newtests}
+}
+
 # We get the list of tests from one of several places:
 # (1) From the command line, all the other arguments.
-# (2) By applying any TESTTYPE given on the command line.
-# (3) If ${ghprbActualCommit} is in the environment, the tests changed by
+# (2) If ${ghprbActualCommit} is in the environment, the tests changed by
 #     that commit.
+#     If no tests are changed in commit, run all tests. When TESTTYPE parameter
+#     is specified, use this parameter to filter tests.
+# (3) By applying any TESTTYPE given on the command line.
 # (4) From finding all scripts in . that are executable and are not support
 #     files.
 if [[ $# != 0 ]]; then
@@ -155,24 +180,14 @@ elif [[ "${ghprbActualCommit}" != "" ]]; then
     for c in ${candidates}; do
         tests+="${c}.sh "
     done
+
+    # Nothing find, find all tests and use TESTTYPE if specified.
+    if [ -z ${tests} ]; then
+        tests=$(find_tests)
+    fi
 else
-    tests=$(find . -maxdepth 1 -name '*sh' -a -perm -o+x)
-
-    newtests=""
-    for f in ${tests}; do
-        if [[ "$TESTTYPE" != "" && "$(grep TESTTYPE= ${f})" =~ "${TESTTYPE}" ]]; then
-            newtests+="${f} "
-        elif [[ "$TESTTYPE" == "" && ! "$(grep TESTTYPE= ${f})" =~ knownfailure ]]; then
-            # Skip any test with the type "knownfailure".  If you want to run these (to
-            # see if they are still failing, for instance) you can add "-t knownfailure"
-            # on the command line.
-            newtests+="${f} "
-        else
-            continue
-        fi
-    done
-
-    tests="${newtests}"
+    # The find_tests function will find all tests and use TESTTYPE if specified.
+    tests=$(find_tests)
 fi
 
 if [[ "${tests}" == "" ]]; then

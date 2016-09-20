@@ -26,7 +26,7 @@ prereqs() {
 }
 
 kernel_args() {
-    echo vnc inst.proxy=http://127.0.0.1:8080
+    echo vnc inst.proxy=http://127.0.0.1:8080 inst.debug
 }
 
 prepare() {

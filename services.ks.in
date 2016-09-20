@@ -15,7 +15,7 @@ timezone America/New_York --utc
 rootpw testcase
 
 # Test services
-services --disabled=sshd --enabled=systemd-bootchart
+services --disabled=sshd --enabled=radvd
 
 # Test SELinux
 selinux --enforcing
@@ -23,14 +23,15 @@ selinux --enforcing
 shutdown
 
 %packages
+radvd
 %end
 
 %post
 
 # Test enabled
-systemctl is-enabled systemd-bootchart
+systemctl is-enabled radvd
 if [[ $? -ne 0 ]]; then
-    echo "*** systemd-bootchart is disabled, not enabled" >> /root/RESULT
+    echo "*** radvd is disabled, not enabled" >> /root/RESULT
 fi
 
 # Test disabled

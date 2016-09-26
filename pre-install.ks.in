@@ -36,23 +36,16 @@ operator:x:11:0:operator:/root:/sbin/nologin
 games:x:12:100:games:/usr/games:/sbin/nologin
 ftp:x:14:50:FTP User:/var/ftp:/sbin/nologin
 nobody:x:99:99:Nobody:/:/sbin/nologin
-polipo:x:600:600:Polipo Web Proxy:/var/cache/polipo:/sbin/nologin
 lighttpd:x:601:601:lighttpd web server:/var/www/lighttpd:/sbin/nologin
 EOF
 %end
 
 %packages
-polipo
 lighttpd
 %end
 
 %post
 ## TEST pre-install
-grep "polipo:x:600:600" /etc/passwd
-if [[ $? -ne 0 ]]; then
-    echo "*** pre-install failed, wrong polipo entry ***" >> /root/RESULT
-fi
-
 grep "lighttpd:x:601:601" /etc/passwd
 if [[ $? -ne 0 ]]; then
     echo "*** pre-install failed, wrong lighttpd entry ***" >> /root/RESULT

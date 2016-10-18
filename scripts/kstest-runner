@@ -52,7 +52,8 @@ class VirtualInstall(object):
     """
     def __init__(self, iso, ks_paths, disk_paths,
                  kernel_args=None, memory=1024, vnc=None,
-                 log_check=None, virtio_host="127.0.0.1", virtio_port=6080):
+                 log_check=None, virtio_host="127.0.0.1", virtio_port=6080,
+                 nics=None):
         """
         Start the installation
 
@@ -68,6 +69,7 @@ class VirtualInstall(object):
         :type log_check: method
         :param str virtio_host: Hostname to connect virtio log to
         :param int virtio_port: Port to connect virtio log to
+        :param list nics: virt-install --network parameters
         """
         self.virt_name = "LiveOS-"+str(uuid.uuid4())
         # add --graphics none later
@@ -90,6 +92,10 @@ class VirtualInstall(object):
         for disk in disk_paths:
             args.append("--disk")
             args.append("path={0}".format(disk))
+
+        for nic in nics or []:
+            args.append("--network")
+            args.append(nic)
 
         if iso.stage2:
             disk_opts = "path={0},device=cdrom,readonly=on,shareable=on".format(iso.iso_path)
@@ -176,7 +182,7 @@ def virt_install(opts, install_log):
                               kernel_args, opts.ram, opts.vnc,
                               log_check = log_monitor.server.log_check,
                               virtio_host = log_monitor.host,
-                              virtio_port = log_monitor.port)
+                              virtio_port = log_monitor.port, nics=opts.nics)
 
         virt.destroy(os.path.basename(opts.tmp))
         log_monitor.shutdown()
@@ -234,6 +240,8 @@ def main():
                         help="Kickstart file defining the install.")
     parser.add_argument("--disk", action="append", type=os.path.abspath, dest="disk_paths",
                         help="Pre-existing disk image to use for destination.")
+    parser.add_argument("--nic", action="append", default=[], dest="nics",
+                        help="Network devices to be used.")
 
     parser.add_argument("--proxy",
                         help="proxy URL to use for the install")

@@ -98,6 +98,9 @@ runone() {
     disks=$(prepare_disks ${tmpdir})
     disk_args=$(for d in $disks; do echo --disk $d,cache=unsafe; done)
 
+    nics=$(prepare_network)
+    network_args=$(for n in $nics; do echo --nic $n; done)
+
     echo "PYTHONPATH=$PYTHONPATH"
     eval ${KSTESTDIR}/scripts/kstest-runner ${kargs} \
                        --iso "${tmpdir}/$(basename ${IMAGE})" \
@@ -107,7 +110,8 @@ runone() {
                        --ram 1024 \
                        --vnc vnc \
                        --timeout 60 \
-                       ${disk_args}
+                       ${disk_args} \
+                       ${network_args}
     cp ${tmpdir}/virt-install.log ${tmpdir}/virt-install-human.log
     sed -i 's/#012/\n/g' ${tmpdir}/virt-install-human.log
     echo

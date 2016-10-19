@@ -30,6 +30,8 @@
 # 3  - Test failed due to kernel panic
 # 77 - Something needed by the test doesn't exist, so skip
 
+set -x
+
 IMAGE=
 KEEPIT=0
 
@@ -81,14 +83,16 @@ runone() {
     # Check that the prepared kickstart is free of substitution markers. Normally
     # the substitutions are run by run_kickstart_tests.sh, but prepare has a chance
     # to run them too. If both of those left any @STUFF@ strings behind, fail.
-    unmatched="$(grep -o '@[^[:space:]]\+@' ${ksfile} | head -1)"
-    if [ -n "$unmatched" ]; then
-        echo "RESULT:${name}:FAILED:Unsubstituted pattern ${unmatched}"
-        cleanup ${tmpdir}
-        cleanup_tmp ${tmpdir}
-        return 99
+    if [[ "${ksfile}" != "" ]]; then
+        unmatched="$(grep -o '@[^[:space:]]\+@' ${ksfile} | head -1)"
+        if [ -n "$unmatched" ]; then
+            echo "RESULT:${name}:FAILED:Unsubstituted pattern ${unmatched}"
+            cleanup ${tmpdir}
+            cleanup_tmp ${tmpdir}
+            return 99
+        fi
+        ks_args="--ks ${ksfile}"
     fi
-
 
     kargs=$(kernel_args)
     if [[ "${kargs}" != "" ]]; then
@@ -104,7 +108,7 @@ runone() {
     echo "PYTHONPATH=$PYTHONPATH"
     eval ${KSTESTDIR}/scripts/kstest-runner ${kargs} \
                        --iso "${tmpdir}/$(basename ${IMAGE})" \
-                       --ks ${ksfile} \
+                       ${ks_args} \
                        --tmp ${tmpdir} \
                        --logfile ${tmpdir}/livemedia.log \
                        --ram 1024 \

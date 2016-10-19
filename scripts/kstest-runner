@@ -102,7 +102,10 @@ class VirtualInstall(object):
             args.append("--disk")
             args.append(disk_opts)
 
-        extra_args = "ks=file:/{0}".format(os.path.basename(ks_paths[0]))
+        if ks_paths:
+            extra_args = "ks=file:/{0}".format(os.path.basename(ks_paths[0]))
+        else:
+            extra_args = ""
         if not vnc:
             extra_args += " inst.cmdline"
         if kernel_args:
@@ -236,7 +239,7 @@ def main():
 
     parser.add_argument("--iso", type=os.path.abspath,
                         help="Anaconda installation .iso path to use for virt-install")
-    parser.add_argument("--ks", action="append", type=os.path.abspath,
+    parser.add_argument("--ks", action="append", type=os.path.abspath, default=[],
                         help="Kickstart file defining the install.")
     parser.add_argument("--disk", action="append", type=os.path.abspath, dest="disk_paths",
                         help="Pre-existing disk image to use for destination.")

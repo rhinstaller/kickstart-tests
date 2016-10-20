@@ -40,6 +40,10 @@ prepare_disks() {
     echo ${tmpdir}/disk-a.img
 }
 
+prepare_network() {
+    echo ""
+}
+
 validate() {
     disksdir=$1
     args=$(for d in ${disksdir}/disk-*img; do echo -a ${d}; done)

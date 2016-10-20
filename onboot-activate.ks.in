@@ -1,0 +1,73 @@
+#test name: onboot-activate
+url @KSTEST_URL@
+install
+network --device=ens4 --bootproto=dhcp --no-activate --onboot=yes
+network --device=ens3 --bootproto=dhcp --onboot=no
+network --device=ens5 --bootproto=dhcp --activate --onboot=no
+
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+%post
+
+# ens3 has ONBOOT=no
+IF_FILE=/etc/sysconfig/network-scripts/ifcfg-ens3
+if [[ -e $IF_FILE ]]; then
+    egrep -q '^ONBOOT="?no"?$' $IF_FILE
+    if [[ $? -ne 0 ]]; then
+       echo "*** unexpected ONBOOT value in $IF_FILE" >> /root/RESULT
+    fi
+else
+   echo "*** ifcfg file $IF_FILE missing" >> /root/RESULT
+fi
+
+# ens4 has ONBOOT=yes
+IF_FILE=/etc/sysconfig/network-scripts/ifcfg-ens4
+if [[ -e $IF_FILE ]]; then
+    egrep -q '^ONBOOT="?yes"?$' $IF_FILE
+    if [[ $? -ne 0 ]]; then
+       echo "*** unexpected ONBOOT value in $IF_FILE" >> /root/RESULT
+    fi
+else
+   echo "*** ifcfg file $IF_FILE missing" >> /root/RESULT
+fi
+
+# ens4 was not activated (nmcli?)
+nmcli -t -f DEVICE,STATE dev | grep ens4:connected
+if [[ $? -ne 1 ]]; then
+    echo "*** Device ens4 connected" >> /root/RESULT
+fi
+
+# ens5 has ONBOOT=no
+IF_FILE=/etc/sysconfig/network-scripts/ifcfg-ens5
+if [[ -e $IF_FILE ]]; then
+    egrep -q '^ONBOOT="?no"?$' $IF_FILE
+    if [[ $? -ne 0 ]]; then
+       echo "*** unexpected ONBOOT value in $IF_FILE" >> /root/RESULT
+    fi
+else
+   echo "*** ifcfg file $IF_FILE missing" >> /root/RESULT
+fi
+
+# ens5 was activated
+nmcli -t -f DEVICE,STATE dev | grep ens5:connected
+if [[ $? -ne 0 ]]; then
+    echo "*** Device ens5 not connected" >> /root/RESULT
+fi
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+   echo SUCCESS > /root/RESULT
+fi
+%end

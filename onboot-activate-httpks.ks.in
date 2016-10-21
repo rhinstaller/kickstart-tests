@@ -21,50 +21,41 @@ shutdown
 
 %post
 
-# ens3 has ONBOOT=no
-IF_FILE=/etc/sysconfig/network-scripts/ifcfg-ens3
-if [[ -e $IF_FILE ]]; then
-    egrep -q '^ONBOOT="?no"?$' $IF_FILE
-    if [[ $? -ne 0 ]]; then
-       echo "*** unexpected ONBOOT value in $IF_FILE" >> /root/RESULT
+function check_device_ifcfg_value() {
+    local nic="$1"
+    local key="$2"
+    local value="$3"
+    local ifcfg_file="/etc/sysconfig/network-scripts/ifcfg-${nic}"
+
+    if [[ -e ${ifcfg_file} ]]; then
+        egrep -q '^'${key}'="?'${value}'"?$' ${ifcfg_file}
+        if [[ $? -ne 0 ]]; then
+           echo "*** unexpected ${key} value in ${ifcfg_file}" >> /root/RESULT
+        fi
+    else
+       echo "*** ifcfg file ${ifcfg_file} missing" >> /root/RESULT
     fi
-else
-   echo "*** ifcfg file $IF_FILE missing" >> /root/RESULT
-fi
+}
 
-# ens4 has ONBOOT=yes
-IF_FILE=/etc/sysconfig/network-scripts/ifcfg-ens4
-if [[ -e $IF_FILE ]]; then
-    egrep -q '^ONBOOT="?yes"?$' $IF_FILE
-    if [[ $? -ne 0 ]]; then
-       echo "*** unexpected ONBOOT value in $IF_FILE" >> /root/RESULT
+function check_device_connected() {
+    local nic="$1"
+    local expected_result="$2"
+    local exit_code=0
+    if [[ ${expected_result} == "no" ]]; then
+        exit_code=1
     fi
-else
-   echo "*** ifcfg file $IF_FILE missing" >> /root/RESULT
-fi
 
-# ens4 was not activated (nmcli?)
-nmcli -t -f DEVICE,STATE dev | grep ens4:connected
-if [[ $? -ne 1 ]]; then
-    echo "*** Device ens4 connected" >> /root/RESULT
-fi
-
-# ens5 has ONBOOT=no
-IF_FILE=/etc/sysconfig/network-scripts/ifcfg-ens5
-if [[ -e $IF_FILE ]]; then
-    egrep -q '^ONBOOT="?no"?$' $IF_FILE
-    if [[ $? -ne 0 ]]; then
-       echo "*** unexpected ONBOOT value in $IF_FILE" >> /root/RESULT
+    nmcli -t -f DEVICE,STATE dev | grep "${nic}:connected"
+    if [[ $? -ne ${exit_code} ]]; then
+        echo "*** Device ${nic} connected:${expected_result} check failed" >> /root/RESULT
     fi
-else
-   echo "*** ifcfg file $IF_FILE missing" >> /root/RESULT
-fi
+}
 
-# ens5 was activated
-nmcli -t -f DEVICE,STATE dev | grep ens5:connected
-if [[ $? -ne 0 ]]; then
-    echo "*** Device ens5 not connected" >> /root/RESULT
-fi
+check_device_ifcfg_value ens3 ONBOOT no
+check_device_ifcfg_value ens4 ONBOOT yes
+check_device_ifcfg_value ens5 ONBOOT no
+check_device_connected ens4 no
+check_device_connected ens5 yes
 
 # No error was written to /root/RESULT file, everything is OK
 if [[ ! -e /root/RESULT ]]; then

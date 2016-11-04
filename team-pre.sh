@@ -28,18 +28,5 @@
 TESTTYPE="knownfailure"
 
 . ${KSTESTDIR}/functions.sh
-
-
-kernel_args() {
-    echo vnc debug=1 inst.debug ip=ens3:dhcp
-}
-
-# Arguments for virt-install --network options
-prepare_network() {
-    echo "network:default"
-    echo "network:default"
-    echo "network:default"
-    echo "network:default"
-    echo "network:default"
-}
+. ${KSTESTDIR}/team.sh
 

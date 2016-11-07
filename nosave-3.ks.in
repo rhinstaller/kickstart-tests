@@ -1,0 +1,22 @@
+#test name: nosave-3
+url @KSTEST_URL@
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+clearpart --all --initlabel
+autopart
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+%post
+echo SUCCESS > /root/RESULT
+%end

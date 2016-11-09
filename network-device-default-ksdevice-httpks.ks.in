@@ -1,0 +1,49 @@
+#test name: network-device-default-ksdevice
+#NOTE: as this test is a "-httpks" the kickstart should be really applied
+#      in initrafs (ifcfg files created by parse-kickstart). The code actually
+#      ignores the command without --device specified (and no ksdevice set),
+#      but it will be applied in anaconda.
+url @KSTEST_URL@
+install
+
+network --bootproto=dhcp --ipv6=2001:cafe:cafe::1/64
+
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+%post
+
+function check_device_ifcfg_value() {
+    local nic="$1"
+    local key="$2"
+    local value="$3"
+    local ifcfg_file="/etc/sysconfig/network-scripts/ifcfg-${nic}"
+
+    if [[ -e ${ifcfg_file} ]]; then
+        egrep -q '^'${key}'="?'${value}'"?$' ${ifcfg_file}
+        if [[ $? -ne 0 ]]; then
+           echo "*** unexpected ${key} value in ${ifcfg_file}" >> /root/RESULT
+        fi
+    else
+       echo "*** ifcfg file ${ifcfg_file} missing" >> /root/RESULT
+    fi
+}
+
+check_device_ifcfg_value ens4 IPV6ADDR 2001:cafe:cafe::1/64
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+   echo SUCCESS > /root/RESULT
+fi
+%end

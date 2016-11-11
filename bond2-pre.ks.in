@@ -1,0 +1,73 @@
+#test name: bond2-pre
+#NOTE: this test is a variant of bond2 test, it is sharing its .sh file (setup of NICs and network boot configuration) so beware of changing it independently of bond2 test
+url @KSTEST_URL@
+install
+
+%include /tmp/ksinclude
+%pre
+echo "network --device bond0 --bootproto dhcp --bondslaves=ens4,ens5 --bondopts=mode=active-backup,primary=ens4 --activate --onboot=no" >> /tmp/ksinclude
+echo "network --device bond1 --bootproto dhcp --bondslaves=ens6,ens7 --bondopts=mode=active-backup,primary=ens6,miimon=100,fail_over_mac=2" >> /tmp/ksinclude
+%end
+
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+%post
+
+function check_device_ifcfg_value() {
+    local nic="$1"
+    local key="$2"
+    local value="$3"
+    local ifcfg_file="/etc/sysconfig/network-scripts/ifcfg-${nic}"
+
+    if [[ -e ${ifcfg_file} ]]; then
+        egrep -q '^'${key}'="?'${value}'"?$' ${ifcfg_file}
+        if [[ $? -ne 0 ]]; then
+           echo "*** unexpected ${key} value in ${ifcfg_file}" >> /root/RESULT
+        fi
+    else
+       echo "*** ifcfg file ${ifcfg_file} missing" >> /root/RESULT
+    fi
+}
+
+function check_device_connected() {
+    local nic="$1"
+    local expected_result="$2"
+    local exit_code=0
+    if [[ ${expected_result} == "no" ]]; then
+        exit_code=1
+    fi
+
+    nmcli -t -f DEVICE,STATE dev | grep "${nic}:connected"
+    if [[ $? -ne ${exit_code} ]]; then
+        echo "*** Device ${nic} connected:${expected_result} check failed" >> /root/RESULT
+    fi
+}
+
+
+check_device_ifcfg_value bond0 ONBOOT no
+check_device_ifcfg_value bond0_slave_1 ONBOOT no
+check_device_ifcfg_value bond0_slave_2 ONBOOT no
+check_device_connected bond0 yes
+
+check_device_ifcfg_value bond1 ONBOOT yes
+check_device_ifcfg_value bond1_slave_1 ONBOOT yes
+check_device_ifcfg_value bond1_slave_2 ONBOOT yes
+check_device_connected bond1 no
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+   echo SUCCESS > /root/RESULT
+fi
+%end

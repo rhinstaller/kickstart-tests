@@ -30,5 +30,4 @@ We could think about mechanism for sharing %post script bash snippets/functions 
 
 ### Static IP configuration:
 
-To be able to test static IP configuration we need to learn the IP range for NIC subnet (eg libvirt "default" network). We might even need to create dedicated networks so that we prevent IP address collisions for parallel tests.
-
+To prevent IP address collisions for parallel tests running on the same hypervisor we create dedicated NATed libvirt network for a test and substitute KSTEST macros in network command of the kickstart with proper IP addresses/ranges. See scripts/create-network.py and its callers for details. We might want to use bigger network prefixes in future if the number of parallel tests running on one hypervisor using this feature exceeds 100.

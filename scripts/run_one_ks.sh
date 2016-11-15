@@ -101,7 +101,7 @@ runone() {
     disks=$(prepare_disks ${tmpdir})
     disk_args=$(for d in $disks; do echo --disk $d,cache=unsafe; done)
 
-    nics=$(prepare_network)
+    nics=$(prepare_network ${tmpdir})
     network_args=$(for n in $nics; do echo --nic $n; done)
 
     echo "PYTHONPATH=$PYTHONPATH"

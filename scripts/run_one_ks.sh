@@ -17,6 +17,7 @@
 # Red Hat, Inc.
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
+#                    Jiri Konecny <jkonecny@redhat.com>
 
 # This script runs a single kickstart test on a single system.  It takes
 # command line arguments instead of environment variables because it is
@@ -83,7 +84,7 @@ runone() {
     # to run them too. If both of those left any @STUFF@ strings behind, fail.
     if [[ "${ksfile}" != "" ]]; then
         unmatched="$(grep -o '@[^[:space:]]\+@' ${ksfile} | head -1)"
-        if [ -n "$unmatched" ]; then
+        if [[ -n "$unmatched" ]]; then
             echo "RESULT:${name}:FAILED:Unsubstituted pattern ${unmatched}"
             cleanup ${tmpdir}
             cleanup_tmp ${tmpdir}
@@ -117,37 +118,47 @@ runone() {
     cp ${tmpdir}/virt-install.log ${tmpdir}/virt-install-human.log
     sed -i 's/#012/\n/g' ${tmpdir}/virt-install-human.log
     echo
-    if [[ -f ${tmpdir}/virt-install.log && "$(grep CRIT ${tmpdir}/virt-install.log)" != "" ]]; then
-        echo "RESULT:${name}:FAILED:\n$(grep CRIT ${tmpdir}/virt-install.log | sed 's/#012/\n/g')"
-        cleanup ${tmpdir}
-        cleanup_tmp ${tmpdir}
-        return 1
-    elif [[ -f ${tmpdir}/livemedia.log ]]; then
-        if [[ "$(grep 'due to timeout' ${tmpdir}/livemedia.log)" != "" ]]; then
-            echo "RESULT:${name}:FAILED:Test timed out."
-            cleanup ${tmpdir}
-            cleanup_tmp ${tmpdir}
-            return 2
-        elif [[ "$(grep 'Call Trace' ${tmpdir}/livemedia.log)" != "" ]]; then
-            echo "RESULT:${name}:FAILED:Kernel panic."
-            cleanup ${tmpdir}
-            cleanup_tmp ${tmpdir}
-            return 0
+
+    RESULT=""
+    RET_CODE=0
+    if [[ -f ${tmpdir}/virt-install.log ]]; then
+        # Ignore rsyslogd CRIT error, this doesn't block the installation
+        if [[ "$(grep -e 'CRIT systemd-coredump:[^\n]*rsyslogd' ${tmpdir}/virt-install.log)" != "" ]]; then
+            echo "CRIT error in test:$(grep CRIT ${tmpdir}/virt-install.log \
+                  | sed 's/#012/\n/g')"
+        # Anaconda CRIT error blocking the installation
+        elif [[ "$(grep CRIT ${tmpdir}/virt-install.log)" != "" ]]; then
+            RESULT="FAILED:$(grep CRIT ${tmpdir}/virt-install.log | sed 's/#012/\n/g')"
+            RET_CODE=1
         fi
 
-        result=$(validate ${tmpdir})
-        if [[ $? != 0 ]]; then
-            echo "RESULT:${name}:FAILED:${result}"
-            cleanup ${tmpdir}
-            cleanup_tmp ${tmpdir}
-            return 1
+        if [[ ${RET_CODE} -eq 0 ]]; then
+            # TIME OUT error
+            if [[ "$(grep 'due to timeout' ${tmpdir}/livemedia.log)" != "" ]]; then
+                RESULT="FAILED:Test timed out."
+                RET_CODE=2
+            # Kernel Call Trace error
+            elif [[ "$(grep 'Call Trace' ${tmpdir}/livemedia.log)" != "" ]]; then
+                RESULT="FAILED:Kernel panic."
+                RET_CODE=0
+            fi
         fi
     fi
 
-    echo RESULT:${name}:SUCCESS
+    ret=$(validate ${tmpdir})
+    if [[ $? != 0 ]]; then
+        RESULT="FAILED:${ret}"
+        RET_CODE=1
+    fi
+
+    if [[ -z "${RESULT}" ]]; then
+        RESULT="SUCCESS"
+    fi
+
+    echo RESULT:${name}:${RESULT}
     cleanup ${tmpdir}
     cleanup_tmp ${tmpdir}
-    return 0
+    return ${RET_CODE}
 }
 
 # Have to be root to run this test, as it requires creating disk images.

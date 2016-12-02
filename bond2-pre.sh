@@ -17,15 +17,20 @@
 #
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
-# This is actually testing application of kickstart network commands in
-# anaconda (which would normally be triggered by defining networking in %pre
-# and %including it into kickstart).  It is caused by network kickstart
-# commands not being applied in dracut because for ks=file:/ks.cfg (kickstart
-# injected in initrd) network devices are not found in sysfs in the time of
-# parsing the kickstart.
-
-#TESTTYPE="network"
-TESTTYPE="knownfailure"
+TESTTYPE="network"
 
 . ${KSTESTDIR}/functions.sh
-. ${KSTESTDIR}/bond2.sh
+
+
+kernel_args() {
+    echo vnc debug=1 inst.debug ip=ens3:dhcp
+}
+
+# Arguments for virt-install --network options
+prepare_network() {
+    echo "network:default"
+    echo "network:default"
+    echo "network:default"
+    echo "network:default"
+    echo "network:default"
+}

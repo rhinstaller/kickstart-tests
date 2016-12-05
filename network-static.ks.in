@@ -22,8 +22,10 @@ shutdown
 @KSINCLUDE@ post-lib-network.sh
 
 check_device_ifcfg_value ens4 IPADDR @KSTEST_STATIC_IP@
+check_device_ifcfg_value ens4 ONBOOT no
 check_device_connected ens3 yes
 check_device_connected ens4 yes
+check_device_ipv4_address ens4 @KSTEST_STATIC_IP@
 
 # No error was written to /root/RESULT file, everything is OK
 if [[ ! -e /root/RESULT ]]; then

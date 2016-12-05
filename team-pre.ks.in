@@ -28,13 +28,41 @@ shutdown
 @KSINCLUDE@ post-lib-network.sh
 
 check_device_ifcfg_value team0 ONBOOT no
-check_device_ifcfg_value team0_slave_1 ONBOOT no
-check_device_ifcfg_value team0_slave_2 ONBOOT no
+
+# FIXME (BUG) commented is the behaviour with regular parse-kickstart
+# we should unify it
+#check_device_ifcfg_value team0_slave_1 ONBOOT no
+#check_device_ifcfg_value team0_slave_2 ONBOOT no
+#check_device_ifcfg_value team0_slave_1 TEAM_MASTER team0
+#check_device_ifcfg_value team0_slave_2 TEAM_MASTER team0
+check_device_ifcfg_value ens4 ONBOOT no
+check_device_ifcfg_value ens5 ONBOOT no
+check_device_ifcfg_value ens4 TEAM_MASTER team0
+check_device_ifcfg_value ens5 TEAM_MASTER team0
+
 check_device_connected team0 yes
+check_team_has_slave team0 ens3 no
+check_team_has_slave team0 ens4 yes
+check_team_has_slave team0 ens5 yes
+check_team_has_slave team0 ens6 no
+check_team_has_slave team0 ens7 no
+check_team_option team0 "mode activebackup"
+check_team_option team0 "priority \(port:ens4\) -10"
+check_team_option team0 "priority \(port:ens5\) 100"
 
 check_device_ifcfg_value team1 ONBOOT yes
-check_device_ifcfg_value team1_slave_1 ONBOOT yes
-check_device_ifcfg_value team1_slave_2 ONBOOT yes
+
+# FIXME (BUG) commented is the behaviour with regular parse-kickstart
+# we should unify it
+#check_device_ifcfg_value team1_slave_1 ONBOOT yes
+#check_device_ifcfg_value team1_slave_2 ONBOOT yes
+#check_device_ifcfg_value team1_slave_1 TEAM_MASTER team1
+#check_device_ifcfg_value team1_slave_2 TEAM_MASTER team1
+check_device_ifcfg_value ens6 ONBOOT yes
+check_device_ifcfg_value ens7 ONBOOT yes
+check_device_ifcfg_value ens6 TEAM_MASTER team1
+check_device_ifcfg_value ens7 TEAM_MASTER team1
+
 check_device_connected team1 no
 
 # No error was written to /root/RESULT file, everything is OK

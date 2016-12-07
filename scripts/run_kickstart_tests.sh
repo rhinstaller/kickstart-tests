@@ -138,7 +138,7 @@ function find_tests() {
         fi
     done
 
-    echo ${newtests}
+    echo "${newtests}"
 }
 
 # We get the list of tests from one of several places:
@@ -182,7 +182,7 @@ elif [[ "${ghprbActualCommit}" != "" ]]; then
     done
 
     # Nothing find, find all tests and use TESTTYPE if specified.
-    if [ -z ${tests} ]; then
+    if [ -z "${tests}" ]; then
         tests=$(find_tests)
     fi
 else

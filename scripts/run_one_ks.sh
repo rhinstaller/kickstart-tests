@@ -104,10 +104,13 @@ runone() {
     nics=$(prepare_network ${tmpdir})
     network_args=$(for n in $nics; do echo --nic $n; done)
 
+    add_args=$(additional_runner_args)
+
     echo "PYTHONPATH=$PYTHONPATH"
     eval ${KSTESTDIR}/scripts/kstest-runner ${kargs} \
                        --iso "${tmpdir}/$(basename ${IMAGE})" \
                        ${ks_args} \
+                       ${add_args} \
                        --tmp ${tmpdir} \
                        --logfile ${tmpdir}/livemedia.log \
                        --ram 1024 \

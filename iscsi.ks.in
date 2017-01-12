@@ -1,0 +1,52 @@
+#test name: iscsi-root
+
+url @KSTEST_URL@
+install
+
+iscsiname @KSTEST_ISCSINAME@
+iscsi --ipaddr @KSTEST_ISCSI_IP@ --port @KSTEST_ISCSI_PORT@ --target @KSTEST_ISCSI_TARGET@
+
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+
+# for non-offload iSCSI /boot can be on iSCSI only when using iBFT,
+# so put it to local disk
+#part /boot --size=500 --ondisk=sda
+#part / --size=5000 --ondisk=sdb --grow
+#part swap --size=1000 --ondisk=sdb
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+%post --nochroot
+
+SYSROOT=${ANA_INSTALL_PATH:-/mnt/sysimage}
+
+function check_iscsi_session_nochroot() {
+    local transport="$1"
+    local target="$2"
+
+    iscsiadm -m session | egrep -q '^'${transport}':.*'${target}
+    if [[ $? -ne 0 ]]; then
+        echo "*** Failed check: ${target} session using ${transport} exists" >> $SYSROOT/root/RESULT
+    fi
+}
+
+check_iscsi_session_nochroot tcp @KSTEST_ISCSI_TARGET@
+
+%end
+
+%post
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+   echo SUCCESS > /root/RESULT
+fi
+%end

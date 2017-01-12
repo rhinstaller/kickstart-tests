@@ -48,6 +48,11 @@ validate() {
     disksdir=$1
     args=$(for d in ${disksdir}/disk-*img; do echo -a ${d}; done)
 
+    # Use also iscsi disk if there is any
+    if [[ -n ${iscsi_disk_img} ]]; then
+        args="${args} -a ${disksdir}/${iscsi_disk_img}"
+    fi
+
     # Grab files out of the installed system while it still exists.
     # Grab these files:
     #
@@ -100,4 +105,35 @@ start_httpd() {
 
     # Construct a URL
     httpd_url="http://$(${scriptdir}/find-ip):${httpd_port}/"
+}
+
+create_iscsi_target() {
+    local wwn=$1
+    local backstore=$2
+    local imgfile=$3
+    local logfile=$4
+
+    targetcli backstores/fileio create ${backstore} ${imgfile} 10G &>> ${logfile}
+    # we assume adding portal by targetcli by default
+    targetcli iscsi/ create ${wwn} &>> ${logfile}
+    targetcli iscsi/${wwn}/tpg1/luns create /backstores/fileio/${backstore} &>> ${logfile}
+    # ACLs - disable, use demo mode
+    targetcli /iscsi/${wwn}/tpg1/ set attribute authentication=0 demo_mode_write_protect=0 generate_node_acls=1 cache_dynamic_acls=1 &>> ${logfile}
+
+    local scriptdir=${PWD}/scripts
+    local target_ip=$(${scriptdir}/find-ip)
+    echo ${target_ip}
+}
+
+remove_iscsi_target() {
+    local wwn=$1
+    local backstore=$2
+    local imgfile=$3
+    local logfile=$4
+
+    targetcli /iscsi/ delete ${wwn} &>> ${logfile}
+    targetcli /backstores/fileio/ delete ${backstore} &>> ${logfile}
+    if [[ ${KEEPIT} == 1 ]]; then
+        rm ${imgfile}
+    fi
 }

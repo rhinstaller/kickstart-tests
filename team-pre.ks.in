@@ -25,36 +25,7 @@ shutdown
 
 %post
 
-function check_device_ifcfg_value() {
-    local nic="$1"
-    local key="$2"
-    local value="$3"
-    local ifcfg_file="/etc/sysconfig/network-scripts/ifcfg-${nic}"
-
-    if [[ -e ${ifcfg_file} ]]; then
-        egrep -q '^'${key}'="?'${value}'"?$' ${ifcfg_file}
-        if [[ $? -ne 0 ]]; then
-           echo "*** unexpected ${key} value in ${ifcfg_file}" >> /root/RESULT
-        fi
-    else
-       echo "*** ifcfg file ${ifcfg_file} missing" >> /root/RESULT
-    fi
-}
-
-function check_device_connected() {
-    local nic="$1"
-    local expected_result="$2"
-    local exit_code=0
-    if [[ ${expected_result} == "no" ]]; then
-        exit_code=1
-    fi
-
-    nmcli -t -f DEVICE,STATE dev | grep "${nic}:connected"
-    if [[ $? -ne ${exit_code} ]]; then
-        echo "*** Device ${nic} connected:${expected_result} check failed" >> /root/RESULT
-    fi
-}
-
+@KSINCLUDE@ post-lib-network.sh
 
 check_device_ifcfg_value team0 ONBOOT no
 check_device_ifcfg_value team0_slave_1 ONBOOT no

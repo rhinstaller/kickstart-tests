@@ -21,34 +21,14 @@ shutdown
 %end
 
 %post
-IF_FILE='/etc/sysconfig/network-scripts/ifcfg-bond0'
 
-if [[ -e $IF_FILE ]]; then
-   cp $IF_FILE /root/
-else
-   echo '*** ifcfg file for bond interface missing' >> /root/RESULT
-   exit 0
-fi
+@KSINCLUDE@ post-lib-network.sh
 
-grep -q '^DEVICE="bond0"$' $IF_FILE
-if [[ $? -ne 0 ]]; then
-   echo '*** DEVICE is not present' >> /root/RESULT
-fi
-
-grep -q '^TYPE="Bond"$' $IF_FILE
-if [[ $? -ne 0 ]]; then
-   echo '*** TYPE is not present' >> /root/RESULT
-fi
-
-grep -q '^ONBOOT="yes"$' $IF_FILE
-if [[ $? -ne 0 ]]; then
-   echo '*** ONBOOT is not present' >> /root/RESULT
-fi
-
-grep -q '^BOOTPROTO="dhcp"$' $IF_FILE
-if [[ $? -ne 0 ]]; then
-   echo '*** BOOTPROTO is not present' >> /root/RESULT
-fi
+check_device_ifcfg_value bond0 DEVICE bond0
+check_device_ifcfg_value bond0 TYPE Bond
+check_device_ifcfg_value bond0 ONBOOT yes
+check_device_ifcfg_value bond0 BOOTPROTO dhcp
+check_device_ifcfg_value bond0 BOOTPROTO dhcp
 
 # No error was written to /root/RESULT file, everything is OK
 if [[ ! -e /root/RESULT ]]; then

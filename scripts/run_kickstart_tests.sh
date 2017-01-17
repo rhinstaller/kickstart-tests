@@ -272,6 +272,20 @@ for t in ${tests}; do
     sed ${sed_args} ${ks} > ${t/.sh/.ks}
 done
 
+# And now, include common stuff with @KSINCLUDE@ <FILE>
+# For example libraries for post scripts gathering the result
+for t in ${tests}; do
+    inclks=${t/.sh/.ks}
+    # First normalize the @KSINCLUDE@ lines a bit
+    sed -i -e 's/\s*@KSINCLUDE@\s*\(.*\)/@KSINCLUDE@\1/' ${inclks}
+    # Include the files
+    for iline in $(grep "^@KSINCLUDE@.*" ${inclks}); do
+        sfile=${iline:11}
+        echo "Including $sfile into ${inclks}"
+        sed -i -e '\_'${iline}'_ { r'${sfile} -e 'd }' ${inclks}
+    done
+done
+
 # collect the prerequisite list for the requested tests. If there is
 # anything in the list, build it.
 

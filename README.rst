@@ -81,3 +81,26 @@ The following environment variables are currently supported:
 - KSTEST_OS_VERSION - This variable is read from the input boot.iso and it
   contains version of the OS. For example Fedora 26 have
   KSTEST_OS_VERSION = 26 and RHEL 7.3 have KSTEST_OS_VERSION = 7.3 .
+
+Chapter 2. Sharing common code in kickstart (.ks.in) files
+==========================================================
+
+To include kickstart or code snippets into test kickstart file during its
+pre-processing (just after KSTEST_ variables are substituted) use
+@KSINCLUDE@ <FILE_NAME> directive.
+
+For example to include post-lib-network.sh which is a library with functions
+for checking test results of network tests, include it in ks.in test file:
+
+::
+
+  %post
+
+  @KSINCLUDE@ post-lib-network.sh
+
+  check_device_connected ens4 yes
+
+  %end
+
+The including is flat, only one level is supported. Do not use @KSINCLUDE@ in
+included files, the results could be unexpected.

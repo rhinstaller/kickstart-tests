@@ -74,3 +74,10 @@ The following environment variables are currently supported:
   method and instead just use the default.  It is set to the Fedora mirrors in
   scripts/defaults.sh.  This is potentially slow if you are running a lot of
   tests, and you may want to point it at a local mirror.
+
+- KSTEST_OS_NAME - This variable is read from the input boot.iso and it
+  contains a name of the OS. Possible names can be "fedora", "rhel".
+
+- KSTEST_OS_VERSION - This variable is read from the input boot.iso and it
+  contains version of the OS. For example Fedora 26 have
+  KSTEST_OS_VERSION = 26 and RHEL 7.3 have KSTEST_OS_VERSION = 7.3 .

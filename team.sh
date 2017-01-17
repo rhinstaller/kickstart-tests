@@ -24,7 +24,7 @@
 # injected in initrd) network devices are not found in sysfs in the time of
 # parsing the kickstart.
 
-TESTTYPE="network"
+TESTTYPE=${TESTTYPE:-"network"}
 
 . ${KSTESTDIR}/functions.sh
 
@@ -41,4 +41,3 @@ prepare_network() {
     echo "network:default"
     echo "network:default"
 }
-

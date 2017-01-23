@@ -111,66 +111,18 @@ if [[ -e $HOME/.kstests.defaults.sh ]]; then
     . $HOME/.kstests.defaults.sh
 fi
 
-# Probe stage 2 in the input boot.iso and dig useful information from it.
-function probe_boot_iso() {
-
-    function clean_and_exit() {
-        local msg="$1"
-        local root_dir="$2"
-
-        echo "$msg" >&2
-        echo "Cleaning mounted directories" >&2
-        sudo umount $root_dir/stage2 $root_dir/image $root_dir/iso &>>/dev/null
-        rm -rf $root_dir
-        exit 3
-    }
-
-    # Mount boot.iso -> install.img -> stage2
-    local ISO_TMP=$(mktemp -d /tmp/kstest-iso-mount.XXXXXXX)
-    if [[ -n $ISO_TMP ]]; then
-
-        # 1) Mount boot.iso
-        mkdir $ISO_TMP/iso
-        sudo mount  -o ro $IMAGE $ISO_TMP/iso
-        if [[ $? -ne 0 ]]; then
-            clean_and_exit "Error: Can't mount boot iso" $ISO_TMP
-        fi
-
-        # 2) Mount install.img
-        mkdir $ISO_TMP/image
-        # Try Fedora directory structure
-        sudo mount $ISO_TMP/iso/images/install.img $ISO_TMP/image 2>/dev/null
-        if [[ $? -ne 0 ]]; then
-            # Try RHEL-7 directory structure
-            sudo mount $ISO_TMP/iso/LiveOS/squashfs.img $ISO_TMP/image
-            if [[ $? -ne 0 ]]; then
-                clean_and_exit "Error: Can't mount image from boot iso" $ISO_TMP
-            fi
-        fi
-
-        # 3) Mount stage2
-        mkdir $ISO_TMP/stage2
-        sudo mount $ISO_TMP/image/LiveOS/rootfs.img $ISO_TMP/stage2
-        if [[ $? -ne 0 ]]; then
-            clean_and_exit "Error: Can't mount stage2 from install.img" $ISO_TMP
-        fi
-    fi
-
-    # Take required information from stage2
-    ISO_OS_NAME=$(egrep -h "^ID=" $ISO_TMP/stage2/etc/*-release)
-    ISO_OS_NAME=$(echo ${ISO_OS_NAME#ID=} | tr -d \")
-    ISO_OS_VERSION=$(egrep -h "^VERSION_ID=" $ISO_TMP/stage2/etc/*-release)
-    ISO_OS_VERSION=$(echo ${ISO_OS_VERSION#VERSION_ID=} | tr -d \")
-
-    # Clean when work is done
-    sudo umount $ISO_TMP/stage2 $ISO_TMP/image $ISO_TMP/iso
-    rm -rf $ISO_TMP
-}
-
 # Grab useful data from boot.iso
-ISO_OS_NAME=""
-ISO_OS_VERSION=""
-probe_boot_iso
+output="$(sudo ./scripts/probe_boot_iso.sh $IMAGE)"
+if [[ $? -ne 0 ]]; then
+    echo "Can't run probe_boot_iso" >&2
+    exit 3
+fi
+ISO_OS_NAME=$(echo "${output}" | grep 'NAME=')
+ISO_OS_NAME="${ISO_OS_NAME##NAME=}"
+ISO_OS_VERSION=$(echo "${output}" | grep 'VERSION=')
+ISO_OS_VERSION="${ISO_OS_VERSION##VERSION=}"
+
+
 # Append sed args to substitute
 sed_args=" -e s#@KSTEST_OS_NAME@#${ISO_OS_NAME}# -e s#@KSTEST_OS_VERSION@#${ISO_OS_VERSION}#"
 

@@ -44,7 +44,7 @@ prepare_network() {
     echo ""
 }
 
-validate() {
+validate_RESULT() {
     disksdir=$1
     args=$(for d in ${disksdir}/disk-*img; do echo -a ${d}; done)
 
@@ -79,6 +79,10 @@ validate() {
     fi
 
     return ${status}
+}
+
+validate() {
+    return $(validate_RESULT $1)
 }
 
 cleanup() {

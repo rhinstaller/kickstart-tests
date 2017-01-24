@@ -84,3 +84,26 @@ function check_device_has_ipv4_address() {
         echo "*** Failed check: ${device} has ipv4 address ${expected_result}" >> /root/RESULT
     fi
 }
+
+function check_ifcfg_file_does_not_exist() {
+    local nic="$1"
+    local ifcfg_file="/etc/sysconfig/network-scripts/ifcfg-${nic}"
+    if [[ -e ${ifcfg_file} ]]; then
+        echo "*** Failed check: ${ifcfg_file} does not exist" >> /root/RESULT
+    fi
+}
+
+function check_bond_has_slave() {
+    local bond="$1"
+    local slave="$2"
+    local expected_result="$3"
+    local exit_code=0
+    if [[ ${expected_result} == "no" ]]; then
+        exit_code=1
+    fi
+
+    cat /proc/net/bonding/${bond} | egrep -q "^Slave.*${slave}"
+    if [[ $? -ne ${exit_code} ]]; then
+        echo "*** Failed check: ${bond} has slave ${slave} ${expected_result}" >> /root/RESULT
+    fi
+}

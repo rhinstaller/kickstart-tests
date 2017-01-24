@@ -1,0 +1,56 @@
+# test name bridged-bond-pre
+url @KSTEST_URL@
+install
+
+%include /tmp/ksinclude
+%pre
+echo "network --device=ens3 --bootproto=dhcp --onboot=yes --activate" >> /tmp/ksinclude
+echo "network --device=bond0   --bondslaves=ens4,ens5 --bondopts=mode=balance-tlb --noipv4 --activate" >> /tmp/ksinclude
+#network --device=bridge0  --bridgeslaves=bond0 --bootproto=static --ip=192.168.124.233 --netmask=255.255.255.0 --gateway=192.168.124.1 --hostname=devel --nameserver=10.34.39.2 --activate
+echo "network --device=bridge0  --bridgeslaves=bond0 --bootproto=dhcp --activate" >> /tmp/ksinclude
+%end
+
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+%post --nochroot
+
+@KSINCLUDE@ post-nochroot-lib-network.sh
+
+check_bridge_has_slave bridge0 bond0 yes
+
+%end
+
+%post
+
+@KSINCLUDE@ post-lib-network.sh
+
+check_device_connected bridge0 yes
+check_device_ifcfg_value bond0 BRIDGE bridge0
+check_device_ifcfg_value bond0 BONDING_OPTS mode=balance-tlb
+check_ifcfg_file_does_not_exist bridge0_slave_1
+check_bond_has_slave bond0 ens4 yes
+check_bond_has_slave bond0 ens5 yes
+check_bond_has_slave bond0 ens3 no
+check_device_has_ipv4_address bridge0 yes
+check_device_has_ipv4_address bond0 no
+
+# WARNING: this depends on assumption of running %post scripts in order they
+# are defined here
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+   echo SUCCESS > /root/RESULT
+fi
+%end

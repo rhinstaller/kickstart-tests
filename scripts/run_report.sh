@@ -1,7 +1,7 @@
 #!/bin/gawk -f
 
 BEGIN {
-    printf("\n\n\n%-30s | %-10s | %s\n", "TEST", "RESULT", "EXPLANATION");
+    printf("\n\n\n%-40s | %-10s | %s\n", "TEST", "RESULT", "EXPLANATION");
     printf("-------------------------------+------------+--------------------------------------------------------\n");
     FS=":";
     count=0;
@@ -25,13 +25,13 @@ BEGIN {
                  failed++;
              }
 
-             printf("%-30s | %-10s | %s\n", $2, result, explanation);
+             printf("%-40s | %-10s | %s\n", $2, result, explanation);
              count++
            }
 END {
     printf("\n");
     printf("============================================================================\n");
-    printf("Test souite for kickstart tests summary:\n");
+    printf("Test suite for kickstart tests summary:\n");
     printf("============================================================================\n");
     printf("# TOTAL:      %s\n", count);
     printf("# PASS:       %s\n", count - failed - timed_out);

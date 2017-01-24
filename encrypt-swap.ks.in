@@ -25,7 +25,7 @@ raid swap --level=1 --device=0 --fstype=swap --encrypted --label=md_swap --passp
 
 keyboard us
 lang en_US.UTF-8
-timezone America/New_York --utc
+timezone America/New_York --nontp --utc
 rootpw testcase
 shutdown
 

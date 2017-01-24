@@ -11,7 +11,7 @@ autopart
 
 keyboard --vckeymap cz --xlayouts=cz,fi
 lang cs_CZ.UTF-8
-timezone America/New_York --utc
+timezone America/New_York --nontp --utc
 rootpw testcase
 shutdown
 

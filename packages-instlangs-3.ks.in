@@ -15,7 +15,7 @@ keyboard us
 # additional langpacks packages don't confuse the locale test
 lang fr_FR.UTF-8
 
-timezone America/New_York --utc
+timezone America/New_York --nontp --utc
 rootpw testcase
 shutdown
 

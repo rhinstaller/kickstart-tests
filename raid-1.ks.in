@@ -21,7 +21,7 @@ raid /     --level=0 --device=2 --fstype=ext4 --label=rootfs --fsoptions=loud,no
 
 keyboard us
 lang en_US.UTF-8
-timezone America/New_York --utc
+timezone America/New_York --nontp --utc
 rootpw testcase
 shutdown
 

@@ -15,7 +15,7 @@ logvol / --name=root --vgname=fedora --percent=90 --fstype=ext4
 
 keyboard us
 lang en_US.UTF-8
-timezone America/New_York --utc
+timezone America/New_York --nontp --utc
 rootpw testcase
 shutdown
 

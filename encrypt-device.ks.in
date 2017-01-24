@@ -16,7 +16,7 @@ logvol /home  --fstype="ext4" --grow --size=1 --name=home_lv --vgname=vg01
 
 keyboard us
 lang en_US.UTF-8
-timezone America/New_York --utc
+timezone America/New_York --nontp --utc
 rootpw testcase
 shutdown
 

@@ -11,7 +11,7 @@ autopart
 
 keyboard us
 lang en
-timezone America/New_York
+timezone America/New_York --nontp
 rootpw qweqwe
 shutdown
 

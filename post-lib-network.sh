@@ -107,3 +107,28 @@ function check_bond_has_slave() {
         echo "*** Failed check: ${bond} has slave ${slave} ${expected_result}" >> /root/RESULT
     fi
 }
+
+function check_team_has_slave() {
+    local team="$1"
+    local slave="$2"
+    local expected_result="$3"
+    local exit_code=0
+    if [[ ${expected_result} == "no" ]]; then
+        exit_code=1
+    fi
+
+    teamnl ${team} ports | egrep -q ' '${slave}':'
+    if [[ $? -ne ${exit_code} ]]; then
+        echo "*** Failed check: ${team} has slave ${slave} ${expected_result}" >> /root/RESULT
+    fi
+}
+
+function check_team_option() {
+    local team="$1"
+    local option="$2"
+
+    teamnl ${team} options | egrep -q "${option}"
+    if [[ $? -ne 0 ]]; then
+        echo "*** Failed check: ${team} has option ${option}" >> /root/RESULT
+    fi
+}

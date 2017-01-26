@@ -53,10 +53,16 @@ check_device_ifcfg_value bridge0_slave_1 ONBOOT no
 # bridge1
 
 check_device_connected bridge1 no
-check_device_connected ens4 no
+
+if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
+    check_device_connected ens4 no
+    check_device_has_ipv4_address ens4 no
+else
+    # On Fedora NM automatically activates devices without ifcfgs with default connection
+    check_device_connected ens4 yes
+fi
 
 check_device_ifcfg_value bridge1_slave_1 BRIDGE bridge1
-check_device_has_ipv4_address ens4 no
 check_device_ifcfg_value bridge1 ONBOOT yes
 
 check_device_ifcfg_value bridge1_slave_1 ONBOOT yes

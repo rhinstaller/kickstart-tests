@@ -51,6 +51,7 @@ check_device_ifcfg_value bridge0_slave_1 ONBOOT no
 # bridge1
 
 check_device_connected bridge1 no
+
 check_device_connected ens4 no
 
 check_device_ifcfg_value bridge1_slave_1 BRIDGE bridge1

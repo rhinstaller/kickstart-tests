@@ -24,6 +24,12 @@ shutdown
 %end
 
 %post
+
+expected_fstype="ext4"
+if [ "@KSTEST_OS_NAME@" == "rhel" ]; then
+    expected_fstype="xfs"
+fi
+
 # FIXME: This will need to test for other things one day when we support tests on other arches
 boot_mount="$(grep boot /proc/mounts)"
 if [ -z "${boot_mount}" ]; then
@@ -32,8 +38,8 @@ fi
 
 # Also verify the partitions we explicitly asked for got made.
 root_fstype=$(blkid -o value -t LABEL=root -s TYPE -l)
-if [ "${root_fstype}" != "ext4" ]; then
-    echo "default fstype is incorrect (got $root_fstype; expected ext4)" >> /root/RESULT
+if [ "${root_fstype}" != "${expected_fstype}" ]; then
+    echo "default fstype is incorrect (got $root_fstype; expected ${expected_fstype})" >> /root/RESULT
 fi
 
 if [ ! -e /root/RESULT ]; then

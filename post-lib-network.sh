@@ -132,3 +132,17 @@ function check_team_option() {
         echo "*** Failed check: ${team} has option ${option}" >> /root/RESULT
     fi
 }
+
+function check_ifcfg_exists() {
+    local ifcfg_file="/etc/sysconfig/network-scripts/ifcfg-${1}"
+    local expected_result="$2"
+    local exit_code=0
+    if [[ ${expected_result} == "no" ]]; then
+        exit_code=1
+    fi
+
+    test -e ${ifcfg_file}
+    if [[ $? -ne ${exit_code} ]]; then
+        echo "*** Failed check: ${ifcfg_file} exists ${expected_result}" >> /root/RESULT
+    fi
+}

@@ -69,6 +69,7 @@ validate_RESULT() {
 
     # The /root/RESULT file was saved from the VM.  Check its contents
     # and decide whether the test finally succeeded or not.
+    status=0
     result=$(cat ${disksdir}/RESULT)
     if [[ $? != 0 ]]; then
         status=1

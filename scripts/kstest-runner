@@ -53,7 +53,7 @@ class VirtualInstall(object):
     def __init__(self, iso, ks_paths, disk_paths,
                  kernel_args=None, memory=1024, vnc=None,
                  log_check=None, virtio_host="127.0.0.1", virtio_port=6080,
-                 nics=None):
+                 nics=None, boot=None):
         """
         Start the installation
 
@@ -70,14 +70,19 @@ class VirtualInstall(object):
         :param str virtio_host: Hostname to connect virtio log to
         :param int virtio_port: Port to connect virtio log to
         :param list nics: virt-install --network parameters
+        :param str boot: virt-install --boot option (used eg for ibft)
         """
         self.virt_name = "LiveOS-"+str(uuid.uuid4())
         # add --graphics none later
         # add whatever serial cmds are needed later
         args = ["-n", self.virt_name,
                 "-r", str(memory),
-                "--noreboot",
                 "--noautoconsole"]
+
+        # CHECKME This seems to be necessary because of ipxe ibft chain booting,
+        # otherwise the vm is created but it does not boot into installation
+        if not boot:
+            args.append("--noreboot")
 
         args.append("--graphics")
         if vnc:
@@ -112,11 +117,17 @@ class VirtualInstall(object):
             extra_args += " " + kernel_args
         if iso.stage2:
             extra_args += " stage2=hd:CDLABEL={0}".format(udev_escape(iso.label))
-        args.append("--extra-args")
-        args.append(extra_args)
 
-        args.append("--location")
-        args.append(iso.mount_dir)
+        if boot:
+            # eg booting from ipxe to emulate ibft firmware
+            args.append("--boot")
+            args.append(boot)
+        else:
+            args.append("--extra-args")
+            args.append(extra_args)
+
+            args.append("--location")
+            args.append(iso.mount_dir)
 
         channel_args = "tcp,host={0}:{1},mode=connect,target_type=virtio" \
                        ",name=org.fedoraproject.anaconda.log.0".format(
@@ -185,7 +196,8 @@ def virt_install(opts, install_log):
                               kernel_args, opts.ram, opts.vnc,
                               log_check = log_monitor.server.log_check,
                               virtio_host = log_monitor.host,
-                              virtio_port = log_monitor.port, nics=opts.nics)
+                              virtio_port = log_monitor.port, nics=opts.nics,
+                              boot=opts.boot)
 
         virt.destroy(os.path.basename(opts.tmp))
         log_monitor.shutdown()
@@ -242,7 +254,7 @@ def main():
     parser.add_argument("--ks", action="append", type=os.path.abspath, default=[],
                         help="Kickstart file defining the install.")
     parser.add_argument("--disk", action="append", type=os.path.abspath, dest="disk_paths",
-                        help="Pre-existing disk image to use for destination.")
+                        default=[], help="Pre-existing disk image to use for destination.")
     parser.add_argument("--nic", action="append", default=[], dest="nics",
                         help="Network devices to be used.")
 
@@ -252,6 +264,8 @@ def main():
                         help="location of iso directory tree with initrd.img "
                              "and vmlinuz. Used to run virt-install with a "
                              "newer initrd than the iso.")
+    parser.add_argument("--boot", default=None, type=str,
+                        help="alternative boot image, eg. ipxe.lkrn for ibft")
 
     parser.add_argument("--logfile", default="./livemedia.log",
                         type=os.path.abspath,

@@ -44,6 +44,10 @@ prepare_network() {
     echo ""
 }
 
+additional_runner_args() {
+    echo ""
+}
+
 validate_RESULT() {
     disksdir=$1
     args=$(for d in ${disksdir}/disk-*img; do echo -a ${d}; done)
@@ -110,6 +114,13 @@ start_httpd() {
 
     # Construct a URL
     httpd_url="http://$(${scriptdir}/find-ip):${httpd_port}/"
+}
+
+udev_escape() {
+    local string="$1"
+    local scriptdir=${PWD}/scripts
+    local escaped_string="$(${scriptdir}/udev_escape.py "${string}")"
+    echo ${escaped_string}
 }
 
 create_iscsi_target() {

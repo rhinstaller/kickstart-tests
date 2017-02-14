@@ -29,16 +29,10 @@ shutdown
 
 check_device_ifcfg_value bond0 ONBOOT no
 
-# FIXME (BUG) commented is the behaviour with regular parse-kickstart
-# we should unify it
-#check_device_ifcfg_value bond0_slave_1 ONBOOT no
-#check_device_ifcfg_value bond0_slave_2 ONBOOT no
-#check_device_ifcfg_value bond0_slave_1 MASTER bond0
-#check_device_ifcfg_value bond0_slave_2 MASTER bond0
-check_device_ifcfg_value ens4 ONBOOT no
-check_device_ifcfg_value ens5 ONBOOT no
-check_device_ifcfg_value ens4 MASTER bond0
-check_device_ifcfg_value ens5 MASTER bond0
+check_device_ifcfg_value bond0_slave_1 ONBOOT no
+check_device_ifcfg_value bond0_slave_2 ONBOOT no
+check_device_ifcfg_value bond0_slave_1 MASTER bond0
+check_device_ifcfg_value bond0_slave_2 MASTER bond0
 
 check_device_connected bond0 yes
 check_bond_has_slave bond0 ens4 yes
@@ -49,16 +43,10 @@ check_bond_has_slave bond0 ens7 no
 
 check_device_ifcfg_value bond1 ONBOOT yes
 
-# FIXME (BUG) commented is the behaviour with regular parse-kickstart
-# we should unify it
-#check_device_ifcfg_value bond1_slave_1 ONBOOT yes
-#check_device_ifcfg_value bond1_slave_2 ONBOOT yes
-#check_device_ifcfg_value bond1_slave_1 MASTER bond1
-#check_device_ifcfg_value bond1_slave_2 MASTER bond1
-check_device_ifcfg_value ens6 ONBOOT yes
-check_device_ifcfg_value ens7 ONBOOT yes
-check_device_ifcfg_value ens6 MASTER bond1
-check_device_ifcfg_value ens7 MASTER bond1
+check_device_ifcfg_value bond1_slave_1 ONBOOT yes
+check_device_ifcfg_value bond1_slave_2 ONBOOT yes
+check_device_ifcfg_value bond1_slave_1 MASTER bond1
+check_device_ifcfg_value bond1_slave_2 MASTER bond1
 
 # FIXME this doesn't seem to hold for RHEL
 check_device_connected bond1 no

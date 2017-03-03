@@ -5,7 +5,7 @@ install
 
 %include /tmp/ksinclude
 %pre
-echo "network --device team0 --bootproto dhcp --teamslaves=\"ens4'{\\\"prio\\\": -10, \\\"sticky\\\": true}',ens5'{\\\"prio\\\": 100}'\" --teamconfig=\"{\\\"runner\\\": {\\\"name\\\": \\\"activebackup\\\"}}\" --activate" >> /tmp/ksinclude
+echo "network --device team0 --bootproto dhcp --teamslaves=\"ens4'{\\\"prio\\\": -10, \\\"sticky\\\": true}',ens5'{\\\"prio\\\": 100}'\" --teamconfig=\"{\\\"runner\\\": {\\\"name\\\": \\\"activebackup\\\"}}\" --activate --onboot=no" >> /tmp/ksinclude
 echo 'network --device team1 --bootproto dhcp --teamslaves=ens6,ens7 --teamconfig="{\"runner\": {\"name\": \"roundrobin\"}}"' >> /tmp/ksinclude
 %end
 

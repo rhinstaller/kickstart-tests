@@ -93,7 +93,13 @@ runone() {
         ks_args="--ks ${ksfile}"
     fi
 
+    # set kernel arguments
     kargs=$(kernel_args)
+    # set updates image link if -u parameter was used
+    if [[ "${UPDATES}" != "" ]]; then
+        kargs="$kargs inst.updates=${UPDATES}"
+    fi
+
     if [[ "${kargs}" != "" ]]; then
         kargs="--kernel-args \"$kargs\""
     fi
@@ -170,16 +176,17 @@ if [[ ${EUID} != 0 ]]; then
     exit 77
 fi
 
-while getopts ":i:k:" opt; do
+while getopts ":i:k:u:" opt; do
     case $opt in
         i)
             IMAGE=$OPTARG
             ;;
-
         k)
             KEEPIT=$OPTARG
             ;;
-
+        u)
+            UPDATES=$OPTARG
+            ;;
         *)
             echo "Usage: run_one_ks.sh -i ISO [-k KEEPIT] ks-test.sh"
             exit 1

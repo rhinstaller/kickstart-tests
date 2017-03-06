@@ -58,9 +58,13 @@ IMAGE="${TEST_BOOT_ISO}"
 # 2 - Keep log files and disk images (will take up a lot of space)
 KEEPIT=${KEEPIT:-0}
 
+# Link to a server where an updates image is stored. Use on your own
+# responsibility, this can break tests.
+UPDATES_IMG=""
+
 TESTTYPE=""
 
-while getopts ":i:k:t:" opt; do
+while getopts ":i:k:t:u:" opt; do
     case $opt in
        i)
            # If this wasn't set from the environment, set it from the command line
@@ -79,9 +83,14 @@ while getopts ":i:k:t:" opt; do
            # more than one type.  We'll do a pretty stupid test for it.
            TESTTYPE=$OPTARG
            ;;
-
+       u)
+           # Link to an updates image on a server. This will be added as a kernel
+           # parameter inst.updates=<server> to the VM boot options.
+           # This may not be compatible with all the tests.
+           UPDATES_IMG=$OPTARG
+           ;;
        *)
-           echo "Usage: run_kickstart_tests.sh [-i boot.iso] [-k 0|1|2] [tests]"
+           echo "Usage: run_kickstart_tests.sh [-i boot.iso] [-k 0|1|2] [-u link_to_updates.img] [tests]"
            exit 1
            ;;
     esac
@@ -256,6 +265,12 @@ if [ -n "$prereq_list" ] ; then
         -C scripts -f Makefile.prereqs $prereq_list
 fi
 
+# set updates image argument for parallel
+UPDATES_ARG=""
+if [[ -n "$UPDATES_IMG" ]]; then
+    UPDATES_ARG="-u ${UPDATES_IMG}"
+fi
+
 if [[ "$TEST_REMOTES" != "" ]]; then
     _IMAGE=$(basename ${IMAGE})
 
@@ -282,7 +297,9 @@ if [[ "$TEST_REMOTES" != "" ]]; then
     done
 
     parallel --no-notice ${remote_args} --jobs ${TEST_JOBS:-4} \
-             sudo PYTHONPATH=$PYTHONPATH scripts/run_one_ks.sh -i ${_IMAGE} -k ${KEEPIT} {} ::: ${tests}
+             sudo PYTHONPATH=$PYTHONPATH scripts/run_one_ks.sh -i ${_IMAGE} \
+                                                               -k ${KEEPIT} \
+                                                               ${UPDATES_ARG} {} ::: ${tests}
     rc=$?
 
     # (3) Get all the results back from the remote systems, which will have already
@@ -305,8 +322,9 @@ if [[ "$TEST_REMOTES" != "" ]]; then
     rm ${_IMAGE}
 else
     parallel --no-notice --jobs ${TEST_JOBS:-4} \
-        sudo PYTHONPATH=$PYTHONPATH scripts/run_one_ks.sh -i ${IMAGE} -k ${KEEPIT} {} ::: ${tests}
-
+        sudo PYTHONPATH=$PYTHONPATH scripts/run_one_ks.sh -i ${IMAGE} \
+                                                          -k ${KEEPIT} \
+                                                          ${UPDATES_ARG} {} ::: ${tests}
     rc=$?
 fi
 

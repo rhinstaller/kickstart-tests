@@ -25,7 +25,8 @@ shutdown
 
 if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
     check_device_ifcfg_value ens4 BOOTPROTO none
-    check_device_ifcfg_value ens5 BOOTPROTO none
+    # BOOTPROTO is removed from the ifcfg when real ONBOOT value is updated via NM api
+    device_ifcfg_key_missing ens5 BOOTPROTO
 else
     device_ifcfg_key_missing ens4 BOOTPROTO
     device_ifcfg_key_missing ens5 BOOTPROTO

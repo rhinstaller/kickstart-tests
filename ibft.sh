@@ -125,6 +125,12 @@ prepare() {
     ### Create ipxe script to be chainloaded via http
     # sanhook command creates the ibft table
 
+    local kargs=$(real_kernel_args $tmpdir)
+    # set updates image link if -u parameter was used
+    if [[ "${UPDATES}" != "" ]]; then
+        kargs="$kargs inst.updates=${UPDATES}"
+    fi
+
     cat << EOF > ${http_dir}/${ipxe_script}
 #!ipxe
 
@@ -149,7 +155,7 @@ prepare() {
 ## CASE: using single device (net0) both to fetch ks, kernel, intird and ibft
 sanhook iscsi:${target_ip}:::0:${wwn}
 
-kernel ${httpd_url}vmlinuz $(real_kernel_args $tmpdir)
+kernel ${httpd_url}vmlinuz ${kargs}
 initrd ${httpd_url}initrd.img
 
 boot

@@ -1,0 +1,41 @@
+#test name: network-static-to-dhcp-pre-single
+# rhbz#1432886
+url @KSTEST_URL@
+install
+%include /tmp/ksinclude
+%pre
+echo "network --device=ens3 --bootproto dhcp --activate" >> /tmp/ksinclude
+%end
+
+
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+%post
+
+@KSINCLUDE@ post-lib-network.sh
+
+check_device_connected ens3 yes
+device_ifcfg_key_missing ens3 IPADDR
+device_ifcfg_key_missing ens3 PREFIX
+device_ifcfg_key_missing ens3 NETMASK
+device_ifcfg_key_missing ens3 GATEWAY
+check_device_connected ens3 yes
+check_number_of_device_ipv4_addresses ens3 1
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+   echo SUCCESS > /root/RESULT
+fi
+%end

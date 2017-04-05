@@ -85,6 +85,16 @@ function check_device_has_ipv4_address() {
     fi
 }
 
+function check_number_of_device_ipv4_addresses() {
+    local device="$1"
+    local number="$2"
+
+    num_found=$(ip -f inet addr show ${device} | egrep '^\s+inet\s+' | wc -l)
+    if [[ ${number} !=  ${num_found} ]]; then
+        echo "*** Failed check: ${device} has ${number} ipv4 addresses" >> /root/RESULT
+    fi
+}
+
 function check_ifcfg_file_does_not_exist() {
     local nic="$1"
     local ifcfg_file="/etc/sysconfig/network-scripts/ifcfg-${nic}"

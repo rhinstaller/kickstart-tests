@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015  Red Hat, Inc.
+# Copyright (C) 2017  Red Hat, Inc.
 #
 # This copyrighted material is made available to anyone wishing to use,
 # modify, copy, or redistribute it subject to the terms and conditions of
@@ -16,14 +16,11 @@
 # Red Hat, Inc.
 #
 # Red Hat Author(s): David Shea <dshea@redhat.com>
+#                    Jiri Konecny <jkonecny@redhat.com>
 
 TESTTYPE="method proxy"
 
 . ${KSTESTDIR}/functions.sh
-
-prereqs() {
-    echo proxy-common.ks
-}
 
 prepare() {
     ks=$1
@@ -34,14 +31,54 @@ prepare() {
     # Create the test repo
     PYTHONPATH=${KSTESTDIR}/lib:$PYTHONPATH ${scriptdir}/make-addon-pkgs.py $tmpdir
 
-    # Start a http server to serve the test repo
+    # Start a http and proxy server to serve the test repo
     start_httpd ${tmpdir}/http ${tmpdir}
+    start_proxy ${tmpdir}/proxy
 
-    # Flatten the kickstart to include the proxy %pre script
-    ( cd "$(dirname ${ks})" && ksflatten -o ${tmpdir}/kickstart.ks -c "$(basename $ks)" )
-
-    sed -e "/^repo/ s|HTTP-ADDON-REPO|${httpd_url}|" ${tmpdir}/kickstart.ks > ${tmpdir}/kickstart-repo.ks
+    sed -e  "/^repo/ s|HTTP-ADDON-REPO|${httpd_url}|" \
+        -re "/^(repo|url)/ s|PROXY-ADDON|${proxy_url}|" \
+        -e  "/'proxy=/ s|PROXY-ADDON|${proxy_url%%/*}|" \
+        ${ks} > ${tmpdir}/kickstart-repo.ks
     echo ${tmpdir}/kickstart-repo.ks
+}
+
+validate() {
+    tmpdir=$1
+    validate_RESULT $tmpdir
+    if [ ! -f $tmpdir/RESULT ]; then
+        return 1
+    fi
+
+    check_proxy_settings $tmpdir
+
+    # HTTPS direct mirror; we don't need to capture hostname here
+    httpsdir=$(echo "$KSTEST_URL" | grep -e '--url="\?https:')
+
+    # unless direct https URL was used, also check for:
+    if [ ! "$httpsdir" ]; then
+        # testpkg-http-core from the addon repo
+        grep -q 'testpkg-http-core.*\.rpm' $tmpdir/proxy/access.log
+        if [[ $? -ne 0 ]]; then
+            echo 'addon repo package requests were not proxied' >> $tmpdir/RESULT
+        fi
+
+        # Finally, check that the repoquery used the proxy
+        tail -1 $tmpdir/proxy/access.log | grep -q repodata
+        if [[ $? -ne 0 ]]; then
+            echo 'repoquery on installed system was not proxied' >> $tmpdir/RESULT
+        fi
+    fi
+
+    result=$(cat ${disksdir}/RESULT)
+    if [[ $? != 0 ]]; then
+        echo '*** /root/RESULT does not exist in VM image.'
+        return 1
+    elif [[ "${result}" != SUCCESS* ]]; then
+        echo "${result}"
+        return 1
+    else
+        return 0
+    fi
 }
 
 cleanup() {
@@ -50,4 +87,6 @@ cleanup() {
     if [ -f ${tmpdir}/httpd-pid ]; then
         kill $(cat ${tmpdir}/httpd-pid)
     fi
+
+    stop_proxy ${tmpdir}/proxy
 }

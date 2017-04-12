@@ -26,7 +26,14 @@ shutdown
 check_device_ifcfg_value ens3 ONBOOT no
 check_device_ifcfg_value ens4 ONBOOT yes
 check_device_ifcfg_value ens5 ONBOOT no
-check_device_connected ens4 no
+
+if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
+    check_device_connected ens4 no
+else
+    # On Fedora, default autoconnection "Wired connection 1" is activated
+    # after switchroot
+    check_device_connected ens4 yes
+fi
 check_device_connected ens5 yes
 
 # No error was written to /root/RESULT file, everything is OK

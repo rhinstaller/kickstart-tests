@@ -30,8 +30,15 @@ device_ifcfg_key_missing ens4 BOOTPROTO
 device_ifcfg_key_missing ens5 BOOTPROTO
 # TODO create test with virtual network having ipv6 enabled (ipv6 only connection)
 #      libvirt default net does not have ipv6 enabled
-check_device_connected ens5 no
-check_device_has_ipv4_address ens5 no
+if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
+    check_device_connected ens5 no
+    check_device_has_ipv4_address ens5 no
+else
+    # Fedora: connection from %pre fails to activate (RA timeout, no ip config)
+    # and default con. created by NM (Wired connection 1) is autoactivated again
+    check_device_connected ens5 yes
+    check_device_has_ipv4_address ens5 yes
+fi
 
 # No error was written to /root/RESULT file, everything is OK
 if [[ ! -e /root/RESULT ]]; then

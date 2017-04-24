@@ -24,6 +24,7 @@ shutdown
 @KSINCLUDE@ post-nochroot-lib-network.sh
 
 check_bridge_has_slave_nochroot bridge0 ens3 yes
+check_gui_configurations ens3 bridge0
 
 %end
 

@@ -18,6 +18,14 @@ shutdown
 %packages
 %end
 
+%post --nochroot
+
+@KSINCLUDE@ post-nochroot-lib-network.sh
+
+check_gui_configurations ens3
+
+%end
+
 %post
 
 @KSINCLUDE@ post-lib-network.sh

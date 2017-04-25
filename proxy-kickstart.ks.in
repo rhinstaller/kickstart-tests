@@ -1,6 +1,7 @@
 #test name: proxy-kickstart
-url @KSTEST_URL@ --proxy=http://127.0.0.1:8080
-repo --name=kstest-http --baseurl=HTTP-ADDON-REPO --proxy=http://127.0.0.1:8080 --install
+url @KSTEST_URL@ --proxy=PROXY-ADDON
+repo --name=kstest-http --baseurl=HTTP-ADDON-REPO --proxy=PROXY-ADDON --install
+
 install
 network --bootproto=dhcp
 
@@ -19,72 +20,9 @@ shutdown
 %packages
 %end
 
-# Start the proxy server
-%include scripts/proxy-common.ks
-
 %post --nochroot
-# Checks must differ depending on the form of KSTEST_URL
-# HTTP mirror list; we find the hostname with the cuts
-httplist=$(echo "@KSTEST_URL@" | grep -e '--mirrorlist="\?http:' | cut -d'=' -f2 | cut -d'/' -f3)
-# HTTPS mirror list; ditto
-httpslist=$(echo "@KSTEST_URL@" | grep -e '--mirrorlist="\?https:' | cut -d'=' -f2 | cut -d'/' -f3)
-# HTTP direct mirror; ditto
-httpdir=$(echo "@KSTEST_URL@" | grep -e '--url="\?http:' | cut -d'=' -f2 | cut -d'/' -f3)
 # HTTPS direct mirror; we don't need to capture hostname here
 httpsdir=$(echo "@KSTEST_URL@" | grep -e '--url="\?https:')
-
-if [ "$httpslist" ]; then
-    # check for CONNECT request to mirrorlist host
-    grep -q "CONNECT $httpslist " /tmp/proxy.log
-    if [[ $? -ne 0 ]]; then
-        echo 'Connection to TLS mirrorlist server was not proxied' >> $ANA_INSTALL_PATH/root/RESULT
-    fi
-elif [ "$httplist" ]; then
-    # check for GET request to mirrorlist host (we can't really guess
-    # any path component, even 'mirrorlist' isn't guaranteed). There's
-    # a potential 'false pass' here if the mirror list and repo are on
-    # the same server and the repo requests are proxied but mirror
-    # requests are not.
-    grep -q "$httplist" /tmp/proxy.log
-    if [[ $? -ne 0 ]]; then
-        echo 'Mirror list server request was not proxied' >> $ANA_INSTALL_PATH/root/RESULT
-    fi
-elif [ "$httpsdir" ]; then
-    # check for CONNECT request to mirror
-    grep -q "CONNECT $httpsdir " /tmp/proxy.log
-    if [[ $? -ne 0 ]]; then
-        echo 'Connection to TLS repository server was not proxied' >> $ANA_INSTALL_PATH/root/RESULT
-    fi
-elif [ "$httpdir" ]; then
-    # check for .treeinfo request
-    grep -q '\.treeinfo$' /tmp/proxy.log
-    if [[ $? -ne 0 ]]; then
-        echo '.treeinfo request to repository server was not proxied' >> $ANA_INSTALL_PATH/root/RESULT
-    fi
-else
-    result='Could not parse url line!'
-fi
-
-# unless direct https URL was used, also check for:
-if [ ! "$httpsdir" ]; then
-    # primary.xml from the repodata
-    grep -q 'repodata/.*primary.xml' /tmp/proxy.log
-    if [[ $? -ne 0 ]]; then
-        echo 'repodata requests were not proxied' >> $ANA_INSTALL_PATH/root/RESULT
-    fi
-
-    # the kernel package from the Fedora repo
-    grep -q 'kernel-.*\.rpm' /tmp/proxy.log
-    if [[ $? -ne 0 ]]; then
-        echo 'package requests were not proxied' >> $ANA_INSTALL_PATH/root/RESULT
-    fi
-
-    # testpkg-http-core from the addon repo
-    grep -q 'testpkg-http-core.*\.rpm' /tmp/proxy.log
-    if [[ $? -ne 0 ]]; then
-        echo 'addon repo package requests were not proxied' >> $ANA_INSTALL_PATH/root/RESULT
-    fi
-fi
 
 # Check that the addon repo file was installed
 if [[ ! -f $ANA_INSTALL_PATH/etc/yum.repos.d/kstest-http.repo ]]; then
@@ -92,28 +30,28 @@ if [[ ! -f $ANA_INSTALL_PATH/etc/yum.repos.d/kstest-http.repo ]]; then
 fi
 
 # Check that the proxy configuration was written to the repo file
-grep -q 'proxy=http://127.0.0.1:8080' $ANA_INSTALL_PATH/etc/yum.repos.d/kstest-http.repo
+grep -q 'proxy=PROXY-ADDON' $ANA_INSTALL_PATH/etc/yum.repos.d/kstest-http.repo
 if [[ $? -ne 0 ]]; then
     echo 'kstest-http.repo does not contain proxy information' >> $ANA_INSTALL_PATH/root/RESULT
 fi
 
 # Check that the installed repo file is usable
-# dnf exits with 0 even if something goes wrong, so do a repoquery and look for
-# the package in the output
-chroot $ANA_INSTALL_PATH \
-    dnf --disablerepo=\* --enablerepo=kstest-http --quiet repoquery testpkg-http-core 2>/dev/null | \
-    grep -q 'testpkg-http-core'
-if [[ $? -ne 0 ]]; then
-    echo 'unable to query kstest-http repo' >> $ANA_INSTALL_PATH/root/RESULT
+# Find if this is using yum or dnf
+if [[ -f $ANA_INSTALL_PATH/usr/bin/dnf ]]; then
+	BIN="dnf"
+else
+	BIN="yum"
 fi
 
-# again unless direct https URL was used:
-if [ ! "$httpsdir" ]; then
-    # Finally, check that the repoquery used the proxy
-    tail -1 /tmp/proxy.log | grep -q repodata
-    if [[ $? -ne 0 ]]; then
-        echo 'repoquery on installed system was not proxied' >> $ANA_INSTALL_PATH/root/RESULT
-    fi
+# Clean packages to force package download
+chroot $ANA_INSTALL_PATH $BIN clean packages
+# Download package to test if the installed repository is usable
+chroot $ANA_INSTALL_PATH \
+    $BIN --disablerepo=\* --enablerepo=kstest-http --downloadonly --nogpgcheck -y \
+         reinstall testpkg-http-core 2>/dev/null | \
+        grep -q 'testpkg-http-core'
+if [[ $? -ne 0 ]]; then
+    echo 'unable to query kstest-http repo' >> $ANA_INSTALL_PATH/root/RESULT
 fi
 
 # If nothing was written to RESULT, it worked

@@ -116,6 +116,43 @@ start_httpd() {
     httpd_url="http://$(${scriptdir}/find-ip):${httpd_port}/"
 }
 
+start_proxy() {
+    local proxy_root=$1
+    local config="squid.conf"
+
+    if [ -n "$2" ]; then
+        config="$2"
+    fi
+
+    # Starts a proxy server rooted in $proxy_root. The PID of the server will be
+    # written to $tmpdir/proxy-pid, and the URL for the server will be set in
+    # $proxy_url
+
+    # Proxy must have rights for its folder
+    mkdir -p ${proxy_root}
+    chmod 777 ${proxy_root}
+
+    local scriptdir=${PWD}/scripts
+
+    # Copy configuration file for squid from confs folder to proxy_root
+    # and launch the proxy.
+    cp $scriptdir/confs/$config $proxy_root/squid.conf
+    local proxy_info="$(${scriptdir}/launch_proxy.sh "${proxy_root}")"
+
+    # Parse out the port
+    local proxy_port="$(echo "$proxy_info" | cut -d ' ' -f 2)"
+
+    # Construct a URL
+    proxy_url="http://$(${scriptdir}/find-ip):${proxy_port}/"
+}
+
+stop_proxy() {
+    local proxy_root=$1
+
+    # Stops a proxy server rooted in $proxy_root.
+    kill -15 $(cat $proxy_root/squid.pid)
+}
+
 udev_escape() {
     local string="$1"
     local scriptdir=${PWD}/scripts

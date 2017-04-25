@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015  Red Hat, Inc.
+# Copyright (C) 2017  Red Hat, Inc.
 #
 # This copyrighted material is made available to anyone wishing to use,
 # modify, copy, or redistribute it subject to the terms and conditions of
@@ -16,24 +16,45 @@
 # Red Hat, Inc.
 #
 # Red Hat Author(s): David Shea <dshea@redhat.com>
+#                    Jiri Konecny <jkonecny@redhat.com>
 
 TESTTYPE="method proxy"
 
 . ${KSTESTDIR}/functions.sh
-
-prereqs() {
-    echo proxy-common.ks
-}
+. ${KSTESTDIR}/functions-proxy.sh
 
 kernel_args() {
-    echo vnc inst.proxy=http://127.0.0.1:8080 inst.debug
+    echo vnc inst.proxy=${proxy_url%%/*} inst.debug
 }
 
 prepare() {
     ks=$1
     tmpdir=$2
 
-    # Flatten the kickstart to include the proxy %pre script
-    ( cd "$(dirname ${ks})" && ksflatten -o ${tmpdir}/kickstart.ks -c "$(basename $ks)" )
+    # Start a proxy server
+    start_proxy ${tmpdir}/proxy
+
+    cp ${ks} ${tmpdir}/kickstart.ks
     echo ${tmpdir}/kickstart.ks
+}
+
+validate() {
+    tmpdir=$1
+    validate_RESULT $tmpdir
+    if [ ! -f $tmpdir/RESULT ]; then
+        return 1
+    fi
+
+    check_proxy_settings $tmpdir
+
+    result=$(cat ${disksdir}/RESULT)
+    if [[ $? != 0 ]]; then
+        echo '*** /root/RESULT does not exist in VM image.'
+        return 1
+    elif [[ "${result}" != SUCCESS* ]]; then
+        echo "${result}"
+        return 1
+    else
+        return 0
+    fi
 }

@@ -1,9 +1,7 @@
-#test name: hostname
+#test name: hostname-bootopts
+# rhbz#1441337
 url @KSTEST_URL@
 install
-network --bootproto=dhcp
-# Set hostname for testing
-network --hostname=testhostname.example.com
 
 bootloader --timeout=1
 zerombr
@@ -27,6 +25,6 @@ check_hostname testhostname.example.com
 
 # No error was written to /root/RESULT file, everything is OK
 if [[ ! -e /root/RESULT ]]; then
-    echo SUCCESS > /root/RESULT
+   echo SUCCESS > /root/RESULT
 fi
 %end

@@ -156,3 +156,18 @@ function check_ifcfg_exists() {
         echo "*** Failed check: ${ifcfg_file} exists ${expected_result}" >> /root/RESULT
     fi
 }
+
+function check_hostname() {
+    local hostname="$1"
+
+    grep -q "^${hostname}$" /etc/hostname
+    if [[ $? -ne 0 ]]; then
+        echo '*** Failed check: ${hostname} is set in /etc/hostname' >> /root/RESULT
+    fi
+
+    hostnamectl --static | grep -q "^${hostname}$"
+    if [[ $? -ne 0 ]]; then
+        echo '*** Failed check: hostnamectl --static returns ${hostname}' >> /root/RESULT
+    fi
+
+}

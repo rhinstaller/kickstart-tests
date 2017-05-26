@@ -1,0 +1,43 @@
+#test name: network-device-mac-pre
+url @KSTEST_URL@
+install
+
+%include /tmp/ksinclude
+%pre
+echo "network --bootproto=dhcp --device=52:54:00:12:34:59" >> /tmp/ksinclude
+echo "network --bootproto=dhcp --device=52:54:00:12:34:5A --activate" >> /tmp/ksinclude
+%end
+
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+%post
+
+@KSINCLUDE@ post-lib-network.sh
+
+# --device=<MAC> is used to specify the interface, not to bind the
+# connection to the MAC address
+check_device_ifcfg_key_missing ens3 HWADDR
+check_ifcfg_exists ens3-1 no
+check_device_connected ens3 yes
+
+check_device_ifcfg_key_missing ens4 HWADDR
+check_ifcfg_exists ens4-1 no
+check_device_connected ens4 yes
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+   echo SUCCESS > /root/RESULT
+fi
+%end

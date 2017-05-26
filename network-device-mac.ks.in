@@ -1,0 +1,32 @@
+#test name: network-device-mac
+url @KSTEST_URL@
+install
+
+network --bootproto=dhcp --device=52:54:00:12:34:56
+
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+%post
+
+@KSINCLUDE@ post-lib-network.sh
+
+check_device_ifcfg_value ksdev0 HWADDR 52:54:00:12:34:56
+check_device_connected ksdev0 yes
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+   echo SUCCESS > /root/RESULT
+fi
+%end

@@ -1,7 +1,11 @@
-#test name: network-static
+#test name: onboot-bootopts-pre
 url @KSTEST_URL@
 install
-network --device=ens4 --bootproto static --ip @KSTEST_STATIC_IP@ --netmask @KSTEST_STATIC_NETMASK@ --gateway @KSTEST_STATIC_GATEWAY@ --onboot=no
+
+%include /tmp/ksinclude
+%pre
+echo "network --device=ens4 --bootproto dhcp --onboot=no" >> /tmp/ksinclude
+%end
 
 bootloader --timeout=1
 zerombr
@@ -17,15 +21,22 @@ shutdown
 %packages
 %end
 
+%post --nochroot
+
+@KSINCLUDE@ post-nochroot-lib-network.sh
+
+check_gui_configurations ens3 ens4
+
+%end
+
 %post
 
 @KSINCLUDE@ post-lib-network.sh
 
-check_device_ifcfg_value ens4 IPADDR @KSTEST_STATIC_IP@
+check_device_ifcfg_value ens3 ONBOOT yes
 check_device_ifcfg_value ens4 ONBOOT no
 check_device_connected ens3 yes
 check_device_connected ens4 yes
-check_device_ipv4_address ens4 @KSTEST_STATIC_IP@
 
 # No error was written to /root/RESULT file, everything is OK
 if [[ ! -e /root/RESULT ]]; then

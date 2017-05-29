@@ -33,38 +33,8 @@ kernel_args() {
     echo vnc debug=1 inst.debug ip=dhcp
 }
 
-prepare() {
-    local ks=$1
-    local tmpdir=$2
-
-    ### Create dedicated network to prevent IP address conflicts for parallel tests
-
-    local network=$(basename ${tmpdir})
-
-    local scriptdir=${PWD}/scripts
-    local ips="$(${scriptdir}/create-network.py "${network}")"
-    local ip="$(echo "$ips" | cut -d ' ' -f 1)"
-    local netmask="$(echo "$ips" | cut -d ' ' -f 2)"
-    local gateway="$(echo "$ips" | cut -d ' ' -f 3)"
-
-    # Substitute IP ranges of created network in kickstart
-    sed -i -e s#@KSTEST_STATIC_IP@#${ip}# -e s#@KSTEST_STATIC_NETMASK@#${netmask}# -e s#@KSTEST_STATIC_GATEWAY@#${gateway}# ${ks}
-
-    echo ${ks}
-}
-
 # Arguments for virt-install --network options
 prepare_network() {
-    local tmpdir=$1
-    local network=$(basename ${tmpdir})
-    echo "network:${network}"
-    echo "network:${network}"
-}
-
-cleanup() {
-    local tmpdir=$1
-
-    ### Destroy dedicated network
-    local network=$(basename ${tmpdir})
-    virsh net-destroy ${network}
+    echo "network:default"
+    echo "network:default"
 }

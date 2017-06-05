@@ -69,3 +69,4 @@ cleanup() {
     ### Destroy dedicated network
     local network=$(basename ${tmpdir})
     virsh net-destroy ${network}
+}

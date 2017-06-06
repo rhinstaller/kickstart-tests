@@ -3,6 +3,98 @@ Kickstart Test Documentation
 
 :Authors:
    Chris Lumens <clumens@redhat.com>
+   Martin Kolman <mkolman@redhat.com>
+
+Chapter 0. How to run a single kickstart test manually
+======================================================
+
+What are kickstart tests ?
+--------------------------
+
+Kickstart tests are one way of testing the Anaconda Installer, by running an automated installation based on a kickstart file and checking the results.
+
+Setting up
+----------
+
+First you need to install the needed dependencies:
+
+- livemedia-creator
+- Python bindings for libvirt
+- libguestfs
+- virt-install
+
+On Fedora the dependencies can be installed with dnf like this::
+
+  sudo dnf install livemedia-creator libvirt-python3 libquestfs virt-install
+
+Then clone the kickstart-tests repository::
+
+  git clone https://github.com/rhinstaller/kickstart-tests
+
+And you also need a rawhide boot.iso (provided you want to run the kickstart tests on Rawhide)::
+
+  wget http://download.eng.brq.redhat.com/pub/fedora/linux/development/latest-rawhide/Server/x86_64/os/images/boot.iso
+
+Please note that due to the dynamic nature of Rawhide the boot.iso might not always work.
+
+Running a test
+--------------
+
+Lets just run a simple test to check that everything works correctly – for example the simple tmpfs kickstart command test. First change directory to the kickstart-tests folder::
+
+  cd kickstart-tests
+
+Then run the single test::
+
+  scripts/run_kickstart_tests.sh -i ../boot.iso -k 2 tmpfs-fixed_size.sh
+
+About the parameters:
+
+  -i   sets the path to the boot.iso
+  -k   sets if logs from the run should be kept, as for the values:
+
+ - 0 = keep nothing (the default)
+ - 1 = keep log files
+ - 2 = keep log files and disk images (will take up a lot of space)
+
+And at the end name of the kickstart test script to run.
+
+The -k 2 option is especially useful if you are doing more complicated post-install test validation in you kickstart test script that needs to check contents of the disk image/images.
+
+The results
+-----------
+
+If everything worked out, you should be greeted by a successful test result similar to this one::
+
+
+    ===========================================================================
+    tmpfs-fixed_size.ks on computer.hostname
+    ===========================================================================
+    PYTHONPATH=
+    ...................................................
+    Domain LiveOS-1710fd05-898c-4cf2-b4e1-67d40aaf5f3d has been undefined
+
+    Pool kstest-tmpfs-fixed_size.RI8HWHMF destroyed
+
+    Pool kstest-tmpfs-fixed_size.RI8HWHMF has been undefined
+
+
+    RESULT:tmpfs-fixed_size:SUCCESS
+    2017-06-06 16:46:34,477: install_log = /var/tmp/kstest-tmpfs-fixed_size.RI8HWHMF/virt-install.log
+    2017-06-06 16:46:34,513: Running virt-install.
+    2017-06-06 16:46:35,903: Processing logs from ('127.0.0.1', 53130)
+    2017-06-06 16:55:06,646: Install finished. Or at least virt shut down.
+    2017-06-06 16:55:06,650: Shutting down LiveOS-1710fd05-898c-4cf2-b4e1-67d40aaf5f3d
+    error: Failed to destroy domain LiveOS-1710fd05-898c-4cf2-b4e1-67d40aaf5f3d
+    error: Requested operation is not valid: the domain is not running
+    2017-06-06 16:55:06,777: Shutting down log processing
+    2017-06-06 16:55:06,778: unmounting the iso
+    2017-06-06 16:55:06,812: Disk Image install successful
+    2017-06-06 16:55:06,812: SUMMARY
+    2017-06-06 16:55:06,812: -------
+    2017-06-06 16:55:06,813: Logs are in /var/tmp/kstest-tmpfs-fixed_size.RI8HWHMF
+    2017-06-06 16:55:06,813: Disk image(s) at /var/tmp/kstest-tmpfs-fixed_size.RI8HWHMF/disk-a.img,cache=unsafe
+    2017-06-06 16:55:06,813: Results are in /var/tmp/kstest-tmpfs-fixed_size.RI8HWHMF
 
 Chapter 1. Environment Variables
 ================================

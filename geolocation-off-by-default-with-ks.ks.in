@@ -1,0 +1,50 @@
+#test name: geolocation-off-by-default-with-ks
+url @KSTEST_URL@
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+%post
+
+# Geolocation should be off by default during a kickstart installation.
+# This can be tested by checking if the sensitive-info log contains
+# any results from a geolocation lookup - there should not be any
+# during a default kickstart installation.
+
+# first check the anaconda log
+if grep -q "Geolocation started:" /tmp/anaconda.log; then
+  echo "error: geolocation started during default kickstart installation" >> /root/RESULT
+fi
+if grep -q "got results from geolocation" /tmp/anaconda.log; then
+  echo "error: got results from geolocation during default kickstart installation" >> /root/RESULT
+fi
+
+# then the sensitive-info log where geolocation record lookup results
+if grep -q "geolocation result:" /tmp/sensitive-info.log; then
+  echo "error: geolocation result found during default kickstart installation" >> /root/RESULT
+fi
+if grep -q "territory:" /tmp/sensitive-info.log; then
+  echo "error: geolocated territory found during default kickstart installation" >> /root/RESULT
+fi
+if grep -q "timezone:" /tmp/sensitive-info.log; then
+  echo "error: geolocated timezone found during default kickstart installation" >> /root/RESULT
+fi
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+    echo SUCCESS > /root/RESULT
+fi
+%end

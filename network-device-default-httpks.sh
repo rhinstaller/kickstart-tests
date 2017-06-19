@@ -17,7 +17,13 @@
 #
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
+#NOTE: as this test is a "-httpks", the kickstart should be really applied
+#      in initrafs (ifcfg files created by parse-kickstart). The parse-kickstart
+#      code actually ignores the command without --device specified
+#      (and no ksdevice set), so it will be applied in anaconda.
+
 TESTTYPE="network"
+KICKSTART_NAME=network-device-default
 
 . ${KSTESTDIR}/functions.sh
 

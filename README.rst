@@ -96,7 +96,31 @@ If everything worked out, you should be greeted by a successful test result simi
     2017-06-06 16:55:06,813: Disk image(s) at /var/tmp/kstest-tmpfs-fixed_size.RI8HWHMF/disk-a.img,cache=unsafe
     2017-06-06 16:55:06,813: Results are in /var/tmp/kstest-tmpfs-fixed_size.RI8HWHMF
 
-Chapter 1. Environment Variables
+Chapter 1. A test definition
+============================
+
+A kickstart test consists of two files:
+
+- <TEST_NAME>.sh - a file defining installer boot options and procedures to set
+  up test-specific environment (eg http server for providing the kickstart
+  file, special virtual networks, iscsi targets for test, etc). This file name
+  is used to specify the kickstart test to be run.
+
+- <TEST_NAME>.ks.in - the kickstart file belonging to the test, containing
+  variables that would be preprocessed (as described in following chapters) to
+  generate the actual kicstart file passed to installer. By default, the file
+  with the same name as the .sh file is used. This can be overriden (eg to
+  share kickstarts among tests that differ only in boot options) in .sh file
+  using KICKATART_NAME=<ANOTHER_TEST_NAME> variable. For example by defining
+
+  ::
+
+    KICKSTART_NAME=network-device-default
+
+  in network-device-default-httpks.sh test, the test will use kickstart
+  network-device-default.ks.in.
+
+Chapter 2. Environment Variables
 ================================
 
 A lot of tests need configuration.  This is information that is required by
@@ -174,7 +198,7 @@ The following environment variables are currently supported:
   contains version of the OS. For example Fedora 26 have
   KSTEST_OS_VERSION = 26 and RHEL 7.3 have KSTEST_OS_VERSION = 7.3 .
 
-Chapter 2. Sharing common code in kickstart (.ks.in) files
+Chapter 3. Sharing common code in kickstart (.ks.in) files
 ==========================================================
 
 To include kickstart or code snippets into test kickstart file during its

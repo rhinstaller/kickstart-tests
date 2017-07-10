@@ -1,0 +1,60 @@
+#test name: autopart-nohome
+url @KSTEST_URL@
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+clearpart --all --initlabel
+
+# Include the generated autopart command.
+%include /tmp/ksinclude
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+%pre
+# Generate the autopart command.
+autopart="autopart --type=plain --nohome"
+
+if [ "@KSTEST_OS_NAME@" == "fedora" ]; then
+    autopart="$autopart --noboot --noswap"
+fi
+
+echo "$autopart" >/tmp/ksinclude
+%end
+
+%post
+# Check the non-existence of partitions.
+check_partition() {
+    local name=$1 pattern=$2
+
+    kname="$( \
+          lsblk -o TYPE,MOUNTPOINT,KNAME --noheadings \
+        | awk -v pattern="$pattern" '$1 ~ /^part$/ && $2 ~ pattern { print $3; }' \
+    )"
+
+    if [ -n "$kname" ]; then
+        echo "$name partition shouldn't exist: $kname" >> /root/RESULT
+    fi
+}
+
+# Check /home, /boot and swap.
+check_partition "/home" '^/home$'
+
+if [ "@KSTEST_OS_NAME@" == "fedora" ]; then
+    check_partition "/boot" '^/boot$'
+    check_partition "swap" '^\\[SWAP\\]$'
+fi
+
+# The test was successful.
+if [ ! -e /root/RESULT ]; then
+    echo SUCCESS > /root/RESULT
+fi
+%end

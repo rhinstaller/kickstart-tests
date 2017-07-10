@@ -1,0 +1,34 @@
+#test name: autopart-fstype
+url @KSTEST_URL@
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+clearpart --all --initlabel
+autopart --type=plain --fstype="ext2"
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+%post
+# Check the fstype of the root.
+root_fstype="$( \
+      lsblk -o MOUNTPOINT,FSTYPE --noheadings \
+    | awk '$1 ~ /^\/$/ { print $2; }' \
+)"
+
+if [ "$root_fstype" != "ext2" ]; then
+    echo "fstype of root is incorrect: $root_fstype)" >> /root/RESULT
+fi
+
+if [ ! -e /root/RESULT ]; then
+    echo SUCCESS > /root/RESULT
+fi
+%end

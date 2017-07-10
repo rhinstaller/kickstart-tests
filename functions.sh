@@ -87,7 +87,8 @@ validate_RESULT() {
 }
 
 validate() {
-    return $(validate_RESULT $1)
+    validate_RESULT $1
+    return $?
 }
 
 cleanup() {

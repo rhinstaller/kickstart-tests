@@ -19,4 +19,5 @@
 
 TESTTYPE="autopart"
 
+
 . ${KSTESTDIR}/functions.sh

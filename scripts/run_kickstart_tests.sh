@@ -202,6 +202,12 @@ elif [[ "${ghprbActualCommit}" != "" ]]; then
     # And then add the .sh suffix back on to everything in $candidates.  That will
     # give us the list of tests to be run.
     for c in ${candidates}; do
+
+        # Skip files that are not executable.
+        if [[ ! -x "${c}.sh" ]]; then
+            continue
+        fi
+
         tests+="${c}.sh "
     done
 

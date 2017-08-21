@@ -35,10 +35,10 @@ check_gui_configurations ens3
 @KSINCLUDE@ post-lib-network.sh
 
 check_device_connected ens3 yes
-device_ifcfg_key_missing ens3 IPADDR
-device_ifcfg_key_missing ens3 PREFIX
-device_ifcfg_key_missing ens3 NETMASK
-device_ifcfg_key_missing ens3 GATEWAY
+check_ifcfg_key_exists ens3 IPADDR no
+check_ifcfg_key_exists ens3 PREFIX no
+check_ifcfg_key_exists ens3 NETMASK no
+check_ifcfg_key_exists ens3 GATEWAY no
 check_device_connected ens3 yes
 check_number_of_device_ipv4_addresses ens3 1
 

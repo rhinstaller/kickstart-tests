@@ -34,8 +34,8 @@ check_gui_configurations ens3 ens4 ens5
 
 @KSINCLUDE@ post-lib-network.sh
 
-device_ifcfg_key_missing ens4 BOOTPROTO
-device_ifcfg_key_missing ens5 BOOTPROTO
+check_ifcfg_key_exists ens4 BOOTPROTO no
+check_ifcfg_key_exists ens5 BOOTPROTO no
 # TODO create test with virtual network having ipv6 enabled (ipv6 only connection)
 #      libvirt default net does not have ipv6 enabled
 if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then

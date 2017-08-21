@@ -46,6 +46,33 @@ function device_ifcfg_key_missing() {
     fi
 }
 
+function check_ifcfg_key_exists() {
+    local nic="$1"
+    local key="$2"
+    local expected_result="$3"
+
+    local ifcfg_file="/etc/sysconfig/network-scripts/ifcfg-${nic}"
+    local exit_code=0
+    if [[ ${expected_result} == "no" ]]; then
+        exit_code=1
+    fi
+
+    if [[ -e ${ifcfg_file} ]]; then
+        egrep -q '^'${key}'=' ${ifcfg_file}
+        if [[ $? -ne ${exit_code} ]]; then
+            echo "*** Failed check: ${key} exists in ${ifcfg_file}: ${expected_result}" >> /root/RESULT
+        fi
+    else
+       echo "*** Failed check: ifcfg file ${ifcfg_file} exists" >> /root/RESULT
+    fi
+}
+
+function check_device_ifcfg_bound_to_mac() {
+    local nic="$1"
+    check_ifcfg_key_exists $nic DEVICE no
+    check_ifcfg_key_exists $nic HWADDR yes
+}
+
 function check_bond_has_slave() {
     local bond="$1"
     local slave="$2"

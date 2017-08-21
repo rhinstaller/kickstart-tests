@@ -1,0 +1,60 @@
+#test name: bindtomac-bond2
+url @KSTEST_URL@
+install
+
+network --device bond0 --bootproto dhcp --bondslaves=ens4,ens5 --bondopts=mode=active-backup,primary=ens4 --activate --onboot=no --bindto=mac
+# TODO?: using ; as separator in --bondoopts
+#        need to find an example of such configuration
+network --device bond1 --bootproto dhcp --bondslaves=ens6,ens7 --bondopts=mode=active-backup,primary=ens6,miimon=100,fail_over_mac=2 --bindto=mac
+
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+%post --nochroot
+
+@KSINCLUDE@ post-nochroot-lib-network.sh
+
+check_gui_configurations ens3 ens4 ens5 ens6 ens7 bond0 bond1
+
+%end
+
+%post
+
+@KSINCLUDE@ post-lib-network.sh
+
+check_device_ifcfg_value bond0 ONBOOT no
+check_device_ifcfg_value bond0_slave_1 ONBOOT no
+check_device_ifcfg_value bond0_slave_2 ONBOOT no
+check_device_connected bond0 yes
+check_bond_has_slave bond0 ens4 yes
+check_bond_has_slave bond0 ens5 yes
+check_bond_has_slave bond0 ens3 no
+check_bond_has_slave bond0 ens6 no
+check_bond_has_slave bond0 ens7 no
+
+check_device_ifcfg_value bond1 ONBOOT yes
+check_device_ifcfg_value bond1_slave_1 ONBOOT yes
+check_device_ifcfg_value bond1_slave_2 ONBOOT yes
+check_device_connected bond1 no
+
+check_device_ifcfg_bound_to_mac bond0_slave_1
+check_device_ifcfg_bound_to_mac bond0_slave_2
+check_device_ifcfg_bound_to_mac bond1_slave_1
+check_device_ifcfg_bound_to_mac bond1_slave_2
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+   echo SUCCESS > /root/RESULT
+fi
+%end

@@ -1,0 +1,44 @@
+#test name: bindtomac-network-device-default
+#NOTE: as this test is a "-httpks" the kickstart should be really applied
+#      in initrafs (ifcfg files created by parse-kickstart). The parse-kickstart
+#      code actually ignores the command without --device specified
+#      (and no ksdevice set), so it will be applied in anaconda.
+url @KSTEST_URL@
+install
+
+network --bootproto=dhcp --ipv6=2001:cafe:cafe::1/64 --bindto=mac
+
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+%post --nochroot
+
+@KSINCLUDE@ post-nochroot-lib-network.sh
+
+check_gui_configurations ens3
+
+%end
+
+%post
+
+@KSINCLUDE@ post-lib-network.sh
+
+check_device_ifcfg_value ens3 IPV6ADDR 2001:cafe:cafe::1/64
+check_device_ifcfg_bound_to_mac ens3
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+   echo SUCCESS > /root/RESULT
+fi
+%end

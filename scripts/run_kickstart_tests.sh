@@ -226,10 +226,19 @@ fi
 
 export KSTESTDIR=$(pwd)
 
-# Now do all the substitutions on the kickstart files matching up with one of
-# the test cases we are going to run.
+# Now do all the substitutions on the kickstart files for the test cases we are
+# going to run.
+# The name of input kickstart (ks.in) file is
+# 1) either defined in the test (.sh) file by KICKSTART_NAME variable
+# 2) or the same as the test (.sh) file name .sh if the variable is not found
 for t in ${tests}; do
-    ks=${t/.sh/.ks.in}
+    ksname_line=$(grep KICKSTART_NAME= ${t})
+    if [[ -n "$ksname_line" ]]; then
+        typeset $ksname_line
+        ks="${KICKSTART_NAME}.ks.in"
+    else
+        ks=${t/.sh/.ks.in}
+    fi
     sed ${sed_args} ${ks} > ${t/.sh/.ks}
 done
 

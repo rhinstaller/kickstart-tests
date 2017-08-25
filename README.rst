@@ -220,3 +220,42 @@ for checking test results of network tests, include it in ks.in test file:
 
 The including is flat, only one level is supported. Do not use @KSINCLUDE@ in
 included files, the results could be unexpected.
+
+Chapter 4. Networking tests
+===========================
+
+This section contains tips for creating kicstart tests for network
+configuration.  In some test cases special or additional network devices and
+virtual networks for test/virt-install instance are defined in prepare() and
+prepare_network() functions of .sh test file.
+
+Static IP configuration
+-----------------------
+
+For tests using static IP configuration, separate NATed network is created in
+prepare() function for each test so IP address collisions between tests running
+in parallel are prevented. Static configuration generated during network
+creation is referred to in kickstart using @KSTEST_ substitiution described
+above.
+
+Allocating device MAC addresses
+-------------------------------
+
+For tests requiring definition of MAC address assigned to the device the
+address is statically assigned in prepare_network() function.  For kvm/qemu
+virtual machines it must start with 52:54:00. These addresses must be unique
+among are tests which are supposed to be run in parallel.  There is currently
+no mechanism to ensure this automatically. When adding a new test it is
+possible to look for already assigned addresses by running this command:
+
+  find *.sh -executable | xargs grep "network=default,mac=52:54:00:" | sort -k3
+
+httpks tests
+------------
+
+The tests containing httpks in its name are fetching kickstart from https
+server (prepare() function of .sh test file) instead of including it via initrd
+inject into initramfs - which is the default approach used in tests.  The
+reason is that using the inject method the network devices are not initialized
+in time of parsing kickstart and obtaining information from sysfs (mostly
+getting hw address) fails which results in incomplete ifcfg file generated.

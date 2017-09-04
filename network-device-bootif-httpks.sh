@@ -23,13 +23,13 @@ TESTTYPE="network"
 
 kernel_args() {
     . ${tmpdir}/ks_url
-    echo vnc debug=1 inst.debug ip=ens3:dhcp BOOTIF=01-52-54-00-12-34-5C inst.ks=${ks_url}
+    echo vnc debug=1 inst.debug ip=ens3:dhcp BOOTIF=01-52-54-00-12-34-55 inst.ks=${ks_url}
 }
 
 # Arguments for virt-install --network options
 prepare_network() {
     echo "network=default"
-    echo "network=default,mac=52:54:00:12:34:5C"
+    echo "network=default,mac=52:54:00:12:34:55"
 }
 
 prepare() {

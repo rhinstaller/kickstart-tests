@@ -22,9 +22,9 @@ function check_gui_configurations() {
 
     old_IFS=$IFS
     IFS=$'\n'
-    for line in $(egrep -o "GUI, device configuration added.*" /tmp/anaconda.log); do
-        local device=$(echo $line | cut -d" " -f8)
-        local con=$(echo $line | cut -d" " -f6)
+    for line in $(egrep -o "device configuration added.*" /tmp/anaconda.log); do
+        local device=$(echo $line | cut -d" " -f7)
+        local con=$(echo $line | cut -d" " -f5)
         dev_cons="${dev_cons} ${device}:${con} "
     done
     IFS=$old_IFS
@@ -40,9 +40,9 @@ function check_gui_configurations() {
     # for devices being slaves)
     old_IFS=$IFS
     IFS=$'\n'
-    for line in $(egrep -o "GUI, attaching connection.*" /tmp/anaconda.log); do
-        local device=$(echo $line | cut -d" " -f7)
-        local con=$(echo $line | cut -d" " -f4)
+    for line in $(egrep -o "attaching connection.*" /tmp/anaconda.log); do
+        local device=$(echo $line | cut -d" " -f6)
+        local con=$(echo $line | cut -d" " -f3)
         dev_cons=$(echo $dev_cons | sed -e "s/$device:None/$device:$con/")
     done
     IFS=$old_IFS

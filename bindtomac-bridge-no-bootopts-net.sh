@@ -19,14 +19,4 @@
 
 TESTTYPE="network"
 
-. ${KSTESTDIR}/functions.sh
-
-
-kernel_args() {
-    echo vnc debug=1 inst.debug
-}
-
-# Arguments for virt-install --network options
-prepare_network() {
-    echo "network:default"
-}
+. ${KSTESTDIR}/bridge-no-bootopts-net.sh

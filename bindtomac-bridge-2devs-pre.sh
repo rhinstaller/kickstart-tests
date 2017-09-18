@@ -19,4 +19,4 @@
 
 TESTTYPE="network"
 
-. ${KSTESTDIR}/bridge-2devs.sh
+. ${KSTESTDIR}/bridge-2devs-pre.sh

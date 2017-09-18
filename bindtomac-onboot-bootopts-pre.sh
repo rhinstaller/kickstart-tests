@@ -26,15 +26,4 @@
 
 TESTTYPE="network"
 
-. ${KSTESTDIR}/functions.sh
-
-
-kernel_args() {
-    echo vnc debug=1 inst.debug ip=dhcp
-}
-
-# Arguments for virt-install --network options
-prepare_network() {
-    echo "network:default"
-    echo "network:default"
-}
+. ${KSTESTDIR}/onboot-bootopts-pre.sh

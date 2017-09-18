@@ -19,41 +19,4 @@
 
 TESTTYPE="network"
 
-. ${KSTESTDIR}/functions.sh
-
-
-kernel_args() {
-    . ${tmpdir}/ks_url
-    echo vnc debug=1 inst.debug ip=ens3:dhcp inst.ks=${ks_url}
-}
-
-# Arguments for virt-install --network options
-prepare_network() {
-    echo "network:default"
-    echo "network:default"
-}
-
-prepare() {
-    ks=$1
-    tmpdir=$2
-
-    # Copy the kickstart to a directory in tmpdir
-    mkdir ${tmpdir}/http
-    cp $ks ${tmpdir}/http/ks.cfg
-
-    # Start a http server to serve the included file
-    start_httpd ${tmpdir}/http $tmpdir
-
-    echo ks_url=${httpd_url}ks.cfg > ${tmpdir}/ks_url
-    # Return empty path to kickstart file which will result in ks not
-    # being injected into initrd.
-    echo ""
-}
-
-cleanup() {
-    tmpdir=$1
-
-    if [ -f ${tmpdir}/httpd-pid ]; then
-        kill $(cat ${tmpdir}/httpd-pid)
-    fi
-}
+. ${KSTESTDIR}/bridge-2devs-httpks.sh

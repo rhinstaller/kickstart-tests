@@ -20,12 +20,17 @@ First you need to install the needed dependencies:
 
 - livemedia-creator
 - Python bindings for libvirt
-- libguestfs
+- libguestfs-tools
 - virt-install
+- parallel
 
 On Fedora the dependencies can be installed with dnf like this::
 
-  sudo dnf install livemedia-creator libvirt-python3 libquestfs virt-install
+  sudo dnf install lorax-lmc-virt libguestfs-tools libvirt-python3 virt-install parallel
+
+You also need to start libvirt service to be able to use virt-install::
+
+  sudo systemctl start libvirtd
 
 Then clone the kickstart-tests repository::
 

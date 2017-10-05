@@ -1,5 +1,7 @@
 SYSROOT=${ANA_INSTALL_PATH:-/mnt/sysimage}
 
+# check_bridge_has_slave BRIDGE SLAVE "yes|no"
+# Check that the bridge device BRIDGE has ("yes") or has not ("no") a slave device SLAVE
 function check_bridge_has_slave() {
     local bridge="$1"
     local slave="$2"
@@ -15,6 +17,9 @@ function check_bridge_has_slave() {
     fi
 }
 
+# check_gui_configurations
+# Works only for gui installations.
+# Checks that the connections configurable in Network Spoke are those corresponding to ifcfg files of devices
 function check_gui_configurations() {
     # parse added devices and connections from anaconda.log into eg
     # " bond0.222:1484c12b-0f40-445b-93b4-10bef8ec6ce3 bond0:8df1c4f6-76aa-42e3-9fa9-aa1f00c155b4 ens5:None ens4:None ens3:d3b58e36-68cb-4de1-b1fc-98707045274f "

@@ -116,7 +116,7 @@ A kickstart test consists of two files:
   generate the actual kicstart file passed to installer. By default, the file
   with the same name as the .sh file is used. This can be overriden (eg to
   share kickstarts among tests that differ only in boot options) in .sh file
-  using KICKATART_NAME=<ANOTHER_TEST_NAME> variable. For example by defining
+  using KICKSTART_NAME=<ANOTHER_TEST_NAME> variable. For example by defining
 
   ::
 
@@ -124,6 +124,9 @@ A kickstart test consists of two files:
 
   in network-device-default-httpks.sh test, the test will use kickstart
   network-device-default.ks.in.
+
+  NOTE: possible redefinintions of KICKSTART_NAME value in files included in
+  the the .sh file (eg to reuse .sh file of another test) are ignored.
 
 Chapter 2. Environment Variables
 ================================

@@ -31,14 +31,14 @@ check_gui_configurations ens3 ens4
 
 check_device_ifcfg_value ens3 DEVICE ens3
 check_device_ifcfg_value ens3 ONBOOT yes
-device_ifcfg_key_missing ens3 HWADDR
+check_ifcfg_key_exists ens3 HWADDR no
 check_device_connected ens3 yes
 
 # ens4 is configured neigher via boot options nor via kickstart so anaconda
 # creates default ifcfg file (rhel) or dumps it from default connection created
 # by NM on Fedora
 check_device_ifcfg_value ens4 DEVICE ens4
-device_ifcfg_key_missing ens4 HWADDR
+check_ifcfg_key_exists ens4 HWADDR no
 if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
     check_device_ifcfg_value ens4 ONBOOT no
     check_device_connected ens4 no

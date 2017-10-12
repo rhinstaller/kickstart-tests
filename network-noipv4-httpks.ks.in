@@ -34,10 +34,10 @@ check_gui_configurations ens3 ens4 ens5
 if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
     check_device_ifcfg_value ens4 BOOTPROTO none
     # BOOTPROTO is removed from the ifcfg when real ONBOOT value is updated via NM api
-    device_ifcfg_key_missing ens5 BOOTPROTO
+    check_ifcfg_key_exists ens5 BOOTPROTO no
 else
-    device_ifcfg_key_missing ens4 BOOTPROTO
-    device_ifcfg_key_missing ens5 BOOTPROTO
+    check_ifcfg_key_exists ens4 BOOTPROTO no
+    check_ifcfg_key_exists ens5 BOOTPROTO no
 fi
 
 # TODO create test with virtual network having ipv6 enabled (ipv6 only connection)

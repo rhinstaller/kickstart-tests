@@ -22,7 +22,7 @@
 #      code actually ignores the command without --device specified
 #      (and no ksdevice set), so it will be applied in anaconda.
 
-TESTTYPE="network"
+TESTTYPE=${TESTTYPE:-"network"}
 KICKSTART_NAME=network-device-default
 
 . ${KSTESTDIR}/functions.sh

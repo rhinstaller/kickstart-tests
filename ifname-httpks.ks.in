@@ -42,7 +42,7 @@ check_device_connected ifname0 yes
 if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
     # If the device is not activated in initramfs, ifname from boot options is not applied
     check_device_ifcfg_value ens4 DEVICE ens4
-    device_ifcfg_key_missing ens4 HWADDR
+    check_ifcfg_key_exists ens4 HWADDR no
     check_device_ifcfg_value ens4 ONBOOT no
     check_device_connected ens4 no
 else

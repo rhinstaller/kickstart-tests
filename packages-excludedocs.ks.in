@@ -42,8 +42,8 @@ else
         fi
     else
         echo "there are files in /usr/share/doc" > /root/RESULT
-        echo >> /root/RESULT
-        find /usr/share/doc >> /root/RESULT
+        echo "" >> /root/RESULT
+        find /usr/share/doc -type f >> /root/RESULT
     fi
 fi
 %end

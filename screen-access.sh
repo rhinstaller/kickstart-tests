@@ -24,6 +24,9 @@ TESTTYPE="logs"
 # The content of /etc/sysconfig/anaconda without comments.
 expected_config=\
 "
+[BlivetGuiSpoke]
+visited = 1
+
 [CustomPartitioningSpoke]
 visited = 1
 
@@ -49,7 +52,10 @@ visited = 1
 visited = 1
 
 [StorageSpoke]
-visited = 1"
+visited = 1
+
+[General]
+post_install_tools_disabled = 1"
 
 validate() {
     disksdir=$1
@@ -70,11 +76,19 @@ validate() {
         real_config=$(grep -vE "^#" "${disksdir}/anaconda.sysconfig")
 
         # Compare with the expected content.
-        diff <( echo "$real_config" ) <( echo "$expected_config" )
+        diff <( echo "$real_config" ) <( echo "$expected_config" ) >/dev/null
 
         # If it is different, then fail.
         if [[ $? != 0 ]]; then
             echo '*** /etc/sysconfig/anaconda is different.'
+
+            echo "CONFIG:"
+            echo "$real_config"
+            echo ""
+            echo "EXPECTED CONFIG:"
+            echo "$expected_config"
+            echo ""
+
             return 1
         fi
     fi

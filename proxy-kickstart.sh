@@ -21,6 +21,7 @@
 TESTTYPE="method proxy"
 
 . ${KSTESTDIR}/functions.sh
+. ${KSTESTDIR}/functions-proxy.sh
 
 prepare() {
     ks=$1

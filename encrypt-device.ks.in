@@ -35,7 +35,7 @@ if [ $? != 0 ]; then
     echo "discard not enabled for root_lv" >> /home/RESULT
 fi
 
-if [ ! -e /root/RESULT ]; then
-    echo SUCCESS > /root/RESULT
+if [ ! -e /home/RESULT ]; then
+    echo SUCCESS > /home/RESULT
 fi
 %end

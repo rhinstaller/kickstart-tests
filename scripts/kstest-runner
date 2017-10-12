@@ -51,7 +51,7 @@ class VirtualInstall(object):
     Run virt-install using an iso and a kickstart
     """
     def __init__(self, iso, ks_paths, disk_paths,
-                 kernel_args=None, memory=1024, vnc=None,
+                 kernel_args=None, memory=2048, vnc=None,
                  log_check=None, virtio_host="127.0.0.1", virtio_port=6080,
                  nics=None, boot=None):
         """
@@ -76,7 +76,7 @@ class VirtualInstall(object):
         # add --graphics none later
         # add whatever serial cmds are needed later
         args = ["-n", self.virt_name,
-                "-r", str(memory),
+                "--memory", str(memory),
                 "--noautoconsole"]
 
         # CHECKME This seems to be necessary because of ipxe ibft chain booting,
@@ -279,7 +279,7 @@ def main():
 
     # Group of arguments to pass to virt-install
     virt_group = parser.add_argument_group("virt-install arguments")
-    virt_group.add_argument("--ram", metavar="MEMORY", type=int, default=1024,
+    virt_group.add_argument("--ram", metavar="MEMORY", type=int, default=2048,
                             help="Memory to allocate for installer in megabytes.")
     virt_group.add_argument("--vnc",
                             help="Passed to --graphics command")

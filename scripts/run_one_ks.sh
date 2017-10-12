@@ -119,7 +119,7 @@ runone() {
                        ${add_args} \
                        --tmp ${tmpdir} \
                        --logfile ${tmpdir}/livemedia.log \
-                       --ram 1024 \
+                       --ram 2048 \
                        --vnc vnc \
                        --timeout 60 \
                        ${disk_args} \

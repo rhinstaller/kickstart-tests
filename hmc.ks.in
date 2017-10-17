@@ -1,0 +1,56 @@
+#version=DEVEL
+#test name: hmc
+
+# This test is for testing the install method hmc.
+#
+# This install method can be used only on s390x with SE/HMC, so to be able
+# to test it, we use fake scripts, that will mount DVD the usual way instead.
+# This test requires a full DVD ISO, so it is marked as a known failure.
+
+# Enable hmc in a kickstart file or use inst.repo=hmc.
+hmc
+
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+clearpart --all --initlabel
+autopart
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+@core
+%end
+
+%pre
+
+# Create the fake /usr/sbin/lshmc
+cat > /usr/sbin/lshmc <<__EOT__
+#!/bin/bash
+# This is a fake script for testing HMC.
+exit 0
+__EOT__
+
+chmod +x /usr/sbin/lshmc
+
+# Create the fake /usr/bin/hmcdrvfs $repodir
+cat > /usr/bin/hmcdrvfs <<__EOT__
+#!/bin/bash
+# This is a fake script for testing HMC.
+mount /dev/cdrom \$1
+exit 0
+__EOT__
+
+chmod +x /usr/bin/hmcdrvfs
+
+%end
+
+%post
+echo SUCCESS > /root/RESULT
+%end

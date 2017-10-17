@@ -48,7 +48,7 @@ echo "${generated_config}" > etc/sysconfig/anaconda
 %post --nochroot --interpreter /bin/bash
 
 log_pattern=\
-"anaconda: Spoke [a-zA-Z]\+ will not be displayed \
+"Spoke [a-zA-Z]\+ will not be displayed \
 because it has already been visited before.$"
 
 expected_spokes=\
@@ -63,9 +63,16 @@ mkdir -p "${ANA_INSTALL_PATH}/root"
 skipped_spokes=$( \
   cat "/tmp/anaconda.log" \
 | grep -oe "${log_pattern}" \
-| awk '{print $3;}' \
+| awk '{print $2;}' \
 | sort \
 )
+
+echo "SKIPPED SPOKES:"
+echo "$skipped_spokes"
+echo ""
+echo "EXPECTED SPOKES:"
+echo "$expected_spokes"
+echo ""
 
 # Compare with the expected spokes.
 diff <( echo "${skipped_spokes}" ) <( echo "${expected_spokes}" )

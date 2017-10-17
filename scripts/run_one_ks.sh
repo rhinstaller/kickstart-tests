@@ -105,10 +105,10 @@ runone() {
     fi
 
     disks=$(prepare_disks ${tmpdir})
-    disk_args=$(for d in $disks; do echo --disk $d,cache=unsafe; done)
+    disk_args=$(for d in $disks; do echo "--disk $d,cache=unsafe"; done)
 
     nics=$(prepare_network ${tmpdir})
-    network_args=$(for n in $nics; do echo --nic $n; done)
+    network_args=$(for n in $nics; do echo "--nic $n"; done)
 
     add_args=$(additional_runner_args)
 
@@ -119,7 +119,7 @@ runone() {
                        ${add_args} \
                        --tmp ${tmpdir} \
                        --logfile ${tmpdir}/livemedia.log \
-                       --ram 1024 \
+                       --ram 2048 \
                        --vnc vnc \
                        --timeout 60 \
                        ${disk_args} \

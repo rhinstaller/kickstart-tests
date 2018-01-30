@@ -64,7 +64,7 @@ UPDATES_IMG=""
 
 TESTTYPE=""
 
-while getopts ":i:k:t:u:" opt; do
+while getopts ":i:k:t:u:b:" opt; do
     case $opt in
        i)
            # If this wasn't set from the environment, set it from the command line
@@ -89,8 +89,12 @@ while getopts ":i:k:t:u:" opt; do
            # This may not be compatible with all the tests.
            UPDATES_IMG=$OPTARG
            ;;
+       b)
+           # Use additional boot options. Will be added to kernel_args from .sh file.
+           BOOT_ARGS=$OPTARG
+           ;;
        *)
-           echo "Usage: run_kickstart_tests.sh [-i boot.iso] [-k 0|1|2] [-u link_to_updates.img] [tests]"
+           echo "Usage: run_kickstart_tests.sh [-i boot.iso] [-k 0|1|2] [-u link_to_updates.img] [-b additional_boot_options] [tests]"
            exit 1
            ;;
     esac
@@ -280,6 +284,11 @@ if [[ -n "$UPDATES_IMG" ]]; then
     UPDATES_ARG="-u ${UPDATES_IMG}"
 fi
 
+BOOT_ARG=""
+if [[ -n "$BOOT_ARGS" ]]; then
+    BOOT_ARG="-b \"${BOOT_ARGS}\""
+fi
+
 if [[ "$TEST_REMOTES" != "" ]]; then
     _IMAGE=$(basename ${IMAGE})
 
@@ -308,7 +317,7 @@ if [[ "$TEST_REMOTES" != "" ]]; then
     parallel --no-notice ${remote_args} --jobs ${TEST_JOBS:-4} \
              sudo PYTHONPATH=$PYTHONPATH scripts/run_one_ks.sh -i ${_IMAGE} \
                                                                -k ${KEEPIT} \
-                                                               ${UPDATES_ARG} {} ::: ${tests}
+                                                               ${UPDATES_ARG} ${BOOT_ARG} {} ::: ${tests}
     rc=$?
 
     # (3) Get all the results back from the remote systems, which will have already
@@ -333,7 +342,7 @@ else
     parallel --no-notice --jobs ${TEST_JOBS:-4} \
         sudo PYTHONPATH=$PYTHONPATH scripts/run_one_ks.sh -i ${IMAGE} \
                                                           -k ${KEEPIT} \
-                                                          ${UPDATES_ARG} {} ::: ${tests}
+                                                          ${UPDATES_ARG} ${BOOT_ARG} {} ::: ${tests}
     rc=$?
 fi
 

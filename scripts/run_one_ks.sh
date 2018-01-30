@@ -95,6 +95,12 @@ runone() {
 
     # set kernel arguments
     kargs=$(kernel_args)
+
+    # add additional boot options
+    if [[ "${BOOT_ARGS}" != "" ]]; then
+        kargs="$kargs ${BOOT_ARGS}"
+    fi
+
     # set updates image link if -u parameter was used
     if [[ "${UPDATES}" != "" ]]; then
         kargs="$kargs inst.updates=${UPDATES}"
@@ -176,7 +182,7 @@ if [[ ${EUID} != 0 ]]; then
     exit 77
 fi
 
-while getopts ":i:k:u:" opt; do
+while getopts ":i:k:u:b:" opt; do
     case $opt in
         i)
             IMAGE=$OPTARG
@@ -187,8 +193,11 @@ while getopts ":i:k:u:" opt; do
         u)
             UPDATES=$OPTARG
             ;;
+        b)
+            BOOT_ARGS=$OPTARG
+            ;;
         *)
-            echo "Usage: run_one_ks.sh -i ISO [-k KEEPIT] ks-test.sh"
+            echo "Usage: run_one_ks.sh -i ISO [-k KEEPIT] [-u UPDATES_IMG] [-b ADDITIONAL_BOOT_OPTIONS] ks-test.sh"
             exit 1
             ;;
     esac

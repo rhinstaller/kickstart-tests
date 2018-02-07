@@ -62,6 +62,9 @@ About the parameters:
  - 1 = keep log files
  - 2 = keep log files and disk images (will take up a lot of space)
 
+  -u   use updates image given by URL
+  -b   use additional installer boot options
+
 And at the end name of the kickstart test script to run.
 
 The -k 2 option is especially useful if you are doing more complicated post-install test validation in you kickstart test script that needs to check contents of the disk image/images.

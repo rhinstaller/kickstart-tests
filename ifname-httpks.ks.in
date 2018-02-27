@@ -38,6 +38,7 @@ check_device_ifcfg_value ifname0 IPV6ADDR 2001:cafe:cafe::2/64
 check_device_ifcfg_value ifname0 HWADDR 52:54:00:12:34:5b
 check_device_ifcfg_value ifname0 DEVICE ifname0
 check_device_connected ifname0 yes
+check_ifcfg_exists ifname0-1 no
 
 if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
     # If the device is not activated in initramfs, ifname from boot options is not applied

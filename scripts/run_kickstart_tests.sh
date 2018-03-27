@@ -223,6 +223,8 @@ if [[ "${tests}" == "" ]]; then
     exit 77
 fi
 
+echo "Running tests: ${tests}"
+
 if [[ -z "${sed_args}" ]]; then
     echo "No substitutions provided, tests will fail; skipping."
     exit 77

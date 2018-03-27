@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Vendula Poncova <vponcova@redhat.com>
 
-TESTTYPE="autopart"
+TESTTYPE="autopart storage"
 
 . ${KSTESTDIR}/functions.sh

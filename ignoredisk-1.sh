@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="raid storage"
+TESTTYPE="ignoredisk storage"
 
 . ${KSTESTDIR}/functions.sh
 

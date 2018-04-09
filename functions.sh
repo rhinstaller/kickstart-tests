@@ -179,6 +179,7 @@ create_iscsi_target() {
     echo ${target_ip}
 }
 
+
 remove_iscsi_target() {
     local wwn=$1
     local backstore=$2

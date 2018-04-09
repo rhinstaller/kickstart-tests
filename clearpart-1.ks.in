@@ -1,0 +1,22 @@
+#version=DEVEL
+#test name: ignoredisk
+url @KSTEST_URL@
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1
+clearpart --none --initlabel
+autopart
+
+keyboard us
+lang en_US.UTF-8
+timezone America/New_York --utc
+rootpw testcase
+shutdown
+
+%packages
+%end
+
+%post
+echo SUCCESS > /root/RESULT
+%end

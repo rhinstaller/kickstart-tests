@@ -1,0 +1,82 @@
+#version=DEVEL
+#test name: ignoredisk
+url @KSTEST_URL@
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1 --boot-drive=sda
+clearpart --list=sda1 --initlabel
+autopart
+
+keyboard us
+lang en_US.UTF-8
+timezone America/New_York --utc
+rootpw testcase
+shutdown
+
+%packages
+%end
+
+%pre
+# Doing all this here is a lot easier than trying to make virt tools do
+# what I want on the outside.  Also this'll run before storage.
+parted /dev/sda mklabel msdos
+parted --align=none /dev/sda mkpart primary 0 1G
+mkfs.ext4 /dev/sda1
+mkdir /sda
+mount /dev/sda1 /sda
+echo TEST > /sda/sentinel
+umount /sda
+rmdir /sda
+%end
+
+%pre
+# Doing all this here is a lot easier than trying to make virt tools do
+# what I want on the outside.  Also this'll run before storage.
+parted /dev/sdb mklabel msdos
+parted --align=none /dev/sdb mkpart primary 0 1G
+mkfs.ext4 /dev/sdb1
+mkdir /sdb
+mount /dev/sdb1 /sdb
+echo TEST > /sdb/sentinel
+umount /sdb
+rmdir /sdb
+%end
+
+%post --nochroot
+SYSROOT=${ANA_INSTALL_PATH:-/mnt/sysimage}
+
+# Check that /dev/sda1 was cleared:
+
+mkdir /sda
+mount /dev/sda1 /sda
+if [[ $? == 0 ]]; then
+    if [[ -f /sda/sentinel ]]; then
+        if [[ "$(cat /sda/sentinel)" == "TEST" ]]; then
+            echo "*** /sda/sentinel exists" >> ${SYSROOT}/root/RESULT
+        fi
+    fi
+
+    umount /sda
+fi
+
+# Check that /dev/sdb1 wasn't cleared:
+
+mkdir /sdb
+mount /dev/sdb1 /sdb
+if [[ $? != 0 ]]; then
+    echo "*** could not mount /dev/sdb1" >> ${SYSROOT}/root/RESULT
+else
+    if [[ ! -f /sdb/sentinel ]]; then
+        echo "*** /sdb/sentinel no longer exists" >> ${SYSROOT}/root/RESULT
+    elif [[ "$(cat /sdb/sentinel)" != "TEST" ]]; then
+        echo "*** /sdb/sentinel has changed contents" >> ${SYSROOT}/root/RESULT
+    fi
+
+    umount /sdb
+fi
+
+if [ ! -e /root/RESULT ]; then
+    echo SUCCESS > ${SYSROOT}/root/RESULT
+fi
+%end

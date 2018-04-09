@@ -31,22 +31,24 @@ umount /sdb
 rmdir /sdb
 %end
 
-%post
+%post --nochroot
+SYSROOT=${ANA_INSTALL_PATH:-/mnt/sysimage}
+
 mkdir /sdb
 mount /dev/sdb1 /sdb
 if [[ $? != 0 ]]; then
-    echo "*** could not mount /dev/sdb1" >> /root/RESULT
+    echo "*** could not mount /dev/sdb1" >> ${SYSROOT}/root/RESULT
 else
     if [[ ! -f /sdb/sentinel ]]; then
-        echo "*** /sdb/sentinel no longer exists" >> /root/RESULT
+        echo "*** /sdb/sentinel no longer exists" >> ${SYSROOT}/root/RESULT
     elif [[ "$(cat /sdb/sentinel)" != "TEST" ]]; then
-        echo "*** /sdb/sentinel has changed contents" >> /root/RESULT
+        echo "*** /sdb/sentinel has changed contents" >> ${SYSROOT}/root/RESULT
     fi
 
     umount /sdb
 fi
 
 if [ ! -e /root/RESULT ]; then
-    echo SUCCESS > /root/RESULT
+    echo SUCCESS > ${SYSROOT}/root/RESULT
 fi
 %end

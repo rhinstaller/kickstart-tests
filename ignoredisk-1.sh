@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2017  Red Hat, Inc.
+# Copyright (C) 2015  Red Hat, Inc.
 #
 # This copyrighted material is made available to anyone wishing to use,
 # modify, copy, or redistribute it subject to the terms and conditions of
@@ -15,15 +15,16 @@
 # License and may only be used or replicated with the express permission of
 # Red Hat, Inc.
 #
-# Red Hat Author(s): Vendula Poncova <vponcova@redhat.com>
+# Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="autopart storage"
+TESTTYPE="ignoredisk storage"
 
 . ${KSTESTDIR}/functions.sh
 
 prepare_disks() {
     tmpdir=$1
 
-    qemu-img create -q -f qcow2 ${tmpdir}/disk-a.img 60G
-    echo ${tmpdir}/disk-a.img
+    qemu-img create -q -f qcow2 ${tmpdir}/disk-a.img 10G
+    qemu-img create -q -f qcow2 ${tmpdir}/disk-b.img 10G
+    echo ${tmpdir}/disk-a.img ${tmpdir}/disk-b.img
 }

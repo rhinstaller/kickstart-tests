@@ -1,0 +1,50 @@
+url @KSTEST_URL@
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1 --driveorder=sdx,sdb,sda
+
+autopart
+clearpart --all --initlabel
+zerombr
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+
+%pre-install
+# Get the MBR after the partitioning.
+dd if=/dev/sda bs=512 count=1 of=/tmp/pre_install_mbr_sda.bin
+dd if=/dev/sdb bs=512 count=1 of=/tmp/pre_install_mbr_sdb.bin
+%end
+
+
+%post --nochroot
+SYSROOT=${ANA_INSTALL_PATH:-/mnt/sysimage}
+
+# Get the current MBR.
+dd if=/dev/sda bs=512 count=1 of=/tmp/current_mbr_sda.bin
+dd if=/dev/sdb bs=512 count=1 of=/tmp/current_mbr_sdb.bin
+
+# Check the MBR. The boot drive is defined by the first usable drive from --driveorder.
+cmp /tmp/pre_install_mbr_sda.bin /tmp/current_mbr_sda.bin
+if [[ $? -ne 0 ]]; then
+    echo '*** Failed check: MBR should be the same on sda' >> ${ANA_INSTALL_PATH}/root/RESULT
+fi
+
+cmp /tmp/pre_install_mbr_sdb.bin /tmp/current_mbr_sdb.bin
+if [[ $? -ne 1 ]]; then
+    echo '*** Failed check: MBR should be changed on sdb' >> ${ANA_INSTALL_PATH}/root/RESULT
+fi
+
+# The test was successful.
+if [ ! -e  ${ANA_INSTALL_PATH}/root/RESULT ]; then
+    echo SUCCESS >  ${ANA_INSTALL_PATH}/root/RESULT
+fi
+%end

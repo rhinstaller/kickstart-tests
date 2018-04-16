@@ -1,0 +1,40 @@
+url @KSTEST_URL@
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1 --boot-drive=sda --nombr
+
+autopart
+clearpart --all
+zerombr
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+
+%pre-install
+# Get the MBR after the partitioning.
+dd if=/dev/sda bs=512 count=1 of=/tmp/pre_install_mbr_content.bin
+%end
+
+
+%post --nochroot
+SYSROOT=${ANA_INSTALL_PATH:-/mnt/sysimage}
+
+# Get the current MBR.
+dd if=/dev/sda bs=512 count=1 of=/tmp/current_mbr_content.bin
+
+# Check the MBR.
+cmp /tmp/pre_install_mbr_content.bin /tmp/current_mbr_content.bin
+if [[ $? -ne 0 ]]; then
+    echo '*** Failed check: MBR should be the same' >> ${ANA_INSTALL_PATH}/root/RESULT
+else
+    echo SUCCESS > ${ANA_INSTALL_PATH}/root/RESULT
+fi
+%end

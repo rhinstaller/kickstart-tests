@@ -48,6 +48,14 @@ additional_runner_args() {
     echo ""
 }
 
+copy_file() {
+    disks="$1"
+    file="$2"
+    dir="$3"
+
+    virt-copy-out ${disks} ${file} ${dir}
+}
+
 validate_RESULT() {
     disksdir=$1
     args=$(for d in ${disksdir}/disk-*img; do echo -a ${d}; done)
@@ -68,7 +76,7 @@ validate_RESULT() {
                 /var/log/anaconda/      \
                 /root/RESULT
     do
-        virt-copy-out ${args} ${item} ${disksdir}
+        copy_file "${args}" "${item}" "${disksdir}"
     done
 
     # The /root/RESULT file was saved from the VM.  Check its contents

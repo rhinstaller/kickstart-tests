@@ -1,0 +1,34 @@
+#test name: autopart-encrypted-2
+
+url @KSTEST_URL@
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+clearpart --all --initlabel
+autopart --type=lvm --encrypted --passphrase="passphrase" --cipher="aes-xts-plain64"
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+%post
+# Check the cipher name of /dev/sda2.
+crypted="/dev/sda2"
+cipher="$(cryptsetup luksDump ${crypted} | grep 'Cipher name:')"
+
+echo "${cipher}" | grep "^Cipher name:[[:space:]]*aes$"
+
+if [[ $? != 0 ]] ; then
+    echo "*** unexpected cipher ${cipher} of ${crypted}" > /root/RESULT
+    exit 1
+fi
+
+echo 'SUCCESS' > /root/RESULT
+%end

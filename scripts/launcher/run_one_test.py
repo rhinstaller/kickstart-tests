@@ -33,8 +33,12 @@
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from enum import Enum
+from contextlib import AbstractContextManager
+from tempfile import mkdtemp
+from glob import glob
 
 import os
+import shutil
 
 
 class KeepLevel(Enum):
@@ -55,6 +59,7 @@ class RunnerConfiguration(object):
         """, formatter_class=RawDescriptionHelpFormatter)
         self._confiure_parser()
 
+        self._ks_test_name = ""
         self._sh_path = ""
         self._ks_path = ""
         self._image_path = ""
@@ -88,6 +93,10 @@ class RunnerConfiguration(object):
         return self._ks_path
 
     @property
+    def ks_test_name(self):
+        return self._ks_test_name
+
+    @property
     def boot_image(self):
         return self._image_path
 
@@ -105,8 +114,10 @@ class RunnerConfiguration(object):
         self._sh_path = ns.kickstart_test
         self._image_path = ns.image
 
-        base_name = os.path.splitext(self._sh_path)[0]
-        self._ks_path = "{}{}".format(base_name, ".ks")
+        base_path = os.path.splitext(self._sh_path)[0]
+        self._ks_path = "{}{}".format(base_path, ".ks")
+
+        self._ks_test_name = os.path.basename(base_path)
 
         if ns.keep and ns.keep not in [0, 1, 2]:
             raise ValueError("keep parameter can contain only numbers: 0, 1 or 2 !")
@@ -129,7 +140,42 @@ class RunnerConfiguration(object):
             raise IOError("Updates image '{}' does not exists!".format(self._updates_img_path))
 
 
+class TempManager(AbstractContextManager):
+
+    def __init__(self, keep_type, test_name):
+        super().__init__()
+
+        self._tmp_dir = None
+        self._keep_type = keep_type
+        self._test_name = test_name
+
+    def __enter__(self):
+        prefix = "kstest-{}.".format(self._test_name)
+        self._tmp_dir = mkdtemp(prefix=prefix, dir="/var/tmp")
+
+        return self._tmp_dir
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self._keep_type is KeepLevel.NOTHING:
+            shutil.rmtree(self._tmp_dir)
+        elif self._keep_type is KeepLevel.LOGS_ONLY:
+            images_path = self._tmp_join_path("disk-*.img")
+            ks_path = self._tmp_join_path("*.ks")
+
+            for f in glob(images_path):
+                os.remove(f)
+
+            for f in glob(ks_path):
+                os.remove(f)
+
+    def _tmp_join_path(self, file_path):
+        return os.path.join(self._tmp_dir, file_path)
+
+
 if __name__ == '__main__':
     configuration = RunnerConfiguration()
 
     configuration.process_argument()
+
+    with TempManager(configuration.keep_level, configuration.ks_test_name) as temp_dir:
+        pass

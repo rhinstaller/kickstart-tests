@@ -39,6 +39,9 @@ from glob import glob
 
 import os
 import shutil
+import subprocess
+
+SHELL_INTERFACE_PATH = "launcher_interface.sh"
 
 
 class KeepLevel(Enum):
@@ -108,6 +111,10 @@ class RunnerConfiguration(object):
     def update_img_path(self):
         return self._updates_img_path
 
+    @property
+    def script_path(self):
+        return os.path.dirname(os.path.realpath(__file__))
+
     def process_argument(self):
         ns = self._parser.parse_args()
 
@@ -172,10 +179,92 @@ class TempManager(AbstractContextManager):
         return os.path.join(self._tmp_dir, file_path)
 
 
+class ShellLauncher(object):
+
+    def __init__(self, configuration, tmp_dir):
+        super().__init__()
+        self._conf = configuration
+        self._tmp_dir = tmp_dir
+
+    def run_prepare(self):
+        ret = self._run_shell_func("prepare")
+        return ret.stdout.decode()
+
+    def run_cleanup(self):
+        ret = self._run_shell_func("cleanup")
+        return ret.stdout.decode()
+
+    def _run_shell_func(self, func_name):
+        cmd_args = []
+        script_path = os.path.join(self._conf.script_path, SHELL_INTERFACE_PATH)
+
+        cmd_args.append(script_path)
+        cmd_args.append("-i")
+        cmd_args.append(self._conf.boot_image)
+        cmd_args.append("-k")
+        cmd_args.append(str(self._conf.keep_level.value))
+
+        if self._conf.update_img_path:
+            cmd_args.append("-u")
+            cmd_args.append(self._conf.update_img_path)
+
+        cmd_args.append("-w")
+        cmd_args.append(self._tmp_dir)
+        cmd_args.append("-t")
+        cmd_args.append(self._conf.shell_test_path)
+
+        cmd_args.append(func_name)
+
+        out = subprocess.run(cmd_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        try:
+            out.check_returncode()
+            return out
+        except subprocess.CalledProcessError as e:
+            self._report_error(e)
+            raise e
+
+    @staticmethod
+    def _report_error(exc):
+        print("Failed to run subprocess:")
+        print("stderr:")
+        print(exc.stderr)
+        print("stdout:")
+        print(exc.stdout)
+
+
+class Runner(object):
+
+    def __init__(self, configuration, tmp_dir):
+        super().__init__()
+        self._conf = configuration
+        self._tmp_dir = tmp_dir
+        self._ks_file = None
+
+        self._shell = ShellLauncher(configuration, tmp_dir)
+
+    def prepare_test(self):
+        self._copy_image_to_tmp()
+
+        try:
+            self._shell.run_prepare()
+        except subprocess.CalledProcessError:
+            msg = "RESULT:{}:FAILED:Test prep failed: {}".format(self._conf.ks_test_name,
+                                                                 self._conf.ks_test_path)
+            print(msg)
+            self._shell.run_cleanup()
+            exit(99)
+
+    def _copy_image_to_tmp(self):
+        print("Copying image to temp directory {}".format(self._tmp_dir))
+        shutil.copy2(self._conf.boot_image, self._tmp_dir)
+
+
 if __name__ == '__main__':
-    configuration = RunnerConfiguration()
+    config = RunnerConfiguration()
 
-    configuration.process_argument()
+    config.process_argument()
 
-    with TempManager(configuration.keep_level, configuration.ks_test_name) as temp_dir:
-        pass
+    with TempManager(config.keep_level, config.ks_test_name) as temp_dir:
+        runner = Runner(config, temp_dir)
+        runner.prepare_test()

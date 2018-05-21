@@ -1,0 +1,81 @@
+#test name: autopart-encrypted-3
+
+url @KSTEST_URL@
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+clearpart --all --initlabel
+autopart --type=lvm --encrypted --passphrase="passphrase" --escrowcert=file:///tmp/escrow_test/escrow.crt --backuppassphrase
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+volume_key
+%end
+
+%pre
+# Create an nss database for the escrow certificate
+mkdir -p /tmp/escrow_test/nss
+certutil -d /tmp/escrow_test/nss --empty-password -N
+
+# Create a self-signed certificate
+# certutil waits for input if not provided with entropy data (-z). Use some
+# crappy data from urandom in the hope of leaving some entropy for the LUKS
+# operations to use later.
+dd if=/dev/urandom of=/tmp/escrow_test/entropy bs=20 count=1
+certutil -d /tmp/escrow_test/nss -S -x -n escrow_cert \
+    -s 'CN=Escrow Test' -t ',,TC' -z /tmp/escrow_test/entropy
+
+# Export the certificate
+certutil -d /tmp/escrow_test/nss -L -n escrow_cert -a -o /tmp/escrow_test/escrow.crt
+%end
+
+%pre-install
+# Copy the escrow database to the install path so we can use it during %post
+mkdir $ANA_INSTALL_PATH/root
+cp -a /tmp/escrow_test $ANA_INSTALL_PATH/root/
+%end
+
+%post
+# This is just a simplified version from the escrow-cert test.
+# First, check that the escrow stuff is there
+ls /root/*-escrow >/dev/null 2>&1
+if [[ $? != 0 ]]; then
+    echo '*** escrow packet was not created' > /root/RESULT
+    exit 1
+fi
+
+ls /root/*-escrow-backup-passphrase >/dev/null 2>&1
+if [[ $? != 0 ]]; then
+    echo '*** backup passphrase was not created' > /root/RESULT
+    exit 1
+fi
+
+# Get the LUKS device UUID from the escrow packet filename
+uuid="$(basename /root/*-escrow | sed 's|-escrow$||')"
+
+# Try out the backup passphrase
+backup_passphrase="$(volume_key --secrets -d /root/escrow_test/nss /root/$uuid-escrow-backup-passphrase | sed -n '/^Passphrase:/s|^Passphrase:[[:space:]]*||p')"
+
+if [[ $? != 0 ]] || [[ -z "$backup_passphrase" ]]; then
+    echo '*** unable to parse backup passphrase' > /root/RESULT
+    exit 1
+fi
+
+# Try to use the backup passphrase.
+crypted="/dev/sda2"
+echo -n $backup_passphrase | cryptsetup luksOpen --test-passphrase "${crypted}"
+
+if [[ $? != 0 ]] ; then
+    echo "*** cannot open ${crypted} with the backup passphrase" > /root/RESULT
+    exit 1
+fi
+
+echo 'SUCCESS' > /root/RESULT
+%end

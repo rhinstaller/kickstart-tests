@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
-TESTTYPE="iscsi"
+TESTTYPE="knownfailure iscsi"
 
 . ${KSTESTDIR}/functions.sh
 

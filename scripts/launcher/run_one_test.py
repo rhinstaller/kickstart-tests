@@ -30,6 +30,7 @@
 # 2  - Test failed due to time out
 # 3  - Test failed due to kernel panic
 # 77 - Something needed by the test doesn't exist, so skip
+# 99 - Test preparation failed
 
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from enum import Enum
@@ -38,6 +39,7 @@ from tempfile import mkdtemp
 from glob import glob
 
 import os
+import re
 import shutil
 import subprocess
 
@@ -241,6 +243,8 @@ class Runner(object):
         self._tmp_dir = tmp_dir
         self._ks_file = None
 
+        self._check_subs_re = re.compile(r'@\w*@')
+
         self._shell = ShellLauncher(configuration, tmp_dir)
 
     def prepare_test(self):
@@ -248,16 +252,37 @@ class Runner(object):
 
         try:
             self._shell.run_prepare()
-        except subprocess.CalledProcessError:
-            msg = "RESULT:{}:FAILED:Test prep failed: {}".format(self._conf.ks_test_name,
-                                                                 self._conf.ks_test_path)
-            print(msg)
+        except subprocess.CalledProcessError as e:
+            self._print_result(result=False, msg="Test prep failed", description=e.stdout.decode())
             self._shell.run_cleanup()
             exit(99)
+
+        ok, reason = self._check_ks_test()
+        if ok is False:
+            self._print_result(result=False, msg="Unsubstituted pattern", description=reason)
+            self._shell.run_cleanup()
+            exit(99)
+
+    def _print_result(self, result, msg, description):
+        text_result = "SUCCESS" if result else "FAILED"
+        msg = "RESULT:{name}:{result}:{message}: {desc}".format(name=self._conf.ks_test_name,
+                                                                result=text_result,
+                                                                message=msg,
+                                                                desc=description)
+        print(msg)
 
     def _copy_image_to_tmp(self):
         print("Copying image to temp directory {}".format(self._tmp_dir))
         shutil.copy2(self._conf.boot_image, self._tmp_dir)
+
+    def _check_ks_test(self):
+        with open(self._conf.ks_test_path, 'rt') as f:
+            for num, line in enumerate(f):
+                subs = self._check_subs_re.search(line)
+                if subs is not None:
+                    return False, "{} on line {}".format(subs[0], num)
+
+        return True, None
 
 
 if __name__ == '__main__':

@@ -196,6 +196,22 @@ class ShellLauncher(object):
         ret = self._run_shell_func("cleanup")
         return ret.stdout.decode()
 
+    def run_prepare_disks(self):
+        ret = self._run_shell_func("prepare_disks")
+        return ret.stdout.decode()
+
+    def run_prepare_network(self):
+        ret = self._run_shell_func("prepare_network")
+        return ret.stdout.decode()
+
+    def run_kernel_args(self):
+        ret = self._run_shell_func("kernel_args")
+        return ret.stdout.decode()
+
+    def run_additional_runner_args(self):
+        ret = self._run_shell_func("additional_runner_args")
+        return ret.stdout.decode()
+
     def _run_shell_func(self, func_name):
         cmd_args = []
         script_path = os.path.join(self._conf.script_path, SHELL_INTERFACE_PATH)
@@ -283,6 +299,35 @@ class Runner(object):
                     return False, "{} on line {}".format(subs[0], num)
 
         return True, None
+
+    def _collect_disks(self):
+        ret = []
+
+        disks = self._shell.run_prepare_disks()
+        for d in disks.split(" "):
+            ret.append("--disk")
+            ret.append("{},cache=unsafe;".format(d))
+
+        return ret
+
+    def _collect_network(self):
+        ret = []
+
+        networks = self._shell.run_prepare_network()
+        for n in networks.split(" "):
+            ret.append("--nic")
+            ret.append(n)
+
+        return ret
+
+    def _get_runner_args(self):
+        ret = []
+
+        args = self._shell.run_additional_runner_args()
+        for arg in args.split(" "):
+            ret.append(arg)
+
+        return ret
 
 
 if __name__ == '__main__':

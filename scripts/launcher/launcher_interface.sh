@@ -94,6 +94,9 @@ case $1 in
     prepare_network)
         echo $(prepare_network ${tmpdir})
         ;;
+    kernel_args)
+        echo $(kernel_args)
+        ;;
     additional_runner_args)
         echo $(additional_runner_args)
         ;;

@@ -43,7 +43,7 @@ from pylorax.mount import IsoMountpoint
 import libvirt
 
 
-__all__ = ["VirtualConfiguration", "VirtualManager"]
+__all__ = ["VirtualConfiguration", "VirtualManager", "InstallError"]
 
 
 class InstallError(Exception):

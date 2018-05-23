@@ -114,7 +114,7 @@ class Runner(object):
         ret = virt_manager.run()
 
     def _check_ks_test(self):
-        with open(self._conf.ks_test_path, 'rt') as f:
+        with open(self._ks_file, 'rt') as f:
             for num, line in enumerate(f):
                 subs = self._check_subs_re.search(line)
                 if subs is not None:

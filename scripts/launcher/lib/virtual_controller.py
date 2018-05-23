@@ -376,6 +376,8 @@ class VirtualManager(object):
         super().__init__()
         self._conf = virtual_configuration
 
+        self._install_log = os.path.join(self._conf.temp_dir, "virt-install.log")
+
     def _start_virt_install(self, install_log):
         """
         Use virt-install to install to a disk image
@@ -467,6 +469,8 @@ class VirtualManager(object):
             log.error("ERROR: Image creation failed: %s", e)
             return False
 
+        self._create_human_log()
+
         log.info("SUMMARY")
         log.info("-------")
         log.info("Logs are in %s", os.path.abspath(os.path.dirname(self._conf.log_path)))
@@ -474,6 +478,14 @@ class VirtualManager(object):
         log.info("Results are in %s", self._conf.temp_dir)
 
         return True
+
+    def _create_human_log(self):
+        output_log = os.path.join(self._conf.temp_dir, "virt-install-human.log")
+        with open(self._install_log, 'rt') as in_file:
+            with open(output_log, 'wt') as out_file:
+                for line in in_file:
+                    line.replace("#012", "\n")
+                    out_file.write(line)
 
     def _check_setup(self):
         errors = []

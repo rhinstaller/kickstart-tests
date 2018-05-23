@@ -24,7 +24,7 @@
 #   - just use sanboot in ipxe script:
 #     sanboot iscsi:${target_ip}:::0:${wwn}
 
-TESTTYPE="iscsi"
+TESTTYPE="knownfailure iscsi"
 
 . ${KSTESTDIR}/functions.sh
 

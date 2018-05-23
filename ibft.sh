@@ -67,6 +67,12 @@ additional_runner_args() {
     echo "--boot kernel=${ipxe_image},kernel_args='ifconf -c dhcp net0 && chain ${ipxe_script_url}'"
 }
 
+boot_args() {
+    . ${tmpdir}/httpd_url
+    ipxe_script_url="${httpd_url}${ipxe_script}"
+    echo "--boot kernel=${ipxe_image},kernel_args='ifconf -c dhcp net0 && chain ${ipxe_script_url}'"
+}
+
 prepare() {
     ks=$1
     tmpdir=$2

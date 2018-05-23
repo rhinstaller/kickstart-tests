@@ -33,6 +33,7 @@
 # 99 - Test preparation failed
 
 
+import os
 import re
 import shutil
 import subprocess
@@ -40,6 +41,7 @@ import subprocess
 from lib.temp_manager import TempManager
 from lib.configuration import RunnerConfiguration
 from lib.shell_launcher import ShellLauncher
+from lib.virtual_controller import VirtualManager, VirtualConfiguration
 
 
 class Runner(object):
@@ -58,7 +60,7 @@ class Runner(object):
         self._copy_image_to_tmp()
 
         try:
-            self._shell.run_prepare()
+            self._ks_file = self._shell.run_prepare()
         except subprocess.CalledProcessError as e:
             self._print_result(result=False, msg="Test prep failed", description=e.stdout.decode())
             self._shell.run_cleanup()
@@ -81,6 +83,35 @@ class Runner(object):
     def _copy_image_to_tmp(self):
         print("Copying image to temp directory {}".format(self._tmp_dir))
         shutil.copy2(self._conf.boot_image, self._tmp_dir)
+
+    def run_test(self):
+        self.prepare_test()
+
+        kernel_args = self._shell.run_kernel_args().split(" ")
+
+        if self._conf.updates_img_path:
+            kernel_args.append("inst.updates={}".format(self._conf.updates_img_path))
+
+        if kernel_args:
+            kernel_args = '--kernel-args "{}"'.format(kernel_args)
+
+        disk_args = self._collect_disks()
+        nics_args = self._collect_network()
+        boot_args = self._shell.run_boot_args()
+
+        v_conf = VirtualConfiguration(self._conf.boot_image, self._ks_file)
+        v_conf.kernel_args = kernel_args
+        v_conf.temp_dir = self._tmp_dir
+        v_conf.log_path = os.path.join(self._tmp_dir, "livemedia.log")
+        v_conf.ram = 1024
+        v_conf.vnc = "vnc"
+        v_conf.boot_image = boot_args
+        v_conf.timeout = 60
+        v_conf.disk_paths = disk_args
+        v_conf.networks = nics_args
+
+        virt_manager = VirtualManager(v_conf)
+        ret = virt_manager.run()
 
     def _check_ks_test(self):
         with open(self._conf.ks_test_path, 'rt') as f:

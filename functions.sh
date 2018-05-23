@@ -48,6 +48,11 @@ additional_runner_args() {
     echo ""
 }
 
+
+boot_args() {
+    echo ""
+}
+
 copy_file() {
     disks="$1"
     file="$2"

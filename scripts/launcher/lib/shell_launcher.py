@@ -58,6 +58,10 @@ class ShellLauncher(object):
         ret = self._run_shell_func("additional_runner_args")
         return ret.stdout.decode()
 
+    def run_boot_args(self):
+        ret = self._run_shell_func("boot_args")
+        return ret.stdout.decode()
+
     def _run_shell_func(self, func_name):
         cmd_args = []
         script_path = os.path.join(self._conf.script_path, SHELL_INTERFACE_PATH)

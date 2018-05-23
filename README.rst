@@ -26,7 +26,11 @@ First you need to install the needed dependencies:
 
 On Fedora the dependencies can be installed with dnf like this::
 
-  sudo dnf install lorax-lmc-virt libguestfs-tools libvirt-python3 virt-install parallel
+  sudo dnf install lorax-lmc-virt libguestfs-tools python3-libvirt virt-install parallel
+
+Or with the install_dependencies_fedora.sh script:
+
+  ./scripts/install_dependencies_fedora.sh
 
 You also need to start libvirt service to be able to use virt-install::
 

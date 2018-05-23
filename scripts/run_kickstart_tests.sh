@@ -322,11 +322,13 @@ if [[ "$TEST_REMOTES" != "" ]]; then
         remote_args="${remote_args} --sshlogin kstest@${remote}"
     done
 
-    parallel --no-notice ${remote_args} --jobs ${TEST_JOBS:-4} \
+    cd ..
+    parallel --no-notice ${remote_args} --wd kickstart-tests --jobs ${TEST_JOBS:-4} \
              sudo PYTHONPATH=$PYTHONPATH scripts/run_one_ks.sh -i ${_IMAGE} \
                                                                -k ${KEEPIT} \
                                                                ${UPDATES_ARG} ${BOOT_ARG} {} ::: ${tests}
     rc=$?
+    cd -
 
     # (3) Get all the results back from the remote systems, which will have already
     # applied the KEEPIT setting.  However if KEEPIT is 0 (meaning, don't save

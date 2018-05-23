@@ -275,7 +275,8 @@ class VirtualInstall(object):
         # add whatever serial cmds are needed later
         args = ["-n", self._virt_name,
                 "-r", str(self._memory),
-                "--noautoconsole"]
+                "--noautoconsole",
+                "--rng", "/dev/random"]
 
         # CHECKME This seems to be necessary because of ipxe ibft chain booting,
         # otherwise the vm is created but it does not boot into installation

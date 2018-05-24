@@ -34,7 +34,6 @@
 
 
 import os
-import re
 import shutil
 import subprocess
 
@@ -42,7 +41,7 @@ from lib.temp_manager import TempManager
 from lib.configuration import RunnerConfiguration
 from lib.shell_launcher import ShellLauncher
 from lib.virtual_controller import VirtualManager, VirtualConfiguration
-from lib.validator import ResultFormatter
+from lib.validator import KickstartValidator, ResultFormatter
 
 
 class Runner(object):
@@ -53,10 +52,11 @@ class Runner(object):
         self._tmp_dir = tmp_dir
         self._ks_file = None
 
-        self._check_subs_re = re.compile(r'@\w*@')
-
         self._shell = ShellLauncher(configuration, tmp_dir)
         self._result_formatter = ResultFormatter(self._conf.ks_test_name)
+        # test prepare function can change place of the kickstart test
+        # so the validator will be set later
+        self._validator = None
 
     def prepare_test(self):
         self._copy_image_to_tmp()
@@ -69,10 +69,10 @@ class Runner(object):
             self._shell.run_cleanup()
             exit(99)
 
-        ok, reason = self._check_ks_test()
-        if ok is False:
-            self._result_formatter.print_result(result=False, msg="Unsubstituted pattern",
-                                                description=reason)
+        self._validator = KickstartValidator(self._conf.ks_test_name, self._ks_file)
+        self._validator.check_ks_substitution()
+        if self._validator.result is False:
+            self._validator.print_result()
             self._shell.run_cleanup()
             exit(99)
 
@@ -108,15 +108,6 @@ class Runner(object):
 
         virt_manager = VirtualManager(v_conf)
         ret = virt_manager.run()
-
-    def _check_ks_test(self):
-        with open(self._ks_file, 'rt') as f:
-            for num, line in enumerate(f):
-                subs = self._check_subs_re.search(line)
-                if subs is not None:
-                    return False, "{} on line {}".format(subs[0], num)
-
-        return True, None
 
     def _collect_disks(self):
         ret = []

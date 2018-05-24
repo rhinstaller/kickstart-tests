@@ -23,6 +23,11 @@
 import re
 
 
+def replace_new_lines(line):
+        line.replace("#012", "\n")
+        return line
+
+
 class ResultFormatter(object):
 
     def __init__(self, test_name):

@@ -22,14 +22,14 @@
 #            Chris Lumens <clumens@redhat.com>
 #            Jiri Konecny <jkonecny@redhat.com>
 #
-import logging
-log = logging.getLogger("livemedia-creator")
 
 import os
 import sys
 import uuid
 import tempfile
 import subprocess
+import libvirt
+
 from time import sleep
 
 # Use the Lorax treebuilder branch for iso creation
@@ -40,7 +40,10 @@ from pylorax import setup_logging
 from pylorax.monitor import LogMonitor
 from pylorax.mount import IsoMountpoint
 
-import libvirt
+from .validator import replace_new_lines
+
+import logging
+log = logging.getLogger("livemedia-creator")
 
 
 __all__ = ["VirtualConfiguration", "VirtualManager", "InstallError"]
@@ -484,7 +487,7 @@ class VirtualManager(object):
         with open(self._install_log, 'rt') as in_file:
             with open(output_log, 'wt') as out_file:
                 for line in in_file:
-                    line.replace("#012", "\n")
+                    line = replace_new_lines(line)
                     out_file.write(line)
 
     def _check_setup(self):

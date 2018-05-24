@@ -42,6 +42,7 @@ from lib.temp_manager import TempManager
 from lib.configuration import RunnerConfiguration
 from lib.shell_launcher import ShellLauncher
 from lib.virtual_controller import VirtualManager, VirtualConfiguration
+from lib.validator import ResultFormatter
 
 
 class Runner(object):
@@ -55,6 +56,7 @@ class Runner(object):
         self._check_subs_re = re.compile(r'@\w*@')
 
         self._shell = ShellLauncher(configuration, tmp_dir)
+        self._result_formatter = ResultFormatter(self._conf.ks_test_name)
 
     def prepare_test(self):
         self._copy_image_to_tmp()
@@ -62,23 +64,17 @@ class Runner(object):
         try:
             self._ks_file = self._shell.run_prepare()
         except subprocess.CalledProcessError as e:
-            self._print_result(result=False, msg="Test prep failed", description=e.stdout.decode())
+            self._result_formatter.print_result(result=False, msg="Test prep failed",
+                                                description=e.stdout.decode())
             self._shell.run_cleanup()
             exit(99)
 
         ok, reason = self._check_ks_test()
         if ok is False:
-            self._print_result(result=False, msg="Unsubstituted pattern", description=reason)
+            self._result_formatter.print_result(result=False, msg="Unsubstituted pattern",
+                                                description=reason)
             self._shell.run_cleanup()
             exit(99)
-
-    def _print_result(self, result, msg, description):
-        text_result = "SUCCESS" if result else "FAILED"
-        msg = "RESULT:{name}:{result}:{message}: {desc}".format(name=self._conf.ks_test_name,
-                                                                result=text_result,
-                                                                message=msg,
-                                                                desc=description)
-        print(msg)
 
     def _copy_image_to_tmp(self):
         print("Copying image to temp directory {}".format(self._tmp_dir))

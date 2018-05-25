@@ -40,7 +40,7 @@ from pylorax import setup_logging
 from pylorax.monitor import LogMonitor
 from pylorax.mount import IsoMountpoint
 
-from .validator import replace_new_lines, LogValidator
+from .validator import replace_new_lines
 
 import logging
 log = logging.getLogger("livemedia-creator")
@@ -405,7 +405,6 @@ class VirtualManager(object):
         self._conf = virtual_configuration
 
         self._result_msg = ""
-        self._validator = LogValidator(self._conf.test_name, log)
 
     @property
     def result_msg(self):
@@ -504,21 +503,11 @@ class VirtualManager(object):
 
         self._create_human_log()
 
-        self._validator.check_install_errors(self._conf.install_logpath)
-
-        if self._validator.result:
-            self._validator.check_virt_errors(self._conf.log_path)
-
         log.info("SUMMARY")
         log.info("-------")
         log.info("Logs are in %s", os.path.abspath(os.path.dirname(self._conf.log_path)))
         log.info("Disk image(s) at %s", ",".join(self._conf.disk_paths))
         log.info("Results are in %s", self._conf.temp_dir)
-
-        if not self._validator.result:
-            self._validator.log_result()
-            self._validator.print_result()
-            return False
 
         return True
 

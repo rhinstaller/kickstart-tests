@@ -41,7 +41,10 @@ from lib.temp_manager import TempManager
 from lib.configuration import RunnerConfiguration
 from lib.shell_launcher import ShellLauncher
 from lib.virtual_controller import VirtualManager, VirtualConfiguration
-from lib.validator import KickstartValidator, ResultFormatter
+from lib.validator import KickstartValidator, LogValidator, ResultFormatter
+
+import logging
+log = logging.getLogger("livemedia-creator")
 
 
 class Runner(object):
@@ -108,7 +111,16 @@ class Runner(object):
         v_conf.networks = nics_args
 
         virt_manager = VirtualManager(v_conf)
-        ret = virt_manager.run()
+
+        if not virt_manager.run():
+            exit(1)
+
+        validator = self._validate_logs(v_conf)
+
+        if not validator.result:
+            validator.log_result()
+            validator.print_result()
+            exit(validator.return_code)
 
     def _collect_disks(self):
         ret = []
@@ -138,6 +150,15 @@ class Runner(object):
             ret.append(arg)
 
         return ret
+
+    def _validate_logs(self, virt_configuration):
+        validator = LogValidator(self._conf.ks_test_name, log)
+        validator.check_install_errors(virt_configuration.install_logpath)
+
+        if validator.result:
+            validator.check_virt_errors(virt_configuration.log_path)
+
+        return validator
 
 
 if __name__ == '__main__':

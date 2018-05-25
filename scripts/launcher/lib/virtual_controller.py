@@ -189,6 +189,14 @@ class VirtualConfiguration(object):
         self._logfile = value
 
     @property
+    def install_logpath(self):
+        """Virtual log file
+
+        Will be dynamically created based on the temp position.
+        """
+        return os.path.join(self._tmp, "virt-install.log")
+
+    @property
     def temp_dir(self) -> str:
         """Top level temporary directory"""
         return self._tmp
@@ -396,8 +404,6 @@ class VirtualManager(object):
         super().__init__()
         self._conf = virtual_configuration
 
-        self._install_log = os.path.join(self._conf.temp_dir, "virt-install.log")
-
         self._result_msg = ""
         self._validator = LogValidator(self._conf.test_name, log)
 
@@ -498,7 +504,7 @@ class VirtualManager(object):
 
         self._create_human_log()
 
-        self._validator.check_install_errors(self._install_log)
+        self._validator.check_install_errors(self._conf.install_logpath)
 
         if self._validator.result:
             self._validator.check_virt_errors(self._conf.log_path)
@@ -518,7 +524,7 @@ class VirtualManager(object):
 
     def _create_human_log(self):
         output_log = os.path.join(self._conf.temp_dir, "virt-install-human.log")
-        with open(self._install_log, 'rt') as in_file:
+        with open(self._conf.install_logpath, 'rt') as in_file:
             with open(output_log, 'wt') as out_file:
                 for line in in_file:
                     line = replace_new_lines(line)

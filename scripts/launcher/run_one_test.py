@@ -38,9 +38,9 @@ import shutil
 import subprocess
 
 from lib.temp_manager import TempManager
-from lib.configuration import RunnerConfiguration
+from lib.configuration import RunnerConfiguration, VirtualConfiguration
 from lib.shell_launcher import ShellLauncher
-from lib.virtual_controller import VirtualManager, VirtualConfiguration
+from lib.virtual_controller import VirtualManager
 from lib.validator import KickstartValidator, LogValidator, ResultFormatter
 
 import logging

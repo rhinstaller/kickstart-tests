@@ -25,7 +25,8 @@ import os
 import sys
 import argparse
 
-from launcher.lib.virtual_controller import VirtualConfiguration, VirtualManager, InstallError
+from launcher.lib.virtual_controller import VirtualManager
+from launcher.lib.configuration import VirtualConfiguration
 
 
 def create_parser():

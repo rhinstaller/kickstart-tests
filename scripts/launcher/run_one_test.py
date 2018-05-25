@@ -196,3 +196,6 @@ if __name__ == '__main__':
     with TempManager(config.keep_level, config.ks_test_name) as temp_dir:
         runner = Runner(config, temp_dir)
         runner.prepare_test()
+        ret_code = runner.run_test()
+
+    exit(ret_code)

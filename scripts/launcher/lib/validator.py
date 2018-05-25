@@ -109,3 +109,37 @@ class KickstartValidator(Validator):
                     return
 
         self._return_code = 0
+
+
+class LogValidator(Validator):
+
+    def __init__(self, test_name, log):
+        super().__init__(test_name, log)
+
+    def check_install_errors(self, install_log):
+        ret_code = 0
+
+        with open(install_log, 'rt') as log_f:
+            for line in log_f:
+
+                # non critical error blocking the installation
+                if "CRIT systemd-coredump:" in line:
+                    self._log.info("Non critical error: {}".format(replace_new_lines(line)))
+                    continue
+                elif "CRIT" in line:
+                    self._result_msg = replace_new_lines(line)
+                    self._return_code = 1
+                    break
+
+        return ret_code
+
+    def check_virt_errors(self, virt_log_path):
+        with open(virt_log_path, 'rt') as virt_log:
+            for line in virt_log:
+                if "due to timeout" in line:
+                    self._result_msg = "Test timed out"
+                    self._return_code = 2
+                    break
+                elif "Call Trace" in line:
+                    self._result_msg = "Kernel panic"
+                    self._return_code = 0

@@ -40,7 +40,7 @@ from pylorax import setup_logging
 from pylorax.monitor import LogMonitor
 from pylorax.mount import IsoMountpoint
 
-from .validator import replace_new_lines
+from .validator import replace_new_lines, LogValidator
 
 import logging
 log = logging.getLogger("livemedia-creator")
@@ -59,6 +59,7 @@ class VirtualConfiguration(object):
     def __init__(self, iso_path, ks_paths):
         super().__init__()
 
+        self._test_name = ""
         self._iso = iso_path
         self._ks_paths = ks_paths
         self._disk = []
@@ -87,6 +88,22 @@ class VirtualConfiguration(object):
         msg = msg[:-1]
 
         return msg
+
+    @property
+    def test_name(self):
+        """Name of this test run.
+
+        Optional. Can be empty string.
+        """
+        return self._test_name
+
+    @test_name.setter
+    def test_name(self, value):
+        """Set name of this test run.
+
+        Optional. Can be empty string.
+        """
+        self._test_name = value
 
     @property
     def iso_path(self) -> str:
@@ -381,6 +398,13 @@ class VirtualManager(object):
 
         self._install_log = os.path.join(self._conf.temp_dir, "virt-install.log")
 
+        self._result_msg = ""
+        self._validator = LogValidator(self._conf.test_name, log)
+
+    @property
+    def result_msg(self):
+        return self._result_msg
+
     def _start_virt_install(self, install_log):
         """
         Use virt-install to install to a disk image
@@ -474,11 +498,21 @@ class VirtualManager(object):
 
         self._create_human_log()
 
+        self._validator.check_install_errors(self._install_log)
+
+        if self._validator.result:
+            self._validator.check_virt_errors(self._conf.log_path)
+
         log.info("SUMMARY")
         log.info("-------")
         log.info("Logs are in %s", os.path.abspath(os.path.dirname(self._conf.log_path)))
         log.info("Disk image(s) at %s", ",".join(self._conf.disk_paths))
         log.info("Results are in %s", self._conf.temp_dir)
+
+        if not self._validator.result:
+            self._validator.log_result()
+            self._validator.print_result()
+            return False
 
         return True
 

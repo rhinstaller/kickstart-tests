@@ -55,29 +55,33 @@ class Validator(object):
         super(). __init__()
 
         self._log = log
-        self._result = False
+        self._return_code = 0
         self._result_msg = ""
         self._result_formatter = ResultFormatter(name)
 
     @property
     def result(self):
-        return self._result
+        return self._return_code == 0
+
+    @property
+    def return_code(self):
+        return self._return_code
 
     @property
     def result_message(self):
         return self._result_msg
 
     def print_result(self, description=""):
-        self._result_formatter.print_result(self._result,
+        self._result_formatter.print_result(self.result,
                                             self._result_msg,
                                             description)
 
     def log_result(self, description=""):
         if self._log:
-            msg = self._result_formatter.format_result(self._result,
+            msg = self._result_formatter.format_result(self.result,
                                                        self._result_msg,
                                                        description)
-            if self._result != 0:
+            if self._return_code != 0:
                 self._log.error(msg)
             else:
                 self._log.info(msg)
@@ -101,7 +105,7 @@ class KickstartValidator(Validator):
                 subs = self._check_subs_re.search(line)
                 if subs is not None:
                     self._result_msg = "{} on line {}".format(subs[0], num)
-                    self._result = False
+                    self._return_code = 1
                     return
 
-        self._result = True
+        self._return_code = 0

@@ -159,6 +159,10 @@ class VirtualInstall(object):
                        self._virtio_host, self._virtio_port)
         args.append("--channel")
         args.append(channel_args)
+        return args
+
+    def run(self):
+        args = self._prepare_args()
 
         log.info("Running virt-install.")
         log.info("virt-install %s", args)
@@ -232,6 +236,7 @@ class VirtualManager(object):
                                   nics=self._conf.networks,
                                   boot=self._conf.boot_image)
 
+            virt.run()
             virt.destroy(os.path.basename(self._conf.temp_dir))
             log_monitor.shutdown()
         except InstallError as e:

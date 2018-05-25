@@ -27,6 +27,32 @@ import subprocess
 SHELL_INTERFACE_PATH = "launcher_interface.sh"
 
 
+class ShellOutput(object):
+
+    def __init__(self, subprocess_out):
+        super().__init__()
+
+        self._out = subprocess_out
+
+    @property
+    def stdout(self):
+        return self._out.stdout.decode()
+
+    @property
+    def stderr(self):
+        return self._out.stderr.decode()
+
+    @property
+    def return_code(self):
+        return self._out.returncode
+
+    def check_ret_code_with_exception(self):
+        return self._out.check_return_code()
+
+    def check_ret_code(self):
+        return self._out.returncode == 0
+
+
 class ShellLauncher(object):
 
     def __init__(self, configuration, tmp_dir):
@@ -35,32 +61,28 @@ class ShellLauncher(object):
         self._tmp_dir = tmp_dir
 
     def run_prepare(self):
-        ret = self._run_shell_func("prepare")
-        return ret.stdout.decode()
+        return self._run_shell_func("prepare")
 
     def run_cleanup(self):
-        ret = self._run_shell_func("cleanup")
-        return ret.stdout.decode()
+        return self._run_shell_func("cleanup")
 
     def run_prepare_disks(self):
-        ret = self._run_shell_func("prepare_disks")
-        return ret.stdout.decode()
+        return self._run_shell_func("prepare_disks")
 
     def run_prepare_network(self):
-        ret = self._run_shell_func("prepare_network")
-        return ret.stdout.decode()
+        return self._run_shell_func("prepare_network")
 
     def run_kernel_args(self):
-        ret = self._run_shell_func("kernel_args")
-        return ret.stdout.decode()
+        return self._run_shell_func("kernel_args")
 
     def run_additional_runner_args(self):
-        ret = self._run_shell_func("additional_runner_args")
-        return ret.stdout.decode()
+        return self._run_shell_func("additional_runner_args")
 
     def run_boot_args(self):
-        ret = self._run_shell_func("boot_args")
-        return ret.stdout.decode()
+        return self._run_shell_func("boot_args")
+
+    def run_validate(self):
+        return self._run_shell_func("validate")
 
     def _run_shell_func(self, func_name):
         cmd_args = []
@@ -85,17 +107,15 @@ class ShellLauncher(object):
 
         out = subprocess.run(cmd_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        try:
-            out.check_returncode()
-            return out
-        except subprocess.CalledProcessError as e:
-            self._report_error(e)
-            raise e
+        if out.returncode != 0:
+            self._report_error(out)
+
+        return ShellOutput(out)
 
     @staticmethod
-    def _report_error(exc):
+    def _report_error(subprocess_out):
         print("Failed to run subprocess:")
         print("stderr:")
-        print(exc.stderr)
+        print(subprocess_out.stderr)
         print("stdout:")
-        print(exc.stdout)
+        print(subprocess_out.stdout)

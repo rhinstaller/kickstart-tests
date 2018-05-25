@@ -70,23 +70,26 @@ class Runner(object):
             self._result_formatter.print_result(result=False, msg="Test prep failed",
                                                 description=e.stdout.decode())
             self._shell.run_cleanup()
-            exit(99)
+            return False
 
         self._validator = KickstartValidator(self._conf.ks_test_name, self._ks_file)
         self._validator.check_ks_substitution()
         if self._validator.result is False:
             self._validator.print_result()
             self._shell.run_cleanup()
-            exit(99)
+            return False
+
+        return True
 
     def _copy_image_to_tmp(self):
         print("Copying image to temp directory {}".format(self._tmp_dir))
         shutil.copy2(self._conf.boot_image, self._tmp_dir)
 
     def run_test(self):
-        self.prepare_test()
+        if not self.prepare_test():
+            return 99
 
-        kernel_args = self._shell.run_kernel_args().split(" ")
+        kernel_args = self._shell.run_kernel_args().stdout.split(" ")
 
         if self._conf.updates_img_path:
             kernel_args.append("inst.updates={}".format(self._conf.updates_img_path))
@@ -113,20 +116,26 @@ class Runner(object):
         virt_manager = VirtualManager(v_conf)
 
         if not virt_manager.run():
-            exit(1)
+            return 1
 
         validator = self._validate_logs(v_conf)
 
         if not validator.result:
             validator.log_result()
             validator.print_result()
-            exit(validator.return_code)
+            self._shell.run_cleanup()
+            return validator.return_code
+
+        self._shell.run_cleanup()
+        return ret.return_code
 
     def _collect_disks(self):
         ret = []
 
-        disks = self._shell.run_prepare_disks()
-        for d in disks.split(" "):
+        out = self._shell.run_prepare_disks()
+        out.check_ret_code_with_exception()
+
+        for d in out.stdout.split(" "):
             ret.append("--disk")
             ret.append("{},cache=unsafe;".format(d))
 
@@ -135,8 +144,10 @@ class Runner(object):
     def _collect_network(self):
         ret = []
 
-        networks = self._shell.run_prepare_network()
-        for n in networks.split(" "):
+        out = self._shell.run_prepare_network()
+        out.check_ret_code_with_exception()
+
+        for n in out.stdout.split(" "):
             ret.append("--nic")
             ret.append(n)
 
@@ -145,8 +156,9 @@ class Runner(object):
     def _get_runner_args(self):
         ret = []
 
-        args = self._shell.run_additional_runner_args()
-        for arg in args.split(" "):
+        out = self._shell.run_additional_runner_args()
+        out.check_ret_code_with_exception()
+        for arg in out.stdout.split(" "):
             ret.append(arg)
 
         return ret

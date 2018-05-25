@@ -202,12 +202,6 @@ class VirtualManager(object):
         super().__init__()
         self._conf = virtual_configuration
 
-        self._result_msg = ""
-
-    @property
-    def result_msg(self):
-        return self._result_msg
-
     def _start_virt_install(self, install_log):
         """
         Use virt-install to install to a disk image

@@ -1,0 +1,125 @@
+#test name: module-enable-many
+#
+# test installing many modules with stream but not profiles specification
+# - a default profile should be selected automatically based on module
+#   metadata
+
+url @KSTEST_URL@
+repo --name=modular @KSTEST_MODULAR_URL@
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+@^Fedora Server Edition
+kernel
+vim
+@nodejs:10
+@postgresql:9.6
+@mongodb:3.4
+@mysql:5.7
+@gimp:2.10
+%end
+
+%post
+# modules have some packages defined as their API in their profiles,
+# we can check for those to be (or not to be installed) to see if the
+# module has (or has not) been installed
+
+# the vim standalone package
+rpm -q vim-minimal
+if [[ $? != 0 ]]; then
+    echo '*** vim-minimal package requested but not installed' >> /root/RESULT
+fi
+
+# it is also nice to have kernel
+rpm -q kernel
+if [[ $? != 0 ]]; then
+    echo '*** kernel package not installed' >> /root/RESULT
+fi
+
+rpm -q nodejs
+if [[ $? != 0 ]]; then
+    echo '*** nodejs for module nodejs default profile not installed' >> /root/RESULT
+fi
+
+rpm -q nodejs-devel
+if [[ $? == 0 ]]; then
+    echo '*** nodejs-devel for module nodejs default profile installed' >> /root/RESULT
+fi
+
+rpm -q postgresql-server
+if [[ $? != 0 ]]; then
+    echo '*** postgresql-server for the postgresql module default profile not installed' >> /root/RESULT
+fi
+
+rpm -q mongodb-server
+if [[ $? != 0 ]]; then
+    echo '*** mongodb-server for the mongodb module default profile not installed' >> /root/RESULT
+fi
+
+rpm -q mongodb
+if [[ $? != 0 ]]; then
+    echo '*** mongodb for the mongodb module default profile not installed' >> /root/RESULT
+fi
+
+rpm -q community-mysql-server
+if [[ $? != 0 ]]; then
+    echo '*** community-mysql-server for the mysql module default profile not installed' >> /root/RESULT
+fi
+
+rpm -q community-mysql
+if [[ $? != 0 ]]; then
+    echo '*** community-mysql for the mysql module default profile installed' >> /root/RESULT
+fi
+
+rpm -q gimp
+if [[ $? != 0 ]]; then
+    echo '*** gimp for the gimp module default profile not installed' >> /root/RESULT
+fi
+
+rpm -q gimp-devel
+if [[ $? == 0 ]]; then
+    echo '*** gimp-devel for the gimp module default profile installed' >> /root/RESULT
+fi
+
+# next we will check if the module is seen as enabled/installed from the
+# metadata/DNF point of view
+
+# log a "dnf module list" call for debugging purposes
+dnf module list
+
+# all installed modules should be also enabled
+dnf module list --enabled nodejs | grep nodejs || echo "*** nodejs module not marked as enabled" >> /root/RESULT
+dnf module list --enabled postgresql | grep postgresql  || echo "*** postgresql module not marked as enabled" >> /root/RESULT
+dnf module list --enabled mongodb | grep mongodb  || echo "*** mongodb module not marked as enabled" >> /root/RESULT
+dnf module list --enabled mysql | grep mysql || echo "*** mysql module not marked as enabled" >> /root/RESULT
+dnf module list --enabled gimp | grep gimp || echo "*** gimp module not marked as enabled" >> /root/RESULT
+
+# check all modules are also marked as installed with the correct profile
+dnf module list --installed nodejs | grep "default \[i\]" || echo "*** nodejs module profile not marked as installed" >> /root/RESULT
+dnf module list --installed postgresql | grep "default \[i\]" || echo "*** postgresql module profile not marked as installed" >> /root/RESULT
+dnf module list --installed mongodb | grep "default \[i\]" || echo "*** mongodb profile not marked as installed" >> /root/RESULT
+dnf module list --installed mysql | grep "default \[i\]" || echo "*** mysql module profile not marked as installed" >> /root/RESULT
+dnf module list --installed gimp | grep "default \[i\]" || echo "*** gimp module profile not marked as installed" >> /root/RESULT
+
+if [ ! -f /root/RESULT ]
+then
+    # no result file (no errors) -> success
+    echo SUCCESS > /root/RESULT
+else
+    # some errors happened
+    exit 1
+fi
+
+%end

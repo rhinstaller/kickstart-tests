@@ -126,6 +126,10 @@ class Runner(object):
             self._shell.run_cleanup()
             return validator.return_code
 
+        ret = self._validate_result()
+        if ret.check_ret_code():
+            self._result_formatter.print_result(True, "test done")
+
         self._shell.run_cleanup()
         return ret.return_code
 
@@ -171,6 +175,17 @@ class Runner(object):
             validator.check_virt_errors(virt_configuration.log_path)
 
         return validator
+
+    def _validate_result(self):
+        output = self._shell.run_validate()
+
+        if output.check_ret_code():
+            msg = "with return code {}".format(output.return_code)
+            description = "stdout: '{}' stderr: '{}'".format(output.stdout,
+                                                             output.stderr)
+            self._result_formatter.print_result(False, msg, description)
+
+        return output
 
 
 if __name__ == '__main__':

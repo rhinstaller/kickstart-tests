@@ -160,10 +160,12 @@ runone() {
         fi
     fi
 
-    ret=$(validate ${tmpdir})
-    if [[ $? != 0 ]]; then
-        RESULT="FAILED:${ret}"
-        RET_CODE=1
+    if [[ -z "${RESULT}" ]]; then
+        ret=$(validate ${tmpdir})
+        if [[ $? != 0 ]]; then
+            RESULT="FAILED:${ret}"
+            RET_CODE=1
+        fi
     fi
 
     if [[ -z "${RESULT}" ]]; then

@@ -230,9 +230,9 @@ class VirtualManager(object):
                                   kernel_args=kernel_args,
                                   memory=self._conf.ram,
                                   vnc=self._conf.vnc,
-                                  log_check = log_monitor.server.log_check,
-                                  virtio_host = log_monitor.host,
-                                  virtio_port = log_monitor.port,
+                                  log_check=log_monitor.server.log_check,
+                                  virtio_host=log_monitor.host,
+                                  virtio_port=log_monitor.port,
                                   nics=self._conf.networks,
                                   boot=self._conf.boot_image)
 
@@ -281,7 +281,7 @@ class VirtualManager(object):
     def run(self):
         setup_logging(self._conf.log_path, log)
 
-        log.debug(VirtualConfiguration)
+        log.debug(self._conf)
 
         # Check for invalid combinations of options, print all the errors and exit.
         errors = self._check_setup()

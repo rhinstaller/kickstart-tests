@@ -153,7 +153,7 @@ class VirtualConfiguration(object):
         self._kernel_args = None
         self._timeout = None
 
-    def __str__(self):
+    def __repr__(self):
         msg = "Virtual Configuration:"
 
         for p in dir(VirtualConfiguration):

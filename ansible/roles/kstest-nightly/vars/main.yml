@@ -1,0 +1,13 @@
+---
+
+kstest:
+  nightly:
+    git_repo_dir: git/kickstart-tests
+    # When to run the tests
+    cron:
+      hour: 22
+      minute: 00
+    results_summary_script:
+      src: files/scripts/kstests_history.py
+      # Relative path in home directory
+      dest: "kstests_history.py"

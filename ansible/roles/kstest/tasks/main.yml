@@ -1,0 +1,112 @@
+---
+
+### Unlock Cloud Image root
+
+- name: Unlock root
+  user:
+    name: root
+    password: anaconda
+
+### Install required stuff on top of Cloud Image
+
+- name: Install required groups
+  dnf:
+    name:
+      - "@virtualization"
+    state: present
+
+- name: Install packages
+  dnf:
+    name:
+      - git
+      - libselinux-python
+      - NetworkManager
+      - lorax-lmc-virt # kstests livemedia-creator
+      - openssh-clients # kstests scp
+      - parallel # kstests
+      - python3-libvirt # kstests
+      - libguestfs-tools # kstests
+      - vim
+    state: present
+
+- name: Install kernel-modules (reboot if updated)
+  dnf:
+      name: "kernel-modules"
+      state: present
+  notify:
+      - Reboot machine
+
+### Create kstests user which can sudo without password
+
+- name: Create kstest user
+  user:
+    name: kstest
+
+- name: Create kstest .ssh dir
+  file:
+    path: /home/kstest/.ssh
+    state: directory
+    owner: kstest
+    group: kstest
+    mode: 0700
+
+- name: Allow authentication for remote tests
+  authorized_key:
+    user: kstest
+    key: "{{ lookup('file', item) }}"
+  with_fileglob:
+    - "files/authorized_keys/*"
+  tags:
+    - ssh-keys
+
+- name: Disable lecture message from sudo
+  copy:
+    src: files/sudoers.d.lecture
+    dest: /etc/sudoers.d/lecture
+    owner: root
+    group: root
+    mode: 0440
+
+- name: Make sure there is a 'wheel' group
+  group:
+    name: whell
+    state: present
+
+- name: Allow 'wheel' group to have passwordless sudo
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%wheel'
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+
+- name: Add kstest to wheel group
+  user:
+    name: kstest
+    groups: wheel
+    append: yes
+
+- name: Allow authentization as root for Vritual Manager
+  authorized_key:
+    user: root
+    key: "{{ lookup('file', item) }}"
+  with_fileglob:
+    - "files/authorized_keys/*"
+  tags:
+    - ssh-keys
+
+# This is probably not required but we like NM
+
+- name: Enable NetworkManager service
+  service:
+    name: NetworkManager
+    enabled: yes
+  notify:
+      - Reboot machine
+
+- name: Disable network service
+  service:
+    name: network
+    enabled: no
+  notify:
+      - Reboot machine

@@ -21,6 +21,7 @@
 # Print something that looks like an externally accessible IPv4 address.
 
 ip addr list | \
+    grep -v '192.168.122.1' | \
     grep '^[[:space:]]*inet\>.*scope global' | \
     head -1 | \
     sed 's/^[[:space:]]*inet \([[:digit:].]*\).*/\1/'

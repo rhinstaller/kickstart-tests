@@ -315,9 +315,13 @@ if [[ "$TEST_REMOTES" != "" ]]; then
     # in the same location.
     cp ${IMAGE} ${_IMAGE}
 
-    # (2) Run parallel.  We always add the local system to the list of machines
-    # being passed to parallel.  Don't add it yourself.
-    remote_args="--sshlogin :"
+    # (2) Run parallel.  By default add the local system to the list of machines
+    # being passed to parallel.
+    if [[ "${TEST_REMOTES_ONLY}" != "yes" ]]; then
+        remote_args="--sshlogin :"
+    else
+        remote_args=""
+    fi
     for remote in ${TEST_REMOTES}; do
         remote_args="${remote_args} --sshlogin kstest@${remote}"
     done

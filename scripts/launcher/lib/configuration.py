@@ -56,8 +56,8 @@ class RunnerConfiguration(object):
     def _confiure_parser(self):
         self._parser.add_argument("kickstart_test", metavar="KS test controller",
                                   type=str, help="Kickstart test to run")
-        self._parser.add_argument("image", metavar="Image path", type=str,
-                                  help="Image used to run specified kickstart test")
+        self._parser.add_argument("-i", metavar="Image path", type=str, required=True,
+                                  dest="image", help="Image used to run specified kickstart test")
         self._parser.add_argument("--keep", '-k', metavar="0,1,2", type=int,
                                   dest="keep", help="""
                                   Set the level of what should be kept after a test

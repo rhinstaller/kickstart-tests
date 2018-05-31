@@ -355,9 +355,10 @@ if [[ "$TEST_REMOTES" != "" ]]; then
     rm ${_IMAGE}
 else
     parallel --no-notice --jobs ${TEST_JOBS:-4} \
-        sudo PYTHONPATH=$PYTHONPATH scripts/run_one_ks.sh -i ${IMAGE} \
-                                                          -k ${KEEPIT} \
-                                                          ${UPDATES_ARG} ${BOOT_ARG} {} ::: ${tests}
+        sudo PYTHONPATH=$PYTHONPATH scripts/launcher/run_one_test.py \
+                                                      -i ${IMAGE} \
+                                                      -k ${KEEPIT} \
+                                                      ${UPDATES_ARG} ${BOOT_ARG} {} ::: ${tests}
     rc=$?
 fi
 

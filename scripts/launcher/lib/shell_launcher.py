@@ -36,18 +36,18 @@ class ShellOutput(object):
 
     @property
     def stdout(self):
-        return self._out.stdout.decode()
+        return self._out.stdout.decode().rstrip()
 
     @property
     def stderr(self):
-        return self._out.stderr.decode()
+        return self._out.stderr.decode().rstrip()
 
     @property
     def return_code(self):
         return self._out.returncode
 
     def check_ret_code_with_exception(self):
-        return self._out.check_return_code()
+        return self._out.check_returncode()
 
     def check_ret_code(self):
         return self._out.returncode == 0

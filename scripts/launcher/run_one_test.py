@@ -65,7 +65,9 @@ class Runner(object):
         self._copy_image_to_tmp()
 
         try:
-            self._ks_file = self._shell.run_prepare()
+            shell_out = self._shell.run_prepare()
+            shell_out.check_ret_code_with_exception()
+            self._ks_file = shell_out.stdout
         except subprocess.CalledProcessError as e:
             self._result_formatter.print_result(result=False, msg="Test prep failed",
                                                 description=e.stdout.decode())
@@ -91,7 +93,7 @@ class Runner(object):
 
         kernel_args = self._shell.run_kernel_args().stdout.split(" ")
 
-        if self._conf.updates_img_path:
+        if self._conf.update_img_path:
             kernel_args.append("inst.updates={}".format(self._conf.updates_img_path))
 
         if kernel_args:

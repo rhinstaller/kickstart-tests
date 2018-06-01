@@ -42,6 +42,7 @@ class TempManager(AbstractContextManager):
     def __enter__(self):
         prefix = "kstest-{}.".format(self._test_name)
         self._tmp_dir = mkdtemp(prefix=prefix, dir="/var/tmp")
+        self._change_permission()
 
         return self._tmp_dir
 
@@ -60,4 +61,7 @@ class TempManager(AbstractContextManager):
 
     def _tmp_join_path(self, file_path):
         return os.path.join(self._tmp_dir, file_path)
+
+    def _change_permission(self):
+        os.chmod(self._tmp_dir, 0o755)
 

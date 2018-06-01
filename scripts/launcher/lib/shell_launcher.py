@@ -62,7 +62,43 @@ class ShellOutput(object):
         return self._out.returncode == 0
 
 
-class ShellLauncher(object):
+class ProcessLauncher(object):
+
+    def __init__(self, log=None, print_errors=True):
+        super().__init__()
+        self._log = log
+        self._print_errors = print_errors
+        self._cmd = None
+
+    def _report_result(self, subprocess_out):
+        if not subprocess_out.check_ret_code():
+            msg = self._format_result(subprocess_out)
+            if self._log:
+                self._log.warning(msg)
+            if self._print_errors:
+                print(msg)
+
+    def _format_result(self, subprocess_out):
+        msg = "Failed to run subprocess: '{}'\n".format(self._cmd)
+        if subprocess_out.stderr:
+            msg += "stderr:\n"
+            msg += subprocess_out.stderr + "\n"
+        if subprocess_out.stdout:
+            msg += "stdout:\n"
+            msg += subprocess_out.stdout + "\n"
+
+        return msg
+
+    def run_process(self, args):
+        self._cmd = args
+        out = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        s_out = ShellOutput(out)
+        self._report_result(s_out)
+        return s_out
+
+
+class ShellLauncher(ProcessLauncher):
 
     def __init__(self, configuration, tmp_dir):
         super().__init__()
@@ -114,17 +150,4 @@ class ShellLauncher(object):
 
         cmd_args.append(func_name)
 
-        out = subprocess.run(cmd_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-        if out.returncode != 0:
-            self._report_error(out)
-
-        return ShellOutput(out)
-
-    @staticmethod
-    def _report_error(subprocess_out):
-        print("Failed to run subprocess:")
-        print("stderr:")
-        print(subprocess_out.stderr)
-        print("stdout:")
-        print(subprocess_out.stdout)
+        return self.run_process(cmd_args)

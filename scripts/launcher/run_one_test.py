@@ -189,7 +189,7 @@ class Runner(object):
     def _validate_result(self):
         output = self._shell.run_validate()
 
-        if output.check_ret_code():
+        if not output.check_ret_code():
             msg = "with return code {}".format(output.return_code)
             description = "stdout: '{}' stderr: '{}'".format(output.stdout,
                                                              output.stderr)

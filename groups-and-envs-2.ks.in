@@ -1,4 +1,10 @@
 #test name: groups-and-envs-2
+# what we are testing there:
+# - that we can exclude groups which are a part of an environment
+# - that we can exclude groups we have specified in ourselves
+#   (this could be important for multiple ksincluded %packages sections)
+# - that the --optional flag for package groups is working
+# - that the --nodefaults flag for package groups is working
 url @KSTEST_URL@
 install
 network --bootproto=dhcp
@@ -47,11 +53,21 @@ if [[ $? == 0 ]]; then
     echo '*** 3d-printing group should not have been installed' >> /root/RESULT
 fi
 
-# Testing #3 - fedora-dockerfiles is only part of container-management, where
-# it is optional, so it should be installed.
-rpm -q fedora-dockerfiles
+# Testing #3 - buildah, podman, origin-clients are optional part of container-management,
+# so should be installed when the --optional flag is passed for the group spec
+rpm -q buildah
 if [[ $? != 0 ]]; then
-    echo '*** fedora-dockerfiles was not installed' >> /root/RESULT
+    echo '*** buildah was not installed for @container-management --optional' >> /root/RESULT
+fi
+
+rpm -q podman
+if [[ $? != 0 ]]; then
+    echo '*** podman was not installed for @container-management --optional' >> /root/RESULT
+fi
+
+rpm -q origin-clients
+if [[ $? != 0 ]]; then
+    echo '*** origin-clients was not installed for @container-management --optional' >> /root/RESULT
 fi
 
 # Testing #4 - rpm-build is mandatory so it should be installed.  rpmdevtools is

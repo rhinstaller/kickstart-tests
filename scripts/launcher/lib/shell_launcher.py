@@ -39,6 +39,15 @@ class ShellOutput(object):
         return self._out.stdout.decode().rstrip()
 
     @property
+    def stdout_as_array(self):
+        ret = self.stdout
+
+        if ret:
+            return ret.split(" ")
+        else:
+            return []
+
+    @property
     def stderr(self):
         return self._out.stderr.decode().rstrip()
 

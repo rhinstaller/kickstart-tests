@@ -37,45 +37,47 @@ shutdown
 # Testing #1 - lrzsz is only part of dial-up, and should not be installed.
 rpm -q lrzsz
 if [[ $? == 0 ]]; then
-    echo '*** dial-up group should not have been installed' > /root/RESULT
-    exit 1
+    echo '*** dial-up group should not have been installed' >> /root/RESULT
 fi
 
 # Testing #2 - meshlab is only part of 3d-printing, and should not
 # be installed.
 rpm -q meshlab
 if [[ $? == 0 ]]; then
-    echo '*** 3d-printing group should not have been installed' > /root/RESULT
-    exit 1
+    echo '*** 3d-printing group should not have been installed' >> /root/RESULT
 fi
 
 # Testing #3 - fedora-dockerfiles is only part of container-management, where
 # it is optional, so it should be installed.
 rpm -q fedora-dockerfiles
 if [[ $? != 0 ]]; then
-    echo '*** fedora-dockerfiles was not installed' > /root/RESULT
-    exit 1
+    echo '*** fedora-dockerfiles was not installed' >> /root/RESULT
 fi
 
 # Testing #4 - rpm-build is mandatory so it should be installed.  rpmdevtools is
 # default so it should not.  rpmlint is optional so it should not.
 rpm -q rpm-build
 if [[ $? != 0 ]]; then
-    echo '*** Mandatory package from rpm-development-tools was not installed' > /root/RESULT
-    exit 1
+    echo '*** Mandatory package from rpm-development-tools was not installed' >> /root/RESULT
 else
     rpm -q rpmdevtools
     if [[ $? == 0 ]]; then
-        echo '*** Default package from rpm-development-tools should not have been installed' > /root/RESULT
-        exit 1
+        echo '*** Default package from rpm-development-tools should not have been installed' >> /root/RESULT
     else
         rpm -q rpmlint
         if [[ $? == 0 ]]; then
-            echo '*** Optional package from rpm-development-tools should not have been installed' > /root/RESULT
-            exit 1
+            echo '*** Optional package from rpm-development-tools should not have been installed' >> /root/RESULT
         fi
     fi
 fi
 
-echo SUCCESS > /root/RESULT
+if [ ! -f /root/RESULT ]
+then
+    # no result file (no errors) -> success
+    echo SUCCESS > /root/RESULT
+else
+    # some errors happened
+    exit 1
+fi
+
 %end

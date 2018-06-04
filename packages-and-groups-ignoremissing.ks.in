@@ -1,0 +1,53 @@
+#version=DEVEL
+#test name: packages-and-groups-ignoremissing
+#
+# what we are testing there:
+# - that multiple missing packages & groups (at the same time) are ignored
+#   if --ignoremissing is used
+# - that regular packages and groups requested at the same time
+#   are installed correctly
+# - that such an installation finishes successfully
+url @KSTEST_URL@
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+clearpart --all --initlabel
+autopart
+
+keyboard us
+lang en_US.UTF-8
+timezone America/New_York --utc
+rootpw testcase
+shutdown
+
+%packages --ignoremissing
+fake-package-name-1
+fake-package-name-2
+@fake-group-name-1
+@fake-group-name-2
+vim
+@c-development
+%end
+
+%post
+rpm -q vim-minimal
+if [[ $? != 0 ]]; then
+    echo '*** vim package was not installed' >> /root/RESULT
+fi
+
+rpm -q gcc
+if [[ $? != 0 ]]; then
+    echo '*** gcc should have been installed via the c-development package group' >> /root/RESULT
+fi
+
+if [ ! -f /root/RESULT ]
+then
+    # no result file (no errors) -> success
+    echo SUCCESS > /root/RESULT
+else
+    # some errors happened
+    exit 1
+fi
+%end

@@ -1,9 +1,9 @@
 #version=DEVEL
-#test name: packages-ignoremissing
+#test name: groups-ignoremissing
 #
 # what we are testing there:
-# - that missing packages are ignored if --ignoremissing is used
-# - that such an installation finishes
+# - that missing groups are ignored if --ignoremissing is used
+# - that such an installation finishes successfully
 url @KSTEST_URL@
 install
 network --bootproto=dhcp
@@ -20,7 +20,7 @@ rootpw testcase
 shutdown
 
 %packages --ignoremissing
-fake-package-name
+@fake-group-name
 %end
 
 %post

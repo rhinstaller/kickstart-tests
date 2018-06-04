@@ -196,6 +196,10 @@ class VirtualInstall(object):
         """
         log.info("shutting down %s", self._virt_name)
         launcher = ProcessLauncher(log, False)
+
+        # FIXME: these should be logged as warning but then it is printed to stderr because that
+        # FIXME: is lorax setting which can't be easily changed
+        launcher.log_level = logging.DEBUG
         launcher.run_process(["virsh", "destroy", self._virt_name])
         launcher.run_process(["virsh", "undefine", self._virt_name])
         launcher.run_process(["virsh", "pool-destroy", pool_name])

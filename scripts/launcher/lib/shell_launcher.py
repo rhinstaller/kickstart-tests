@@ -18,9 +18,10 @@
 # Red Hat, Inc.
 #
 # Red Hat Author(s): Jiri Konecny <jkonecny@redhat.com>
-
+#
 # This is a library to control the shell scripts in the test.
 
+import logging
 import os
 import subprocess
 
@@ -69,12 +70,26 @@ class ProcessLauncher(object):
         self._log = log
         self._print_errors = print_errors
         self._cmd = None
+        self._log_level = logging.WARNING
+
+    @property
+    def log_level(self):
+        """Get log level used to report error"""
+        return self._log_level
+
+    @log_level.setter
+    def log_level(self, value):
+        """Set log level used to print subprocess failure
+
+        This is required because lorax (livemedia-creator log) have stderr logging set to INFO.
+        """
+        self._log_level = value
 
     def _report_result(self, subprocess_out):
         if not subprocess_out.check_ret_code():
             msg = self._format_result(subprocess_out)
             if self._log:
-                self._log.warning(msg)
+                self._log.log(self._log_level, msg)
             if self._print_errors:
                 print(msg)
 

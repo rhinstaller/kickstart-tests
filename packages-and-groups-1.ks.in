@@ -39,36 +39,39 @@ kacst*
 # Testing #1 - gcc should be installed, but not valgrind
 rpm -q gcc
 if [[ $? != 0 ]]; then
-    echo '*** c-development group was not installed' > /root/RESULT
-    exit 1
+    echo '*** c-development group was not installed' >> /root/RESULT
 fi
 
 rpm -q valgrind
 if [[ $? == 0 ]]; then
-    echo '*** valgrind package should not have been installed' > /root/RESULT
-    exit 1
+    echo '*** valgrind package should not have been installed' >> /root/RESULT
 fi
 
 # Testing #2 - qemu-kvm should not be installed.
 rpm -q qemu-kvm
 if [[ $? == 0 ]]; then
-    echo '*** qemu-kvm package should not have been installed' > /root/RESULT
-    exit 1
+    echo '*** qemu-kvm package should not have been installed' >> /root/RESULT
 fi
 
 # Testing #3 - kacst font stuff should be installed.
 count=$(rpm -qa kacst\* | wc -l)
 if [[ $count -lt 5 ]]; then
-    echo '*** kacst glob was not installed' > /root/RESULT
-    exit 1
+    echo '*** kacst glob was not installed' >> /root/RESULT
 fi
 
 # Testing #4 - ibus stuff should not be installed.
 count=$(rpm -qa ibus\* | wc -l)
 if [[ $count -gt 0 ]]; then
-    echo '*** ibus glob should not have been installed' > /root/RESULT
+    echo '*** ibus glob should not have been installed' >> /root/RESULT
+fi
+
+if [ ! -f /root/RESULT ]
+then
+    # no result file (no errors) -> success
+    echo SUCCESS > /root/RESULT
+else
+    # some errors happened
     exit 1
 fi
 
-echo SUCCESS > /root/RESULT
 %end

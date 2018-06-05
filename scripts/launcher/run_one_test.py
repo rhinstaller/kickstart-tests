@@ -61,7 +61,7 @@ class Runner(object):
         # so the validator will be set later
         self._validator = None
 
-    def prepare_test(self):
+    def _prepare_test(self):
         self._copy_image_to_tmp()
 
         try:
@@ -88,7 +88,7 @@ class Runner(object):
         shutil.copy2(self._conf.boot_image, self._tmp_dir)
 
     def run_test(self):
-        if not self.prepare_test():
+        if not self._prepare_test():
             return 99
 
         kernel_args = self._get_kernel_args()
@@ -205,7 +205,6 @@ if __name__ == '__main__':
 
     with TempManager(config.keep_level, config.ks_test_name) as temp_dir:
         runner = Runner(config, temp_dir)
-        runner.prepare_test()
         ret_code = runner.run_test()
 
     exit(ret_code)

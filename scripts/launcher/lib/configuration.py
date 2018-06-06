@@ -84,8 +84,12 @@ class RunnerConfiguration(object):
         return self._ks_test_name
 
     @property
-    def boot_image(self):
+    def boot_image_path(self):
         return self._image_path
+
+    @property
+    def boot_image_name(self):
+        return os.path.basename(self._image_path)
 
     @property
     def keep_level(self):

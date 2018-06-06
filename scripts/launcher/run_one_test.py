@@ -85,7 +85,7 @@ class Runner(object):
 
     def _copy_image_to_tmp(self):
         print("Copying image to temp directory {}".format(self._tmp_dir))
-        shutil.copy2(self._conf.boot_image, self._tmp_dir)
+        shutil.copy2(self._conf.boot_image_path, self._tmp_dir)
 
     def run_test(self):
         if not self._prepare_test():
@@ -100,7 +100,9 @@ class Runner(object):
         nics_args = self._collect_network()
         boot_args = self._get_boot_args()
 
-        v_conf = VirtualConfiguration(self._conf.boot_image, [self._ks_file])
+        target_boot_iso = os.path.join(self._tmp_dir, self._conf.boot_image_name)
+
+        v_conf = VirtualConfiguration(target_boot_iso, [self._ks_file])
         v_conf.kernel_args = kernel_args
         v_conf.test_name = self._conf.ks_test_name
         v_conf.temp_dir = self._tmp_dir

@@ -150,7 +150,7 @@ class ShellLauncher(ProcessLauncher):
 
         cmd_args.append(script_path)
         cmd_args.append("-i")
-        cmd_args.append(self._conf.boot_image)
+        cmd_args.append(self._conf.boot_image_path)
         cmd_args.append("-k")
         cmd_args.append(str(self._conf.keep_level.value))
 

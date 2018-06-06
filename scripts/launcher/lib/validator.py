@@ -22,6 +22,10 @@
 
 import re
 
+from .test_logging import get_logger
+
+log = get_logger()
+
 
 def replace_new_lines(line):
         line.replace("#012", "\n")
@@ -46,15 +50,14 @@ class ResultFormatter(object):
 
     def print_result(self, result, msg, description=""):
         msg = self.format_result(result, msg, description)
-        print(msg)
+        log.info(msg)
 
 
 class Validator(object):
 
-    def __init__(self, name, log=None):
+    def __init__(self, name):
         super(). __init__()
 
-        self._log = log
         self._return_code = 0
         self._result_msg = ""
         self._result_formatter = ResultFormatter(name)
@@ -77,20 +80,19 @@ class Validator(object):
                                             description)
 
     def log_result(self, description=""):
-        if self._log:
-            msg = self._result_formatter.format_result(self.result,
-                                                       self._result_msg,
-                                                       description)
-            if self._return_code != 0:
-                self._log.error(msg)
-            else:
-                self._log.info(msg)
+        msg = self._result_formatter.format_result(self.result,
+                                                   self._result_msg,
+                                                   description)
+        if self._return_code != 0:
+            log.error(msg)
+        else:
+            log.info(msg)
 
 
 class KickstartValidator(Validator):
 
-    def __init__(self, test_name, kickstart_path, log=None):
-        super().__init__(test_name, log=log)
+    def __init__(self, test_name, kickstart_path):
+        super().__init__(test_name)
 
         self._kickstart_path = kickstart_path
         self._check_subs_re = re.compile(r'@\w*@')
@@ -113,8 +115,8 @@ class KickstartValidator(Validator):
 
 class LogValidator(Validator):
 
-    def __init__(self, test_name, log):
-        super().__init__(test_name, log)
+    def __init__(self, test_name):
+        super().__init__(test_name)
 
     def check_install_errors(self, install_log):
         ret_code = 0
@@ -124,7 +126,7 @@ class LogValidator(Validator):
 
                 # non critical error blocking the installation
                 if "CRIT systemd-coredump:" in line:
-                    self._log.info("Non critical error: {}".format(replace_new_lines(line)))
+                    log.info("Non critical error: {}".format(replace_new_lines(line)))
                     continue
                 elif "CRIT" in line:
                     self._result_msg = replace_new_lines(line)

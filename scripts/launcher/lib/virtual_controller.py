@@ -43,10 +43,10 @@ from pylorax.mount import IsoMountpoint
 from .configuration import VirtualConfiguration
 from .validator import replace_new_lines
 from .shell_launcher import ProcessLauncher
+from .test_logging import get_logger
 
-import logging
-log = logging.getLogger("livemedia-creator")
 
+log = get_logger()
 
 __all__ = ["VirtualManager", "InstallError"]
 
@@ -195,11 +195,7 @@ class VirtualInstall(object):
         Could use libvirt for this instead.
         """
         log.info("shutting down %s", self._virt_name)
-        launcher = ProcessLauncher(log, False)
-
-        # FIXME: these should be logged as warning but then it is printed to stderr because that
-        # FIXME: is lorax setting which can't be easily changed
-        launcher.log_level = logging.DEBUG
+        launcher = ProcessLauncher(False)
         launcher.run_process(["virsh", "destroy", self._virt_name])
         launcher.run_process(["virsh", "undefine", self._virt_name])
         launcher.run_process(["virsh", "pool-destroy", pool_name])
@@ -231,6 +227,7 @@ class VirtualManager(object):
             kernel_args += " proxy=" + self._conf.proxy
 
         try:
+            log.info("Starting virtual machine")
             virt = VirtualInstall(iso_mount, self._conf.ks_paths,
                                   disk_paths=self._conf.disk_paths,
                                   kernel_args=kernel_args,
@@ -305,14 +302,18 @@ class VirtualManager(object):
             return False
 
         self._create_human_log()
-
-        log.info("SUMMARY")
-        log.info("-------")
-        log.info("Logs are in %s", os.path.abspath(os.path.dirname(self._conf.log_path)))
-        log.info("Disk image(s) at %s", ",".join(self._conf.disk_paths))
-        log.info("Results are in %s", self._conf.temp_dir)
+        self._report_result()
 
         return True
+
+    def _report_result(self):
+        msg = "SUMMARY\n"
+        msg += "-------\n"
+        msg += "Logs are in {}\n".format(os.path.abspath(os.path.dirname(self._conf.log_path)))
+        msg += "Disk image(s) at {}\n".format(",".join(self._conf.disk_paths))
+        msg += "Results are in {}\n".format(self._conf.temp_dir)
+
+        log.info(msg)
 
     def _create_human_log(self):
         output_log = os.path.join(self._conf.temp_dir, "virt-install-human.log")

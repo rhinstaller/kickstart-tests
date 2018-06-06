@@ -61,11 +61,13 @@ class Runner(object):
         # so the validator will be set later
         self._validator = None
 
-    def prepare_test(self):
+    def _prepare_test(self):
         self._copy_image_to_tmp()
 
         try:
-            self._ks_file = self._shell.run_prepare()
+            shell_out = self._shell.run_prepare()
+            shell_out.check_ret_code_with_exception()
+            self._ks_file = shell_out.stdout
         except subprocess.CalledProcessError as e:
             self._result_formatter.print_result(result=False, msg="Test prep failed",
                                                 description=e.stdout.decode())
@@ -86,22 +88,19 @@ class Runner(object):
         shutil.copy2(self._conf.boot_image, self._tmp_dir)
 
     def run_test(self):
-        if not self.prepare_test():
+        if not self._prepare_test():
             return 99
 
-        kernel_args = self._shell.run_kernel_args().stdout.split(" ")
+        kernel_args = self._get_kernel_args()
 
-        if self._conf.updates_img_path:
+        if self._conf.update_img_path:
             kernel_args.append("inst.updates={}".format(self._conf.updates_img_path))
-
-        if kernel_args:
-            kernel_args = '--kernel-args "{}"'.format(kernel_args)
 
         disk_args = self._collect_disks()
         nics_args = self._collect_network()
-        boot_args = self._shell.run_boot_args()
+        boot_args = self._get_boot_args()
 
-        v_conf = VirtualConfiguration(self._conf.boot_image, self._ks_file)
+        v_conf = VirtualConfiguration(self._conf.boot_image, [self._ks_file])
         v_conf.kernel_args = kernel_args
         v_conf.test_name = self._conf.ks_test_name
         v_conf.temp_dir = self._tmp_dir
@@ -139,9 +138,8 @@ class Runner(object):
         out = self._shell.run_prepare_disks()
         out.check_ret_code_with_exception()
 
-        for d in out.stdout.split(" "):
-            ret.append("--disk")
-            ret.append("{},cache=unsafe;".format(d))
+        for d in out.stdout_as_array:
+            ret.append("{},cache=unsafe".format(d))
 
         return ret
 
@@ -151,7 +149,7 @@ class Runner(object):
         out = self._shell.run_prepare_network()
         out.check_ret_code_with_exception()
 
-        for n in out.stdout.split(" "):
+        for n in out.stdout_as_array:
             ret.append("--nic")
             ret.append(n)
 
@@ -162,10 +160,22 @@ class Runner(object):
 
         out = self._shell.run_additional_runner_args()
         out.check_ret_code_with_exception()
-        for arg in out.stdout.split(" "):
+        for arg in out.stdout_as_array:
             ret.append(arg)
 
         return ret
+
+    def _get_kernel_args(self):
+        out = self._shell.run_kernel_args()
+
+        out.check_ret_code_with_exception()
+        return out.stdout
+
+    def _get_boot_args(self):
+        out = self._shell.run_boot_args()
+
+        out.check_ret_code_with_exception()
+        return out.stdout_as_array
 
     def _validate_logs(self, virt_configuration):
         validator = LogValidator(self._conf.ks_test_name, log)
@@ -179,7 +189,7 @@ class Runner(object):
     def _validate_result(self):
         output = self._shell.run_validate()
 
-        if output.check_ret_code():
+        if not output.check_ret_code():
             msg = "with return code {}".format(output.return_code)
             description = "stdout: '{}' stderr: '{}'".format(output.stdout,
                                                              output.stderr)
@@ -195,7 +205,6 @@ if __name__ == '__main__':
 
     with TempManager(config.keep_level, config.ks_test_name) as temp_dir:
         runner = Runner(config, temp_dir)
-        runner.prepare_test()
         ret_code = runner.run_test()
 
     exit(ret_code)

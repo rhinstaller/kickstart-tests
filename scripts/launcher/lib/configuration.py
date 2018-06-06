@@ -56,8 +56,8 @@ class RunnerConfiguration(object):
     def _confiure_parser(self):
         self._parser.add_argument("kickstart_test", metavar="KS test controller",
                                   type=str, help="Kickstart test to run")
-        self._parser.add_argument("image", metavar="Image path", type=str,
-                                  help="Image used to run specified kickstart test")
+        self._parser.add_argument("-i", metavar="Image path", type=str, required=True,
+                                  dest="image", help="Image used to run specified kickstart test")
         self._parser.add_argument("--keep", '-k', metavar="0,1,2", type=int,
                                   dest="keep", help="""
                                   Set the level of what should be kept after a test
@@ -102,8 +102,8 @@ class RunnerConfiguration(object):
     def process_argument(self):
         ns = self._parser.parse_args()
 
-        self._sh_path = ns.kickstart_test
-        self._image_path = ns.image
+        self._sh_path = os.path.abspath(ns.kickstart_test)
+        self._image_path = os.path.abspath(ns.image)
 
         base_path = os.path.splitext(self._sh_path)[0]
         self._ks_path = "{}{}".format(base_path, ".ks")
@@ -116,7 +116,7 @@ class RunnerConfiguration(object):
             self._keep_option = KeepLevel(ns.keep)
 
         if ns.updates_path:
-            self._updates_img_path = ns.updates_path
+            self._updates_img_path = os.path.abspath(ns.updates_path)
 
         self._check_arguments()
 

@@ -97,6 +97,9 @@ case $1 in
     kernel_args)
         echo $(kernel_args)
         ;;
+    boot_args)
+        echo $(boot_args)
+        ;;
     additional_runner_args)
         echo $(additional_runner_args)
         ;;
@@ -104,7 +107,7 @@ case $1 in
         echo $(validate ${tmpdir})
         ;;
     *)
-        echo "Bad function name!"
+        echo "Bad function name \'$1\' !"
         exit 3
         ;;
 esac

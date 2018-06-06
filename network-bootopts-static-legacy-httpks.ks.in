@@ -1,0 +1,43 @@
+#test name: network-static-to-dhcp-pre
+# Testing legacy boot options (rhel6). Works on RHEL 7, doesn't work on Fedora 26
+url @KSTEST_URL@
+
+# We need a device with dns configured for repo
+network --device=ens4 --bootproto dhcp
+
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+%post --nochroot
+
+@KSINCLUDE@ post-nochroot-lib-network.sh
+
+check_gui_configurations ens3 ens4
+
+%end
+
+%post
+
+@KSINCLUDE@ post-lib-network.sh
+
+check_device_connected ens3 yes
+check_device_ifcfg_value ens3 IPADDR @KSTEST_STATIC_IP@
+check_device_ipv4_address ens3 @KSTEST_STATIC_IP@
+check_device_connected ens4 yes
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+   echo SUCCESS > /root/RESULT
+fi
+%end

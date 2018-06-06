@@ -89,8 +89,8 @@ class Validator(object):
 
 class KickstartValidator(Validator):
 
-    def __init__(self, test_name, kickstart_path):
-        super().__init__(test_name)
+    def __init__(self, test_name, kickstart_path, log=None):
+        super().__init__(test_name, log=log)
 
         self._kickstart_path = kickstart_path
         self._check_subs_re = re.compile(r'@\w*@')
@@ -104,7 +104,7 @@ class KickstartValidator(Validator):
             for num, line in enumerate(f):
                 subs = self._check_subs_re.search(line)
                 if subs is not None:
-                    self._result_msg = "{} on line {}".format(subs[0], num)
+                    self._result_msg = "Substitution '{}' failed on line '{}'".format(subs[0], num)
                     self._return_code = 1
                     return
 

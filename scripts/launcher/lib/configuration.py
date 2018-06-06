@@ -92,7 +92,7 @@ class RunnerConfiguration(object):
         return self._keep_option
 
     @property
-    def update_img_path(self):
+    def updates_img_path(self):
         return self._updates_img_path
 
     @property
@@ -116,7 +116,7 @@ class RunnerConfiguration(object):
             self._keep_option = KeepLevel(ns.keep)
 
         if ns.updates_path:
-            self._updates_img_path = os.path.abspath(ns.updates_path)
+            self._updates_img_path = ns.updates_path
 
         self._check_arguments()
 
@@ -127,8 +127,6 @@ class RunnerConfiguration(object):
             raise IOError("Kickstart file '{}' does not exists!".format(self._ks_path))
         elif not os.path.exists(self._image_path):
             raise IOError("Boot iso file '{}' does not exists!".format(self._image_path))
-        elif self._updates_img_path and not os.path.exists(self._updates_img_path):
-            raise IOError("Updates image '{}' does not exists!".format(self._updates_img_path))
 
 
 class VirtualConfiguration(object):

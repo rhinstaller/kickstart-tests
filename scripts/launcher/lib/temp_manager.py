@@ -51,12 +51,12 @@ class TempManager(AbstractContextManager):
             shutil.rmtree(self._tmp_dir)
         elif self._keep_type is KeepLevel.LOGS_ONLY:
             images_path = self._tmp_join_path("disk-*.img")
-            ks_path = self._tmp_join_path("*.ks")
+            iso_path = self._tmp_join_path("*.iso")
 
             for f in glob(images_path):
                 os.remove(f)
 
-            for f in glob(ks_path):
+            for f in glob(iso_path):
                 os.remove(f)
 
     def _tmp_join_path(self, file_path):

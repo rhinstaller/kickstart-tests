@@ -154,9 +154,9 @@ class ShellLauncher(ProcessLauncher):
         cmd_args.append("-k")
         cmd_args.append(str(self._conf.keep_level.value))
 
-        if self._conf.update_img_path:
+        if self._conf.updates_img_path:
             cmd_args.append("-u")
-            cmd_args.append(self._conf.update_img_path)
+            cmd_args.append(self._conf.updates_img_path)
 
         cmd_args.append("-w")
         cmd_args.append(self._tmp_dir)

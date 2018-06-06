@@ -76,7 +76,7 @@ class Runner(object):
 
         self._validator = KickstartValidator(self._conf.ks_test_name, self._ks_file)
         self._validator.check_ks_substitution()
-        if self._validator.result is False:
+        if not self._validator.result:
             self._validator.print_result()
             self._shell.run_cleanup()
             return False
@@ -93,8 +93,8 @@ class Runner(object):
 
         kernel_args = self._get_kernel_args()
 
-        if self._conf.update_img_path:
-            kernel_args.append("inst.updates={}".format(self._conf.updates_img_path))
+        if self._conf.updates_img_path:
+            kernel_args += " inst.updates={}".format(self._conf.updates_img_path)
 
         disk_args = self._collect_disks()
         nics_args = self._collect_network()

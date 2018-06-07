@@ -345,6 +345,7 @@ if [[ "$TEST_REMOTES" != "" ]]; then
     for remote in ${TEST_REMOTES}; do
         if [[ ${KEEPIT} > 0 ]]; then
             ssh kstest@${remote} sudo chown -R kstest:kstest /var/tmp/kstest-\*
+            ssh kstest@${remote} sudo chmod -R a+r /var/tmp/kstest-\*
             scp -r kstest@${remote}:/var/tmp/kstest-\* /var/tmp/
         fi
 

@@ -80,34 +80,47 @@ ks=${t/.sh/.ks}
 . $t
 
 name=$(basename ${t%.sh})
+ret=0
+msg=""
 
 case $1 in
     cleanup)
         cleanup ${tmpdir}
+        ret=$?
         ;;
     prepare)
-        echo $(prepare ${ks} ${tmpdir})
+        msg=$(prepare ${ks} ${tmpdir})
+        ret=$?
         ;;
     prepare_disks)
-        echo $(prepare_disks ${tmpdir})
+        msg=$(prepare_disks ${tmpdir})
+        ret=$?
         ;;
     prepare_network)
-        echo $(prepare_network ${tmpdir})
+        msg=$(prepare_network ${tmpdir})
+        ret=$?
         ;;
     kernel_args)
-        echo $(kernel_args)
+        msg=$(kernel_args)
+        ret=$?
         ;;
     boot_args)
-        echo $(boot_args)
+        msg=$(boot_args)
+        ret=$?
         ;;
     additional_runner_args)
-        echo $(additional_runner_args)
+        msg=$(additional_runner_args)
+        ret=$?
         ;;
     validate)
-        echo $(validate ${tmpdir})
+        msg=$(validate ${tmpdir})
+        ret=$?
         ;;
     *)
         echo "Bad function name \'$1\' !"
         exit 3
         ;;
 esac
+
+echo ${msg}
+exit ${ret}

@@ -69,15 +69,14 @@ class Runner(object):
             shell_out.check_ret_code_with_exception()
             self._ks_file = shell_out.stdout
         except subprocess.CalledProcessError as e:
-            self._result_formatter.print_result(result=False, msg="Test prep failed",
-                                                description=e.stdout.decode())
+            self._result_formatter.report_result(result=False, msg="Test prep failed")
             self._shell.run_cleanup()
             return False
 
         self._validator = KickstartValidator(self._conf.ks_test_name, self._ks_file)
         self._validator.check_ks_substitution()
         if not self._validator.result:
-            self._validator.print_result()
+            self._validator.report_result()
             self._shell.run_cleanup()
             return False
 
@@ -117,20 +116,19 @@ class Runner(object):
         virt_manager = VirtualManager(v_conf)
 
         if not virt_manager.run():
-            self._result_formatter.print_result(False, "Virtual machine installation failed.")
+            self._result_formatter.report_result(False, "Virtual machine installation failed.")
             return 1
 
         validator = self._validate_logs(v_conf)
 
         if not validator.result:
-            validator.log_result()
-            validator.print_result()
+            validator.report_result()
             self._shell.run_cleanup()
             return validator.return_code
 
         ret = self._validate_result()
         if ret.check_ret_code():
-            self._result_formatter.print_result(True, "test done")
+            self._result_formatter.report_result(True, "test done")
 
         self._shell.run_cleanup()
         return ret.return_code
@@ -193,10 +191,8 @@ class Runner(object):
         output = self._shell.run_validate()
 
         if not output.check_ret_code():
-            msg = "with return code {}".format(output.return_code)
-            description = "stdout: '{}' stderr: '{}'".format(output.stdout,
-                                                             output.stderr)
-            self._result_formatter.print_result(False, msg, description)
+            msg = "Validation failed with return code {}".format(output.return_code)
+            self._result_formatter.report_result(False, msg)
 
         return output
 

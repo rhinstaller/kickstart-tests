@@ -39,17 +39,15 @@ class ResultFormatter(object):
 
         self._test_name = test_name
 
-    def format_result(self, result, msg, description=""):
+    def format_result(self, result, msg):
         text_result = "SUCCESS" if result else "FAILED"
-        msg = "RESULT:{name}:{result}:{message}: {desc}".format(name=self._test_name,
-                                                                result=text_result,
-                                                                message=msg,
-                                                                desc=description)
-
+        msg = "RESULT:{name}:{result}:{message}".format(name=self._test_name,
+                                                        result=text_result,
+                                                        message=msg)
         return msg
 
-    def print_result(self, result, msg, description=""):
-        msg = self.format_result(result, msg, description)
+    def report_result(self, result, msg):
+        msg = self.format_result(result, msg)
         log.info(msg)
 
 
@@ -74,15 +72,9 @@ class Validator(object):
     def result_message(self):
         return self._result_msg
 
-    def print_result(self, description=""):
-        self._result_formatter.print_result(self.result,
-                                            self._result_msg,
-                                            description)
-
-    def log_result(self, description=""):
+    def report_result(self):
         msg = self._result_formatter.format_result(self.result,
-                                                   self._result_msg,
-                                                   description)
+                                                   self._result_msg)
         if self._return_code != 0:
             log.error(msg)
         else:

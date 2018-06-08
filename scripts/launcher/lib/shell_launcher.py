@@ -93,6 +93,7 @@ class ProcessLauncher(object):
 
     def run_process(self, args):
         self._cmd = args
+        log.debug("Running command: {}".format(args))
         out = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         s_out = ShellOutput(out)

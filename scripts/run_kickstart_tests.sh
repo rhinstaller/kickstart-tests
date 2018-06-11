@@ -328,7 +328,8 @@ if [[ "$TEST_REMOTES" != "" ]]; then
 
     cd ..
     parallel --no-notice ${remote_args} --wd kickstart-tests --jobs ${TEST_JOBS:-4} \
-             sudo PYTHONPATH=$PYTHONPATH scripts/run_one_ks.sh -i ${_IMAGE} \
+             sudo PYTHONPATH=$PYTHONPATH scripts/launcher/run_one_test.py \
+                                                               -i ${_IMAGE} \
                                                                -k ${KEEPIT} \
                                                                ${UPDATES_ARG} ${BOOT_ARG} {} ::: ${tests}
     rc=$?

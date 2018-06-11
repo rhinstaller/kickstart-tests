@@ -8,7 +8,7 @@ BEGIN {
     failed=0;
     timed_out=0;
 }
-/^RESULT:/ { if ($4 == "Test timed out.") {
+/^RESULT:/ { if ($4 == "Test timed out") {
                  result = "TIMED OUT";
                  explanation = "";
                  timed_out++;

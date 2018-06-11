@@ -21,9 +21,12 @@
 #
 # This is a library to control the shell scripts in the test.
 
-import logging
 import os
 import subprocess
+
+from .test_logging import get_logger
+
+log = get_logger()
 
 SHELL_INTERFACE_PATH = "launcher_interface.sh"
 
@@ -65,31 +68,15 @@ class ShellOutput(object):
 
 class ProcessLauncher(object):
 
-    def __init__(self, log=None, print_errors=True):
+    def __init__(self, print_errors=True):
         super().__init__()
-        self._log = log
         self._print_errors = print_errors
         self._cmd = None
-        self._log_level = logging.WARNING
-
-    @property
-    def log_level(self):
-        """Get log level used to report error"""
-        return self._log_level
-
-    @log_level.setter
-    def log_level(self, value):
-        """Set log level used to print subprocess failure
-
-        This is required because lorax (livemedia-creator log) have stderr logging set to INFO.
-        """
-        self._log_level = value
 
     def _report_result(self, subprocess_out):
         if not subprocess_out.check_ret_code():
             msg = self._format_result(subprocess_out)
-            if self._log:
-                self._log.log(self._log_level, msg)
+            log.debug(msg)
             if self._print_errors:
                 print(msg)
 
@@ -106,6 +93,7 @@ class ProcessLauncher(object):
 
     def run_process(self, args):
         self._cmd = args
+        log.debug("Running command: {}".format(args))
         out = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         s_out = ShellOutput(out)
@@ -150,13 +138,13 @@ class ShellLauncher(ProcessLauncher):
 
         cmd_args.append(script_path)
         cmd_args.append("-i")
-        cmd_args.append(self._conf.boot_image)
+        cmd_args.append(self._conf.boot_image_path)
         cmd_args.append("-k")
         cmd_args.append(str(self._conf.keep_level.value))
 
-        if self._conf.update_img_path:
+        if self._conf.updates_img_path:
             cmd_args.append("-u")
-            cmd_args.append(self._conf.update_img_path)
+            cmd_args.append(self._conf.updates_img_path)
 
         cmd_args.append("-w")
         cmd_args.append(self._tmp_dir)

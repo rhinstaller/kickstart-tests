@@ -303,7 +303,7 @@ class VirtualManager(object):
             self._prepare_and_run()
         except InstallError as e:
             log.error("ERROR: Image creation failed: %s", e)
-            return False
+            raise e
 
         self._create_human_log()
         self._report_result()

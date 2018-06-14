@@ -39,7 +39,7 @@ import subprocess
 from lib.temp_manager import TempManager
 from lib.configuration import RunnerConfiguration, VirtualConfiguration
 from lib.shell_launcher import ShellLauncher
-from lib.virtual_controller import VirtualManager
+from lib.virtual_controller import VirtualManager, InstallError
 from lib.validator import KickstartValidator, LogValidator, ResultFormatter
 from lib.test_logging import setup_logger, get_logger
 
@@ -115,8 +115,10 @@ class Runner(object):
 
         virt_manager = VirtualManager(v_conf)
 
-        if not virt_manager.run():
-            self._result_formatter.report_result(False, "Virtual machine installation failed.")
+        try:
+            virt_manager.run()
+        except InstallError as e:
+            self._result_formatter.report_result(False, str(e))
             return 1
 
         validator = self._validate_logs(v_conf)

@@ -35,6 +35,7 @@ class KickstartTest(object):
         super().__init__()
         self._path = path
         self._name = os.path.basename(path)
+        self._content = ""
 
     def __repr__(self):
         return "<test_manager.KickstartTest path: {}>".format(self._path)
@@ -46,3 +47,15 @@ class KickstartTest(object):
     @property
     def name(self):
         return self._name
+
+    @property
+    def content(self):
+        return self._content
+
+    @content.setter
+    def content(self, value):
+        self._content = value
+
+    def load_content(self):
+        with open(self._path, "r") as f:
+            self._content = f.read()

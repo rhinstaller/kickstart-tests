@@ -19,8 +19,11 @@
 # Red Hat Author(s): Jiri Konecny <jkonecny@redhat.com>
 #
 
-from test_manager.collector import TestCollector
+import sys
 import argparse
+
+from test_manager.collector import TestCollector
+from test_manager.configurator import TestConfigurator
 
 
 class ArgumentParser(object):
@@ -71,4 +74,10 @@ if __name__ == "__main__":
     else:
         tests = collector.find_all(parser.root_directory)
 
-    print(tests)
+    if not tests:
+        print("No tests found!", file=sys.stderr)
+        exit(1)
+
+    configurator = TestConfigurator()
+    configurator.load()
+    configurator.prepare_tests(tests)

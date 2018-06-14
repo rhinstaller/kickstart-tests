@@ -347,6 +347,7 @@ if [[ "$TEST_REMOTES" != "" ]]; then
         if [[ ${KEEPIT} > 0 ]]; then
             ssh kstest@${remote} sudo chown -R kstest:kstest /var/tmp/kstest-\*
             ssh kstest@${remote} sudo chmod -R a+r /var/tmp/kstest-\*
+            ssh kstest@${remote} sudo find /var/tmp/kstest-\* -type d -exec chmod 755 {} +
             scp -r kstest@${remote}:/var/tmp/kstest-\* /var/tmp/
         fi
 

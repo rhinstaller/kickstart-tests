@@ -61,7 +61,7 @@ class VirtualInstall(object):
     Run virt-install using an iso and a kickstart
     """
     def __init__(self, iso, ks_paths, disk_paths, log_check,
-                 kernel_args=None, memory=1024, vnc=None,
+                 kernel_args=None, vcpu_count=1, memory=1024, vnc=None,
                  virtio_host="127.0.0.1", virtio_port=6080,
                  nics=None, boot=None):
         """
@@ -75,6 +75,7 @@ class VirtualInstall(object):
         :type log_check: method
         :param list disk_paths: Paths to pre-existing disk images.
         :param str kernel_args: Extra kernel arguments to pass on the kernel cmdline
+        :param int vcpu_count: Number of virtual CPUs to assign to the virt
         :param int memory: Amount of RAM to assign to the virt, in MiB
         :param str vnc: Arguments to pass to virt-install --graphics
         :param str virtio_host: Hostname to connect virtio log to
@@ -89,6 +90,7 @@ class VirtualInstall(object):
         self._ks_paths = ks_paths
         self._disk_paths = disk_paths
         self._kernel_args = kernel_args
+        self._vcpu_count = vcpu_count
         self._memory = memory
         self._vnc = vnc
         self._log_check = log_check
@@ -103,6 +105,7 @@ class VirtualInstall(object):
         args = ["-n", self._virt_name,
                 "-r", str(self._memory),
                 "--noautoconsole",
+                "--vcpus", str(self._vcpu_count),
                 "--rng", "/dev/random"]
 
         # CHECKME This seems to be necessary because of ipxe ibft chain booting,
@@ -231,6 +234,7 @@ class VirtualManager(object):
             virt = VirtualInstall(iso_mount, self._conf.ks_paths,
                                   disk_paths=self._conf.disk_paths,
                                   kernel_args=kernel_args,
+                                  vcpu_count=self._conf.vcpu_count,
                                   memory=self._conf.ram,
                                   vnc=self._conf.vnc,
                                   log_check=log_monitor.server.log_check,

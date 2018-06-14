@@ -150,6 +150,7 @@ class VirtualConfiguration(object):
         self._logfile = "./livemedia.log"
         self._tmp = "/var/tmp"
         self._keep_image = True
+        self._vcpu_count = 1
         self._ram = 1024
         self._vnc = None
         self._kernel_args = None
@@ -295,6 +296,16 @@ class VirtualConfiguration(object):
     def keep_image(self, value: bool):
         """Set keep raw disk image after .iso creation"""
         self._keep_image = value
+
+    @property
+    def vcpu_count(self) -> int:
+        """Number of CPU to allocate for installer"""
+        return self._vcpu_count
+
+    @vcpu_count.setter
+    def vcpu_count(self, value: int):
+        """Number of CPU to allocate for installer"""
+        self._vcpu_count = value
 
     @property
     def ram(self) -> int:

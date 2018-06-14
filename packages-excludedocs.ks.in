@@ -26,6 +26,16 @@ shutdown
 %end
 
 %post
+# The xz package  stores license files in the docs folder
+# so they are still installed even if we tell DNF to
+# not install docs.
+#
+# Reported as: https://bugzilla.redhat.com/show_bug.cgi?id=1590873
+#
+# For now let's just remove these files so that the test will pass.
+rm -f /usr/share/doc/xz/COPYING
+rm -f /usr/share/doc/xz/COPYING.GPLv2
+
 if [ ! -d /usr/share/doc ]; then
     echo SUCCESS > /root/RESULT
 else

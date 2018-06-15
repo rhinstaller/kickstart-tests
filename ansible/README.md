@@ -19,3 +19,10 @@ The playbooks:
 
   * Playbook for deploying hosts on which kickstart tests can be run remotely using [kstest role](roles/kstest)
   * [inventory](inventory/hosts) group: `[kstest]`
+
+* `kstest-master.yml`
+
+  * Playbook for deploying hosts from which kickstart tests can be run remotely using [kstest-master role](roles/kstest-master)
+  * [inventory](inventory/hosts) group: `[kstest-master]`
+
+

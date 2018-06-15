@@ -1,0 +1,18 @@
+---
+
+# Hosts to be used for running tests (additionally to kstests-master host),
+# eg the hosts deployed by kstest.yml playbook.
+# Multiple hosts are separated by space.
+kstest_test_remotes:
+# Repository for tests (will be used to download boot.iso).
+kstest_compose_url: http://download.eng.brq.redhat.com/pub/fedora/development-rawhide/Everything/x86_64/os/
+# Number of jobs to be run in parallel on one host.
+kstest_test_jobs: 4
+# Tests to be run (empty for all).
+kstest_tests_to_run: ""
+# Path to remote destination for remote sync of results.
+#kstest_remote_results_path: "user@host:results"
+kstest_remote_results_path: ""
+# Keep results locally after syncing to remote destination.
+# True unless "no".
+kstest_remote_results_keep_local: "no"

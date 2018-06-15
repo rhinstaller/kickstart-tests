@@ -105,6 +105,9 @@ while getopts ":i:k:t:s:u:b:" opt; do
     esac
 done
 
+echo "starting kickstart tests"
+date
+
 if [[ ! -e "${IMAGE}" ]]; then
     echo "Required boot.iso does not exist; skipping."
     exit 77
@@ -308,13 +311,25 @@ fi
 if [[ "$TEST_REMOTES" != "" ]]; then
     _IMAGE=$(basename ${IMAGE})
 
+    echo "running tests on remotes:"
+    echo ${TEST_REMOTES}
+
+    echo "tests size:"
+    du -sh .
+
+    echo "image size:"
+    du -sh ${IMAGE}
+
     # (1) Copy everything to the remote systems.  We do this ourselves because
     # parallel doesn't like globs, and we need to put the boot image somewhere
     # that qemu on the remote systems can read.
     for remote in ${TEST_REMOTES}; do
+        echo "preparing remote ${remote}"
         ssh kstest@${remote} mkdir -p kickstart-tests
         ssh kstest@${remote} mkdir -p install_images
+        echo "synchronizing tests"
         rsync -az --delete . kstest@${remote}:kickstart-tests/
+        echo "synchronizing installation image"
         rsync -az ${IMAGE} kstest@${remote}:install_images/
         # remove any old images
         ssh kstest@${remote} find install_images -type f ! -name ${_IMAGE} -delete
@@ -340,6 +355,8 @@ if [[ "$TEST_REMOTES" != "" ]]; then
     done
 
     cd ..
+
+    echo "starting tests"
     parallel --no-notice ${remote_args} --wd kickstart-tests --jobs ${TEST_JOBS:-4} \
              sudo PYTHONPATH=$PYTHONPATH scripts/launcher/run_one_test.py \
                                                                -i ../install_images/${_IMAGE} \
@@ -356,7 +373,9 @@ if [[ "$TEST_REMOTES" != "" ]]; then
     # We also need to clean up the stuff we copied over in step 1, and then clean up
     # the results from the remotes too.  We don't want to keep things scattered all
     # over the place.
+    echo "tests done, gathering results"
     for remote in ${TEST_REMOTES}; do
+        echo "gathering results from remote ${remote}"
         if [[ ${KEEPIT} > 0 ]]; then
             ssh kstest@${remote} sudo chown -R kstest:kstest /var/tmp/kstest-\*
             ssh kstest@${remote} sudo chmod -R a+r /var/tmp/kstest-\*
@@ -377,5 +396,7 @@ fi
 
 # Return exit code from above.  This is structure for future improvement,
 # you can do a cleaning here.
+echo "test fisnihed"
+date
 
 exit ${rc}

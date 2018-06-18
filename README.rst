@@ -274,3 +274,8 @@ inject into initramfs - which is the default approach used in tests.  The
 reason is that using the inject method the network devices are not initialized
 in time of parsing kickstart and obtaining information from sysfs (mostly
 getting hw address) fails which results in incomplete ifcfg file generated.
+
+Chapter 5. Running tests on remote hosts
+========================================
+
+See ansible/README.rst

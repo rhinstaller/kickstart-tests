@@ -1,0 +1,74 @@
+- name: Checkout kickstart tests repo
+  become: false
+  remote_user: kstest
+  git:
+    repo: https://github.com/rhinstaller/kickstart-tests.git
+    dest: "/home/kstest/{{ kstest.nightly.git_repo_dir }}"
+    force: yes
+
+- name: Install kstest private key
+  copy:
+    src: files/keys/kstests.pem
+    dest: /home/kstest/.ssh/id_rsa
+    owner: kstest
+    group: kstest
+    mode: 0700
+  tags:
+    - ssh-keys
+
+- name: Install kstest public key
+  copy:
+    src: files/keys/kstests.pub
+    dest: /home/kstest/.ssh/id_rsa.pub
+    owner: kstest
+    group: kstest
+    mode: 0700
+  tags:
+    - ssh-keys
+
+- name: Install and configure script for nightly run
+  template:
+    src: run_nightly_tests.j2
+    dest: /home/kstest/run_nightly_tests.sh
+    owner: kstest
+    group: kstest
+    mode: 0755
+  tags:
+    - config-test
+
+- name: Install script for creating tests history summary
+  copy:
+    src: "{{ kstest.nightly.results_summary_script.src }}"
+    dest: "/home/kstest/{{ kstest.nightly.results_summary_script.dest }}"
+    owner: kstest
+    group: kstest
+    mode: 0755
+  when: kstest.nightly.results_summary_script.src is defined
+
+- name: Don't require remote kstest host authentication
+  copy:
+    src: files/sshd_config
+    dest: /home/kstest/.ssh/config
+    owner: kstest
+    group: kstest
+    mode: 0600
+
+- name: Setup cron to run nightly
+  cron:
+    name: "Run nightly kickstart tests"
+    hour: "{{ kstest.nightly.cron.hour }}"
+    minute: "{{ kstest.nightly.cron.minute }}"
+    user: kstest
+    job: /home/kstest/run_nightly_tests.sh
+    state: present
+  tags:
+    - config-test
+
+- name: Set up cron PATH
+  cron:
+    name: PATH
+    user: kstest
+    env: yes
+    value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# TODO: setup rotating of results

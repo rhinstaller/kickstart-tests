@@ -34,6 +34,8 @@ class TestConfigurator(object):
         super().__init__()
         self._config_loader = ConfigLoader()
 
+        self._re_checker = re.compile(r'@.*@')
+
     def load(self):
         """Load configuration from the configuration file"""
         self._config_loader.load_default_config()
@@ -64,6 +66,17 @@ class TestConfigurator(object):
         for key in substitutions.keys():
             pattern = r"@{}@".format(key.upper())
             test.content = re.sub(pattern, substitutions[key], test.content)
+
+    def check_test(self, test):
+        """Check if given test is prepared for use.
+
+        :param test: Kickstart test object for processing.
+        :type test: testmanager.kickstart_test.KickstartTest
+        """
+        if self._re_checker.search(test.content):
+            return False
+        else:
+            return True
 
 
 class ConfigLoader(ConfigParser):

@@ -83,5 +83,11 @@ if __name__ == "__main__":
     configurator.prepare_tests(tests)
 
     for t in tests:
+        if not configurator.check_test(t):
+            print("Test {} is not properly set-up, skipping...".format(t.name))
+            continue
+        else:
+            print("Writing {} as {}".format(t.name, t.target_path))
+
         with open(t.target_path, 'w') as f:
             f.write(t.content)

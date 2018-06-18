@@ -304,16 +304,21 @@ if [[ "$TEST_REMOTES" != "" ]]; then
     # parallel doesn't like globs, and we need to put the boot image somewhere
     # that qemu on the remote systems can read.
     for remote in ${TEST_REMOTES}; do
-        ssh kstest@${remote} mkdir kickstart-tests
-        scp -r . kstest@${remote}:kickstart-tests/
-        scp ${IMAGE} kstest@${remote}:kickstart-tests/
+        ssh kstest@${remote} mkdir -p kickstart-tests
+        ssh kstest@${remote} mkdir -p install_images
+        rsync -az --delete . kstest@${remote}:kickstart-tests/
+        rsync -az ${IMAGE} kstest@${remote}:install_images/
+        # remove any old images
+        ssh kstest@${remote} find install_images -type f ! -name ${_IMAGE} -delete
     done
 
     # (1a) We also need to copy the provided image to under kickstart_tests/ on
     # the local system too.  This is because parallel will attempt to run the
     # same command line on every system and that requires the image to also be
     # in the same location.
-    cp ${IMAGE} ${_IMAGE}
+    mkdir -p ../install_images
+    cp ${IMAGE} ../install_images/
+    find ../install_images -type f ! -name ${_IMAGE} -delete
 
     # (2) Run parallel.  By default add the local system to the list of machines
     # being passed to parallel.
@@ -329,7 +334,7 @@ if [[ "$TEST_REMOTES" != "" ]]; then
     cd ..
     parallel --no-notice ${remote_args} --wd kickstart-tests --jobs ${TEST_JOBS:-4} \
              sudo PYTHONPATH=$PYTHONPATH scripts/launcher/run_one_test.py \
-                                                               -i ${_IMAGE} \
+                                                               -i ../install_images/${_IMAGE} \
                                                                -k ${KEEPIT} \
                                                                ${UPDATES_ARG} ${BOOT_ARG} {} ::: ${tests}
     rc=$?
@@ -351,11 +356,8 @@ if [[ "$TEST_REMOTES" != "" ]]; then
             scp -r kstest@${remote}:/var/tmp/kstest-\* /var/tmp/
         fi
 
-        ssh kstest@${remote} sudo rm -rf kickstart-tests /var/tmp/kstest-\*
+        ssh kstest@${remote} sudo rm -rf /var/tmp/kstest-\*
     done
-
-    # (3a) And then also remove the copy of the image we made earlier.
-    rm ${_IMAGE}
 else
     parallel --no-notice --jobs ${TEST_JOBS:-4} \
         sudo PYTHONPATH=$PYTHONPATH scripts/launcher/run_one_test.py \

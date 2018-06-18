@@ -81,3 +81,7 @@ if __name__ == "__main__":
     configurator = TestConfigurator()
     configurator.load()
     configurator.prepare_tests(tests)
+
+    for t in tests:
+        with open(t.target_path, 'w') as f:
+            f.write(t.content)

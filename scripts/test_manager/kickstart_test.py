@@ -45,6 +45,14 @@ class KickstartTest(object):
         return self._path
 
     @property
+    def target_path(self):
+        return os.path.splitext(self.path)[0]
+
+    @property
+    def dir(self):
+        return os.path.dirname(self._path)
+
+    @property
     def name(self):
         return self._name
 

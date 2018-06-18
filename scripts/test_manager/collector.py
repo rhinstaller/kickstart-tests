@@ -38,7 +38,7 @@ class TestCollector(object):
         :rtype: Test instance
         """
         ret = set()
-        find_pattern = os.path.join(root, "*.ks")
+        find_pattern = os.path.join(root, "*.ks.in")
         for f in iglob(find_pattern):
             ret.add(KickstartTest(f))
 

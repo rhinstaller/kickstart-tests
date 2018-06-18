@@ -45,6 +45,28 @@ class TestCollector(object):
         return ret
 
     @classmethod
+    def find_by_group(cls, root, group):
+        """Find all tests belonging to a test group specified by group parameter.
+
+        :param root: Root directory of tests.
+        :type root: str
+
+        :param group: Group of tests you are looking for.
+        :type group: str
+
+        :returns: Test object with path to the test.
+        :rtype: Test instance
+        """
+        result = set()
+        tests = cls.find_all(root)
+
+        for t in tests:
+            if t.metadata.group == group:
+                result.add(t)
+
+        return result
+
+    @classmethod
     def find_by_paths(cls, test_paths):
         """Find tests by paths.
 

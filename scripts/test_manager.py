@@ -36,6 +36,7 @@ class ArgumentParser(object):
 
         self._tests = ()
         self._root_dir = ""
+        self._test_group = ""
 
         self._configure_parser()
 
@@ -47,10 +48,17 @@ class ArgumentParser(object):
     def root_directory(self):
         return self._root_dir
 
+    @property
+    def test_group(self):
+        return self._test_group
+
     def _configure_parser(self):
         self._parser.add_argument("--root", "-r", required=False, type=str, default=".",
-                                  help="Set root directory of the tests. This will be used "
-                                       "when looking for all existing tests or group of tests.")
+                                  help="""Set root directory of the tests. This will be used
+                                  when looking for all existing tests or group of tests.""")
+        self._parser.add_argument("--group", "-g", required=False, type=str, default="",
+                                  help="""Specify test type, only tests with this type will be
+                                  used.""")
         self._parser.add_argument("tests", type=str, nargs='*', default=(),
                                   metavar="/path/to/test1 /path/to/test2 ...",
                                   help="""Specify path to kickstart tests. 
@@ -61,6 +69,7 @@ class ArgumentParser(object):
 
         self._root_dir = ns.root
         self._tests = ns.tests
+        self._test_group = ns.group
 
 
 if __name__ == "__main__":
@@ -71,6 +80,8 @@ if __name__ == "__main__":
     tests = []
     if parser.tests:
         tests = collector.find_by_paths(parser.tests)
+    elif parser.test_group:
+        tests = collector.find_by_group(parser.root_directory, parser.test_group)
     else:
         tests = collector.find_all(parser.root_directory)
 

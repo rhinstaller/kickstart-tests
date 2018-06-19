@@ -3,7 +3,7 @@
 
 set -x
 
-TEST_REMOTES="{{ kstest_test_remotes }}"
+TEST_REMOTES="{{ kstest_test_remotes | default(groups['kstest']|join(' ')) }}"
 COMPOSE_URL="{{ kstest_compose_url }}"
 TEST_JOBS={{ kstest_test_jobs }}
 KSTESTS="{{ kstest_tests_to_run }}"

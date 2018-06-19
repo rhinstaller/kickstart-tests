@@ -3,7 +3,8 @@
 # Hosts to be used for running tests (additionally to kstests-master host),
 # eg the hosts deployed by kstest.yml playbook.
 # Multiple hosts are separated by space.
-kstest_test_remotes:
+# If not defined, all hosts from kstest group will be used
+#kstest_test_remotes:
 # Repository for tests (will be used to download boot.iso).
 kstest_compose_url: http://download.eng.brq.redhat.com/pub/fedora/development-rawhide/Everything/x86_64/os/
 # Number of jobs to be run in parallel on one host.

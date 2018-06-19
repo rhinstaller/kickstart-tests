@@ -46,26 +46,56 @@ class KickstartTest(object):
 
     @property
     def path(self):
+        """Get path to the kickstart test file.
+
+        :rtype: str
+        """
         return self._path
 
     @property
     def target_path(self):
+        """Get path to the result kickstart test file.
+
+        :rtype: str
+        """
         return os.path.splitext(self.path)[0]
 
     @property
     def dir(self):
+        """Get directory where the test is stored.
+
+        :rtype: str
+        """
         return os.path.dirname(self._path)
 
     @property
     def name(self):
+        """Get name of this test.
+
+        :rtype: str
+        """
         return self._name
 
     @property
     def content(self):
+        """Get content of the test.
+
+        This content will be changed in the process. This is content which will be written to
+        a result kickstart file.
+
+        .. NOTE: load_content() method must be called before first read of this value.
+
+        :rtype: str
+        """
         return self._content
 
     @content.setter
     def content(self, value):
+        """Set content. This will be used in process to save kickstart test results.
+
+        :param value: Content of this kickstart test. It will change during processing.
+        :type value: str
+        """
         self._content = value
 
     @property
@@ -77,6 +107,10 @@ class KickstartTest(object):
         return self._metadata
 
     def load_content(self):
+        """Load content of this test.
+
+        This will replace the content property.
+        """
         with open(self._path, "r") as f:
             self._content = f.read()
 
@@ -136,6 +170,11 @@ class TestMetadata(object):
             self.find_groups()
 
         return self._groups
+
+    @property
+    def known_failure(self):
+        """Get if this test failure is expected."""
+        return "knownfailure" in self.groups
 
     def find_groups(self):
         """Find groups of this test.

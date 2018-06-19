@@ -37,6 +37,17 @@ class TestCollector(object):
         :returns: Test object with path to the test.
         :rtype: Test instance
         """
+        tests = cls._find_all(root)
+        result = set()
+
+        for t in tests:
+            if not t.metadata.known_failure:
+                result.add(t)
+
+        return result
+
+    @classmethod
+    def _find_all(cls, root):
         ret = set()
         find_pattern = os.path.join(root, "*.ks.in")
         for f in iglob(find_pattern):
@@ -58,11 +69,14 @@ class TestCollector(object):
         :rtype: Test instance
         """
         result = set()
-        tests = cls.find_all(root)
+        tests = cls._find_all(root)
 
         for t in tests:
             if group in t.metadata.groups:
-                result.add(t)
+                if t.metadata.known_failure:
+                    continue
+                else:
+                    result.add(t)
 
         return result
 

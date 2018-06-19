@@ -89,7 +89,7 @@ if __name__ == "__main__":
         print("No tests found!", file=sys.stderr)
         exit(1)
 
-    configurator = TestConfigurator()
+    configurator = TestConfigurator(parser.root_directory)
     configurator.load()
     configurator.prepare_tests(tests)
 

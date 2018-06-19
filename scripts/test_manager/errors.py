@@ -20,7 +20,11 @@
 #
 
 
-class MetadataError(Exception):
+class TestManagerError(Exception):
+    pass
+
+
+class MetadataError(TestManagerError):
     pass
 
 
@@ -29,4 +33,8 @@ class MissingMetadataError(MetadataError):
 
 
 class MissingMetadataTestGroupError(MetadataError):
+    pass
+
+
+class IncludeFileMissingError(TestManagerError):
     pass

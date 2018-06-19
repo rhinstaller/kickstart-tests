@@ -23,18 +23,25 @@ import re
 import os
 
 from configparser import ConfigParser
+from test_manager.errors import IncludeFileMissingError
 
 GLOBAL_SECTION = "GLOBAL"
 
 
 class TestConfigurator(object):
 
-    def __init__(self):
-        """Collect all information about test environment and prepare test based on this."""
+    def __init__(self, root_dir):
+        """Collect all information about test environment and prepare test based on this.
+
+        :param root_dir: Root directory of the tests.
+        :type root_dir: str
+        """
         super().__init__()
         self._config_loader = ConfigLoader()
 
         self._re_checker = re.compile(r'@.*@')
+        self._root = root_dir
+        self._re_ks_include = re.compile(r'@KSINCLUDE@\s+([^\s]*)')
 
     def load(self):
         """Load configuration from the configuration file"""
@@ -60,12 +67,40 @@ class TestConfigurator(object):
         :param test: Kickstart test object for processing.
         :type test: testmanager.kickstart_test.KickstartTest
         """
+        self._do_substitutions(test)
+
+    def _do_substitutions(self, test):
         substitutions = self._config_loader.substitutions()
         test.load_content()
 
         for key in substitutions.keys():
             pattern = r"@{}@".format(key.upper())
             test.content = re.sub(pattern, substitutions[key], test.content)
+
+        try:
+            test.content = self._include_kickstart_parts(test.content)
+        except IncludeFileMissingError as ex:
+            raise IncludeFileMissingError(str(ex) + " {}".format(test.name))
+
+    def _include_kickstart_parts(self, content):
+        match = self._re_ks_include.search(content)
+
+        if not match:
+            return content
+
+        include_content = self._load_file_content(match[1])
+        return self._re_ks_include.sub(include_content, content)
+
+    def _load_file_content(self, file):
+        file_path = os.path.join(self._root, file)
+
+        if not os.path.exists(file_path):
+            raise IncludeFileMissingError("KSINCLUDE file {} missing in test".format(file_path))
+
+        with open(file_path, "rt") as f:
+            res = f.read()
+
+        return res
 
     def check_test(self, test):
         """Check if given test is prepared for use.

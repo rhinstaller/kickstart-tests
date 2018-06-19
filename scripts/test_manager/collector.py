@@ -61,7 +61,7 @@ class TestCollector(object):
         tests = cls.find_all(root)
 
         for t in tests:
-            if t.metadata.group == group:
+            if group in t.metadata.groups:
                 result.add(t)
 
         return result

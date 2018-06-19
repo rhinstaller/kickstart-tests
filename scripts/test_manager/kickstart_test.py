@@ -84,6 +84,13 @@ class KickstartTest(object):
 class TestMetadata(object):
 
     def __init__(self, test_path):
+        """Create kickstart test metadata object.
+
+        This object will load metadata and store all the relevant information for the test.
+
+        :param test_path: Path to the test.
+        :type test_path: str
+        """
         super().__init__()
 
         metadata_file = self._get_metadata_file_name(test_path)
@@ -93,7 +100,7 @@ class TestMetadata(object):
                                                                               test_path))
 
         self._path = metadata_file
-        self._group = None
+        self._groups = None
 
     @staticmethod
     def _get_metadata_file_name(test_path):
@@ -105,26 +112,44 @@ class TestMetadata(object):
 
     @property
     def path(self):
+        """Get metadata file path.
+
+        :returns: str
+        """
         return self._path
 
     @property
     def name(self):
+        """Get name of this metadata file.
+
+        :returns: str
+        """
         return os.path.basename(self._path)
 
     @property
-    def group(self):
-        if self._group is None:
-            self.find_group()
+    def groups(self):
+        """Get list of groups where this test belongs.
 
-        return self._group
+        :returns: [str]
+        """
+        if self._groups is None:
+            self.find_groups()
 
-    def find_group(self):
+        return self._groups
+
+    def find_groups(self):
+        """Find groups of this test.
+
+        This method will be called automatically with the first call of groups property.
+        """
         with open(self._path, 'rt') as f:
             for line in f:
-                if "TESTTYPE=" in line:
-                    group = line.split("=")[1]
-                    group = group.strip("'\" \n")
-                    self._group = group
+                if "#TESTTYPE=" in line:
+                    continue
+                elif "TESTTYPE=" in line:
+                    groups = line.split("=")[1]
+                    groups = groups.strip("'\" \n")
+                    self._groups = groups.split(" ")
                     return
 
         raise MissingMetadataTestGroupError("Missing test group for test {}".format(self.name))

@@ -52,6 +52,14 @@
   tags:
     - schedule-test
 
+- name: Enable and start crond service
+  service:
+    name: crond
+    state: started
+    enabled: yes
+  tags:
+    - schedule-test
+
 - name: Set up cron PATH
   cron:
     name: PATH

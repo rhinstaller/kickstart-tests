@@ -1,0 +1,19 @@
+---
+
+kstest:
+  master:
+    # ssh key to access remote hosts for running tests
+    private_ssh_key:
+    # relative path in home directory
+    git_repo_dir: git/kickstart-tests
+    # set to "no" to prevent pulling the repository before the run
+    git_pull: "yes"
+    # schedule running test
+    cron:
+      disabled: true
+      hour: 22
+      minute: 00
+    results_summary_script:
+      src: files/scripts/kstests_history.py
+      # relative path in home directory
+      dest: "kstests_history.py"

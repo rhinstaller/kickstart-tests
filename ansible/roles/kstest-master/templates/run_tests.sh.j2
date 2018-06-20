@@ -1,0 +1,157 @@
+#!/bin/bash
+#{{ ansible_managed }}
+
+set -x
+
+TEST_REMOTES="{{ kstest_test_remotes | default(groups['kstest']|join(' ')) }}"
+COMPOSE_URL="{{ kstest_compose_url }}"
+TEST_JOBS={{ kstest_test_jobs }}
+KSTESTS="{{ kstest_tests_to_run }}"
+REMOTE_RESULTS_PATH="{{ kstest_remote_results_path }}"
+REMOTE_RESULTS_KEEP_LOCAL="{{ kstest_remote_results_keep_local }}"
+RESULTS_SUMMARY_SCRIPT="{{ kstest.master.results_summary_script.dest }}"
+
+COMPOSE_BOOT_ISO=images/boot.iso
+KSTEST_USER=kstest
+RESULTS_DIR=results
+KSTEST_REPO_DIR={{ kstest.master.git_repo_dir }}
+GIT_PULL_KSTESTS={{ kstest.master.git_pull }}
+
+HOME_DIR=/home/${KSTEST_USER}
+KSTEST_REPO_PATH=${HOME_DIR}/${KSTEST_REPO_DIR}
+RESULTS_PATH=${HOME_DIR}/${RESULTS_DIR}
+BOOT_ISO=boot.master.iso
+ISOMD5SUM_FILENAME=isomd5sum.txt
+RESULT_REPORT_FILENAME=result_report.txt
+# Test run id
+
+START_TIME=$(date +%F-%H_%M_%S)
+
+TIME_OF_START=$(date +%s)
+
+
+### Create results directories
+
+RESULTS_RUN_PATH="${RESULTS_PATH}/runs"
+if [ ! -d ${RESULTS_RUN_PATH} ]; then
+    mkdir -p ${RESULTS_RUN_PATH}
+fi
+
+
+### Cd to repository dir
+
+cd ${KSTEST_REPO_PATH}
+
+
+### Update git repository
+
+if [[ "${GIT_PULL_KSTESTS}" != "no" ]]; then
+  git reset --hard HEAD
+  git pull
+fi
+
+# Set up parameters for test
+cat > scripts/defaults.sh <<- EOF
+export KSTEST_URL="--url=${COMPOSE_URL}"
+export TEST_REMOTES=${TEST_REMOTES}
+export TEST_JOBS=${TEST_JOBS}
+EOF
+
+
+### Create this test result dir
+
+RESULT_PATH="${RESULTS_RUN_PATH}/${START_TIME}"
+mkdir ${RESULT_PATH}
+
+TIME_OF_UPDATING_REPO=$(date +%s)
+
+
+### Download the boot.iso
+
+rm -f ${BOOT_ISO}
+curl "${COMPOSE_URL}/${COMPOSE_BOOT_ISO}" -o ${BOOT_ISO}
+
+ISO_MD5_SUM=$(md5sum ${BOOT_ISO})
+
+TIME_OF_DOWNLOADING_ISO=$(date +%s)
+
+
+### Run the test
+
+RESULT_LOG="${RESULT_PATH}/kstest.log"
+scripts/run_kickstart_tests.sh -i ${BOOT_ISO} -k 1 ${KSTESTS} > ${RESULT_LOG}
+
+
+### Create result
+
+RESULT_REPORT="${RESULT_PATH}/${RESULT_REPORT_FILENAME}"
+scripts/run_report.sh ${RESULT_LOG} > ${RESULT_REPORT}
+
+TIME_OF_RUNNING_TESTS=$(date +%s)
+
+
+### Cd back from the repository dir
+
+cd -
+
+
+### Drop iso md5sum info into results
+
+ISO_MD5_SUM_FILE="${RESULT_PATH}/${ISOMD5SUM_FILENAME}"
+echo ${ISO_MD5_SUM} > ${ISO_MD5_SUM_FILE}
+
+
+### Store logs
+
+# Fixup permissions
+sudo chown -R ${KSTEST_USER}:${KSTEST_USER} /var/tmp/kstest-*
+# Clean up
+find /var/tmp/kstest-* -name "*.iso" -delete
+find /var/tmp/kstest-* -name "*.img" -delete
+# Move to results directory
+mv /var/tmp/kstest-* ${RESULT_PATH}
+
+
+### Create history result
+
+if [[ -n "${RESULTS_SUMMARY_SCRIPT}" ]]; then
+    ${HOME_DIR}/${RESULTS_SUMMARY_SCRIPT} ${RESULTS_RUN_PATH} ${RESULT_REPORT_FILENAME} ${ISOMD5SUM_FILENAME} > "${RESULTS_PATH}/index.html"
+fi
+
+TIME_OF_RESULTS_PROCESSING=$(date +%s)
+
+
+### Gather results of timing
+
+TINFO=""
+
+for timevar in $(awk -F"=" '/^TIME_OF_*/ {print $1}' $0); do
+    timestamp=${!timevar}
+    if [ -n "$LAST" ]; then
+        secs=$(($timestamp - $LAST))
+        human=$(date -u -d @${secs} +"%T")
+        TINFO+=" $timevar: ${human} (${secs}s)"
+    fi
+    LAST=$timestamp
+done
+
+
+### Store test parameters
+
+TEST_PARAMETERS_FILE="${RESULT_PATH}/test_parameters.txt"
+cat > ${TEST_PARAMETERS_FILE} <<- EOF
+KSTEST_URL="--url=${COMPOSE_URL}"
+TEST_REMOTES=${TEST_REMOTES}
+TEST_JOBS=${TEST_JOBS}
+# Time consumed: ${TINFO}
+EOF
+
+
+### Sync results to remote host
+
+if [[ -n "${REMOTE_RESULTS_PATH}" ]]; then
+    rsync -avz ${RESULTS_PATH} ${REMOTE_RESULTS_PATH}
+    if [[ "${REMOTE_RESULTS_KEEP_LOCAL}" == "no" ]]; then
+        rm -rf ${RESULT_PATH}
+    fi
+fi

@@ -1,0 +1,82 @@
+- name: Checkout kickstart tests repo
+  become: false
+  remote_user: "{{ kstest_remote_user }}"
+  git:
+    repo: https://github.com/rhinstaller/kickstart-tests.git
+    dest: "/home/{{ kstest_remote_user }}/{{ kstest.master.git_repo_dir }}"
+    force: yes
+
+- name: Install {{ kstest_remote_user }} private key
+  copy:
+    src: "{{ kstest.master.private_ssh_key }}"
+    dest: /home/{{ kstest_remote_user }}/.ssh/id_rsa
+    owner: "{{ kstest_remote_user }}"
+    group: "{{ kstest_remote_user }}"
+    mode: 0600
+  tags:
+    - ssh-keys
+
+- name: Don't require remote kstest host authentication
+  copy:
+    src: files/sshd_config
+    dest: /home/{{ kstest_remote_user }}/.ssh/config
+    owner: "{{ kstest_remote_user }}"
+    group: "{{ kstest_remote_user }}"
+    mode: 0600
+
+- name: Install and configure script for remote run
+  template:
+    src: run_tests.sh.j2
+    dest: /home/{{ kstest_remote_user }}/run_tests.sh
+    owner: "{{ kstest_remote_user }}"
+    group: "{{ kstest_remote_user }}"
+    mode: 0755
+  tags:
+    - configure-test
+
+- name: Install script for creating tests history summary
+  copy:
+    src: "{{ kstest.master.results_summary_script.src }}"
+    dest: "/home/kstest/{{ kstest.master.results_summary_script.dest }}"
+    owner: "{{ kstest_remote_user }}"
+    group: "{{ kstest_remote_user }}"
+    mode: 0755
+  when: kstest.master.results_summary_script.src is defined
+
+### Schedule tests run in crontab
+
+- name: Install crontab
+  dnf:
+    name: crontabs
+    state: latest
+  tags:
+    - schedule-test
+
+- name: Enable and start crond service
+  service:
+    name: crond
+    state: started
+    enabled: yes
+  tags:
+    - schedule-test
+
+- name: Set up cron PATH
+  cron:
+    name: PATH
+    user: "{{ kstest_remote_user }}"
+    env: yes
+    value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+  tags:
+    - schedule-test
+
+- name: Configure scheduled test with cron
+  cron:
+    name: "Scheduled kickstart tests"
+    hour: "{{ kstest.master.cron.hour }}"
+    minute: "{{ kstest.master.cron.minute }}"
+    user: "{{ kstest_remote_user }}"
+    job: /home/{{ kstest_remote_user }}/run_tests.sh
+    state: present
+    disabled: "{{ kstest.master.cron.disabled }}"
+  tags:
+    - schedule-test

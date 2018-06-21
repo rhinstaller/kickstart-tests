@@ -79,7 +79,7 @@ TIME_OF_DOWNLOADING_ISO=$(date +%s)
 ### Run the test
 
 RESULT_LOG="${RESULT_PATH}/kstest.log"
-scripts/run_kickstart_tests.sh -i ${BOOT_ISO} -k 1 ${KSTESTS} > ${RESULT_LOG}
+scripts/run_kickstart_tests.sh -i ${BOOT_ISO} -k 1 ${KSTESTS} 2>&1 | tee ${RESULT_LOG}
 
 
 ### Create result

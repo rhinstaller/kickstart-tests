@@ -255,9 +255,9 @@ class VirtualManager(object):
 
         if log_monitor.server.log_check():
             if not log_monitor.server.error_line and self._conf.timeout:
-                msg = "virt_install failed due to timeout"
+                msg = "Test timed out"
             else:
-                msg = "virt_install failed on line: %s" % log_monitor.server.error_line
+                msg = "Test failed on line: %s" % log_monitor.server.error_line
             raise InstallError(msg)
 
     def _prepare_and_run(self):

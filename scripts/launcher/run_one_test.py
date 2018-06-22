@@ -153,7 +153,6 @@ class Runner(object):
         out.check_ret_code_with_exception()
 
         for n in out.stdout_as_array:
-            ret.append("--nic")
             ret.append(n)
 
         return ret

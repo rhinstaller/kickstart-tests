@@ -1,0 +1,4 @@
+---
+kstests:
+  topology: kstests.yml
+  layout: kstests.yml

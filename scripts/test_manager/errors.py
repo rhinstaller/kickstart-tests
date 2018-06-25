@@ -21,20 +21,49 @@
 
 
 class TestManagerError(Exception):
-    pass
+
+    @property
+    def name(self):
+        return "General test manager error"
 
 
 class MetadataError(TestManagerError):
-    pass
+
+    @property
+    def name(self):
+        return "Metadata error"
 
 
 class MissingMetadataError(MetadataError):
-    pass
+
+    @property
+    def name(self):
+        return "Missing metadata file"
 
 
 class MissingMetadataTestGroupError(MetadataError):
-    pass
+
+    @property
+    def name(self):
+        return "Missing test group"
 
 
 class IncludeFileMissingError(TestManagerError):
-    pass
+
+    @property
+    def name(self):
+        return "KSINCLUDE file is missing"
+
+
+class MissingSubstitutionError(TestManagerError):
+
+    @property
+    def name(self):
+        return "Missing substitution"
+
+
+class KnownFailureError(TestManagerError):
+
+    @property
+    def name(self):
+        return "Known failure"

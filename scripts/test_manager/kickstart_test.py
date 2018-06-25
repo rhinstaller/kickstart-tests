@@ -38,11 +38,57 @@ class KickstartTest(object):
         self._path = path
         self._name = os.path.basename(path)
         self._content = ""
+        self._errors = []
+        self._metadata = None
 
-        self._metadata = TestMetadata(path)
+        self.load_metadata()
 
     def __repr__(self):
         return "<test_manager.KickstartTest path: {}>".format(self._path)
+
+    @property
+    def valid(self):
+        """Is this test valid for use?
+
+        This test is valid if there are no errors.
+
+        :rtype: bool
+        """
+        return len(self._errors) == 0
+
+    @property
+    def errors(self):
+        """Get list of error instances raised during setup of this test.
+
+        :returns: An exception instance raised during setup.
+        :rtype: Exception instance from test_manager.errors module.
+        """
+        return self._errors
+
+    @property
+    def error_message(self):
+        """Format the error property to a string.
+
+        This is helpful for reporting error to the user.
+
+        Message will be in format for every error in the error list:
+        ERROR:<name>:<error name>:<error description>
+
+        If no error is present return:
+        SUCCESS:<name>::
+
+        :rtype: str
+        """
+        if not self._errors:
+            return "SUCCESS:{}::".format(self._name)
+
+        msg = ""
+
+        for e in self._errors:
+            for line in str(e).split('\n'):
+                msg += "ERROR:{}:{}:{}\n".format(self._name, e.name, line)
+
+        return msg.rstrip('\n')
 
     @property
     def path(self):
@@ -113,6 +159,34 @@ class KickstartTest(object):
         """
         with open(self._path, "r") as f:
             self._content = f.read()
+
+    def load_metadata(self):
+        """Load metadata for this test.
+
+        It may raise an exception.
+        """
+        self._metadata = TestMetadata(self._path)
+
+    def add_error(self, error):
+        """Set error to this test.
+
+        :param error: Exception instance for the raised error.
+        :type error: Instance of one of the exception from test_manager.errors module.
+        """
+        for e in self._errors:
+            # prevent duplicates
+            if e.name == error.name and str(e) == str(error):
+                return
+
+        self._errors.append(error)
+
+    def clear_error(self):
+        """Clear error raised during setup.
+
+        This may be handy in case there are multiple configuration required to finish configuration
+        properly.
+        """
+        self._errors = []
 
 
 class TestMetadata(object):

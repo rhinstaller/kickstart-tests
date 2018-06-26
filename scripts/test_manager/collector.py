@@ -23,6 +23,7 @@ import os
 from glob import iglob
 
 from test_manager.kickstart_test import KickstartTest
+from test_manager.errors import KickstartTestPathError
 
 
 class TestCollector(object):
@@ -80,6 +81,8 @@ class TestCollector(object):
     def find_by_paths(cls, test_paths):
         """Find tests by paths.
 
+        Paths must point to a source kickstart file with extension .ks.in .
+
         :param test_paths: Test paths for processing.
         :type test_paths: Array of paths pointing to the tests.
 
@@ -90,7 +93,9 @@ class TestCollector(object):
 
         for t in test_paths:
             if not os.path.exists(t):
-                raise ValueError("Test path {} doesn't exists!".format(t))
+                raise KickstartTestPathError("Test path {} doesn't exists!".format(t))
+            if ".ks.in" not in t[-6:]:
+                raise KickstartTestPathError("Test file {} must have suffix .ks.in".format(t))
             ret.add(KickstartTest(t))
 
         return ret

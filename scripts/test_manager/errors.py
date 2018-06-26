@@ -67,3 +67,10 @@ class KnownFailureError(TestManagerError):
     @property
     def name(self):
         return "Known failure"
+
+
+class KickstartTestPathError(TestManagerError):
+
+    @property
+    def name(self):
+        return "Invalid Kickstart test path"

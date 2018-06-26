@@ -23,12 +23,15 @@ import re
 import os
 
 from configparser import ConfigParser
-from test_manager.errors import IncludeFileMissingError
+
+from test_manager import BaseFilter
+from test_manager.errors import IncludeFileMissingError, MissingSubstitutionError, \
+    KnownFailureError
 
 GLOBAL_SECTION = "GLOBAL"
 
 
-class TestConfigurator(object):
+class TestConfigurator(BaseFilter):
 
     def __init__(self, root_dir):
         """Collect all information about test environment and prepare test based on this.
@@ -39,37 +42,53 @@ class TestConfigurator(object):
         super().__init__()
         self._config_loader = ConfigLoader()
 
-        self._re_checker = re.compile(r'@.*@')
         self._root = root_dir
+        self._process_known_failure = False
+        self._re_checker = re.compile(r'@.+?@')
         self._re_ks_include = re.compile(r'@KSINCLUDE@\s+([^\s]*)')
 
-    def load(self):
+        self.prepare_filters()
+
+    @property
+    def process_known_failure(self):
+        """Will the configurator process even known failure tests.
+
+        :rtype: bool
+        """
+        return self._process_known_failure
+
+    @process_known_failure.setter
+    def process_known_failure(self, value):
+        """Set if configurator should process known failure tests.
+
+        :param value: True if known failure tests should be processed.
+        :type value: bool
+        """
+        self._process_known_failure = value
+
+    def prepare_filters(self):
+        self.add_filter("load_test", self._load_test)
+        self.add_filter("pre_processing_check", self._pre_processing_check)
+        self.add_filter("do_substitutions", self._do_substitutions)
+        self.add_filter("post_processing_check", self._post_processing_check)
+
+    def load_configuration(self):
         """Load configuration from the configuration file"""
         self._config_loader.load_default_config()
 
-    def prepare_tests(self, tests):
-        """Prepare multiple tests by the loaded configuration.
+    @staticmethod
+    def _load_test(test):
+        """Load test content and metadata."""
+        test.load_content()
+        test.load_metadata()
 
-        This will effectively only call self.prepare_test on all files.
-
-        Result will be saved in the KickstartTest instance content.
-        """
-        for t in tests:
-            self.prepare_test(t)
-
-    def prepare_test(self, test):
-        """Prepare test based on the configuration loaded.
-
-        .. NOTE: You must load configuration before calling this method!
-
-        Result will be stored in the KickstartTest object.
-
-        :param test: Kickstart test object for processing.
-        :type test: testmanager.kickstart_test.KickstartTest
-        """
-        self._do_substitutions(test)
+    def _pre_processing_check(self, test):
+        """Check if test is valid to start processing."""
+        if not self._process_known_failure and test.metadata.known_failure:
+            raise KnownFailureError("")
 
     def _do_substitutions(self, test):
+        """Make substitutions for this test"""
         substitutions = self._config_loader.substitutions()
         test.load_content()
 
@@ -80,7 +99,7 @@ class TestConfigurator(object):
         try:
             test.content = self._include_kickstart_parts(test.content)
         except IncludeFileMissingError as ex:
-            raise IncludeFileMissingError(str(ex) + " {}".format(test.name))
+            raise IncludeFileMissingError(str(ex) + " {}".format(test.name)).with_traceback(ex)
 
     def _include_kickstart_parts(self, content):
         match = self._re_ks_include.search(content)
@@ -102,16 +121,20 @@ class TestConfigurator(object):
 
         return res
 
-    def check_test(self, test):
-        """Check if given test is prepared for use.
+    def _post_processing_check(self, test):
+        """Check if given test is prepared for use."""
+        matches = self._re_checker.findall(test.content)
+        # remove duplicate values
+        matches = set(matches)
+        msg = ""
 
-        :param test: Kickstart test object for processing.
-        :type test: testmanager.kickstart_test.KickstartTest
-        """
-        if self._re_checker.search(test.content):
-            return False
-        else:
-            return True
+        for m in matches:
+            msg += "'{}' can't be substituted\n".format(m)
+
+        msg = msg.rstrip('\n')
+
+        if msg:
+            raise MissingSubstitutionError(msg)
 
 
 class ConfigLoader(ConfigParser):

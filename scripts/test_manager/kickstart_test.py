@@ -41,8 +41,6 @@ class KickstartTest(object):
         self._errors = []
         self._metadata = None
 
-        self.load_metadata()
-
     def __repr__(self):
         return "<test_manager.KickstartTest path: {}>".format(self._path)
 

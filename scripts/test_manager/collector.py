@@ -41,19 +41,9 @@ class TestCollector(object):
         result = set()
 
         for t in tests:
-            if not t.metadata.known_failure:
-                result.add(t)
+            result.add(t)
 
         return result
-
-    @classmethod
-    def _find_all(cls, root):
-        ret = set()
-        find_pattern = os.path.join(root, "*.ks.in")
-        for f in iglob(find_pattern):
-            ret.add(KickstartTest(f))
-
-        return ret
 
     @classmethod
     def find_by_group(cls, root, group):
@@ -73,12 +63,18 @@ class TestCollector(object):
 
         for t in tests:
             if group in t.metadata.groups:
-                if t.metadata.known_failure:
-                    continue
-                else:
-                    result.add(t)
+                result.add(t)
 
         return result
+
+    @classmethod
+    def _find_all(cls, root):
+        ret = set()
+        find_pattern = os.path.join(root, "*.ks.in")
+        for f in iglob(find_pattern):
+            ret.add(KickstartTest(f))
+
+        return ret
 
     @classmethod
     def find_by_paths(cls, test_paths):

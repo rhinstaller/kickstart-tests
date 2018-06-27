@@ -1,0 +1,64 @@
+#version=DEVEL
+#test name: mountpoint-assignment-1
+
+url @KSTEST_URL@
+install
+network --bootproto=dhcp
+bootloader --timeout=1
+
+mount /dev/sda1 /boot
+mount /dev/sda2 / --reformat
+mount /dev/sda3 /home
+mount /dev/sda4 none
+
+keyboard us
+lang en_US.UTF-8
+timezone America/New_York --utc
+rootpw testcase
+shutdown
+
+%packages
+%end
+
+%pre
+
+# Do the partitioning here.
+parted /dev/sda mklabel msdos
+
+parted --align=none /dev/sda mkpart primary 512K 1.5G
+mkfs.ext2 /dev/sda1
+
+parted --align=none /dev/sda mkpart primary 1.5G 8G
+mkfs.ext4 /dev/sda2
+
+parted --align=none /dev/sda mkpart primary 8G 9G
+mkfs.ext4 /dev/sda3
+
+parted --align=none /dev/sda mkpart primary 9G 10G
+mkswap /dev/sda4
+
+%end
+
+%post
+
+# Check the existence of mount points.
+check_mount_point() {
+    local device=$1 mount_point=$2
+
+    found_mount_point="$( lsblk $device -o MOUNTPOINT --noheadings )"
+
+    if [ "$mount_point" != "$found_mount_point" ]; then
+        echo "${device} shouldn't be mounted at ${found_mount_point}" >>/root/RESULT
+    fi
+}
+
+check_mount_point "/dev/sda1" "/boot"
+check_mount_point "/dev/sda2" "/"
+check_mount_point "/dev/sda3" "/home"
+check_mount_point "/dev/sda4" "[SWAP]"
+
+if [ ! -e /root/RESULT ]; then
+    echo SUCCESS >/root/RESULT
+fi
+
+%end

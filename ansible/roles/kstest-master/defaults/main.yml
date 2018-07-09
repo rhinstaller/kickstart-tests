@@ -17,3 +17,5 @@ kstest_remote_results_path: ""
 # Keep results locally after syncing to remote destination.
 # True unless "no".
 kstest_remote_results_keep_local: "no"
+# Url of updates image to be used
+kstest_updates_img: ""

@@ -132,6 +132,9 @@ class ShellLauncher(ProcessLauncher):
     def run_validate(self):
         return self._run_shell_func("validate")
 
+    def run_inject_ks_to_initrd(self):
+        return self._run_shell_func("inject_ks_to_initrd")
+
     def _run_shell_func(self, func_name):
         cmd_args = []
         script_path = os.path.join(self._conf.script_path, SHELL_INTERFACE_PATH)

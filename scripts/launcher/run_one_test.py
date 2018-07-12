@@ -46,6 +46,10 @@ from lib.test_logging import setup_logger, get_logger
 log = get_logger()
 
 
+class BadParameterError(Exception):
+    pass
+
+
 class Runner(object):
 
     def __init__(self, configuration, tmp_dir):
@@ -101,7 +105,11 @@ class Runner(object):
 
         target_boot_iso = os.path.join(self._tmp_dir, self._conf.boot_image_name)
 
-        v_conf = VirtualConfiguration(target_boot_iso, [self._ks_file])
+        ks = []
+        if self._should_inject_ks_to_initrd():
+            ks.append(self._ks_file)
+
+        v_conf = VirtualConfiguration(target_boot_iso, ks)
         v_conf.kernel_args = kernel_args
         v_conf.test_name = self._conf.ks_test_name
         v_conf.temp_dir = self._tmp_dir
@@ -134,6 +142,19 @@ class Runner(object):
 
         self._shell.run_cleanup()
         return ret.return_code
+
+    def _should_inject_ks_to_initrd(self):
+        out = self._shell.run_inject_ks_to_initrd()
+
+        out.check_ret_code_with_exception()
+
+        if out.stdout == "true":
+            return True
+        elif out.stdout == "false":
+            return False
+        else:
+            raise BadParameterError("Shell function inject_ks_to_initrd must return 'true' or "
+                                    "'false' but returned {}".format(out.stdout))
 
     def _collect_disks(self):
         ret = []

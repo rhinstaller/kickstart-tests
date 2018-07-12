@@ -88,6 +88,10 @@ case $1 in
         cleanup ${tmpdir}
         ret=$?
         ;;
+    inject_ks_to_initrd)
+        msg=$(inject_ks_to_initrd)
+        ret=$?
+        ;;
     prepare)
         msg=$(prepare ${ks} ${tmpdir})
         ret=$?

@@ -167,9 +167,11 @@ initrd ${httpd_url}initrd.img
 boot
 EOF
 
-    # Return empty path to kickstart file which will result in ks not
-    # being injected into initrd.
-    echo ""
+    echo "${ks}"
+}
+
+inject_ks_to_initrd() {
+    echo "false"
 }
 
 cleanup() {

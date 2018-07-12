@@ -31,6 +31,10 @@ log = get_logger()
 SHELL_INTERFACE_PATH = "launcher_interface.sh"
 
 
+class ShellProcessError(Exception):
+    pass
+
+
 class ShellOutput(object):
 
     def __init__(self, subprocess_out):
@@ -108,29 +112,72 @@ class ShellLauncher(ProcessLauncher):
         self._conf = configuration
         self._tmp_dir = tmp_dir
 
-    def run_prepare(self):
-        return self._run_shell_func("prepare")
+    def prepare(self):
+        out = self._run_shell_func("prepare")
+        out.check_ret_code_with_exception()
+        return out.stdout
 
-    def run_cleanup(self):
+    def cleanup(self):
         return self._run_shell_func("cleanup")
 
-    def run_prepare_disks(self):
-        return self._run_shell_func("prepare_disks")
+    def prepare_disks(self):
+        out = self._run_shell_func("prepare_disks")
+        ret = []
 
-    def run_prepare_network(self):
-        return self._run_shell_func("prepare_network")
+        out.check_ret_code_with_exception()
 
-    def run_kernel_args(self):
-        return self._run_shell_func("kernel_args")
+        for d in out.stdout_as_array:
+            ret.append("{},cache=unsafe".format(d))
 
-    def run_additional_runner_args(self):
-        return self._run_shell_func("additional_runner_args")
+        return ret
 
-    def run_boot_args(self):
-        return self._run_shell_func("boot_args")
+    def prepare_network(self):
+        out = self._run_shell_func("prepare_network")
+        ret = []
 
-    def run_validate(self):
+        out.check_ret_code_with_exception()
+
+        for n in out.stdout_as_array:
+            ret.append(n)
+
+        return ret
+
+    def kernel_args(self):
+        out = self._run_shell_func("kernel_args")
+
+        out.check_ret_code_with_exception()
+        return out.stdout
+
+    def additional_runner_args(self):
+        out = self._run_shell_func("additional_runner_args")
+        ret = []
+
+        out.check_ret_code_with_exception()
+        for arg in out.stdout_as_array:
+            ret.append(arg)
+
+        return ret
+
+    def boot_args(self):
+        out = self._run_shell_func("boot_args")
+        out.check_ret_code_with_exception()
+        return out.stdout_as_array
+
+    def validate(self):
         return self._run_shell_func("validate")
+
+    def inject_ks_to_initrd(self):
+        out = self._run_shell_func("inject_ks_to_initrd")
+
+        out.check_ret_code_with_exception()
+
+        if out.stdout == "true":
+            return True
+        elif out.stdout == "false":
+            return False
+        else:
+            raise ShellProcessError("Shell function inject_ks_to_initrd must return 'true' or "
+                                    "'false' but returned {}".format(out.stdout))
 
     def _run_shell_func(self, func_name):
         cmd_args = []

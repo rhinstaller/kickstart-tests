@@ -22,6 +22,13 @@ prereqs() {
     echo
 }
 
+inject_ks_to_initrd() {
+    # Return true to inject kickstart to initrd. If false is specified than other way to
+    # use kickstart must be used.
+    # returns: "true" or "false"
+    echo "true"
+}
+
 kernel_args() {
     echo vnc debug=1 inst.debug
 }

@@ -68,7 +68,7 @@ class Runner(object):
             shell_out = self._shell.run_prepare()
             shell_out.check_ret_code_with_exception()
             self._ks_file = shell_out.stdout
-        except subprocess.CalledProcessError as e:
+        except subprocess.CalledProcessError:
             self._result_formatter.report_result(result=False, msg="Test prep failed")
             self._shell.run_cleanup()
             return False

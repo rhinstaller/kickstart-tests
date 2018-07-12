@@ -46,10 +46,6 @@ from lib.test_logging import setup_logger, get_logger
 log = get_logger()
 
 
-class BadParameterError(Exception):
-    pass
-
-
 class Runner(object):
 
     def __init__(self, configuration, tmp_dir):
@@ -69,19 +65,17 @@ class Runner(object):
         self._copy_image_to_tmp()
 
         try:
-            shell_out = self._shell.run_prepare()
-            shell_out.check_ret_code_with_exception()
-            self._ks_file = shell_out.stdout
+            self._ks_file = self._shell.prepare()
         except subprocess.CalledProcessError:
             self._result_formatter.report_result(result=False, msg="Test prep failed")
-            self._shell.run_cleanup()
+            self._shell.cleanup()
             return False
 
         self._validator = KickstartValidator(self._conf.ks_test_name, self._ks_file)
         self._validator.check_ks_substitution()
         if not self._validator.result:
             self._validator.report_result()
-            self._shell.run_cleanup()
+            self._shell.cleanup()
             return False
 
         return True
@@ -94,19 +88,19 @@ class Runner(object):
         if not self._prepare_test():
             return 99
 
-        kernel_args = self._get_kernel_args()
+        kernel_args = self._shell.kernel_args()
 
         if self._conf.updates_img_path:
             kernel_args += " inst.updates={}".format(self._conf.updates_img_path)
 
-        disk_args = self._collect_disks()
-        nics_args = self._collect_network()
-        boot_args = self._get_boot_args()
+        disk_args = self._shell.prepare_disks()
+        nics_args = self._shell.prepare_network()
+        boot_args = self._shell.boot_args()
 
         target_boot_iso = os.path.join(self._tmp_dir, self._conf.boot_image_name)
 
         ks = []
-        if self._should_inject_ks_to_initrd():
+        if self._shell.inject_ks_to_initrd():
             ks.append(self._ks_file)
 
         v_conf = VirtualConfiguration(target_boot_iso, ks)
@@ -133,72 +127,15 @@ class Runner(object):
 
         if not validator.result:
             validator.report_result()
-            self._shell.run_cleanup()
+            self._shell.cleanup()
             return validator.return_code
 
         ret = self._validate_result()
         if ret.check_ret_code():
             self._result_formatter.report_result(True, "test done")
 
-        self._shell.run_cleanup()
+        self._shell.cleanup()
         return ret.return_code
-
-    def _should_inject_ks_to_initrd(self):
-        out = self._shell.run_inject_ks_to_initrd()
-
-        out.check_ret_code_with_exception()
-
-        if out.stdout == "true":
-            return True
-        elif out.stdout == "false":
-            return False
-        else:
-            raise BadParameterError("Shell function inject_ks_to_initrd must return 'true' or "
-                                    "'false' but returned {}".format(out.stdout))
-
-    def _collect_disks(self):
-        ret = []
-
-        out = self._shell.run_prepare_disks()
-        out.check_ret_code_with_exception()
-
-        for d in out.stdout_as_array:
-            ret.append("{},cache=unsafe".format(d))
-
-        return ret
-
-    def _collect_network(self):
-        ret = []
-
-        out = self._shell.run_prepare_network()
-        out.check_ret_code_with_exception()
-
-        for n in out.stdout_as_array:
-            ret.append(n)
-
-        return ret
-
-    def _get_runner_args(self):
-        ret = []
-
-        out = self._shell.run_additional_runner_args()
-        out.check_ret_code_with_exception()
-        for arg in out.stdout_as_array:
-            ret.append(arg)
-
-        return ret
-
-    def _get_kernel_args(self):
-        out = self._shell.run_kernel_args()
-
-        out.check_ret_code_with_exception()
-        return out.stdout
-
-    def _get_boot_args(self):
-        out = self._shell.run_boot_args()
-
-        out.check_ret_code_with_exception()
-        return out.stdout_as_array
 
     def _validate_logs(self, virt_configuration):
         validator = LogValidator(self._conf.ks_test_name)
@@ -210,7 +147,7 @@ class Runner(object):
         return validator
 
     def _validate_result(self):
-        output = self._shell.run_validate()
+        output = self._shell.validate()
 
         if not output.check_ret_code():
             msg = "Validation failed with return code {}".format(output.return_code)

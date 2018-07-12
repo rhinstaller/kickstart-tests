@@ -10,6 +10,7 @@ KSTESTS="{{ kstest_tests_to_run }}"
 REMOTE_RESULTS_PATH="{{ kstest_remote_results_path }}"
 REMOTE_RESULTS_KEEP_LOCAL="{{ kstest_remote_results_keep_local }}"
 RESULTS_SUMMARY_SCRIPT="{{ kstest.master.results_summary_script.dest }}"
+UPDATES_IMAGE="{{ kstest_updates_img }}"
 
 COMPOSE_BOOT_ISO=images/boot.iso
 KSTEST_USER=kstest
@@ -75,11 +76,17 @@ ISO_MD5_SUM=$(md5sum ${BOOT_ISO})
 
 TIME_OF_DOWNLOADING_ISO=$(date +%s)
 
+### Use updates image
+
+UPDATES_IMAGE_ARG=""
+if [[ -n "${UPDATES_IMAGE}" ]]; then
+    UPDATES_IMAGE_ARG="-u ${UPDATES_IMAGE}"
+fi
 
 ### Run the test
 
 RESULT_LOG="${RESULT_PATH}/kstest.log"
-scripts/run_kickstart_tests.sh -i ${BOOT_ISO} -k 1 ${KSTESTS} 2>&1 | tee ${RESULT_LOG}
+scripts/run_kickstart_tests.sh -i ${BOOT_ISO} -k 1 ${UPDATES_IMAGE_ARG} ${KSTESTS} 2>&1 | tee ${RESULT_LOG}
 
 
 ### Create result
@@ -143,6 +150,7 @@ cat > ${TEST_PARAMETERS_FILE} <<- EOF
 KSTEST_URL="--url=${COMPOSE_URL}"
 TEST_REMOTES=${TEST_REMOTES}
 TEST_JOBS=${TEST_JOBS}
+UPDATES_IMAGE=${UPDATES_IMAGE}
 # Time consumed: ${TINFO}
 EOF
 

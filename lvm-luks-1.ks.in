@@ -1,0 +1,62 @@
+#test name: lvm-luks-1
+
+url @KSTEST_URL@
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+clearpart --all --initlabel
+
+# Test LUKS 2 with default values.
+# FIXME: remove the --pbkdf-time option
+
+part /boot --fstype="ext4" --size=1024
+part pv.1 --fstype="lvmpv" --size=9215
+
+volgroup fedora pv.1
+
+logvol / --name=root --vgname=fedora --fstype="ext4" --grow --size=1024 --encrypted --passphrase="passphrase" --luks-version=luks1
+logvol swap --name=swap --vgname=fedora --fstype="swap" --size=1023
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+%post
+
+# Set the crypted device.
+crypted="/dev/mapper/fedora-root"
+
+# Check if the type of the crypted device is crypto_LUKS.
+type="$(blkid -o value -s TYPE ${crypted})"
+
+if [[ "$type" != "crypto_LUKS" ]] ; then
+    echo "*** unexpected type ${type} of ${crypted}" >> /root/RESULT
+fi
+
+# Check if the LUKS version is luks1.
+result="$(cryptsetup luksDump ${crypted} | awk '{ if ($1 == "Version:") print $2; }' )"
+
+if [[ "$result" != "1" ]] ; then
+    echo "*** unexpected LUKS version for ${crypted}: ${result}" >> /root/RESULT
+fi
+
+# Try to use the passphrase.
+echo "passphrase" | cryptsetup luksOpen --test-passphrase "${crypted}"
+
+if [[ $? != 0 ]] ; then
+    echo "*** cannot open ${crypted} with the passphrase" >> /root/RESULT
+fi
+
+# The test was successful.
+if [ ! -e /root/RESULT ]; then
+    echo SUCCESS > /root/RESULT
+fi
+
+%end

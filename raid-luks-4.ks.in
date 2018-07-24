@@ -1,0 +1,60 @@
+#version=DEVEL
+#test name: raid-luks-4
+
+url @KSTEST_URL@
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1
+clearpart --all --initlabel
+
+# Test LUKS 2 with argon2i and options --pbkdf-iterations and --pbkdf-memory.
+
+part /boot --fstype="ext4" --size=1024
+part swap --fstype="swap" --size=2048
+part raid.1 --fstype="mdmember" --ondisk=sda --size=7167
+part raid.2 --fstype="mdmember" --ondisk=sdb --size=7167
+
+raid / --device=root --fstype="ext4" --level=RAID1 --encrypted --passphrase="passphrase" --luks-version=luks2 --pbkdf=argon2i --pbkdf-iterations=4 --pbkdf-memory=64 raid.1 raid.2
+
+keyboard us
+lang en_US.UTF-8
+timezone America/New_York --utc
+rootpw testcase
+shutdown
+
+%packages
+%end
+
+%post
+
+# Set the crypted device.
+crypted="/dev/md/root"
+
+# Check the PBKDF.
+result="$(cryptsetup luksDump ${crypted} | awk '{ if ($1 == "PBKDF:") print $2; }' )"
+
+if [[ "$result" != "argon2i" ]] ; then
+    echo "*** unexpected PBKDF for ${crypted}: ${result}" >> /root/RESULT
+fi
+
+# Check the iterations.
+result="$(cryptsetup luksDump ${crypted} | awk '{ if ($1 == "Time" && $2 == "cost:") print $3; }' )"
+
+if [[ "$result" != "4" ]] ; then
+    echo "*** unexpected iterations for ${crypted}: ${result}" >> /root/RESULT
+fi
+
+# Check the memory.
+result="$(cryptsetup luksDump ${crypted} | awk '{ if ($1 == "Memory:") print $2; }' )"
+
+if [[ "$result" != "64" ]] ; then
+    echo "*** unexpected memory for ${crypted}: ${result}" >> /root/RESULT
+fi
+
+# The test was successful.
+if [ ! -e /root/RESULT ]; then
+    echo SUCCESS > /root/RESULT
+fi
+
+%end

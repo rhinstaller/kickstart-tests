@@ -74,12 +74,12 @@ if [[ $# -ne 1 || -z $1 ]]; then
     exit 1
 fi
 
-export KSTESTDIR=$(pwd)
+export KSTESTDIR="$(pwd)"
 
 ks=${t/.sh/.ks}
 . $t
 
-name=$(basename ${t%.sh})
+name="$(basename ${t%.sh})"
 ret=0
 msg=""
 
@@ -89,35 +89,35 @@ case $1 in
         ret=$?
         ;;
     inject_ks_to_initrd)
-        msg=$(inject_ks_to_initrd)
+        msg="$(inject_ks_to_initrd)"
         ret=$?
         ;;
     prepare)
-        msg=$(prepare ${ks} ${tmpdir})
+        msg="$(prepare ${ks} ${tmpdir})"
         ret=$?
         ;;
     prepare_disks)
-        msg=$(prepare_disks ${tmpdir})
+        msg="$(prepare_disks ${tmpdir})"
         ret=$?
         ;;
     prepare_network)
-        msg=$(prepare_network ${tmpdir})
+        msg="$(prepare_network ${tmpdir})"
         ret=$?
         ;;
     kernel_args)
-        msg=$(kernel_args)
+        msg="$(kernel_args)"
         ret=$?
         ;;
     boot_args)
-        msg=$(boot_args)
+        msg="$(boot_args)"
         ret=$?
         ;;
     additional_runner_args)
-        msg=$(additional_runner_args)
+        msg="$(additional_runner_args)"
         ret=$?
         ;;
     validate)
-        msg=$(validate ${tmpdir})
+        msg="$(validate ${tmpdir})"
         ret=$?
         ;;
     *)
@@ -126,5 +126,5 @@ case $1 in
         ;;
 esac
 
-echo ${msg}
+echo "${msg}"
 exit ${ret}

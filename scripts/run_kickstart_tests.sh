@@ -63,8 +63,9 @@ KEEPIT=${KEEPIT:-0}
 UPDATES_IMG=""
 
 TESTTYPE=""
+SKIP_TESTTYPE=""
 
-while getopts ":i:k:t:u:b:" opt; do
+while getopts ":i:k:t:s:u:b:" opt; do
     case $opt in
        i)
            # If this wasn't set from the environment, set it from the command line
@@ -82,6 +83,10 @@ while getopts ":i:k:t:u:b:" opt; do
            # Only run tests that have TESTTYPE=<this value> in them.  Tests can have
            # more than one type.  We'll do a pretty stupid test for it.
            TESTTYPE=$OPTARG
+           ;;
+       s)
+           # Exclude tests of the given testtype. We'll do a pretty stupid test for it.
+           SKIP_TESTTYPE=$OPTARG
            ;;
        u)
            # Link to an updates image on a server. This will be added as a kernel
@@ -153,8 +158,11 @@ function find_tests() {
     local tests=$(find . -maxdepth 1 -name '*sh' -a -perm -o+x)
 
     local newtests=""
+    local skipped_tests=""
     for f in ${tests}; do
-        if [[ "$TESTTYPE" != "" && "$(grep TESTTYPE= ${f})" =~ "${TESTTYPE}" ]]; then
+        if [[ "$SKIP_TESTTYPE" != "" && "$(grep TESTTYPE= ${f})" =~ "${SKIP_TESTTYPE}" ]]; then
+            skipped_tests+="${f}"
+        elif [[ "$TESTTYPE" != "" && "$(grep TESTTYPE= ${f})" =~ "${TESTTYPE}" ]]; then
             newtests+="${f} "
         elif [[ "$TESTTYPE" == "" && ! "$(grep TESTTYPE= ${f})" =~ knownfailure ]]; then
             # Skip any test with the type "knownfailure".  If you want to run these (to

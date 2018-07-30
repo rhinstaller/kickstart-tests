@@ -5,8 +5,12 @@
 # Multiple hosts are separated by space.
 # If not defined, all hosts from kstest group will be used
 #kstest_test_remotes:
-# Repository for tests (will be used to download boot.iso).
-kstest_compose_url: http://download.eng.brq.redhat.com/pub/fedora/development-rawhide/Everything/x86_64/os/
+# Software http repository for tests.
+kstest_url: "--url=http://download.eng.brq.redhat.com/pub/fedora/development-rawhide/Everything/x86_64/os/"
+# Software ftp repository for tests.
+kstest_ftp_url: "ftp://download.eng.brq.redhat.com/pub/fedora/development-rawhide/Everything/x86_64/os/"
+# Boot iso url.
+kstest_boot_iso_url: "http://download.eng.brq.redhat.com/pub/fedora/development-rawhide/Everything/x86_64/os/images/boot.iso"
 # Number of jobs to be run in parallel on one host.
 kstest_test_jobs: 4
 # Tests to be run (empty for all).

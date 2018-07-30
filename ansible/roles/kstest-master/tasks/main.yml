@@ -2,9 +2,12 @@
   become: false
   remote_user: "{{ kstest_remote_user }}"
   git:
-    repo: https://github.com/rhinstaller/kickstart-tests.git
+    repo: "{{ kstest_git_repo }}"
     dest: "/home/{{ kstest_remote_user }}/{{ kstest.master.git_repo_dir }}"
+    version: "{{ kstest_git_version }}"
     force: yes
+  tags:
+    - configure-test
 
 - name: Install {{ kstest_remote_user }} private key
   copy:

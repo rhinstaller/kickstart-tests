@@ -67,6 +67,17 @@ mkdir ${RESULT_PATH}
 TIME_OF_UPDATING_REPO=$(date +%s)
 
 
+### Store test parameters
+
+TEST_PARAMETERS_FILE="${RESULT_PATH}/test_parameters.txt"
+cat > ${TEST_PARAMETERS_FILE} <<- EOF
+KSTEST_URL="--url=${COMPOSE_URL}"
+TEST_REMOTES=${TEST_REMOTES}
+TEST_JOBS=${TEST_JOBS}
+UPDATES_IMAGE=${UPDATES_IMAGE}
+EOF
+
+
 ### Download the boot.iso
 
 rm -f ${BOOT_ISO}
@@ -75,6 +86,13 @@ curl "${COMPOSE_URL}/${COMPOSE_BOOT_ISO}" -o ${BOOT_ISO}
 ISO_MD5_SUM=$(md5sum ${BOOT_ISO})
 
 TIME_OF_DOWNLOADING_ISO=$(date +%s)
+
+
+### Drop iso md5sum info into results
+
+ISO_MD5_SUM_FILE="${RESULT_PATH}/${ISOMD5SUM_FILENAME}"
+echo ${ISO_MD5_SUM} > ${ISO_MD5_SUM_FILE}
+
 
 ### Use updates image
 
@@ -100,12 +118,6 @@ TIME_OF_RUNNING_TESTS=$(date +%s)
 ### Cd back from the repository dir
 
 cd -
-
-
-### Drop iso md5sum info into results
-
-ISO_MD5_SUM_FILE="${RESULT_PATH}/${ISOMD5SUM_FILENAME}"
-echo ${ISO_MD5_SUM} > ${ISO_MD5_SUM_FILE}
 
 
 ### Store logs
@@ -141,18 +153,8 @@ for timevar in $(awk -F"=" '/^TIME_OF_*/ {print $1}' $0); do
     fi
     LAST=$timestamp
 done
-
-
-### Store test parameters
-
-TEST_PARAMETERS_FILE="${RESULT_PATH}/test_parameters.txt"
-cat > ${TEST_PARAMETERS_FILE} <<- EOF
-KSTEST_URL="--url=${COMPOSE_URL}"
-TEST_REMOTES=${TEST_REMOTES}
-TEST_JOBS=${TEST_JOBS}
-UPDATES_IMAGE=${UPDATES_IMAGE}
-# Time consumed: ${TINFO}
-EOF
+# Update test parameters with time info
+echo "# Time consumed: ${TINFO}" >> ${TEST_PARAMETERS_FILE}
 
 
 ### Sync results to remote host

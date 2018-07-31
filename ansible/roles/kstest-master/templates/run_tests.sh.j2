@@ -7,6 +7,7 @@ TEST_REMOTES="{{ kstest_test_remotes | default(groups['kstest']|join(' ')) }}"
 COMPOSE_URL="{{ kstest_compose_url }}"
 TEST_JOBS={{ kstest_test_jobs }}
 KSTESTS="{{ kstest_tests_to_run }}"
+TEST_TYPE="{{ kstest_test_type }}"
 REMOTE_RESULTS_PATH="{{ kstest_remote_results_path }}"
 REMOTE_RESULTS_KEEP_LOCAL="{{ kstest_remote_results_keep_local }}"
 RESULTS_SUMMARY_SCRIPT="{{ kstest.master.results_summary_script.dest }}"
@@ -101,10 +102,17 @@ if [[ -n "${UPDATES_IMAGE}" ]]; then
     UPDATES_IMAGE_ARG="-u ${UPDATES_IMAGE}"
 fi
 
+### Run tests of specified type
+
+TEST_TYPE_ARG=""
+if [[ -n "${TEST_TYPE}" ]]; then
+    TEST_TYPE_ARG="-t ${TEST_TYPE}"
+fi
+
 ### Run the test
 
 RESULT_LOG="${RESULT_PATH}/kstest.log"
-scripts/run_kickstart_tests.sh -i ${BOOT_ISO} -k 1 ${UPDATES_IMAGE_ARG} ${KSTESTS} 2>&1 | tee ${RESULT_LOG}
+scripts/run_kickstart_tests.sh -i ${BOOT_ISO} -k 1 ${UPDATES_IMAGE_ARG} ${TEST_TYPE_ARG} ${KSTESTS} 2>&1 | tee ${RESULT_LOG}
 
 
 ### Create result

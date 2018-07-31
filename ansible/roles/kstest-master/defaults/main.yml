@@ -11,6 +11,8 @@ kstest_compose_url: http://download.eng.brq.redhat.com/pub/fedora/development-ra
 kstest_test_jobs: 4
 # Tests to be run (empty for all).
 kstest_tests_to_run: ""
+# Category of tests to be run if not specified explicitly
+kstest_test_type: ""
 # Path to remote destination for remote sync of results.
 #kstest_remote_results_path: "user@host:results"
 kstest_remote_results_path: ""

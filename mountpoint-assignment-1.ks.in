@@ -24,17 +24,22 @@ shutdown
 
 # Do the partitioning here.
 parted /dev/sda mklabel msdos
+sleep 1
 
 parted --align=none /dev/sda mkpart primary 512K 1.5G
+sleep 1
 mkfs.ext2 /dev/sda1
 
 parted --align=none /dev/sda mkpart primary 1.5G 8G
+sleep 1
 mkfs.ext4 /dev/sda2
 
 parted --align=none /dev/sda mkpart primary 8G 9G
+sleep 1
 mkfs.ext4 /dev/sda3
 
 parted --align=none /dev/sda mkpart primary 9G 10G
+sleep 1
 mkswap /dev/sda4
 
 %end

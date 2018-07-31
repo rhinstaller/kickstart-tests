@@ -66,6 +66,14 @@ for result_dir in sorted(os.listdir(RESULTS_PATH)):
                         detail = "TRACEBACK"
                     elif "Kernel panic" in expl:
                         detail = "PANIC"
+                    elif "Call Trace" in expl:
+                        detail = "CALL TRACE"
+                    elif "Problem starting" in expl:
+                        detail = "VIRT-INSTALL"
+                    elif "Out of memory" in expl:
+                        detail = "OOM"
+                    elif "error in log" in expl:
+                        detail = "ERROR IN LOG"
 
                 if not test in tests:
                     tests[test] = [" "] * count

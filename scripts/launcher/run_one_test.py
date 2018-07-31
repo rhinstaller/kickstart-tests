@@ -108,7 +108,6 @@ class Runner(object):
         v_conf.test_name = self._conf.ks_test_name
         v_conf.temp_dir = self._tmp_dir
         v_conf.log_path = os.path.join(self._tmp_dir, "livemedia.log")
-        v_conf.ram = 1024
         v_conf.vnc = "vnc"
         v_conf.boot_image = boot_args
         v_conf.timeout = 60

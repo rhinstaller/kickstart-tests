@@ -151,7 +151,7 @@ class VirtualConfiguration(object):
         self._tmp = "/var/tmp"
         self._keep_image = True
         self._vcpu_count = 1
-        self._ram = 1024
+        self._ram = 2048
         self._vnc = None
         self._kernel_args = None
         self._timeout = None

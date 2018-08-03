@@ -4,7 +4,9 @@
 set -x
 
 TEST_REMOTES="{{ kstest_test_remotes | default(groups['kstest']|join(' ')) }}"
-COMPOSE_URL="{{ kstest_compose_url }}"
+KSTEST_URL="{{ kstest_url }}"
+KSTEST_FTP_URL="{{ kstest_ftp_url}}"
+BOOT_ISO_URL="{{ kstest_boot_iso_url }}"
 TEST_JOBS={{ kstest_test_jobs }}
 KSTESTS="{{ kstest_tests_to_run }}"
 TEST_TYPE="{{ kstest_test_type }}"
@@ -12,6 +14,7 @@ REMOTE_RESULTS_PATH="{{ kstest_remote_results_path }}"
 REMOTE_RESULTS_KEEP_LOCAL="{{ kstest_remote_results_keep_local }}"
 RESULTS_SUMMARY_SCRIPT="{{ kstest.master.results_summary_script.dest }}"
 UPDATES_IMAGE="{{ kstest_updates_img }}"
+TEST_DEFAULTS_FILE=scripts/defaults.sh
 
 COMPOSE_BOOT_ISO=images/boot.iso
 KSTEST_USER=kstest
@@ -22,7 +25,7 @@ GIT_PULL_KSTESTS={{ kstest.master.git_pull }}
 HOME_DIR=/home/${KSTEST_USER}
 KSTEST_REPO_PATH=${HOME_DIR}/${KSTEST_REPO_DIR}
 RESULTS_PATH=${HOME_DIR}/${RESULTS_DIR}
-BOOT_ISO=boot.master.iso
+BOOT_ISO=boot.kstest.iso
 ISOMD5SUM_FILENAME=isomd5sum.txt
 RESULT_REPORT_FILENAME=result_report.txt
 # Test run id
@@ -53,11 +56,17 @@ if [[ "${GIT_PULL_KSTESTS}" != "no" ]]; then
 fi
 
 # Set up parameters for test
-cat > scripts/defaults.sh <<- EOF
-export KSTEST_URL="--url=${COMPOSE_URL}"
+cat >> ${TEST_DEFAULTS_FILE} <<- EOF
 export TEST_REMOTES=${TEST_REMOTES}
 export TEST_JOBS=${TEST_JOBS}
 EOF
+
+if [[ -n "${KSTEST_URL}" ]]; then
+    echo "export KSTEST_URL=${KSTEST_URL}" >> ${TEST_DEFAULTS_FILE}
+fi
+if [[ -n "${KSTEST_FTP_URL}" ]]; then
+    echo "export KSTEST_FTP_URL=${KSTEST_FTP_URL}" >> ${TEST_DEFAULTS_FILE}
+fi
 
 
 ### Create this test result dir
@@ -72,7 +81,8 @@ TIME_OF_UPDATING_REPO=$(date +%s)
 
 TEST_PARAMETERS_FILE="${RESULT_PATH}/test_parameters.txt"
 cat > ${TEST_PARAMETERS_FILE} <<- EOF
-KSTEST_URL="--url=${COMPOSE_URL}"
+KSTEST_URL=${KSTEST_URL}
+BOOT_ISO_URL=${BOOT_ISO_URL}
 TEST_REMOTES=${TEST_REMOTES}
 TEST_JOBS=${TEST_JOBS}
 UPDATES_IMAGE=${UPDATES_IMAGE}
@@ -82,7 +92,7 @@ EOF
 ### Download the boot.iso
 
 rm -f ${BOOT_ISO}
-curl "${COMPOSE_URL}/${COMPOSE_BOOT_ISO}" -o ${BOOT_ISO}
+curl "${BOOT_ISO_URL}" -o ${BOOT_ISO}
 
 ISO_MD5_SUM=$(md5sum ${BOOT_ISO})
 

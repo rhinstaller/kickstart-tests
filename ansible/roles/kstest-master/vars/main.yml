@@ -15,5 +15,5 @@ kstest:
       minute: 00
     results_summary_script:
       src: files/scripts/kstests_history.py
-      # relative path in home directory
-      dest: "kstests_history.py"
+      # relative path in home directory ("" to disable creating summary)
+      dest: ""

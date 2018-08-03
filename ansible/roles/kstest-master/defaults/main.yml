@@ -14,6 +14,8 @@ kstest_tests_to_run: ""
 # Category of tests to be run if not specified explicitly
 kstest_test_type: ""
 # Path to remote destination for remote sync of results.
+# Master has to be authorized for accessing the target,
+# ie with kstest.master.private_ssh_key defined in vars/main.yml
 #kstest_remote_results_path: "user@host:results"
 kstest_remote_results_path: ""
 # Keep results locally after syncing to remote destination.

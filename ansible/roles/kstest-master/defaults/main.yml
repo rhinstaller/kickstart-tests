@@ -23,3 +23,7 @@ kstest_remote_results_path: ""
 kstest_remote_results_keep_local: "no"
 # Url of updates image to be used
 kstest_updates_img: ""
+
+# kickstart-tests repository
+kstest_git_repo: https://github.com/rhinstaller/kickstart-tests.git
+kstest_git_version: master

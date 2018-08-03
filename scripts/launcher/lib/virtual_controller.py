@@ -41,6 +41,7 @@ from pylorax.monitor import LogMonitor
 from pylorax.mount import IsoMountpoint
 
 from .configuration import VirtualConfiguration
+from .log_handler import VirtualLogRequestHandler
 from .validator import replace_new_lines
 from .shell_launcher import ProcessLauncher
 from .test_logging import get_logger
@@ -221,7 +222,12 @@ class VirtualManager(object):
         image.
         """
         iso_mount = IsoMountpoint(self._conf.iso_path, self._conf.location)
-        log_monitor = LogMonitor(install_log, timeout=self._conf.timeout)
+
+        log_monitor = LogMonitor(
+            install_log,
+            timeout=self._conf.timeout,
+            log_request_handler_class=VirtualLogRequestHandler
+        )
 
         kernel_args = ""
         if self._conf.kernel_args:

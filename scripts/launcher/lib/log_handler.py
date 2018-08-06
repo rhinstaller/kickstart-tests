@@ -31,6 +31,7 @@ class VirtualLogRequestHandler(LogRequestHandler):
     # of the default ones contained in Lorax
     added_simple_tests = [
         "Payload setup error:",
+        "Out of memory:",
     ]
 
     def __init__(self):

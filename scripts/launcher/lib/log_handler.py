@@ -27,6 +27,16 @@ class VirtualLogRequestHandler(LogRequestHandler):
         # "Call Trace:"
     ]
 
+    # Specify error lines you want to add on top
+    # of the default ones contained in Lorax
+    added_simple_tests = [
+    ]
+
+    def __init__(self):
+        super().__init__()
+        # add any additional error lines
+        self.simple_tests.extend(self.added_simple_tests)
+
     def iserror(self, line):
 
         # Skip ignored simple tests.

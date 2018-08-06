@@ -32,6 +32,8 @@ class VirtualLogRequestHandler(LogRequestHandler):
     added_simple_tests = [
         "Payload setup error:",
         "Out of memory:",
+        "The following group or module is missing:",
+        "Stream was not specified for a module",
     ]
 
     def __init__(self, *args, **kwargs):

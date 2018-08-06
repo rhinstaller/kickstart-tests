@@ -113,3 +113,5 @@ cd -
 # Destroy the provisioned hosts
 linchpin -v --creds-path <PATH_TO_CREDENTIALS> --workspace linchpin -p linchpin/PinFile -c linchpin/linchpin.conf destroy
 ```
+
+The script updated with configuration checks and hints: [../run_tests_in_cloud.sh](../run_tests_in_cloud.sh)

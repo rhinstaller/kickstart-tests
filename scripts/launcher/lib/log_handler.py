@@ -30,6 +30,7 @@ class VirtualLogRequestHandler(LogRequestHandler):
     # Specify error lines you want to add on top
     # of the default ones contained in Lorax
     added_simple_tests = [
+        "Payload setup error:",
     ]
 
     def __init__(self):

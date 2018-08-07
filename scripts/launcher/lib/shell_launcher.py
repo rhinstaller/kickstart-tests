@@ -51,7 +51,7 @@ class ShellOutput(object):
         ret = self.stdout
 
         if ret:
-            return ret.split(" ")
+            return ret.split()
         else:
             return []
 

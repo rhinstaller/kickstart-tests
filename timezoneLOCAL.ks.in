@@ -22,8 +22,12 @@ shutdown
 %post
 ## UTC ZONE TEST
 # hwclock LOCAL test
+# check with both old and new (exclusive) cmdline options
 hwclock -D | grep "Assuming hardware clock is kept in local time."
-if [[ $? -ne 0 ]]; then
+old_hwclock_rc=$?
+hwclock --verbose | grep "Assuming hardware clock is kept in local time."
+hwclock_rc=$?
+if [[ $old_hwclock_rc -ne 0 && $hwclock_rc -ne 0 ]]; then
     echo "*** hwclock not set to LOCAL time." >> /root/RESULT
 fi
 

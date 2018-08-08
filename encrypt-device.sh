@@ -27,7 +27,7 @@ validate() {
 
     # Grab the coverage results out of the installed system while it still
     # exists.
-    virt-copy-out ${args} /root/anaconda.coverage ${disksdir}
+    run_with_timeout 1000s "virt-copy-out ${args} /root/anaconda.coverage ${disksdir}"
 
     # There should be a /home/RESULT (because / is encrypted) file with results
     # in it.  Check its contents and decide whether the test finally succeeded

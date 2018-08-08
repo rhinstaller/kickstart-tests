@@ -50,7 +50,7 @@ validate() {
                 /var/log/anaconda/      \
                 /root/RESULT
     do
-        virt-copy-out ${args} ${item} ${disksdir} 2>/dev/null
+        run_with_timeout 1000s "virt-copy-out ${args} ${item} ${disksdir}" 2>/dev/null
     done
 
     # The /root/RESULT file was saved from the VM.  Check its contents

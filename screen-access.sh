@@ -62,7 +62,7 @@ validate() {
     args=$(for d in ${disksdir}/disk-*img; do echo -a ${d}; done)
 
     # Copy the user interaction configuration file.
-    virt-copy-out ${args} /etc/sysconfig/anaconda ${disksdir}
+    run_with_timeout 1000s "virt-copy-out ${args} /etc/sysconfig/anaconda ${disksdir}"
 
     # Does it exist?
     if [ ! -f "${disksdir}/anaconda" ]; then

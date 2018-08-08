@@ -34,8 +34,8 @@ class VirtualLogRequestHandler(LogRequestHandler):
         "Out of memory:",
     ]
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         # add any additional error lines
         self.simple_tests.extend(self.added_simple_tests)
 

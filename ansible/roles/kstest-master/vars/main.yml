@@ -4,8 +4,6 @@ kstest:
   master:
     # ssh key to access remote hosts for running tests
     private_ssh_key:
-    # relative path in home directory
-    git_repo_dir: git/kickstart-tests
     # set to "no" to prevent pulling the repository before the run
     git_pull: "yes"
     # schedule running test
@@ -17,3 +15,14 @@ kstest:
       src: files/scripts/kstests_history.py
       # relative path in home directory ("" to disable creating summary)
       dest: ""
+
+    ### Locations (to be used by other playbooks)
+    # relative path in home directory
+    git_repo_dir: git/kickstart-tests
+    # file names
+    file:
+      run: .run
+      log: kstest.log
+      result_report: result_report.txt
+      test_parameters: test_parameters.txt
+      isomd5sum: isomd5sum.txt

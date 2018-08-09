@@ -1,0 +1,51 @@
+---
+- hosts:
+    kstest-master
+    kstest
+  become: true
+  become_user: root
+
+  tasks:
+  - name: Display number of tests run on kstest hosts
+    shell: ls | grep kstest- | wc -l
+    args:
+      chdir: /var/tmp
+    register: number_of_tests_run
+  - debug:
+      var: number_of_tests_run.stdout
+
+- hosts:
+    kstest-master
+  become: true
+  become_user: kstest
+
+  tasks:
+  - include_vars: roles/kstest/vars/main.yml
+  - include_vars: roles/kstest-master/vars/main.yml
+
+  - name: Find current results path
+    command: cat {{ kstest.master.file.run }}
+    register: run_content
+
+  - name: Get test parameters
+    command: cat {{ run_content.stdout }}/{{ kstest.master.file.test_parameters }}
+    register: test_parameters
+  - debug:
+      var: test_parameters.stdout_lines
+
+  - name: Get current results
+    command: /home/{{ kstest_remote_user }}/{{ kstest.master.git_repo_dir }}/scripts/run_report.sh {{ run_content.stdout }}/{{ kstest.master.file.log }}
+    register: current_test_results
+  - debug:
+      var: current_test_results.stdout_lines
+
+  - name: Get test run start time
+    stat:
+      path: "{{ kstest.master.file.run }}"
+    register: st
+  - name: Compute consumed time
+    shell: run_time={{ st.stat.ctime }} ; date -u -d @$(( $(date +%s) - ${run_time%.*} )) +%T
+    register: computed_time
+  - debug:
+      var: computed_time.stdout
+

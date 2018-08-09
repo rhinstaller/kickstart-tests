@@ -15,37 +15,8 @@
 # License and may only be used or replicated with the express permission of
 # Red Hat, Inc.
 #
-# Red Hat Author(s): Vendula Poncova <vponcova@redhat.com>
-#
-from pylorax.monitor import LogRequestHandler
+# Red Hat Author(s): Martin Kolman <mkolman@redhat.com>
 
+TESTTYPE="packaging fedora-only"
 
-class VirtualLogRequestHandler(LogRequestHandler):
-
-    # Specify the error lines you want to ignore.
-    ignored_simple_tests = [
-        # "Call Trace:"
-    ]
-
-    # Specify error lines you want to add on top
-    # of the default ones contained in Lorax
-    added_simple_tests = [
-        "Payload setup error:",
-        "Out of memory:",
-        "The following group or module is missing:",
-        "Stream was not specified for a module",
-    ]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # add any additional error lines
-        self.simple_tests.extend(self.added_simple_tests)
-
-    def iserror(self, line):
-
-        # Skip ignored simple tests.
-        for t in self.ignored_simple_tests:
-            if t in line:
-                return
-
-        super().iserror(line)
+. ${KSTESTDIR}/functions.sh

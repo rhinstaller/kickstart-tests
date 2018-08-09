@@ -1,0 +1,29 @@
+#version=DEVEL
+#test name: module-ignoremissing
+#
+# what we are testing there:
+# - that missing modules are ignored if --ignoremissing is used
+# - that such an installation finishes successfully
+url @KSTEST_URL@
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+clearpart --all --initlabel
+autopart
+
+keyboard us
+lang en_US.UTF-8
+timezone America/New_York --utc
+rootpw testcase
+shutdown
+
+%packages --ignoremissing
+@fake-module:fakestream/fakeprofile
+%end
+
+%post
+# If we made it this far, assume it's a success
+echo SUCCESS > /root/RESULT
+%end

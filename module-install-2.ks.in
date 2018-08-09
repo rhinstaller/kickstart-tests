@@ -1,0 +1,82 @@
+#test name: module-install
+#
+# generic module install test:
+# - enable one module (different one this time)
+# - install a second module (different one this time)
+
+url @KSTEST_URL@
+repo --name=modular @KSTEST_MODULAR_URL@
+
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+module --name=django --stream=1.6
+
+%packages
+@^Fedora Server Edition
+@nodejs:10/default
+kernel
+vim
+%end
+
+%post
+# modules have some packages defined as their API in their profiles,
+# we can check for those to be (or not to be installed) to see if the
+# module has (or has not) been installed
+
+# the vim standalone package
+rpm -q vim-minimal
+if [[ $? != 0 ]]; then
+    echo '*** vim-minimal package requested but not installed' >> /root/RESULT
+fi
+
+# it is also nice to have kernel
+rpm -q kernel
+if [[ $? != 0 ]]; then
+    echo '*** kernel package not installed' >> /root/RESULT
+fi
+
+# the nodejs module should be just enabled, so the API package should *not*
+# be installed
+
+rpm -q nodejs
+if [[ $? != 0 ]]; then
+    echo '*** nodejs package for nodejs module not installed' >> /root/RESULT
+fi
+
+# the django module is installed, so it's API packages should be as well
+rpm -q python2-django
+if [[ $? == 0 ]]; then
+    echo '*** python2-django installed but django module should be just enabled' >> /root/RESULT
+fi
+
+# next we will check if the module is seen as enabled/installed from the
+# metadata/DNF point of view
+
+dnf module list --enabled django | grep django || echo "*** django module not marked as enabled" >> /root/RESULT
+dnf module list --enabled nodejs | grep nodejs || echo "*** nodejs module not marked as enabled" >> /root/RESULT
+dnf module list --installed nodejs | grep nodejs || echo "*** nodejs module not marked as installed" >> /root/RESULT
+
+if [ ! -f /root/RESULT ]
+then
+    # no result file (no errors) -> success
+    echo SUCCESS > /root/RESULT
+else
+    # some errors happened
+    exit 1
+fi
+
+
+
+%end

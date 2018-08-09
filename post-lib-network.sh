@@ -178,10 +178,4 @@ function check_hostname() {
     if [[ $? -ne 0 ]]; then
         echo "*** Failed check: ${hostname} is set in /etc/hostname" >> /root/RESULT
     fi
-
-    hostnamectl --static | grep -q "^${hostname}$"
-    if [[ $? -ne 0 ]]; then
-        echo "*** Failed check: hostnamectl --static returns ${hostname}" >> /root/RESULT
-    fi
-
 }

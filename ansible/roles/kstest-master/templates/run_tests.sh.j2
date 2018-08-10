@@ -55,6 +55,9 @@ if [[ "${GIT_PULL_KSTESTS}" != "no" ]]; then
   git pull
 fi
 
+GIT_REPO=$(git remote -v | grep fetch)
+GIT_BRANCH=$(git name-rev --name-only HEAD)
+
 # Set up parameters for test
 cat >> ${TEST_DEFAULTS_FILE} <<- EOF
 export TEST_REMOTES=${TEST_REMOTES}
@@ -86,6 +89,8 @@ BOOT_ISO_URL=${BOOT_ISO_URL}
 TEST_REMOTES=${TEST_REMOTES}
 TEST_JOBS=${TEST_JOBS}
 UPDATES_IMAGE=${UPDATES_IMAGE}
+GIT_REPO=${GIT_REPO}
+GIT_BRANCH=${GIT_BRANCH}
 EOF
 
 

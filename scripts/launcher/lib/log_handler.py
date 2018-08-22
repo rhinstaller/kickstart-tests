@@ -34,6 +34,8 @@ class VirtualLogRequestHandler(LogRequestHandler):
         "Out of memory:",
         "The following group or module is missing:",
         "Stream was not specified for a module",
+        "The following problem occurred on line",  # kickstart parsing error
+        "storage configuration failed:",
     ]
 
     def iserror(self, line):

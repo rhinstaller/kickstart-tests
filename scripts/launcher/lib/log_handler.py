@@ -29,17 +29,14 @@ class VirtualLogRequestHandler(LogRequestHandler):
 
     # Specify error lines you want to add on top
     # of the default ones contained in Lorax
-    added_simple_tests = [
+    simple_tests = LogRequestHandler.simple_tests + [
         "Payload setup error:",
         "Out of memory:",
         "The following group or module is missing:",
         "Stream was not specified for a module",
+        "The following problem occurred on line",  # kickstart parsing error
+        "storage configuration failed:",
     ]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # add any additional error lines
-        self.simple_tests.extend(self.added_simple_tests)
 
     def iserror(self, line):
 

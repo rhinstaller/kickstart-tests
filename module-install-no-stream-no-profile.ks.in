@@ -25,7 +25,7 @@ shutdown
 kernel
 vim
 @nodejs
-@postgresql
+#@postgresql
 @mongodb
 @mysql
 @gimp
@@ -58,15 +58,15 @@ if [[ $? == 0 ]]; then
     echo '*** nodejs-devel for module nodejs default profile installed' >> /root/RESULT
 fi
 
-rpm -q postgresql-server
-if [[ $? != 0 ]]; then
-    echo '*** postgresql-server for the postgresql module default profile not installed' >> /root/RESULT
-fi
+#rpm -q postgresql-server
+#if [[ $? != 0 ]]; then
+#    echo '*** postgresql-server for the postgresql module default profile not installed' >> /root/RESULT
+#fi
 
-rpm -q postgresql
-if [[ $? == 0 ]]; then
-    echo '*** postgresql for the postgresql module default profile installed' >> /root/RESULT
-fi
+#rpm -q postgresql
+#if [[ $? == 0 ]]; then
+#    echo '*** postgresql for the postgresql module default profile installed' >> /root/RESULT
+#fi
 
 rpm -q mongodb-server
 if [[ $? != 0 ]]; then
@@ -106,14 +106,14 @@ dnf module list
 
 # all installed modules should be also enabled
 dnf module list --enabled nodejs | grep nodejs || echo "nodejs module not marked as enabled" >> /root/RESULT
-dnf module list --enabled postgresql | grep postgresql  || echo "postgresql module not marked as enabled" >> /root/RESULT
+#dnf module list --enabled postgresql | grep postgresql  || echo "postgresql module not marked as enabled" >> /root/RESULT
 dnf module list --enabled mongodb | grep mongodb  || echo "mongodb module not marked as enabled" >> /root/RESULT
 dnf module list --enabled mysql | grep mysql || echo "mysql module not marked as enabled" >> /root/RESULT
 dnf module list --enabled gimp | grep gimp || echo "gimp module not marked as enabled" >> /root/RESULT
 
 # check all modules are also marked as installed with the correct profile
 dnf module list --installed nodejs | grep "default \[i\]" && echo "nodejs module profile not marked as installed" >> /root/RESULT
-dnf module list --installed postgresql | grep "default \[i\]" && echo "postgresql module profile not marked as installed" >> /root/RESULT
+#dnf module list --installed postgresql | grep "default \[i\]" && echo "postgresql module profile not marked as installed" >> /root/RESULT
 dnf module list --installed mongodb | grep "default \[i\]" && echo "mongodb profile not marked as installed" >> /root/RESULT
 dnf module list --installed mysql | grep "default \[i\]" && echo "mysql module profile not marked as installed" >> /root/RESULT
 dnf module list --installed gimp | grep "default \[i\]"&& echo "gimp module profile not marked as installed" >> /root/RESULT

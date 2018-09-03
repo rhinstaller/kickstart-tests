@@ -28,12 +28,11 @@ timezone America/New_York
 rootpw qweqwe
 shutdown
 
-module --name=nodejs --stream=10
+module --name=cri-o --stream=2018.0
 
 %packages
 @^Fedora Server Edition
-# lets use a no-default profile to see if it is correctly set afterwards
-@nodejs:8/development
+@cri-o:1.11/default
 kernel
 vim
 %end
@@ -56,18 +55,18 @@ if [[ $? != 0 ]]; then
 fi
 
 # module should be just enabled due to the miss-match
-rpm -q nodejs
+rpm -q cri-o
 if [[ $? != 0 ]]; then
-    echo '*** nodejs package for nodejs module should be installed' >> /root/RESULT
+    echo '*** cri-o package for cri-o module should be installed' >> /root/RESULT
 fi
 
 # next we will check if the module is seen as enabled/installed from the
 # metadata/DNF point of view
-dnf module list --enabled nodejs | grep nodejs || echo "*** nodejs module not marked as enabled" >> /root/RESULT
-dnf module list --installed nodejs | grep nodejs || echo "*** nodejs module not marked as installed" >> /root/RESULT
+dnf module list --enabled cri-o | grep cri-o || echo "*** cri-o module not marked as enabled" >> /root/RESULT
+dnf module list --installed cri-o | grep cri-o || echo "*** cri-o module not marked as installed" >> /root/RESULT
 
 # check the stream
-dnf module list --enabled nodejs | grep "8 \[e\]" || echo "*** nodejs stream id 8 not marked as enabled (stream id from packages section should win)" >> /root/RESULT
+dnf module list --enabled cri-o | grep "2018.0 \[e\]" || echo "*** cri-o stream id 2018.0 not marked as enabled (stream id from packages section should win)" >> /root/RESULT
 
 if [ ! -f /root/RESULT ]
 then

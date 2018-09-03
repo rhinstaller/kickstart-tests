@@ -22,7 +22,8 @@ shutdown
 @^Fedora Server Edition
 @nodejs:10/default
 @django:1.6/default
-@postgresql:9.6/default
+#@postgresql:9.6/default
+#@mariadb:10.1/default
 @mysql:5.7/default
 @scala:2.10/default
 @gimp:2.10/default
@@ -57,10 +58,20 @@ if [[ $? != 0 ]]; then
     echo '*** python2-django for the django module not installed' >> /root/RESULT
 fi
 
-rpm -q postgresql
-if [[ $? != 0 ]]; then
-    echo '*** postgresql for the postgresql module not installed' >> /root/RESULT
-fi
+#rpm -q postgresql
+#if [[ $? != 0 ]]; then
+#    echo '*** postgresql for the postgresql module not installed' >> /root/RESULT
+#fi
+
+#rpm -q mariadb
+#if [[ $? != 0 ]]; then
+#    echo '*** mariadb for the mariadb module not installed' >> /root/RESULT
+#fi
+
+#rpm -q mariadb-server
+#if [[ $? != 0 ]]; then
+#    echo '*** mariadb-server for the mariadb module not installed' >> /root/RESULT
+#fi
 
 rpm -q community-mysql
 if [[ $? != 0 ]]; then
@@ -86,7 +97,8 @@ dnf module list
 # all installed modules should be also enabled
 dnf module list --enabled django | grep django || echo "*** django module not marked as enabled" >> /root/RESULT
 dnf module list --enabled nodejs | grep nodejs || echo "*** nodejs module not marked as enabled" >> /root/RESULT
-dnf module list --enabled postgresql | grep postgresql  || echo "*** postgresql module not marked as enabled" >> /root/RESULT
+#dnf module list --enabled postgresql | grep postgresql  || echo "*** postgresql module not marked as enabled" >> /root/RESULT
+#dnf module list --enabled mariadb | grep mariadb || echo "*** mariadb module not marked as enabled" >> /root/RESULT
 dnf module list --enabled mysql | grep mysql || echo "*** mysql module not marked as enabled" >> /root/RESULT
 dnf module list --enabled scala | grep scala  || echo "*** scala module not marked as enabled" >> /root/RESULT
 dnf module list --enabled gimp | grep gimp  || echo "*** gimp module not marked as enabled" >> /root/RESULT
@@ -94,11 +106,20 @@ dnf module list --enabled gimp | grep gimp  || echo "*** gimp module not marked 
 # check all modules are also marked as installed
 dnf module list --installed django | grep django || echo "*** django module not marked as installed" >> /root/RESULT
 dnf module list --installed nodejs | grep nodejs || echo "*** nodejs module not marked as installed" >> /root/RESULT
-dnf module list --installed postgresql | grep postgresql  || echo "*** postgresql module not marked as installed" >> /root/RESULT
+#dnf module list --installed postgresql | grep postgresql  || echo "*** postgresql module not marked as installed" >> /root/RESULT
+#dnf module list --installed mariadb | grep mariadb || echo "*** mariadb module not marked as installed" >> /root/RESULT
 dnf module list --installed mysql | grep mysql || echo "*** mysql module not marked as installed" >> /root/RESULT
 dnf module list --installed scala | grep scala  || echo "*** scala module not marked as installed" >> /root/RESULT
 dnf module list --installed gimp | grep gimp  || echo "*** gimp module not marked as installed" >> /root/RESULT
 
+# check the stream and profile as well
+dnf module list --installed django | grep "default \[i\]" || echo "*** django module default profile not marked as installed" >> /root/RESULT
+dnf module list --installed nodejs | grep "default \[i\]" || echo "*** nodejs module default profile not marked as installed" >> /root/RESULT
+#dnf module list --installed postgresq | grep "default \[i\]" || echo "*** postgresql module default profile not marked as installed" >> /root/RESULT
+#dnf module list --installed mariadb | grep "default \[i\]" || echo "*** mariadb module default profile not marked as installed" >> /root/RESULT
+dnf module list --installed mysql | grep "default \[i\]" || echo "*** mysql module default profile not marked as installed" >> /root/RESULT
+dnf module list --installed scala grep "default \[i\]" || echo "*** scala module default profile not marked as installed" >> /root/RESULT
+dnf module list --installed gimp | grep "default \[i\]" || echo "*** gimp module default profile not marked as installed" >> /root/RESULT
 
 if [ ! -f /root/RESULT ]
 then

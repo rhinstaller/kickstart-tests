@@ -20,6 +20,7 @@
       - python3-libvirt # kstests
       - libguestfs-tools # kstests
       - vim
+      - rsync
     state: latest
 
 - name: Install kernel-modules (reboot if updated)

@@ -61,7 +61,7 @@ class VirtualInstall(object):
     """
     Run virt-install using an iso and a kickstart
     """
-    def __init__(self, iso, ks_paths, disk_paths, log_check,
+    def __init__(self, test_name, iso, ks_paths, disk_paths, log_check,
                  kernel_args=None, vcpu_count=1, memory=1024, vnc=None,
                  virtio_host="127.0.0.1", virtio_port=6080,
                  nics=None, boot=None):
@@ -86,7 +86,7 @@ class VirtualInstall(object):
         """
         super().__init__()
 
-        self._virt_name = "LiveOS-" + str(uuid.uuid4())
+        self._virt_name = "kstest-" + test_name + "_(" + str(uuid.uuid4()) + ")"
         self._iso = iso
         self._ks_paths = ks_paths
         self._disk_paths = disk_paths
@@ -237,7 +237,8 @@ class VirtualManager(object):
 
         try:
             log.info("Starting virtual machine")
-            virt = VirtualInstall(iso_mount, self._conf.ks_paths,
+            virt = VirtualInstall(self._conf.test_name,
+                                  iso_mount, self._conf.ks_paths,
                                   disk_paths=self._conf.disk_paths,
                                   kernel_args=kernel_args,
                                   vcpu_count=self._conf.vcpu_count,

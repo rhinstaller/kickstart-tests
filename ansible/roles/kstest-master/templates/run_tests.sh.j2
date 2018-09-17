@@ -26,13 +26,23 @@ HOME_DIR=/home/${KSTEST_USER}
 KSTEST_REPO_PATH=${HOME_DIR}/${KSTEST_REPO_DIR}
 RESULTS_PATH=${HOME_DIR}/${RESULTS_DIR}
 BOOT_ISO=boot.kstest.iso
-ISOMD5SUM_FILENAME=isomd5sum.txt
-RESULT_REPORT_FILENAME=result_report.txt
-# Test run id
+ISOMD5SUM_FILENAME={{ kstest.master.file.isomd5sum }}
+RESULT_REPORT_FILENAME={{ kstest.master.file.result_report }}
+TEST_PARAMETERS_FILENAME={{ kstest.master.file.test_parameters }}
+LOG_FILENAME={{ kstest.master.file.log }}
+RUN_FILENAME={{ kstest.master.file.run }}
 
+# Test run id
 START_TIME=$(date +%F-%H_%M_%S)
 
 TIME_OF_START=$(date +%s)
+
+### Check run file (indicates a test is running)
+
+if [[ -f ${RUN_FILENAME} ]]; then
+    echo "A test seems to be already running, ${RUN_FILENAME} exists" >2
+    exit 1
+fi
 
 
 ### Create results directories
@@ -41,6 +51,17 @@ RESULTS_RUN_PATH="${RESULTS_PATH}/runs"
 if [ ! -d ${RESULTS_RUN_PATH} ]; then
     mkdir -p ${RESULTS_RUN_PATH}
 fi
+
+
+### Create this test result dir
+
+RESULT_PATH="${RESULTS_RUN_PATH}/${START_TIME}"
+mkdir ${RESULT_PATH}
+
+
+### Create run file
+
+echo ${RESULT_PATH} > ${RUN_FILENAME}
 
 
 ### Cd to repository dir
@@ -71,11 +92,6 @@ if [[ -n "${KSTEST_FTP_URL}" ]]; then
     echo "export KSTEST_FTP_URL=${KSTEST_FTP_URL}" >> ${TEST_DEFAULTS_FILE}
 fi
 
-
-### Create this test result dir
-
-RESULT_PATH="${RESULTS_RUN_PATH}/${START_TIME}"
-mkdir ${RESULT_PATH}
 
 TIME_OF_UPDATING_REPO=$(date +%s)
 
@@ -126,7 +142,7 @@ fi
 
 ### Run the test
 
-RESULT_LOG="${RESULT_PATH}/kstest.log"
+RESULT_LOG="${RESULT_PATH}/${LOG_FILENAME}"
 scripts/run_kickstart_tests.sh -i ${BOOT_ISO} -k 1 ${UPDATES_IMAGE_ARG} ${TEST_TYPE_ARG} ${KSTESTS} 2>&1 | tee ${RESULT_LOG}
 
 
@@ -178,6 +194,11 @@ for timevar in $(awk -F"=" '/^TIME_OF_*/ {print $1}' $0); do
 done
 # Update test parameters with time info
 echo "# Time consumed: ${TINFO}" >> ${TEST_PARAMETERS_FILE}
+
+
+### Remove run file
+
+rm ${RUN_FILENAME}
 
 
 ### Sync results to remote host

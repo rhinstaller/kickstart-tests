@@ -1,0 +1,11 @@
+---
+- hosts:
+    kstest
+  become: true
+  become_user: root
+
+  tasks:
+  - name: Update all packages
+    dnf:
+      name: "*"
+      state: latest

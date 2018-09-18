@@ -1,0 +1,19 @@
+---
+- hosts:
+    kstest
+  become: true
+  become_user: root
+
+  tasks:
+  - name: Find kickstart test results
+    find:
+      paths: /var/tmp
+      patterns: "kstest-*"
+      file_type: any
+    register: wildcard_items_to_delete
+
+  - name: Femove kickstart test results
+    file:
+      path: "{{ item.path }}"
+      state: absent
+    with_items: "{{ wildcard_items_to_delete.files }}"

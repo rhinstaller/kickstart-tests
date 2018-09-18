@@ -1,0 +1,14 @@
+---
+- hosts:
+    kstest
+  become: true
+  become_user: root
+
+  tasks:
+  - name: List available images
+    shell: ls -lh install_images
+    args:
+      chdir: /home/kstest
+    register: available_images
+  - debug:
+      var: available_images.stdout_lines

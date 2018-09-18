@@ -361,6 +361,7 @@ if [[ "$TEST_REMOTES" != "" ]]; then
              sudo PYTHONPATH=$PYTHONPATH scripts/launcher/run_one_test.py \
                                                                -i ../install_images/${_IMAGE} \
                                                                -k ${KEEPIT} \
+                                                               --append-host-id \
                                                                ${UPDATES_ARG} ${BOOT_ARG} {} ::: ${tests}
     rc=$?
     cd -
@@ -390,6 +391,7 @@ else
         sudo PYTHONPATH=$PYTHONPATH scripts/launcher/run_one_test.py \
                                                       -i ${IMAGE} \
                                                       -k ${KEEPIT} \
+                                                      --append-host-id \
                                                       ${UPDATES_ARG} ${BOOT_ARG} {} ::: ${tests}
     rc=$?
 fi

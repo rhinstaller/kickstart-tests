@@ -35,6 +35,7 @@
 import os
 import shutil
 import subprocess
+import socket
 
 from lib.temp_manager import TempManager
 from lib.configuration import RunnerConfiguration, VirtualConfiguration
@@ -55,10 +56,21 @@ class Runner(object):
         self._ks_file = None
 
         self._shell = ShellLauncher(configuration, tmp_dir)
-        self._result_formatter = ResultFormatter(self._conf.ks_test_name)
+        self._result_formatter = ResultFormatter(self._conf.ks_test_name, host_id=self.host_id)
         # test prepare function can change place of the kickstart test
         # so the validator will be set later
         self._validator = None
+
+    @property
+    def host_id(self):
+        """Return a show string identifying the host where the test is running.
+
+        This is currently simply the hostname.
+
+        :return: a test runner describing string
+        :rtype: str
+        """
+        return socket.gethostname()
 
     def _prepare_test(self):
         log.debug("Preparing test")

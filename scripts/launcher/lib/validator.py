@@ -34,16 +34,18 @@ def replace_new_lines(line):
 
 class ResultFormatter(object):
 
-    def __init__(self, test_name):
+    def __init__(self, test_name, host_id=""):
         super().__init__()
 
         self._test_name = test_name
+        self._host_id = host_id
 
     def format_result(self, result, msg):
         text_result = "SUCCESS" if result else "FAILED"
-        msg = "RESULT:{name}:{result}:{message}".format(name=self._test_name,
-                                                        result=text_result,
-                                                        message=msg)
+        msg = "RESULT:{name}:{host_id}:{result}:{message}".format(name=self._test_name,
+                                                            host_id=self._host_id,
+                                                            result=text_result,
+                                                            message=msg)
         return msg
 
     def report_result(self, result, msg):

@@ -52,6 +52,7 @@ class RunnerConfiguration(object):
         self._image_path = ""
         self._keep_option = KeepLevel.NOTHING
         self._updates_img_path = ""
+        self._append_host_id = False
 
     def _confiure_parser(self):
         self._parser.add_argument("kickstart_test", metavar="KS test controller",
@@ -70,6 +71,9 @@ class RunnerConfiguration(object):
         self._parser.add_argument("--updates", '-u', metavar="Path",
                                   type=str, dest="updates_path",
                                   help="Updates image path used in the test")
+        self._parser.add_argument("--append-host-id", default=False, action="store_true",
+                                  dest="append_host_id",
+                                  help="append an id of the host running the test to the result")
 
     @property
     def shell_test_path(self):
@@ -103,6 +107,10 @@ class RunnerConfiguration(object):
     def script_path(self):
         return os.path.dirname(os.path.realpath(__file__))
 
+    @property
+    def append_host_id(self):
+        return self._append_host_id
+
     def process_argument(self):
         ns = self._parser.parse_args()
 
@@ -121,6 +129,9 @@ class RunnerConfiguration(object):
 
         if ns.updates_path:
             self._updates_img_path = ns.updates_path
+
+        if ns.append_host_id:
+            self._append_host_id = ns.append_host_id
 
         self._check_arguments()
 

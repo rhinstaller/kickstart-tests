@@ -1,0 +1,53 @@
+#test name: autopart-luks-1
+
+url @KSTEST_URL@
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+clearpart --all --initlabel
+
+# Test LUKS 1.
+autopart --type=lvm --encrypted --passphrase="passphrase" --luks-version=luks1
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+%post
+
+# Set the crypted device.
+crypted="/dev/sda2"
+
+# Check if the type of /dev/sda2 is crypto_LUKS.
+type="$(blkid -o value -s TYPE ${crypted})"
+
+if [[ "$type" != "crypto_LUKS" ]] ; then
+    echo "*** unexpected type ${type} of ${crypted}" > /root/RESULT
+    exit 1
+fi
+
+# Check if the LUKS version of /dev/sda2 is luks1.
+result="$(cryptsetup luksDump ${crypted} | awk '{ if ($1 == "Version:") print $2; }' )"
+
+if [[ "$result" != "1" ]] ; then
+    echo "*** unexpected LUKS version for ${crypted}: ${result}" > /root/RESULT
+    exit 1
+fi
+
+# Try to use the passphrase.
+echo "passphrase" | cryptsetup luksOpen --test-passphrase "${crypted}"
+
+if [[ $? != 0 ]] ; then
+    echo "*** cannot open ${crypted} with the passphrase" > /root/RESULT
+    exit 1
+fi
+
+echo 'SUCCESS' > /root/RESULT
+%end

@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Vendula Poncova <vponcova@redhat.com>
 
-TESTTYPE="storage partition luks"
+TESTTYPE="knownfailure storage partition luks"
 
 . ${KSTESTDIR}/functions.sh
 

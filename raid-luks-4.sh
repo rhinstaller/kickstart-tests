@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Vendula Poncova <vponcova@redhat.com>
 
-TESTTYPE="storage raid luks"
+TESTTYPE="knownfailure storage raid luks"
 
 . ${KSTESTDIR}/functions.sh
 

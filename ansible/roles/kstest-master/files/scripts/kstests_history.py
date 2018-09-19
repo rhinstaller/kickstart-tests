@@ -3,20 +3,39 @@
 import os
 import sys
 import re
+from argparse import ArgumentParser
 
-if len(sys.argv) < 4:
-    print("usage: {} PATH_TO_RESULTS REPORT_FILENAME ISOMD5SUM_FILENAME".format(sys.argv[0]))
-    exit(1)
-else:
-    RESULTS_PATH = sys.argv[1]
-    REPORT_FILENAME = sys.argv[2]
-    MD5SUM_FILENAME = sys.argv[3]
+parser = ArgumentParser(description="""
+Create summary html page from directory containing results of kickstart test runs.
+""")
+
+parser.add_argument("runs_directory", metavar="RUNS_DIRECTORY", type=str,
+                    help="Directory containing kickstart test runs data")
+parser.add_argument("--report_filename", "-r", metavar="REPORT_FILENAME", type=str,
+                    default="result_report.txt", help="Name of the file with run result report")
+parser.add_argument("--isomd5sum_filename", "-m", metavar="ISO_MD5_SUM_FILENAME", type=str,
+                    default="isomd5sum.txt", help="Name of the file with md5 sum of boot iso")
+parser.add_argument("--status_count", "-s", metavar="NUMBER_OF_LATEST_RESULTS", type=int,
+                    default=3, help="Number of latest results to be used for status")
+
+args = parser.parse_args()
+
+results_path = args.runs_directory
+report_filename = args.report_filename
+md5sum_filename = args.isomd5sum_filename
+history_length = args.status_count
 
 header_row = [" "]
 tests = {}
+
+history_data = {}
+HISTORY_SUCCESS = 0
+HISTORY_FAILED = 1
+HISTORY_UNKNOWN = 2
+
 ANACONDA_VER_RE = re.compile(r'.*main:\s*/sbin/anaconda\s*(.*)')
 
-RESULTS_DIR=os.path.basename(RESULTS_PATH)
+results_dir = os.path.basename(results_path)
 
 def get_anconda_ver(result_path):
     anaconda_log = os.path.join(result_path, "anaconda/anaconda.log")
@@ -29,11 +48,11 @@ def get_anconda_ver(result_path):
 
 count = 0
 old_isomd5 = ""
-for result_dir in sorted(os.listdir(RESULTS_PATH)):
+for result_dir in sorted(os.listdir(results_path)):
     count = count + 1
-    result_path = os.path.join(RESULTS_PATH, result_dir)
+    result_path = os.path.join(results_path, result_dir)
 
-    report_file = os.path.join(result_path, REPORT_FILENAME)
+    report_file = os.path.join(result_path, report_filename)
     if not os.path.exists(report_file):
         print("No {} found, skipping".format(report_file), file=sys.stderr)
         continue
@@ -43,6 +62,7 @@ for result_dir in sorted(os.listdir(RESULTS_PATH)):
     with open(report_file) as f:
         for test, results in tests.items():
             results.append(" ")
+            history_data[test].append(HISTORY_UNKNOWN)
         state = "start"
         for line in f.readlines():
             if state == "start":
@@ -77,34 +97,51 @@ for result_dir in sorted(os.listdir(RESULTS_PATH)):
 
                 if not test in tests:
                     tests[test] = [" "] * count
-
+                    history_data[test] = [HISTORY_UNKNOWN] * count
                 ref = ""
                 test_log_dirs = [d for d in os.listdir(result_path) if d.startswith("kstest-{}.".format(test))]
                 if test_log_dirs:
-                    ref = "{}/{}/{}".format(RESULTS_DIR, result_dir, test_log_dirs[0])
+                    ref = "{}/{}/{}".format(results_dir, result_dir, test_log_dirs[0])
                     if not anaconda_ver:
-                        res_path = os.path.join(RESULTS_PATH, result_dir, test_log_dirs[0])
+                        res_path = os.path.join(results_path, result_dir, test_log_dirs[0])
                         anaconda_ver = get_anconda_ver(res_path)
                 tests[test].pop()
                 tests[test].append("<a href={}>{}</a> {}".format(ref, result, detail))
 
-    with open(os.path.join(result_path, MD5SUM_FILENAME), "r") as f:
+                if result == "SUCCESS":
+                    history_data[test].pop()
+                    history_data[test].append(HISTORY_SUCCESS)
+                elif result == "FAILED":
+                    if not detail:
+                        history_data[test].pop()
+                        history_data[test].append(HISTORY_FAILED)
+
+    with open(os.path.join(result_path, md5sum_filename), "r") as f:
         isomd5 = f.read()
-    header_row.append("<a href=\"{}/{}\">{}</a></br>{}</br>{}".format(RESULTS_DIR, result_dir, result_dir, anaconda_ver,
+    header_row.append("<a href=\"{}/{}\">{}</a></br>{}</br>{}".format(results_dir, result_dir, result_dir, anaconda_ver,
                                                                       "[NEW ISO]" if isomd5 != old_isomd5 else "-"))
     old_isomd5 = isomd5
 
 thead = """
 <tr>
 {}
+<td>STATUS from last {} runs</td>
 </tr>
-""".format("\n".join(["<td>{}</td>".format(label) for label in header_row]))
+""".format("\n".join(["<td>{}</td>".format(label) for label in header_row]), history_length)
 
 rows = []
 for test in sorted(tests):
+    current_history = history_data[test][-history_length:]
+    worth_looking_failed = HISTORY_FAILED in current_history
+    worth_looking_no_success = HISTORY_SUCCESS not in current_history
     cols = ["<td>{}</td>".format(result) for result in tests[test]]
     cols.insert(0, "<td>{}</td>".format(test))
-    cols.append("<td>{}</td>".format(test))
+    if worth_looking_failed:
+        cols.append("<td bgcolor=\"#ff3e00\">{}</td>".format(test))
+    elif worth_looking_no_success:
+        cols.append("<td bgcolor=\"#ffc500\">{}</td>".format(test))
+    else:
+        cols.append("<td>{}</td>".format(test))
     row = "<tr>{}</tr>".format("".join(cols))
     rows.append(row)
 

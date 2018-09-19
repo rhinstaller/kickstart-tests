@@ -75,9 +75,9 @@ for result_dir in sorted(os.listdir(results_path)):
                 detail = ""
                 sline = line.split("|")
                 test = sline[0].strip()
-                result = sline[1].strip()
+                result = sline[-2].strip()
                 if result == "FAILED":
-                    expl = sline[2].strip()
+                    expl = sline[-1].strip()
                     if "does not exist" in expl:
                         detail = "NEXIST"
                     elif expl.endswith("FAILED:"):

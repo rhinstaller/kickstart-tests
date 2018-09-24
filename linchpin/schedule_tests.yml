@@ -1,0 +1,9 @@
+---
+
+- hosts: localhost
+  become: false
+
+  roles:
+   - role: schedule
+     vars:
+       action: schedule

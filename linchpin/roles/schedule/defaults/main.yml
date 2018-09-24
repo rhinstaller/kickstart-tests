@@ -1,0 +1,17 @@
+---
+
+# Each test_id has its own timer, service and script to be run
+# to manage multiple tests from single host.
+test_id: 1
+
+# The path to the git repository from which the tests should be run.
+# If not defined, assumes running the playbook from the git repository root.
+#git_repo_path: "/path/to/kickstart-tests/git/repo"
+
+# Path to linchpin virtualenv
+virtualenv_linchpin_path: "/path/to/bin/activate"
+
+# When the test should be run (systemd OnCalendar value)
+systemd_on_calendar: "daily"
+#systemd_on_calendar: "*-*-* 00:00:00"
+#systemd_on_calendar: "Mon,Tue,Wed,Thu,Fri *-*-* 00:00:00"

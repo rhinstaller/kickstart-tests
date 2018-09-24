@@ -1,0 +1,9 @@
+---
+run_script_name: run_scheduled_tests-{{ test_id }}.sh
+log_file_name: run_scheduled_tests-{{ test_id }}.log
+service_name: kstests-cloud-{{ test_id }}
+systemd_dir_path: "{{ ansible_env['HOME'] }}/.config/systemd/user"
+run_script_dir_path: "{{ git_repo_path | default(playbook_dir.split('/')[0:-1]|join('/')) }}"
+run_script_path: "{{ run_script_dir_path }}/{{ run_script_name }}"
+service_file_path: "{{ systemd_dir_path }}/{{ service_name }}.service"
+timer_file_path: "{{ systemd_dir_path }}/{{ service_name }}.timer"

@@ -1,0 +1,9 @@
+[Unit]
+Description=Runs scheduled kickstart tests in cloud
+
+[Timer]
+OnCalendar={{ systemd_on_calendar }}
+Unit=kstests-cloud-{{ test_id }}.service
+
+[Install]
+WantedBy=default.target

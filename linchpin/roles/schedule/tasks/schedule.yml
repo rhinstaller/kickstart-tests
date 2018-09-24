@@ -1,0 +1,33 @@
+---
+
+- name: Create run script
+  template:
+    src: run_scheduled_tests.sh.j2
+    dest: "{{ run_script_path }}"
+    mode: 0755
+
+- name: Ensure user systemd directory exists
+  file:
+    path: "{{ systemd_dir_path }}"
+    state: directory
+    mode: 0775
+
+- name: Create systemd user service {{ service_file_path }} to run the script
+  template:
+    src: kstests-cloud.service.j2
+    dest: "{{ service_file_path }}"
+    mode: 0664
+
+- name: Create user timer {{ timer_file_path }} to run the service
+  template:
+    src: kstests-cloud.timer.j2
+    dest: "{{ timer_file_path }}"
+    mode: 0664
+
+- name: Restart the timer
+  systemd:
+    name: "{{ service_name }}.timer"
+    user: yes
+    state: restarted
+    enabled: yes
+    daemon_reload: yes

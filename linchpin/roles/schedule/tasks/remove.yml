@@ -1,0 +1,24 @@
+---
+
+- name: Remove the service file {{ service_file_path }}
+  file:
+    state: absent
+    path: "{{ service_file_path }}"
+
+- name: Stop the timer
+  systemd:
+    name: "{{ service_name }}.timer"
+    user: yes
+    state: stopped
+    enabled: no
+    daemon_reload: yes
+
+- name: Remove the timer file {{ timer_file_path }}
+  file:
+    state: absent
+    path: "{{ timer_file_path }}"
+
+- name: Remove the run script {{ run_script_path }}
+  file:
+    state: absent
+    path: "{{ run_script_path }}"

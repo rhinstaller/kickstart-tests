@@ -163,6 +163,7 @@ cd -
 
 # Fixup permissions
 sudo chown -R ${KSTEST_USER}:${KSTEST_USER} /var/tmp/kstest-*
+sudo chmod -R a+r /var/tmp/kstest-*
 # Clean up
 find /var/tmp/kstest-* -name "*.iso" -delete
 find /var/tmp/kstest-* -name "*.img" -delete

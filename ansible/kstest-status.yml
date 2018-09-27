@@ -24,7 +24,7 @@
   - include_vars: roles/kstest-master/vars/main.yml
 
   - name: Find current results path
-    command: cat {{ kstest.master.file.run }}
+    command: cat /home/{{ kstest_remote_user }}/{{ kstest.master.file.run }}
     register: run_content
 
   - name: Get test parameters
@@ -41,7 +41,7 @@
 
   - name: Get test run start time
     stat:
-      path: "{{ kstest.master.file.run }}"
+      path: /home/{{ kstest_remote_user }}/{{ kstest.master.file.run }}
     register: st
   - name: Compute consumed time
     shell: run_time={{ st.stat.ctime }} ; date -u -d @$(( $(date +%s) - ${run_time%.*} )) +%T

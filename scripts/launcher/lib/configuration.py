@@ -53,6 +53,7 @@ class RunnerConfiguration(object):
         self._keep_option = KeepLevel.NOTHING
         self._updates_img_path = ""
         self._append_host_id = False
+        self._hung_task_timeout_secs = 1200
 
     def _confiure_parser(self):
         self._parser.add_argument("kickstart_test", metavar="KS test controller",
@@ -110,6 +111,10 @@ class RunnerConfiguration(object):
     @property
     def append_host_id(self):
         return self._append_host_id
+
+    @property
+    def hung_task_timeout_secs(self):
+        return self._hung_task_timeout_secs
 
     def process_argument(self):
         ns = self._parser.parse_args()

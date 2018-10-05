@@ -105,6 +105,10 @@ class Runner(object):
         if self._conf.updates_img_path:
             kernel_args += " inst.updates={}".format(self._conf.updates_img_path)
 
+        if self._conf.hung_task_timoeout_secs:
+            kernel_args += " inst.kernel.hung_task_timeout_secs={}".format(
+                self._conf.hung_task_timoeut_secs)
+
         disk_args = self._shell.prepare_disks()
         nics_args = self._shell.prepare_network()
         boot_args = self._shell.boot_args()

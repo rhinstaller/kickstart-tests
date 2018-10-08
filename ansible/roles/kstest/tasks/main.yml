@@ -6,6 +6,7 @@
   dnf:
     name:
       - "@virtualization"
+      - libusbx
     state: latest
 
 - name: Install packages

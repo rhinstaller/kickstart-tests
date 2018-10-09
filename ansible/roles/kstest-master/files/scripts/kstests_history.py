@@ -134,9 +134,13 @@ for test in sorted(tests):
     current_history = history_data[test][-history_length:]
     worth_looking_failed = HISTORY_FAILED in current_history
     worth_looking_no_success = HISTORY_SUCCESS not in current_history
+    new_failed = HISTORY_FAILED not in current_history[:-1] \
+        and current_history[-1] == HISTORY_FAILED
     cols = ["<td>{}</td>".format(result) for result in tests[test]]
     cols.insert(0, "<td>{}</td>".format(test))
-    if worth_looking_failed:
+    if new_failed:
+        cols.append("<td bgcolor=\"#ff00dc\">{}</td>".format(test))
+    elif worth_looking_failed:
         cols.append("<td bgcolor=\"#ff3e00\">{}</td>".format(test))
     elif worth_looking_no_success:
         cols.append("<td bgcolor=\"#ffc500\">{}</td>".format(test))

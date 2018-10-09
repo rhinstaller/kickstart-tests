@@ -31,7 +31,8 @@ check_gui_configurations ens3 ens4 ens5
 
 @KSINCLUDE@ post-lib-network.sh
 
-if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
+# NOTE: we don't have rhel7 currently, just rhel
+if [[ "@KSTEST_OS_NAME@" == "rhel7" ]]; then
     check_device_ifcfg_value ens4 BOOTPROTO none
     # BOOTPROTO is removed from the ifcfg when real ONBOOT value is updated via NM api
     check_ifcfg_key_exists ens5 BOOTPROTO no

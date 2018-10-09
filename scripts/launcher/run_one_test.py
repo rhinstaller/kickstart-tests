@@ -126,7 +126,7 @@ class Runner(object):
         v_conf.log_path = os.path.join(self._tmp_dir, "livemedia.log")
         v_conf.vnc = "vnc"
         v_conf.boot_image = boot_args
-        v_conf.timeout = 60
+        v_conf.timeout = 120
         v_conf.disk_paths = disk_args
         v_conf.networks = nics_args
 

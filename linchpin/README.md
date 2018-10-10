@@ -36,12 +36,12 @@ Configuration
 
 * The provisioning parameters (image, host flavor, etc...) are configured in [topologies/kstests.yml](topologies/kstests.yml).
 
-Example: a test run from a local host on remote hosts in a cloud
-----------------------------------------------------------------
+Example 1: a test run from a local host on remote hosts in a cloud
+------------------------------------------------------------------
 
 The test will be run from local host on `kstest` hosts provisioned with `linchpin` and deployed with `kstest` ansible playbook.
 
-* The cloud credentials and number of `kstest` instances should be configured as described above in [Configuration](#configuration). There is no need for `kstest-master` instance.
+* The cloud credentials and number of `kstest` instances should be configured as described above in [Credentials](#credentials) and [Configuration](#configuration). There is no need for `kstest-master` instance.
 * Ansible and the deployment playbook should be configured as described in [kstest](../ansible/roles/kstest#remote-hosts-deployment) role
 
 From the `kickstart-tests` directory provision and deploy remote hosts (`kstest` instances):
@@ -70,15 +70,15 @@ To remove the hosts from the cloud:
 ```
 $ linchpin -v --creds-path <PATH_TO_CREDENTIALS> --workspace linchpin -p linchpin/PinFile -c linchpin/linchpin.conf destroy
 ```
-Example: a test run completely in a cloud
------------------------------------------
+Example 2: a test run completely in a cloud
+-------------------------------------------
 
 The test will be run from `kstest-master` on the master and additional `kstest` hosts.
 
-* The cloud credentials and number of `kstest` instances should be configured as described above.
+* The cloud credentials and number of `kstest` instances should be configured as described above in [Credentials](#credentials) and [Configuration](#configuration).
 * Ansible and the deployment playbooks should be configured as described in [../ansible/README.md](../ansible/README.md)
 * The test parameters can be configured as described in [kstest-master](../ansible/roles/kstest-master) role.
-  * either by modifying the ansible variables file before running the `kstest-master.yml` playbook in the script
+  * either by modifying the [ansible variables file](../ansible/roles/kstest-master/defaults/main.yml) before running the `kstest-master.yml` playbook in the script
   * or by supplying the values via `--extra-vars` option to the `kstest-master.yml` playbook in the script
 
 Example of a script that would be run from kickstart-tests repository directory.
@@ -115,3 +115,48 @@ linchpin -v --creds-path <PATH_TO_CREDENTIALS> --workspace linchpin -p linchpin/
 ```
 
 The script updated with configuration checks and hints: [../run_tests_in_cloud.sh](../run_tests_in_cloud.sh)
+
+Example 3: scheduling tests run completely in cloud
+---------------------------------------------------
+
+To schedule tests in cloud, two approaches can be used.
+
+### 3A: One-shot test runners provisioned for test scheduled from local host
+
+The runners are provisioned when the test scheduled (using user systemd timer) from local host is run and are destroyed after the test finishes.
+
+* Configure runners provisioning with linchpin as described above in [Credentials](#credentials) and [Configuration](#configuration).
+* Configure the test and syncing to remote host (`kstest_remote_results_path` variable) with kstest-master role [test config](../ansible/roles/kstest-master/defaults/main.yml).
+```
+vim ansible/roles/kstest-master/defaults/main.yml
+```
+* Schedule the test from local host using [`schedule_tests.yml`](schedule_tests.yml) playbook and its [configuration file](roles/schedule/defaults/main.yml):
+```
+vim linchpin/roles/schedule/defaults/main.yml
+ansible-playbook linchpin/schedule_tests.yml
+```
+
+* To disable the scheduled test and clean up created files run
+```
+ansible-playbook linchpin/remove_scheduled_tests.yml
+```
+
+### 3B: Persistent test runners in cloud
+
+All runners are persistent, the tests are scheduled (using `cron`) from the master runner.
+
+* Provision test runners, eg using linchpin as described in the previous [example](#example-2-a-test-run-completely-in-a-cloud).
+* Deploy the runners with ansible playbooks eg as described in the previous [example](#example-2-a-test-run-completely-in-a-cloud).
+
+* Configure the test with kstest-master role [test config](../ansible/roles/kstest-master/defaults/main.yml) and apply the configuration to the `kstest-master`. Optionally configure syncing from master runner with `remote_results_path`.
+```
+cd ansible
+vim roles/kstest-master/defaults/main.yml
+ansible-palybook --tags=configure-test kstest-master.yml
+```
+* Schedule test from master in kstest-master role [master config](../ansible/roles/kstest-master/vars/main.yml) (`kstest.master.cron`) and apply the configuration to the `kstest-master`.
+```
+cd ansible
+vim roles/kstest-master/vars/main.yml
+ansible-playbook --tags=schedule-test kstest-master.yml
+```

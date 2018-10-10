@@ -1,0 +1,9 @@
+---
+
+- name: Schedule test {{ test_id }}
+  import_tasks: schedule.yml
+  when: action == "schedule"
+
+- name: Remove scheduled test {{ test_id }}
+  import_tasks: remove.yml
+  when: action == "remove"

@@ -32,10 +32,12 @@ class VirtualLogRequestHandler(LogRequestHandler):
     simple_tests = LogRequestHandler.simple_tests + [
         "Payload setup error:",
         "Out of memory:",
-        "The following group or module is missing:",
+        "Would you like to ignore this and continue with installation?",
+        "Some packages, groups or modules are broken, the installation will be aborted.",
         "Stream was not specified for a module",
         "The following problem occurred on line",  # kickstart parsing error
         "storage configuration failed:",
+        "Not enough space in file systems for the current software selection.",
     ]
 
     def iserror(self, line):

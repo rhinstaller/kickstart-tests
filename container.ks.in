@@ -36,7 +36,7 @@ if [[ $count -gt 0 ]]; then
 fi
 
 # (3) No authconfig or firewall packages should be installed.
-count=$(rpm -qa authconfig\* firewall\* | wc -l)
+count=$(rpm -qa authselect\* authconfig\* firewall\* | wc -l)
 if [[ $count -gt 0 ]]; then
     echo '*** No authconfig or firewall packages should have been installed' > /root/RESULT
     exit 1

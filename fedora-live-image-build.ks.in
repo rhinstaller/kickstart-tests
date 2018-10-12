@@ -39,8 +39,7 @@ zerombr
 # Partition clearing information
 clearpart --all
 # Disk partitioning information
-part / --fstype="ext4" --size=5120
-part / --size=6656
+part / --fstype="ext4" --grow
 
 %post
 # FIXME: it'd be better to get this installed from a package
@@ -410,6 +409,18 @@ restorecon -R /home/liveuser/
 EOF
 
 %end
+
+
+%post
+
+# if we got this far the live image build itself did not fail
+#
+# TODO: some basic checks that the image looks fine
+
+echo SUCCESS > /root/RESULT
+
+%end
+
 
 %packages
 @anaconda-tools

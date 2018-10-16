@@ -331,8 +331,6 @@ if [[ "$TEST_REMOTES" != "" ]]; then
         rsync -az --delete . kstest@${remote}:kickstart-tests/
         echo "synchronizing installation image"
         rsync -az ${IMAGE} kstest@${remote}:install_images/
-        # remove any old images
-        ssh kstest@${remote} find install_images -type f ! -name ${_IMAGE} -delete
     done
 
     # (1a) We also need to copy the provided image to under kickstart_tests/ on

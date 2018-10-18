@@ -3,9 +3,10 @@
 # specify one module in packages section twice with different streams
 #
 # expected result
-# - apparently no crash
-# - highest stream id apparently takes prefference
-#   (which is weird as stream ids should not be comparable for higher/lower)
+# - crash ?
+# - if no crash the I guess the last seen module spec
+#   (we forward the specs to DNF in order), anything else
+#   would be black magic
 
 url @KSTEST_URL@
 repo --name=modular @KSTEST_MODULAR_URL@
@@ -27,8 +28,8 @@ shutdown
 %packages
 @^Fedora Server Edition
 # lets use a no-default profile to see if it is correctly set afterwards
-@nodejs:8/default
-@nodejs:10/default
+@avocado:latest/default
+@avocado:stable/default
 kernel
 vim
 %end
@@ -50,24 +51,21 @@ if [[ $? != 0 ]]; then
     echo '*** kernel package not installed' >> /root/RESULT
 fi
 
-# the nodejs module should be just enabled, so the API package should *not*
-# be installed
-
-rpm -q nodejs
+rpm -q python2-avocado
 if [[ $? != 0 ]]; then
-    echo '*** nodejs package for nodejs module not installed' >> /root/RESULT
+    echo '*** python2-avocado package for avocado module not installed' >> /root/RESULT
 fi
 
 # next we will check if the module is seen as enabled/installed from the
 # metadata/DNF point of view
-dnf module list --enabled nodejs | grep nodejs || echo "*** nodejs module not marked as enabled" >> /root/RESULT
-dnf module list --installed nodejs | grep nodejs || echo "*** nodejs module not marked as installed" >> /root/RESULT
+dnf module list --enabled avocado | grep avocado || echo "*** avocado module not marked as enabled" >> /root/RESULT
+dnf module list --installed avocado | grep avocado || echo "*** avocado module not marked as installed" >> /root/RESULT
 
 # check the stream
-dnf module list --installed nodejs | grep "default \[i\]" || echo "*** nodejs module default profile not marked as installed" >> /root/RESULT
+dnf module list --installed avocado | grep "default \[i\]" || echo "*** avocado module default profile not marked as installed" >> /root/RESULT
 
 # check the stream
-dnf module list --installed nodejs | grep "10 \[e\]" || echo "*** nodejs stream id 10 not marked as enabled" >> /root/RESULT
+dnf module list --installed avocado | grep "stable \[e\]" || echo "*** avocado stream stable not marked as enabled" >> /root/RESULT
 
 if [ ! -f /root/RESULT ]
 then

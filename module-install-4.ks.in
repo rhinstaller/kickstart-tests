@@ -2,7 +2,8 @@
 #
 # generic module install test:
 # - enable one module with a stream
-# - install the same module with a different stream
+# - install the same module with the same stream
+# (enabling one stream and installing a different one is an error)
 
 url @KSTEST_URL@
 repo --name=modular @KSTEST_MODULAR_URL@
@@ -21,12 +22,11 @@ timezone America/New_York
 rootpw qweqwe
 shutdown
 
-module --name=nodejs --stream=10
+module --name=cri-o --stream=1.11
 
 %packages
 @^Fedora Server Edition
-# lets use a no-default profile to see if it is correctly set afterwards
-@nodejs:8/development
+@cri-o:1.11/default
 kernel
 vim
 %end
@@ -48,21 +48,25 @@ if [[ $? != 0 ]]; then
     echo '*** kernel package not installed' >> /root/RESULT
 fi
 
-# the nodejs module should be just enabled, so the API package should *not*
-# be installed
-
-rpm -q nodejs
+rpm -q cri-o
 if [[ $? != 0 ]]; then
-    echo '*** nodejs package for nodejs module not installed' >> /root/RESULT
+    echo '*** cri-o package for cri-o module not installed' >> /root/RESULT
+fi
+
+rpm -q cri-tools
+if [[ $? != 0 ]]; then
+    echo '*** cri-tools package for cri-o module not installed' >> /root/RESULT
 fi
 
 # next we will check if the module is seen as enabled/installed from the
 # metadata/DNF point of view
-dnf module list --enabled nodejs | grep nodejs || echo "*** nodejs module not marked as enabled" >> /root/RESULT
-dnf module list --installed nodejs | grep nodejs || echo "*** nodejs module not marked as installed" >> /root/RESULT
+dnf module list --enabled cri-o | grep cri-o || echo "*** cri-o module not marked as enabled" >> /root/RESULT
+dnf module list --installed cri-o | grep cri-o || echo "*** cri-o module not marked as installed" >> /root/RESULT
 
 # check the stream and profile as well
-dnf module list --installed nodejs | grep "development \[i\]" || echo "*** nodejs module development profile not marked as installed" >> /root/RESULT
+# - commented out due to DNF output breakage, see:
+#   https://bugzilla.redhat.com/show_bug.cgi?id=1602028#c1
+#dnf module list --installed cri-o | grep "default \[i\]" || echo "*** cri-o module default profile not marked as installed" >> /root/RESULT
 
 if [ ! -f /root/RESULT ]
 then

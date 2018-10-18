@@ -35,6 +35,7 @@ class VirtualLogRequestHandler(LogRequestHandler):
         "Would you like to ignore this and continue with installation?",
         "Some packages, groups or modules are broken, the installation will be aborted.",
         "Stream was not specified for a module",
+        "Modular dependency problem:",  # broken module
         "The following problem occurred on line",  # kickstart parsing error
         "storage configuration failed:",
         "Not enough space in file systems for the current software selection.",

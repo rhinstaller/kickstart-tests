@@ -102,14 +102,6 @@ echo "in topology file (${TOPOLOGY_FILE_PATH})."
 echo
 
 
-deployment_key_defined_line=$(grep 'private_key_file.*=.*[^\S]' ${ANSIBLE_CFG_PATH})
-if [[ -n "${deployment_key_defined_line}" ]]; then
-    echo "=> OK: ${ANSIBLE_CFG_PATH}: ${deployment_key_defined_line}"
-else
-    echo "=> FAILED: deployment ssh key not defined in ${ANSIBLE_CFG_PATH}"
-    CHECK_RESULT=1
-fi
-
 linchpin_keypair=$(grep "keypair:" ${TOPOLOGY_FILE_PATH} | uniq)
 echo "=> INFO: should be the same key as ${TOPOLOGY_FILE_PATH}: ${linchpin_keypair}"
 

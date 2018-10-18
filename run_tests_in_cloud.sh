@@ -37,6 +37,8 @@ MASTER_CFG_PATH="ansible/roles/kstest-master/vars/main.yml"
 MASTER_DEFAULTS_PATH="ansible/roles/kstest-master/defaults/main.yml"
 AUTHORIZED_KEYS_DIR="ansible/roles/kstest/files/authorized_keys"
 
+test ! -f "${HOME}/.config/kstests/cloud.conf" || . "${HOME}/.config/kstests/cloud.conf"
+
 CHECK_RESULT=0
 
 

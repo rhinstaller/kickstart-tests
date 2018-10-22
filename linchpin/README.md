@@ -48,7 +48,7 @@ From the `kickstart-tests` directory provision and deploy remote hosts (`kstest`
 
 ```
 rm linchpin/inventories/kstests-*.inventory
-linchpin -v --creds-path <PATH_TO_CREDENTIALS> --workspace linchpin -p linchpin/PinFile -c linchpin/linchpin.conf up
+linchpin -v --creds-path <PATH_TO_CREDENTIALS> --workspace linchpin -c linchpin/linchpin.conf up
 cp linchpin/inventories/kstests-*.inventory ansible/inventory/linchpin.kstests
 cd ansible
 ansible-playbook kstest.yml
@@ -68,7 +68,7 @@ $ TEST_REMOTES=<IP1 IP2 ...> TEST_REMOTES_ONLY=yes scripts/run_kickstart_tests.s
 
 To remove the hosts from the cloud:
 ```
-$ linchpin -v --creds-path <PATH_TO_CREDENTIALS> --workspace linchpin -p linchpin/PinFile -c linchpin/linchpin.conf destroy
+$ linchpin -v --creds-path <PATH_TO_CREDENTIALS> --workspace linchpin -c linchpin/linchpin.conf destroy
 ```
 Example 2: a test run completely in a cloud
 -------------------------------------------
@@ -92,7 +92,7 @@ set -ex
 rm linchpin/inventories/kstests-*.inventory
 
 # Provision the hosts
-linchpin -v --creds-path <PATH_TO_CREDENTIALS> --workspace linchpin -p linchpin/PinFile -c linchpin/linchpin.conf up
+linchpin -v --creds-path <PATH_TO_CREDENTIALS> --workspace linchpin -c linchpin/linchpin.conf up
 
 # Pass resulting inventory to ansible
 cp linchpin/inventories/kstests-*.inventory ansible/inventory/linchpin.kstests
@@ -111,7 +111,7 @@ ansible kstest-master -m shell -a "PATH=$PATH:/usr/sbin ~/run_tests.sh" -u kstes
 cd -
 
 # Destroy the provisioned hosts
-linchpin -v --creds-path <PATH_TO_CREDENTIALS> --workspace linchpin -p linchpin/PinFile -c linchpin/linchpin.conf destroy
+linchpin -v --creds-path <PATH_TO_CREDENTIALS> --workspace linchpin -c linchpin/linchpin.conf destroy
 ```
 
 The script updated with configuration checks and hints: [../run_tests_in_cloud.sh](../run_tests_in_cloud.sh)

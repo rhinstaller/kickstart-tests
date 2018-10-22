@@ -1,0 +1,26 @@
+---
+
+- name: Checkout kickstart tests repo
+  become_user: "{{ kstest_remote_user }}"
+  git:
+    repo: "{{ kstest_git_repo }}"
+    dest: "/home/{{ kstest_remote_user }}/{{ kstest.master.git_repo_dir }}"
+    version: "{{ kstest_git_version }}"
+    update: no
+
+- name: Install and configure script for remote run
+  template:
+    src: run_tests.sh.j2
+    dest: /home/{{ kstest_remote_user }}/run_tests.sh
+    owner: "{{ kstest_remote_user }}"
+    group: "{{ kstest_remote_user }}"
+    mode: 0755
+
+- name: Install script for creating tests history summary
+  copy:
+    src: "{{ kstest.master.results_summary_script.src }}"
+    dest: "/home/kstest/{{ kstest.master.results_summary_script.dest }}"
+    owner: "{{ kstest_remote_user }}"
+    group: "{{ kstest_remote_user }}"
+    mode: 0755
+  when: kstest.master.results_summary_script.src is defined

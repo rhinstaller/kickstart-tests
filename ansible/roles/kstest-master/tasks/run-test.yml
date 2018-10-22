@@ -1,0 +1,5 @@
+---
+
+- name: Run the test
+  become_user: "{{ kstest_remote_user }}"
+  shell: ~/run_tests.sh

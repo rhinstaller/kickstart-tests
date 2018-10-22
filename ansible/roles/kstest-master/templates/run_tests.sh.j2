@@ -20,7 +20,7 @@ COMPOSE_BOOT_ISO=images/boot.iso
 KSTEST_USER=kstest
 RESULTS_DIR=results
 KSTEST_REPO_DIR={{ kstest.master.git_repo_dir }}
-GIT_PULL_KSTESTS={{ kstest.master.git_pull }}
+GIT_PULL_KSTESTS={{ kstest_git_pull }}
 
 HOME_DIR=/home/${KSTEST_USER}
 KSTEST_REPO_PATH=${HOME_DIR}/${KSTEST_REPO_DIR}
@@ -30,7 +30,7 @@ ISOMD5SUM_FILENAME={{ kstest.master.file.isomd5sum }}
 RESULT_REPORT_FILENAME={{ kstest.master.file.result_report }}
 TEST_PARAMETERS_FILENAME={{ kstest.master.file.test_parameters }}
 LOG_FILENAME={{ kstest.master.file.log }}
-RUN_FILENAME={{ kstest.master.file.run }}
+RUN_FILE_PATH=${HOME_DIR}/{{ kstest.master.file.run }}
 
 # Test run id
 START_TIME=$(date +%F-%H_%M_%S)
@@ -39,8 +39,8 @@ TIME_OF_START=$(date +%s)
 
 ### Check run file (indicates a test is running)
 
-if [[ -f ${RUN_FILENAME} ]]; then
-    echo "A test seems to be already running, ${RUN_FILENAME} exists" >2
+if [[ -f ${RUN_FILE_PATH} ]]; then
+    echo "A test seems to be already running, ${RUN_FILE_PATH} exists" >2
     exit 1
 fi
 
@@ -61,7 +61,7 @@ mkdir ${RESULT_PATH}
 
 ### Create run file
 
-echo ${RESULT_PATH} > ${RUN_FILENAME}
+echo ${RESULT_PATH} > ${RUN_FILE_PATH}
 
 
 ### Cd to repository dir
@@ -199,7 +199,7 @@ echo "# Time consumed: ${TINFO}" >> ${TEST_PARAMETERS_FILE}
 
 ### Remove run file
 
-rm ${RUN_FILENAME}
+rm ${RUN_FILE_PATH}
 
 
 ### Sync results to remote host

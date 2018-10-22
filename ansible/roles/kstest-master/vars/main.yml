@@ -2,15 +2,13 @@
 
 kstest:
   master:
-    # ssh key to access remote hosts for running tests
-    private_ssh_key:
-    # set to "no" to prevent pulling the repository before the run
-    git_pull: "yes"
     # schedule running test
     cron:
       disabled: true
       hour: 22
       minute: 00
+
+    # Script for generating summary from history of test results
     results_summary_script:
       src: files/scripts/kstests_history.py
       # relative path in home directory ("" to disable creating summary)

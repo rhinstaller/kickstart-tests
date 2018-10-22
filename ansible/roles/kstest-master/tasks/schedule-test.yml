@@ -1,0 +1,30 @@
+---
+### Schedule tests run in crontab
+
+- name: Install crontab
+  dnf:
+    name: crontabs
+    state: latest
+
+- name: Enable and start crond service
+  service:
+    name: crond
+    state: started
+    enabled: yes
+
+- name: Set up cron PATH
+  cron:
+    name: PATH
+    user: "{{ kstest_remote_user }}"
+    env: yes
+    value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+- name: Configure scheduled test with cron
+  cron:
+    name: "Scheduled kickstart tests"
+    hour: "{{ kstest.master.cron.hour }}"
+    minute: "{{ kstest.master.cron.minute }}"
+    user: "{{ kstest_remote_user }}"
+    job: /home/{{ kstest_remote_user }}/run_tests.sh
+    state: present
+    disabled: "{{ kstest.master.cron.disabled }}"

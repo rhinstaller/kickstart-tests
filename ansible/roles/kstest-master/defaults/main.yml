@@ -31,3 +31,5 @@ kstest_updates_img: ""
 # kickstart-tests repository
 kstest_git_repo: https://github.com/rhinstaller/kickstart-tests.git
 kstest_git_version: master
+# set to "no" to prevent pulling the repository before running the test
+kstest_git_pull: "yes"

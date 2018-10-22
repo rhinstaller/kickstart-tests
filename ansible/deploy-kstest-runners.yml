@@ -1,5 +1,7 @@
 ---
-- hosts: kstest
+- hosts:
+    kstest
+    kstest-master
   become: true
   become_user: root
 

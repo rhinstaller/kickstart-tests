@@ -21,7 +21,7 @@
 
   tasks:
   - include_vars: roles/kstest/vars/main.yml
-  - include_vars: roles/kstest-master/vars/main.yml
+  - include_vars: roles/kstest-master/vars/main/main.yml
 
   - name: Find current results path
     command: cat /home/{{ kstest_remote_user }}/{{ kstest.master.file.run }}

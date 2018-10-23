@@ -13,7 +13,7 @@
           prefix: master-key-
         register: master_key_dir
       - debug:
-          var: master_key_dir
+          msg: "The keys will be generated in {{master_key_dir.path}}"
       - shell: ssh-keygen -b 2048 -t rsa -f {{ master_key_dir.path }}/kstest-master -q -N ""
         args:
           creates: "{{ master_key_dir.path }}/{{ master_key_name }}"
@@ -79,4 +79,4 @@
       - file:
           path: "{{ master_key_dir.path }}/"
           state: absent
-    when: master_key_dir is defined
+    when: master_key_dir is defined and master_key_dir.path is defined

@@ -4,21 +4,8 @@
 # - a default profile should be selected automatically based on module
 #   metadata
 
-url @KSTEST_URL@
-repo --name=modular @KSTEST_MODULAR_URL@
-install
-network --bootproto=dhcp
-
-bootloader --timeout=1
-zerombr
-clearpart --all
-autopart
-
-keyboard us
-lang en
-timezone America/New_York
-rootpw qweqwe
-shutdown
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
 
 %packages
 @^Fedora Server Edition
@@ -113,13 +100,6 @@ dnf module list --installed mongodb | grep "default \[i\]" || echo "*** mongodb 
 dnf module list --installed mysql | grep "default \[i\]" || echo "*** mysql module profile not marked as installed" >> /root/RESULT
 dnf module list --installed gimp | grep "default \[i\]" || echo "*** gimp module profile not marked as installed" >> /root/RESULT
 
-if [ ! -f /root/RESULT ]
-then
-    # no result file (no errors) -> success
-    echo SUCCESS > /root/RESULT
-else
-    # some errors happened
-    exit 1
-fi
+%ksappend validation/success_if_result_empty.ks
 
 %end

@@ -8,22 +8,8 @@
 #   (we forward the specs to DNF in order), anything else
 #   would be black magic
 
-url @KSTEST_URL@
-repo --name=modular @KSTEST_MODULAR_URL@
-
-install
-network --bootproto=dhcp
-
-bootloader --timeout=1
-zerombr
-clearpart --all
-autopart
-
-keyboard us
-lang en
-timezone America/New_York
-rootpw qweqwe
-shutdown
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
 
 %packages
 @^Fedora Server Edition
@@ -67,13 +53,6 @@ dnf module list --installed avocado | grep "default \[i\]" || echo "*** avocado 
 # check the stream
 dnf module list --installed avocado | grep "stable \[e\]" || echo "*** avocado stream stable not marked as enabled" >> /root/RESULT
 
-if [ ! -f /root/RESULT ]
-then
-    # no result file (no errors) -> success
-    echo SUCCESS > /root/RESULT
-else
-    # some errors happened
-    exit 1
-fi
+%ksappend validation/success_if_result_empty.ks
 
 %end

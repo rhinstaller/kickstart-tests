@@ -1,19 +1,8 @@
 #version=DEVEL
 #test name: packages-weakdeps
-url @KSTEST_URL@
-install
-network --bootproto=dhcp
 
-bootloader --timeout=1
-zerombr
-clearpart --all --initlabel
-autopart
-
-keyboard us
-lang en_US.UTF-8
-timezone America/New_York --utc
-rootpw testcase
-shutdown
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
 
 # Install gnupg2 and make sure the packages it recommends are skipped
 %packages --excludeWeakdeps
@@ -36,7 +25,6 @@ if ! ( rpm -q --recommends gnupg2 | grep -q gnupg2-smime ) || \
     echo "gnupg2 --recommends has changed, test needs to be updated" >> /root/RESULT
 fi
 
-if [ ! -f /root/RESULT ]; then
-    echo SUCCESS > /root/RESULT
-fi
+%ksappend validation/success_if_result_empty.ks
+
 %end

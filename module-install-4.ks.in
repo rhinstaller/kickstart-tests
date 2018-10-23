@@ -5,22 +5,8 @@
 # - install the same module with the same stream
 # (enabling one stream and installing a different one is an error)
 
-url @KSTEST_URL@
-repo --name=modular @KSTEST_MODULAR_URL@
-
-install
-network --bootproto=dhcp
-
-bootloader --timeout=1
-zerombr
-clearpart --all
-autopart
-
-keyboard us
-lang en
-timezone America/New_York
-rootpw qweqwe
-shutdown
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
 
 module --name=cri-o --stream=1.11
 
@@ -68,13 +54,6 @@ dnf module list --installed cri-o | grep cri-o || echo "*** cri-o module not mar
 #   https://bugzilla.redhat.com/show_bug.cgi?id=1602028#c1
 #dnf module list --installed cri-o | grep "default \[i\]" || echo "*** cri-o module default profile not marked as installed" >> /root/RESULT
 
-if [ ! -f /root/RESULT ]
-then
-    # no result file (no errors) -> success
-    echo SUCCESS > /root/RESULT
-else
-    # some errors happened
-    exit 1
-fi
+%ksappend validation/success_if_result_empty.ks
 
 %end

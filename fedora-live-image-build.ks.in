@@ -2,7 +2,11 @@
 # - for now just having it run to the end with all of its
 #   complex post scripts should be enough
 
-url @KSTEST_URL@
+# We only use the repository fragment, as the
+# rest of the kickstart is basically 1:1 taken
+# from the Fedora live image creation kickstart
+# so we should keep it as close as possible.
+%ksappend repos/default.ks
 
 #version=DEVEL
 # X Window System configuration information

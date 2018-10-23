@@ -1,23 +1,22 @@
 #version=DEVEL
 #test name: packages-instlangs-3
-url @KSTEST_URL@
-install
-network --bootproto=dhcp
+%ksappend repos/default.ks
 
-bootloader --timeout=1
-zerombr
-clearpart --all --initlabel
-autopart
+# Due to the custom language configuration we
+# use individual fragments instead of the
+# bigger custom_no_packaging.ks fragment.
+%ksappend common/common.ks
+%ksappend network/default.ks
+%ksappend bootloader/default.ks
+%ksappend storage/default.ks
+%ksappend users/default.ks
 
 keyboard us
+timezone America/New_York --utc
 
 # Use a language that overlaps with the --instLangs list below so that
 # additional langpacks packages don't confuse the locale test
 lang fr_FR.UTF-8
-
-timezone America/New_York --utc
-rootpw testcase
-shutdown
 
 # Install a short list of languages
 # Use ones with translations in blivet to make them easy to find.

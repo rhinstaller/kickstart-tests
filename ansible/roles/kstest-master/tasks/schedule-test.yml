@@ -22,9 +22,9 @@
 - name: Configure scheduled test with cron
   cron:
     name: "Scheduled kickstart tests"
-    hour: "{{ kstest.master.cron.hour }}"
-    minute: "{{ kstest.master.cron.minute }}"
+    hour: "{{ kstest_master_cron_hour }}"
+    minute: "{{ kstest_master_cron_minute }}"
     user: "{{ kstest_remote_user }}"
     job: /home/{{ kstest_remote_user }}/run_tests.sh
     state: present
-    disabled: "{{ kstest.master.cron.disabled }}"
+    disabled: "{{ kstest_master_cron_disabled }}"

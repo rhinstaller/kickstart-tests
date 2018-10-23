@@ -2,12 +2,6 @@
 
 kstest:
   master:
-    # schedule running test
-    cron:
-      disabled: true
-      hour: 22
-      minute: 00
-
     # Script for generating summary from history of test results
     results_summary_script:
       src: files/scripts/kstests_history.py

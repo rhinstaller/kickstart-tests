@@ -1,199 +1,321 @@
-#!/bin/sh
+#!/bin/bash
+
+TARGET=""
+STAGE="all"
+CLOUD_CONFIG_DIR=~/.config/linchpin/
+CLOUD_CONFIG_FILE=clouds.yml
+CLOUD_PROFILE="kstests"
+RESULTS_DIR=""
+TEST_CONFIGURATION_FILE=""
+
+KEY_NAME=$(uuidgen)
+KEY_MODE="generate"
+UPLOAD_KEY_PATH=""
+PRIVATE_KEY_PATH=""
+WORK_BASE_DIR=$(pwd)
+USE_KEY_FOR_MASTER="no"
+#STORED_PRIVATE_KEYS_DIR=$(mktemp -d -t kstest-deploymen-keys-XXXXXX)
+STORED_PRIVATE_KEYS_DIR="${WORK_BASE_DIR}/linchpin/keys"
+
+# Directory to which linchpin generates inventory of provisioned runners.
+# Defined by linchpin layout configuration.
+INVENTORY_DIR="linchpin/inventories"
+
 
 usage () {
     cat <<HELP_USAGE
 
-    $0  [-c]
+$(basename $0) [options] [--stage provision|run|destroy|status] TARGET
 
-    Run kickstart tests on hosts provisioned by linchpin and deployed with ansible,
-    syncing results to a remote host.
+Run kickstart tests on runners temporarily provisioned by linchpin in cloud.
+Linchpin target name TARGET is defined in PinFile (linchpin/PinFile).
 
-   -c  Run configuration check.
+Specific stage can be run separately using --stage option.
+
+  --stage provision|run|destroy|status
+                             provision  provision target TARGET in cloud
+                             run        run tests on TARGET
+                             destroy    destroy target TARGET in cloud
+                             status     show status of test running on TARGET
+Options:
+
+  --cloud NAME               name of the cloud profile to be used for cloud credentials
+                             (stored in ~/.config/linchpin/cloud.yml by default)
+  Provisioning options ("provision" stage):
+
+    -k, --key-name NAME      name of the ssh key used for provisioning in cloud;
+                             by default new key is generated on the cloud provider
+    --key-use-existing       use the existing key --key-name from cloud
+    --key-upload PATH        upload public ssh key defined by PATH (as --key-name if defined).
+    --ansible-private-key PATH
+                             path to private ssh key to be used for ansible deployment;
+                             if not defined generated key or user's default ssh key is used;
+                             this option may be required with --key-use-existing or --key-upload
+    --key-use-for-master     use the deployment key also as master runner key which
+                             is used by master to access other test runners;
+                             without the option a new temporary master runner key is generated;
+                             note that the private key will be uploaded to master.
+
+  Test configuration options ("run" stage):
+
+    --results PATH           directory for storing results synced from master to local host
+    --test-configuration PATH
+                             path to file with test configuration to be used;
+                             overrides default test-configuration.yml
+                             (ansible/roles/kstest-master/defaults/main/test-configuration.yml)
+                             which can be overriden also by file
+                             ansible/roles/kstest-master/vars/main/test-configuration.yml
+
 HELP_USAGE
 }
 
-CHECK_ONLY="no"
+options=$(getopt -o k: --long cloud:,results:,key-name:,key-use-existing,key-upload:,ansible-private-key:,key-use-for-master,test-configuration:,stage: -- "$@")
+[ $? -eq 0 ] || {
+    echo "Usage:"
+    usage
+    exit 1
+}
 
-while getopts "c" opt; do
-    case $opt in
-        c)
-            # Run only configuration check
-            CHECK_ONLY="yes"
-            ;;
-        *)
-            echo "Usage:"
-            usage
+eval set -- "$options"
+while true; do
+    case "$1" in
+    # TODO remove -k
+    -k|--key-name)
+        shift;
+        KEY_NAME=$1
+        ;;
+    --key-use-existing)
+        [[ ${KEY_MODE} == "upload" ]] && {
+            echo "Only one of --key-use-existing or --key-upload options can be used."
             exit 1
-            ;;
+        }
+        KEY_MODE=existing
+        ;;
+    --key-upload)
+        [[ ${KEY_MODE} == "existing" ]] && {
+            echo "Only one of --key-use-existing or --key-upload options can be used."
+            exit 1
+        }
+        shift;
+        KEY_MODE=upload
+        UPLOAD_KEY_PATH=$1
+        ;;
+    --ansible-private-key)
+        shift;
+        PRIVATE_KEY_PATH=$1
+        ;;
+    --cloud)
+        shift;
+        CLOUD_PROFILE=$1
+        ;;
+    --results)
+        shift;
+        RESULTS_DIR=$1
+        ;;
+    --key-use-for-master)
+        USE_KEY_FOR_MASTER="yes"
+        ;;
+    --test-configuration)
+        shift;
+        if [[ "$1" == "${1#/}" ]]; then
+            # make relative path absolute
+            TEST_CONFIGURATION_FILE="${WORK_BASE_DIR}/$1"
+        else
+            TEST_CONFIGURATION_FILE=$1
+        fi
+        ;;
+    --stage)
+        shift;
+        STAGE=$1
+        ;;
+    --)
+        shift;
+        TARGET=$1
+        break
+        ;;
     esac
+    shift
 done
 
-DEFAULT_CRED_FILENAME="clouds.yml"
-CRED_DIR="${HOME}/.config/linchpin"
-CRED_FILE_PATH=${CRED_DIR}/${DEFAULT_CRED_FILENAME}
-TOPOLOGY_FILE_PATH="linchpin/topologies/kstests.yml"
-ANSIBLE_CFG_PATH="ansible/ansible.cfg"
-MASTER_CFG_PATH="ansible/roles/kstest-master/vars/main.yml"
-MASTER_DEFAULTS_PATH="ansible/roles/kstest-master/defaults/main.yml"
-AUTHORIZED_KEYS_DIR="ansible/roles/kstest/files/authorized_keys"
-
-CHECK_RESULT=0
-
-
-############################## Check the configuration
-
-echo
-echo "========= Dependencies are installed"
-echo "linchpin and ansible are required to be installed."
-echo "For linchpin installation instructions see:"
-echo "https://linchpin.readthedocs.io/en/latest/installation.html"
-echo
-
-if ! type ansible &> /dev/null; then
-    echo "=> FAILED: ansible package is not installed"
-    CHECK_RESULT=1
-else
-    echo "=> OK: ansible is installed"
-fi
-
-if ! type linchpin &> /dev/null; then
-    echo "=> FAILED: linchpin is not installed"
-    CHECK_RESULT=1
-else
-    echo "=> OK: linchpin is installed"
+if [[ -z ${TARGET} ]]; then
+    echo "TARGET is required"
+    exit 1
 fi
 
 
-echo
-echo "========= Linchpin cloud credentials configuration"
-echo "The credentials file for linchpin provisioner should be in ${CRED_DIR}"
-echo "The name of the file and the profile to be used is defined by"
-echo "   resource_groups.credentials variables in the topology file"
-echo "   (${TOPOLOGY_FILE_PATH})"
-echo
+# Defined for linchpin by layout configuration
+INVENTORY=${INVENTORY_DIR}/${TARGET}.inventory
+TARGET_KEY_DIR=${STORED_PRIVATE_KEYS_DIR}/${TARGET}
 
-config_changed=0
-if [[ -f ${TOPOLOGY_FILE_PATH} ]]; then
-    grep -q 'filename:.*'${DEFAULT_CRED_FILENAME} ${TOPOLOGY_FILE_PATH}
-    config_changed=$?
-fi
 
-if [[ ${config_changed} -eq 0 ]]; then
-    if [[ -f ${CRED_FILE_PATH} ]]; then
-        echo "=> OK: ${CRED_FILE_PATH} exists"
-    else
-        echo "=> FAILED: ${CRED_FILE_PATH} does not exist"
-        CHECK_RESULT=1
+#################################################### provision stage
+
+if [[ ${STAGE} == "all" || ${STAGE} == "provision" ]]; then
+
+    if [[ -e $INVENTORY ]]; then
+        echo "Inventory ${INVENTORY} for target ${TARGET} exists, it must have been already deployed"
+        exit 1
     fi
-else
-    echo "=> NOT CHECKING: seems like this has been configured in a different way"
+
+    # Use default ansible.cfg
+    cp ansible/ansible.cfg .
+
+    # Set up deployment ssh key
+
+    if [[ ! -d ${STORED_PRIVATE_KEYS_DIR} ]]; then
+        mkdir ${STORED_PRIVATE_KEYS_DIR}
+    fi
+
+    mkdir ${TARGET_KEY_DIR}
+    chmod 0700 ${TARGET_KEY_DIR}
+    STORED_PRIVATE_KEY_PATH="${TARGET_KEY_DIR}/${KEY_NAME}"
+    STORED_PUBLIC_KEY_PATH="${TARGET_KEY_DIR}/${KEY_NAME}.pub"
+
+    export OS_CLIENT_CONFIG_FILE=${CLOUD_CONFIG_DIR}/${CLOUD_CONFIG_FILE}
+    ansible-playbook linchpin/handle-ssh-key.yml --extra-vars "key_name=${KEY_NAME} key_mode=${KEY_MODE} cloud_profile=${CLOUD_PROFILE} upload_key_file=${UPLOAD_KEY_PATH} store_private_key_path=${STORED_PRIVATE_KEY_PATH} store_public_key_path=${STORED_PUBLIC_KEY_PATH}"
+
+    # If private key was generated and user does not provide private key,
+    # use the generated one for ansible
+    if [[ -z "${PRIVATE_KEY_PATH}" && -f ${STORED_PRIVATE_KEY_PATH} ]]; then
+        PRIVATE_KEY_PATH=${STORED_PRIVATE_KEY_PATH}
+    fi
+
+    # If the keypair should be used also for master check that the keys are available
+    if [[ ${USE_KEY_FOR_MASTER} == "yes" ]]; then
+        if [[ -z ${PRIVATE_KEY_PATH} || ! -f ${PRIVATE_KEY_PATH} ]]; then
+            echo "Path to private key or newly generated key is required for --key-use-for-master option"
+            exit 1
+        fi
+        if [[ -z ${STORED_PUBLIC_KEY_PATH} ]]; then
+            echo "Don't have path to public key for --key-use-for-master option"
+            exit 1
+        fi
+    fi
+
+    # Show configuration info
+
+    GENERATED=""
+    if [[ -f ${STORED_PRIVATE_KEY_PATH} ]]; then
+        GENERATED=" (generated)"
+    fi
+
+    if [[ -n ${PRIVATE_KEY_PATH} ]]; then
+        KEY_SPEC=${PRIVATE_KEY_PATH}
+    else
+        KEY_SPEC="default private key"
+    fi
+
+    echo "Provisioning cloud ssh keypair:   ${KEY_NAME} ${GENERATED}"
+    echo "Ansible deployment private key:   ${KEY_SPEC}"
+    echo "Inventory for ansible deployment: ${INVENTORY}"
+
+
+    # Provision test runners (defined by target from linchpin/PinFile)
+    # Generates inventory for ansible.
+    linchpin -v --workspace linchpin -c linchpin/linchpin.conf --template-data '{ "keypair": "'${KEY_NAME}'", "cloud_profile": "'${CLOUD_PROFILE}'", "resource_name": "'${TARGET}'" }' up ${TARGET}
+
+    if [[ ! -f ${INVENTORY} ]]; then
+        echo "Can't find inventory ${INVENTORY} generated for target ${TARGET}"
+        exit 1
+    fi
+
+    # Update the generated inventory with ssh key for deployment
+
+    if [[ -n ${PRIVATE_KEY_PATH} ]]; then
+        for group in kstest kstest-master ; do
+            cat <<EOF >> ${INVENTORY}
+[${group}:vars]
+ansible_ssh_private_key_file=${PRIVATE_KEY_PATH}
+EOF
+        done
+    fi
+
+    # Deploy the test runners and master
+
+    ansible-playbook -i ${INVENTORY} ansible/deploy-kstest-runners.yml
+
+    if [[ ${USE_KEY_FOR_MASTER} == "yes" ]]; then
+        ansible-playbook -i ${INVENTORY} ansible/deploy-kstest-master.yml --extra-vars "master_private_ssh_key=${PRIVATE_KEY_PATH} master_public_ssh_key=${STORED_PUBLIC_KEY_PATH}"
+    else
+        ansible-playbook -i ${INVENTORY} ansible/deploy-kstest-master.yml
+    fi
+
 fi
 
+#################################################### run stage
 
-echo
-echo "========== Deployment ssh key configuration"
-echo "The ssh key used for deployment with ansible has to be defined by"
-echo "private_key_file variable in ${ANSIBLE_CFG_PATH}"
-echo "and match the key used for provisioning of the machines with linchpin"
-echo "which is defined by resource_groups.resource_definitions.keypair variable"
-echo "in topology file (${TOPOLOGY_FILE_PATH})."
-echo
+if [[ ${STAGE} == "all" || ${STAGE} == "run" ]]; then
 
+    # Check that the target was deployed
 
-deployment_key_defined_line=$(grep 'private_key_file.*=.*[^\S]' ${ANSIBLE_CFG_PATH})
-if [[ -n "${deployment_key_defined_line}" ]]; then
-    echo "=> OK: ${ANSIBLE_CFG_PATH}: ${deployment_key_defined_line}"
-else
-    echo "=> FAILED: deployment ssh key not defined in ${ANSIBLE_CFG_PATH}"
-    CHECK_RESULT=1
+    INVENTORY=${INVENTORY_DIR}/${TARGET}.inventory
+    if [[ ! -f ${INVENTORY} ]]; then
+        echo "Can't find inventory ${INVENTORY} generated for target ${TARGET}"
+        exit 1
+    fi
+
+    # Configure and the test
+
+    if [[ -n ${TEST_CONFIGURATION_FILE} ]]; then
+        ansible-playbook -i ${INVENTORY} ansible/configure-test-for-kstest-master.yml --extra-vars "kstest_result_run_dir_prefix=${TARGET}. test_configuration=${TEST_CONFIGURATION_FILE}"
+    else
+        ansible-playbook -i ${INVENTORY} ansible/configure-test-for-kstest-master.yml --extra-vars "kstest_result_run_dir_prefix=${TARGET}."
+    fi
+
+    # Run the test
+
+    ansible-playbook -i ${INVENTORY} ansible/run-test-from-kstest-master.yml
+
+    # Fetch results
+
+    if [[ -n ${RESULTS_DIR} ]]; then
+        ansible-playbook -i ${INVENTORY} ansible/sync-results-from-master.yml --extra-vars "local_dir=${RESULTS_DIR}"
+    fi
+
 fi
 
-linchpin_keypair=$(grep "keypair:" ${TOPOLOGY_FILE_PATH} | uniq)
-echo "=> INFO: should be the same key as ${TOPOLOGY_FILE_PATH}: ${linchpin_keypair}"
+#################################################### destroy stage
 
+if [[ ${STAGE} == "all" || ${STAGE} == "destroy" ]]; then
 
-echo
-echo "========== Master ssh key configuration"
-echo "Master's ssh key for accessing remote hosts has to be defined by"
-echo "kstest.master.private_ssh_key variable in ${MASTER_CFG_PATH}"
-echo "and it has to be authorized by remote hosts by adding the public key"
-echo "into ${AUTHORIZED_KEYS_DIR} directory."
-echo
+    # Check that the target was deployed
 
-master_key_defined_line=$(grep '\S*private_ssh_key:.*[^\S]' ${MASTER_CFG_PATH})
-if [[ -n "${master_key_defined_line}" ]]; then
-    echo "=> OK: master ssh key: ${MASTER_CFG_PATH}: ${master_key_defined_line}"
-else
-    echo "=> FAILED: master ssh key not defined in ${MASTER_CFG_PATH}"
-    CHECK_RESULT=1
+    INVENTORY=${INVENTORY_DIR}/${TARGET}.inventory
+    if [[ ! -f ${INVENTORY} ]]; then
+        echo "Can't find inventory ${INVENTORY} generated for target ${TARGET}"
+        exit 1
+    fi
+
+    # Destroy the provisioned hosts
+
+    linchpin -v --workspace linchpin -c linchpin/linchpin.conf --template-data '{ "cloud_profile": "'${CLOUD_PROFILE}'", "resource_name": "'${TARGET}'" }' destroy ${TARGET}
+
+    # Remove the inventory
+
+    rm ${INVENTORY}
+
+    # Remove generated deployment private key
+
+    if [[ -e ${TARGET_KEY_DIR} ]]; then
+        rm -rf ${TARGET_KEY_DIR}
+    fi
+
 fi
 
-authorized_keys=$(ls ${AUTHORIZED_KEYS_DIR})
-if [[ -n "${authorized_keys}" ]]; then
-    echo "=> INFO: should be among ${AUTHORIZED_KEYS_DIR}: ${authorized_keys}"
-else
-    echo "=> FAILED: master ssh key not among authorized keys in ${AUTHORIZED_KEYS_DIR}"
-    CHECK_RESULT=1
+#################################################### check test run status
+
+if [[ ${STAGE} == "status" ]]; then
+
+    # Check that the target was deployed
+
+    INVENTORY=${INVENTORY_DIR}/${TARGET}.inventory
+    if [[ ! -f ${INVENTORY} ]]; then
+        echo "Can't find inventory ${INVENTORY} generated for target ${TARGET}"
+        exit 1
+    fi
+
+    # Show status of test run
+
+    ansible-playbook -i ${INVENTORY} ansible/kstest-status.yml
+
 fi
-
-
-echo
-echo "========== Results host configuration"
-echo "Host for syncing the results from master before the provisioned hosts are"
-echo "destroyed has to be defined by kstest_remote_results_path variable in"
-echo "${MASTER_DEFAULTS_PATH} file."
-echo "Master's ssh key should be authorized to access the results host."
-echo
-
-results_host_defined_line=$(grep '^[\S]*kstest_remote_results_path:.*@.*' ${MASTER_DEFAULTS_PATH})
-if [[ -n "${results_host_defined_line}" ]]; then
-    echo "=> OK: results location: ${MASTER_DEFAULTS_PATH}: ${results_host_defined_line}"
-else
-    echo "=> FAILED: results location not defined in ${MASTER_DEFAULTS_PATH}"
-    CHECK_RESULT=1
-fi
-
-
-echo
-echo "========== Test configuration"
-echo "The test is configured in ${MASTER_DEFAULTS_PATH}:"
-echo
-cat ${MASTER_DEFAULTS_PATH}
-
-if [[ ${CHECK_RESULT} -ne 0 ]]; then
-echo
-echo "=> Configuration check FAILED, see FAILED messages above."
-echo
-fi
-
-if [[ ${CHECK_ONLY} == "yes" || ${CHECK_RESULT} -ne 0 ]]; then
-    exit ${CHECK_RESULT}
-fi
-
-
-############################## Run the test
-
-set -x
-
-### Clean the linchpin generated inventory
-rm -rf linchpin/inventories/*.inventory
-
-### Provision test hosts (all which are defined in the PinFile)
-linchpin -v --workspace linchpin -c linchpin/linchpin.conf up
-
-### Pass inventory generated by linchpin to ansible
-cp linchpin/inventories/*.inventory ansible/inventory/linchpin.inventory
-
-cd ansible
-
-### Deploy the remote hosts
-ansible-playbook kstest.yml
-### Deploy the master and configure the test
-ansible-playbook kstest-master.yml
-### Run the test and sync results
-ansible kstest-master -m shell -a 'PATH=$PATH:/usr/sbin ~/run_tests.sh' -u kstest
-
-cd -
-
-### Destroy the provisioned hosts
-linchpin -v --workspace linchpin -c linchpin/linchpin.conf destroy

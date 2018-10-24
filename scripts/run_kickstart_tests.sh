@@ -63,7 +63,7 @@ KEEPIT=${KEEPIT:-0}
 UPDATES_IMG=""
 
 TESTTYPE=""
-SKIP_TESTTYPE=""
+SKIP_TESTTYPES=""
 
 while getopts ":i:k:t:s:u:b:" opt; do
     case $opt in
@@ -85,8 +85,11 @@ while getopts ":i:k:t:s:u:b:" opt; do
            TESTTYPE=$OPTARG
            ;;
        s)
-           # Exclude tests of the given testtype. We'll do a pretty stupid test for it.
-           SKIP_TESTTYPE=$OPTARG
+           # Exclude tests of the given test types. Multiple test types can be specified
+           # as a whitespace delimitted string in quotes:
+           #
+           # -s "rhel-only knownfailure"
+           SKIP_TESTTYPES=$OPTARG
            ;;
        u)
            # Link to an updates image on a server. This will be added as a kernel
@@ -99,7 +102,7 @@ while getopts ":i:k:t:s:u:b:" opt; do
            BOOT_ARGS=$OPTARG
            ;;
        *)
-           echo "Usage: run_kickstart_tests.sh [-i boot.iso] [-k 0|1|2] [-u link_to_updates.img] [-b additional_boot_options] [tests]"
+           echo "Usage: run_kickstart_tests.sh [-i boot.iso] [-k 0|1|2] [-t test_type_to_run] [-s test_types_to_ignore] [-u link_to_updates.img] [-b additional_boot_options] [tests]"
            exit 1
            ;;
     esac
@@ -155,6 +158,18 @@ sed_args+=$(printenv | while read line; do
     [[ "${key}" =~ ^KSTEST_ ]] && echo -n " -e s#@${key}@#${val}#"
  done)
 
+ # Check if the given test should be skipped based on "test type blacklist" or not.
+ function should_skip_test() {
+     filepath=$1
+     for testtype in ${SKIP_TESTTYPES}; do
+        if [[ "$(grep TESTTYPE= ${filepath})" =~ "$testtype" ]]; then
+            return 0
+        fi
+     done
+     # no test type to skip found if test types of the given kickstart test
+     return 1
+}
+
 # Find all tests in the . folder. These tests will be filtered by TESTTYPE parameter
 # if specified.
 function find_tests() {
@@ -163,7 +178,7 @@ function find_tests() {
     local newtests=""
     local skipped_tests=""
     for f in ${tests}; do
-        if [[ "$SKIP_TESTTYPE" != "" && "$(grep TESTTYPE= ${f})" =~ "${SKIP_TESTTYPE}" ]]; then
+        if should_skip_test ${f}; then
             skipped_tests+="${f}"
         elif [[ "$TESTTYPE" != "" && "$(grep TESTTYPE= ${f})" =~ "${TESTTYPE}" ]]; then
             newtests+="${f} "

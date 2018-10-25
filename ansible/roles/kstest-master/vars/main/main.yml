@@ -9,12 +9,13 @@ kstest:
       dest: ""
 
     ### Locations (to be used by other playbooks)
-    # relative path in home directory
-    git_repo_dir: git/kickstart-tests
-    # file names
     file:
       run: .run
       log: kstest.log
       result_report: result_report.txt
       test_parameters: test_parameters.txt
       isomd5sum: isomd5sum.txt
+    # relative path in home directory
+    dir:
+      results: results
+      git_repo: git/kickstart-tests

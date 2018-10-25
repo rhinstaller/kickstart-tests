@@ -4,7 +4,7 @@
   become_user: "{{ kstest_remote_user }}"
   git:
     repo: "{{ kstest_git_repo }}"
-    dest: "/home/{{ kstest_remote_user }}/{{ kstest.master.git_repo_dir }}"
+    dest: "/home/{{ kstest_remote_user }}/{{ kstest.master.dir.git_repo }}"
     version: "{{ kstest_git_version }}"
     update: no
 

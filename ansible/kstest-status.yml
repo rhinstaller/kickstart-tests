@@ -34,7 +34,7 @@
       var: test_parameters.stdout_lines
 
   - name: Get current results
-    command: /home/{{ kstest_remote_user }}/{{ kstest.master.git_repo_dir }}/scripts/run_report.sh {{ run_content.stdout }}/{{ kstest.master.file.log }}
+    command: /home/{{ kstest_remote_user }}/{{ kstest.master.dir.git_repo }}/scripts/run_report.sh {{ run_content.stdout }}/{{ kstest.master.file.log }}
     register: current_test_results
   - debug:
       var: current_test_results.stdout_lines

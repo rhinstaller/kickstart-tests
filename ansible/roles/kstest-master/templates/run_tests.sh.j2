@@ -18,8 +18,8 @@ TEST_DEFAULTS_FILE=scripts/defaults.sh
 
 COMPOSE_BOOT_ISO=images/boot.iso
 KSTEST_USER=kstest
-RESULTS_DIR=results
-KSTEST_REPO_DIR={{ kstest.master.git_repo_dir }}
+RESULTS_DIR={{ kstest.master.dir.results }}
+KSTEST_REPO_DIR={{ kstest.master.dir.git_repo }}
 GIT_PULL_KSTESTS={{ kstest_git_pull }}
 
 HOME_DIR=/home/${KSTEST_USER}

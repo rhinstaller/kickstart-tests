@@ -7,6 +7,7 @@ CLOUD_CONFIG_FILE=clouds.yml
 CLOUD_PROFILE="kstests"
 RESULTS_DIR=""
 TEST_CONFIGURATION_FILE=""
+PINFILE="PinFile"
 
 KEY_NAME=$(uuidgen)
 KEY_MODE="generate"
@@ -43,6 +44,9 @@ Options:
                              (stored in ~/.config/linchpin/cloud.yml by default)
   Provisioning options ("provision" stage):
 
+    --pinfile                name of the linchpin pinfile to use;
+                             the file is located in linchpin directory, default is "PinFile"
+
     -k, --key-name NAME      name of the ssh key used for provisioning in cloud;
                              by default new key is generated on the cloud provider
     --key-use-existing       use the existing key --key-name from cloud
@@ -69,7 +73,7 @@ Options:
 HELP_USAGE
 }
 
-options=$(getopt -o k: --long cloud:,results:,key-name:,key-use-existing,key-upload:,ansible-private-key:,key-use-for-master,test-configuration:,stage: -- "$@")
+options=$(getopt -o k: --long cloud:,results:,key-name:,key-use-existing,key-upload:,ansible-private-key:,key-use-for-master,test-configuration:,stage:,pinfile: -- "$@")
 [ $? -eq 0 ] || {
     echo "Usage:"
     usage
@@ -127,6 +131,10 @@ while true; do
     --stage)
         shift;
         STAGE=$1
+        ;;
+    --pinfile)
+        shift;
+        PINFILE=$1
         ;;
     --)
         shift;
@@ -212,7 +220,7 @@ if [[ ${STAGE} == "all" || ${STAGE} == "provision" ]]; then
 
     # Provision test runners (defined by target from linchpin/PinFile)
     # Generates inventory for ansible.
-    linchpin -v --workspace linchpin -c linchpin/linchpin.conf --template-data '{ "keypair": "'${KEY_NAME}'", "cloud_profile": "'${CLOUD_PROFILE}'", "resource_name": "'${TARGET}'" }' up ${TARGET}
+    linchpin -v --workspace linchpin -p ${PINFILE} -c linchpin/linchpin.conf --template-data '{ "keypair": "'${KEY_NAME}'", "cloud_profile": "'${CLOUD_PROFILE}'", "resource_name": "'${TARGET}'" }' up ${TARGET}
 
     if [[ ! -f ${INVENTORY} ]]; then
         echo "Can't find inventory ${INVENTORY} generated for target ${TARGET}"
@@ -288,7 +296,7 @@ if [[ ${STAGE} == "all" || ${STAGE} == "destroy" ]]; then
 
     # Destroy the provisioned hosts
 
-    linchpin -v --workspace linchpin -c linchpin/linchpin.conf --template-data '{ "cloud_profile": "'${CLOUD_PROFILE}'", "resource_name": "'${TARGET}'" }' destroy ${TARGET}
+    linchpin -v --workspace linchpin -p ${PINFILE} -c linchpin/linchpin.conf --template-data '{ "cloud_profile": "'${CLOUD_PROFILE}'", "resource_name": "'${TARGET}'" }' destroy ${TARGET}
 
     # Remove the inventory
 

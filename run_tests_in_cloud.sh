@@ -1,7 +1,7 @@
 #!/bin/bash
 
 TARGET=""
-COMMAND="all"
+COMMAND="test"
 CLOUD_CONFIG_DIR=~/.config/linchpin/
 CLOUD_CONFIG_FILE=clouds.yml
 CLOUD_PROFILE="kstests"
@@ -17,6 +17,11 @@ WORK_BASE_DIR=$(pwd)
 USE_KEY_FOR_MASTER="no"
 #STORED_PRIVATE_KEYS_DIR=$(mktemp -d -t kstest-deploymen-keys-XXXXXX)
 STORED_PRIVATE_KEYS_DIR="${WORK_BASE_DIR}/linchpin/keys"
+
+SCHEDULED="no"
+REMOVE_SCHEDULE="no"
+WHEN=""
+LOGFILE=""
 
 # Directory to which linchpin generates inventory of provisioned runners.
 # Defined by linchpin layout configuration.
@@ -79,15 +84,25 @@ Options:
                              which can be overriden also by file
                              ansible/roles/kstest-master/vars/main/test-configuration.yml
 
+  Scheduling the test ("schedule" command):
+
+    --when ON_CALENDAR       schedule test on TARGET;
+                             creates user systemd timer with given OnCalendar specification
+    --remove                 remove the timer for TARGET
+    --logfile                path of the log with output of the scheduled test;
+                             (run_scheduled_kstest-TARGET.log by default)
+
 HELP_USAGE
 }
 
-options=$(getopt -o k: --long cloud:,results:,key-name:,key-use-existing,key-upload:,ansible-private-key:,key-use-for-master,test-configuration:,pinfile: -- "$@")
+options=$(getopt -o k: --long cloud:,results:,key-name:,key-use-existing,key-upload:,ansible-private-key:,key-use-for-master,test-configuration:,pinfile:,when:,remove,logfile:,scheduled -- "$@")
 [ $? -eq 0 ] || {
     echo "Usage:"
     usage
     exit 1
 }
+
+ARGUMENTS="$@"
 
 eval set -- "$options"
 while true; do
@@ -141,6 +156,20 @@ while true; do
         shift;
         PINFILE=$1
         ;;
+    --when)
+        shift;
+        WHEN=$1
+        ;;
+    --remove)
+        REMOVE_SCHEDULE="yes"
+        ;;
+    --logfile)
+        shift;
+        LOGFILE=$1
+        ;;
+    --scheduled)
+        SCHEDULED="yes"
+        ;;
     --)
         shift;
         COMMAND=$1
@@ -168,9 +197,41 @@ INVENTORY=${INVENTORY_DIR}/${TARGET}.inventory
 TARGET_KEY_DIR=${STORED_PRIVATE_KEYS_DIR}/${TARGET}
 
 
+# We were scheduled, just modify the "schedule" from scheduling cmdline to "test"
+# and test!
+if [[ $SCHEDULED == "yes" ]]; then
+    COMMAND="test"
+fi
+
+#################################################### schedule test
+
+if [[ ${COMMAND} == "schedule" ]]; then
+
+    if [[ ${REMOVE_SCHEDULE} == "yes" ]]; then
+        ansible-playbook linchpin/remove_scheduled_tests.yml --extra-vars "test_id=${TARGET}"
+    else
+        CMDLINE="\"$0 ${ARGUMENTS} --scheduled\""
+
+        echo ${CMDLINE}
+
+        WHEN_EXTRA_VAR=""
+        if [[ -n ${WHEN} ]]; then
+            WHEN_EXTRA_VAR=" systemd_on_calendar=\"${WHEN}\""
+        fi
+        LOGFILE_EXTRA_VAR=""
+        if [[ -n ${LOGFILE} ]]; then
+            LOGFILE_EXTRA_VAR=" log_file_name=\"${LOGFILE}\""
+        fi
+
+        ansible-playbook linchpin/schedule_tests.yml --extra-vars "test_id=${TARGET} cmdline=${CMDLINE}${WHEN_EXTRA_VAR}${LOGFILE_EXTRA_VAR}"
+    fi
+
+fi
+
 #################################################### provision stage
 
-if [[ ${COMMAND} == "all" || ${COMMAND} == "provision" ]]; then
+if [[ ${COMMAND} == "test" || ${COMMAND} == "provision" ]]; then
+
 
     if [[ -e $INVENTORY ]]; then
         echo "Inventory ${INVENTORY} for target ${TARGET} exists, it must have been already deployed"
@@ -264,7 +325,7 @@ fi
 
 #################################################### run stage
 
-if [[ ${COMMAND} == "all" || ${COMMAND} == "run" ]]; then
+if [[ ${COMMAND} == "test" || ${COMMAND} == "run" ]]; then
 
     # Check that the target was deployed
 
@@ -296,7 +357,7 @@ fi
 
 #################################################### destroy stage
 
-if [[ ${COMMAND} == "all" || ${COMMAND} == "destroy" ]]; then
+if [[ ${COMMAND} == "test" || ${COMMAND} == "destroy" ]]; then
 
     # Check that the target was deployed
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 TARGET=""
-STAGE="all"
+COMMAND="all"
 CLOUD_CONFIG_DIR=~/.config/linchpin/
 CLOUD_CONFIG_FILE=clouds.yml
 CLOUD_PROFILE="kstests"
@@ -26,23 +26,32 @@ INVENTORY_DIR="linchpin/inventories"
 usage () {
     cat <<HELP_USAGE
 
-$(basename $0) [options] [--stage provision|run|destroy|status] TARGET
+$(basename $0) [options] COMMAND TARGET
 
 Run kickstart tests on runners temporarily provisioned by linchpin in cloud.
 Linchpin target name TARGET is defined in PinFile (linchpin/PinFile).
 
-Specific stage can be run separately using --stage option.
+Various commands can be used to run kickstart tests in cloud.
 
-  --stage provision|run|destroy|status
-                             provision  provision target TARGET in cloud
-                             run        run tests on TARGET
-                             destroy    destroy target TARGET in cloud
-                             status     show status of test running on TARGET
+COMMANDs:
+
+  test               provision TARGET, run tests, destroy TARGET
+  schedule           schedule the test on TARGET using local host timer
+
+  Breaking down the test into separate stages:
+
+  provision          provision target TARGET from PinFile in cloud
+  run                run tests in cloud on target TARGET
+  destroy            destroy target TARGET in cloud
+
+  status             show status of test running on TARGET
+
 Options:
 
   --cloud NAME               name of the cloud profile to be used for cloud credentials
                              (stored in ~/.config/linchpin/cloud.yml by default)
-  Provisioning options ("provision" stage):
+
+  Provisioning options ("provision" command):
 
     --pinfile                name of the linchpin pinfile to use;
                              the file is located in linchpin directory, default is "PinFile"
@@ -60,7 +69,7 @@ Options:
                              without the option a new temporary master runner key is generated;
                              note that the private key will be uploaded to master.
 
-  Test configuration options ("run" stage):
+  Test configuration options ("run" command):
 
     --results PATH           directory for storing results synced from master to local host
     --test-configuration PATH
@@ -73,7 +82,7 @@ Options:
 HELP_USAGE
 }
 
-options=$(getopt -o k: --long cloud:,results:,key-name:,key-use-existing,key-upload:,ansible-private-key:,key-use-for-master,test-configuration:,stage:,pinfile: -- "$@")
+options=$(getopt -o k: --long cloud:,results:,key-name:,key-use-existing,key-upload:,ansible-private-key:,key-use-for-master,test-configuration:,pinfile: -- "$@")
 [ $? -eq 0 ] || {
     echo "Usage:"
     usage
@@ -128,15 +137,13 @@ while true; do
             TEST_CONFIGURATION_FILE=$1
         fi
         ;;
-    --stage)
-        shift;
-        STAGE=$1
-        ;;
     --pinfile)
         shift;
         PINFILE=$1
         ;;
     --)
+        shift;
+        COMMAND=$1
         shift;
         TARGET=$1
         break
@@ -144,6 +151,11 @@ while true; do
     esac
     shift
 done
+
+if [[ -z ${COMMAND} ]]; then
+    echo "COMMAND is required"
+    exit 1
+fi
 
 if [[ -z ${TARGET} ]]; then
     echo "TARGET is required"
@@ -158,7 +170,7 @@ TARGET_KEY_DIR=${STORED_PRIVATE_KEYS_DIR}/${TARGET}
 
 #################################################### provision stage
 
-if [[ ${STAGE} == "all" || ${STAGE} == "provision" ]]; then
+if [[ ${COMMAND} == "all" || ${COMMAND} == "provision" ]]; then
 
     if [[ -e $INVENTORY ]]; then
         echo "Inventory ${INVENTORY} for target ${TARGET} exists, it must have been already deployed"
@@ -252,7 +264,7 @@ fi
 
 #################################################### run stage
 
-if [[ ${STAGE} == "all" || ${STAGE} == "run" ]]; then
+if [[ ${COMMAND} == "all" || ${COMMAND} == "run" ]]; then
 
     # Check that the target was deployed
 
@@ -284,7 +296,7 @@ fi
 
 #################################################### destroy stage
 
-if [[ ${STAGE} == "all" || ${STAGE} == "destroy" ]]; then
+if [[ ${COMMAND} == "all" || ${COMMAND} == "destroy" ]]; then
 
     # Check that the target was deployed
 
@@ -312,7 +324,7 @@ fi
 
 #################################################### check test run status
 
-if [[ ${STAGE} == "status" ]]; then
+if [[ ${COMMAND} == "status" ]]; then
 
     # Check that the target was deployed
 

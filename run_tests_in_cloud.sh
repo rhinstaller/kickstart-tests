@@ -58,7 +58,7 @@ Options:
 
   Provisioning options ("provision" command):
 
-    --pinfile                name of the linchpin pinfile to use;
+    -p, --pinfile            name of the linchpin pinfile to use;
                              the file is located in linchpin directory, default is "PinFile"
 
     -k, --key-name NAME      name of the ssh key used for provisioning in cloud;
@@ -76,8 +76,8 @@ Options:
 
   Test configuration options ("run" command):
 
-    --results PATH           directory for storing results synced from master to local host
-    --test-configuration PATH
+    -r, --results PATH       directory for storing results synced from master to local host
+    -c, --test-configuration PATH
                              path to file with test configuration to be used;
                              overrides default test-configuration.yml
                              (ansible/roles/kstest-master/defaults/main/test-configuration.yml)
@@ -95,7 +95,7 @@ Options:
 HELP_USAGE
 }
 
-options=$(getopt -o k: --long cloud:,results:,key-name:,key-use-existing,key-upload:,ansible-private-key:,key-use-for-master,test-configuration:,pinfile:,when:,remove,logfile:,scheduled -- "$@")
+options=$(getopt -o k:r:c:p: --long cloud:,results:,key-name:,key-use-existing,key-upload:,ansible-private-key:,key-use-for-master,test-configuration:,pinfile:,when:,remove,logfile:,scheduled -- "$@")
 [ $? -eq 0 ] || {
     echo "Usage:"
     usage
@@ -136,14 +136,14 @@ while true; do
         shift;
         CLOUD_PROFILE=$1
         ;;
-    --results)
+    -r|--results)
         shift;
         RESULTS_DIR=$1
         ;;
     --key-use-for-master)
         USE_KEY_FOR_MASTER="yes"
         ;;
-    --test-configuration)
+    -c|--test-configuration)
         shift;
         if [[ "$1" == "${1#/}" ]]; then
             # make relative path absolute
@@ -152,7 +152,7 @@ while true; do
             TEST_CONFIGURATION_FILE=$1
         fi
         ;;
-    --pinfile)
+    -p|--pinfile)
         shift;
         PINFILE=$1
         ;;

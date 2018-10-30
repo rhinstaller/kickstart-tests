@@ -1,13 +1,16 @@
 #!/bin/bash
 
-TARGET=""
 COMMAND="test"
+RESULTS_DIR=""
+TEST_CONFIGURATION_FILE=""
+
 CLOUD_CONFIG_DIR=~/.config/linchpin/
 CLOUD_CONFIG_FILE=clouds.yml
 CLOUD_PROFILE="kstests"
-RESULTS_DIR=""
-TEST_CONFIGURATION_FILE=""
+
 PINFILE="PinFile"
+TARGET=""
+REMOTE_USER="fedora"
 
 KEY_NAME=$(uuidgen)
 KEY_MODE="generate"
@@ -63,7 +66,7 @@ Options:
     -k, --key-name NAME      name of the ssh key used for provisioning in cloud;
                              by default new key is generated on the cloud provider
     --key-use-existing       use the existing key --key-name from cloud
-    --key-upload PATH        upload public ssh key defined by PATH (as --key-name if defined).
+    --key-upload PATH        upload public ssh key defined by PATH (as --key-name if defined)
     --ansible-private-key PATH
                              path to private ssh key to be used for ansible deployment;
                              if not defined generated key or user's default ssh key is used;
@@ -71,7 +74,11 @@ Options:
     --key-use-for-master     use the deployment key also as master runner key which
                              is used by master to access other test runners;
                              without the option a new temporary master runner key is generated;
-                             note that the private key will be uploaded to master.
+                             note that the private key will be uploaded to master
+
+    --remote-user            remote user for deployment of provisioned runners by ansible;
+                             for example for Fedora cloud images it is "fedora";
+                             for RHEL could images it is "cloud-user"
 
   Test configuration options ("run" command):
 
@@ -94,7 +101,7 @@ Options:
 HELP_USAGE
 }
 
-options=$(getopt -o k:r:c:p: --long cloud:,results:,key-name:,key-use-existing,key-upload:,ansible-private-key:,key-use-for-master,test-configuration:,pinfile:,when:,remove,logfile:,scheduled -- "$@")
+options=$(getopt -o k:r:c:p: --long cloud:,results:,key-name:,key-use-existing,key-upload:,ansible-private-key:,key-use-for-master,test-configuration:,pinfile:,when:,remove,logfile:,scheduled,remote-user: -- "$@")
 [ $? -eq 0 ] || {
     echo "Usage:"
     usage
@@ -134,6 +141,10 @@ while true; do
     --cloud)
         shift;
         CLOUD_PROFILE=$1
+        ;;
+    --remote-user)
+        shift;
+        REMOTE_USER=$1
         ;;
     -r|--results)
         shift;
@@ -306,6 +317,7 @@ if [[ ${COMMAND} == "test" || ${COMMAND} == "provision" ]]; then
             cat <<EOF >> ${INVENTORY}
 [${group}:vars]
 ansible_ssh_private_key_file=${PRIVATE_KEY_PATH}
+remote_user=${REMOTE_USER}
 EOF
         done
     fi

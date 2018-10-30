@@ -36,20 +36,19 @@ $(basename $0) [options] COMMAND TARGET
 Run kickstart tests on runners temporarily provisioned by linchpin in cloud.
 Linchpin target name TARGET is defined in PinFile (linchpin/PinFile).
 
-Various commands can be used to run kickstart tests in cloud.
+These commands for running a test can be used:
 
 COMMANDs:
 
   test               provision TARGET, run tests, destroy TARGET
   schedule           schedule the test on TARGET using local host timer
+  status             show status of the test running on TARGET
 
   Breaking down the test into separate stages:
 
-  provision          provision target TARGET from PinFile in cloud
-  run                run tests in cloud on target TARGET
-  destroy            destroy target TARGET in cloud
-
-  status             show status of test running on TARGET
+  provision          provision target TARGET from PinFile
+  run                run tests on target TARGET
+  destroy            destroy target TARGET
 
 Options:
 

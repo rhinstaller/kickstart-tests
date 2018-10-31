@@ -13,16 +13,16 @@ The playbooks
 
 *runner*:
 
-* `deploy-kstest-runners.yml` - deploys *runners* - hosts on which the tests can be run remotely
+* `kstest-runners-deploy.yml` - deploys *runners* - hosts on which the tests can be run remotely
 
 *master*:
 
-* `deploy-kstest-master.yml` - deploys *master* runner (on top of a *runner*) from which the tests can be run or scheduled and which can also store and forward test results
-* `configure-test-for-kstest-master.yml` - [configures a test](#test-configuration) to be run from *master* on *runners*
-* `run-test-from-kstest-master.yml` - runs test from *master* on *runners* (including the *master*)
-* `show-master-test-status.yml` - shows the status of a test run from *master*
-* `sync-results-from-master.yml` - synchronizes test [results](#results) from *master* to local host
-* `schedule-test-on-kstest-master.yml` - [schedules](#scheduling-configuration) test on *master*
+* `kstest-master-deploy.yml` - deploys *master* runner (on top of a *runner*) from which the tests can be run or scheduled and which can also store and forward test results
+* `kstest-master-configure-test.yml` - [configures a test](#test-configuration) to be run from *master* on *runners*
+* `kstest-master-run-test.yml` - runs test from *master* on *runners* (including the *master*)
+* `kstest-master-show-test-status.yml` - shows the status of a test run from *master*
+* `kstest-master-fetch-results.yml` - synchronizes test [results](#results) from *master* to local host
+* `kstest-master-schedule-test.yml` - [schedules](#scheduling-configuration) test on *master*
 
 
 Deployment configuration
@@ -60,7 +60,7 @@ Depending on the provisioning, access to the hosts may need to be additionally c
 
 * Access to *runners* can be further configured by dropping public ssh key into [roles/kstest/files/authorized_keys](roles/kstest/files/authorized_keys) folder. This key will be added to *runner*'s authorized keys. (Note that thanks to idempotency of the playbook this can be done also later after the *runners* are deployed).
 
-* *Master* is using a *master key* for communicating with *runners*. By default a new keypair is generated when deploying the *master* with `deploy-kstest-master.yml` playbook. It is possible to use custom keypair by setting variables pointing to local host path to the keys `master_private_ssh_key` and `master_public_ssh_key` for the playbook. This can be useful if automatic [syncing](#syncing) of results from master to a remote host is used.
+* *Master* is using a *master key* for communicating with *runners*. By default a new keypair is generated when deploying the *master* with `kstest-master-deploy.yml` playbook. It is possible to use custom keypair by setting variables pointing to local host path to the keys `master_private_ssh_key` and `master_public_ssh_key` for the playbook. This can be useful if automatic [syncing](#syncing) of results from master to a remote host is used.
 
 
 NOTE: It is also possible to specify the inventory and access to *runners* in `ansible.cfg` file by updating `inventory`, `remote_user` and `ssh_private_key` variables. In this case the inventory does not have to be passed to the playbooks with `-i` option. The file should be placed in current working directory.
@@ -72,10 +72,10 @@ vim ansible.cfg
 Test configuration
 ------------------
 
-The configuration of the test to be run on the *master* is internally done by setting up the run script (`/home/kstest/run_tests.sh`) on the *master* host with `configure-test-for-kstest-master.yml` playbook:
+The configuration of the test to be run on the *master* is internally done by setting up the run script (`/home/kstest/run_tests.sh`) on the *master* host with `kstest-master-configure-test.yml` playbook:
 
 ```
-ansible-playbook configure-test-for-kstest-master.yml
+ansible-playbook kstest-master-configure-test.yml
 ```
 
 Default test configuration values are defined in `kstest-master` role's configuration [file](roles/kstest-master/defaults/main/test-configuration.yml) and can be overriden in several ways:
@@ -84,12 +84,12 @@ Default test configuration values are defined in `kstest-master` role's configur
 * override the default file with `roles/kstest-master/vars/main/test-configuration.yml` file
 * use playbook extra variable to set up the configuration file to be used:
 ```
-ansible-playbook --extra-vars 'test_configuration=/path/to/the/my-test-config.yml' configure-test-for-kstest-master.yml
+ansible-playbook --extra-vars 'test_configuration=/path/to/the/my-test-config.yml' kstest-master-configure-test.yml
 ```
 * use playbook extra variables to override specific test configuration variables:
 ```
 ansible-playbook --extra-vars 'kstest_updates_img=http://<URL> kstest_test_to_run="user hostname"'
-configure-test-for-kstest-master.yml
+kstest-master-configure-test.yml
 ```
 
 Scheduling configuration
@@ -98,7 +98,7 @@ Scheduling configuration
 A) a test run can scheduled by `cron` on *master* using a playbook:
 
 ```
-ansible-playbook schedule-test-on-kstest-master.yml
+ansible-playbook kstest-master-schedule-test.yml
 ```
 
 Default scheduling configuration values are defined in kstest-master role's [scheduling variables file](roles/kstest-master/defaults/main/schedule.yml) and can be overriden by several means:
@@ -107,7 +107,7 @@ Default scheduling configuration values are defined in kstest-master role's [sch
 * override the default file with `roles/kstest-master/vars/main/schedule.yml` file
 * use playbook extra variables to override specific variables, for example to disable the scheduled test:
 ```
-ansible-playbook --extra-vars 'kstest_schedule_cron_disabled=true' schedule-test-on-kstest-master.yml
+ansible-playbook --extra-vars 'kstest_schedule_cron_disabled=true' kstest-master-schedule-test.yml
 
 ```
 
@@ -144,26 +144,26 @@ By default the results and logs from a test run are stored on *master* in kstest
 
 The names of directories and files are configurable overriding ansible variable defaults set in configuration files [roles/kstest-master/defaults/main/test-configuration.yml](roles/kstest-master/defaults/main/test-configuration.yml) and [roles/kstest-master/vars/main/main.yml](roles/kstest-master/vars/main/main.yml).
 
-The configuration of results is applied by `configure-test-for-kstest-master.yml` playbook:
+The configuration of results is applied by `kstest-master-configure-test.yml` playbook:
 
 ```
-ansible-playbook configure-test-for-kstest-master.yml
+ansible-playbook kstest-master-configure-test.yml
 ```
 
 #### Syncing
 
 A) Pull from the local host:
 
-The results of tests can be synced from *master* to local host using `sync-results-from-master.yml` playbook. The local directory is configurable by `local_dir` ansible variable (by default a temporary directory in `/tmp` is created).
+The results of tests can be synced from *master* to local host using `kstest-master-fetch-results.yml` playbook. The local directory is configurable by `local_dir` ansible variable (by default a temporary directory in `/tmp` is created).
 ```
-ansible-playbook --extra-vars='local_dir=/tmp/kstest-results' sync-results-from-master.yml
+ansible-playbook --extra-vars='local_dir=/tmp/kstest-results' kstest-master-fetch-results.yml
 ```
 
 B) Automatic push from *master* to a remote host:
 
-*Master* can be configured to sync results to a remote host automatically when a test run fininshes. It is set by `kstest_remote_results_*` variables whose defaults are configured in [roles/kstest-master/defaults/main/test-configuration.yml](roles/kstest-master/defaults/main/test-configuration.yml) and applied by `configure-test-for-kstest-master.yml` playbook:
+*Master* can be configured to sync results to a remote host automatically when a test run fininshes. It is set by `kstest_remote_results_*` variables whose defaults are configured in [roles/kstest-master/defaults/main/test-configuration.yml](roles/kstest-master/defaults/main/test-configuration.yml) and applied by `kstest-master-configure-test.yml` playbook:
 ```
-ansible-playbook --extra-vars='kstest_remote_results_path=user@results_server:results kstest_remote_results_keep_local=no' configure-test-for-kstest-master.yml
+ansible-playbook --extra-vars='kstest_remote_results_path=user@results_server:results kstest_remote_results_keep_local=no' kstest-master-configure-test.yml
 ```
 Note: the remote host for storing results needs to have *master* authorized for syncing the results. For example by adding `master_private_ssh_key` from *master* role to authorized keys.
 
@@ -194,7 +194,7 @@ vim ansible/inventory/mytest.inventory
 2) Deploy the runners.
 
 ```
-ansible-playbook -i ansible/inventory/mytest.inventory ansible/deploy-kstest-runners.yml
+ansible-playbook -i ansible/inventory/mytest.inventory ansible/kstest-runners-deploy.yml
 ```
 
 3) Run the test.
@@ -241,8 +241,8 @@ vim inventory/mytest.inventory
 
 2) Deploy the runners and the master.
 ```
-ansible-playbook -i inventory/mytest.inventory deploy-kstest-runners.yml
-ansible-playbook -i inventory/mytest.inventory deploy-kstest-master.yml
+ansible-playbook -i inventory/mytest.inventory kstest-runners-deploy.yml
+ansible-playbook -i inventory/mytest.inventory kstest-master-deploy.yml
 
 ```
 
@@ -250,25 +250,25 @@ ansible-playbook -i inventory/mytest.inventory deploy-kstest-master.yml
 
 [Configure the test](#test-configuration) on *master*:
 ```
-ansible-playbook -i inventory/mytest.inventory configure-test-for-kstest-master.yml
+ansible-playbook -i inventory/mytest.inventory kstest-master-configure-test.yml
 ```
 
 4) Run the test.
 
 ```
-ansible-playbook -i inventory/mytest.inventory run-test-from-kstest-master.yml
+ansible-playbook -i inventory/mytest.inventory kstest-master-run-test.yml
 ```
 
 It is possible to check the status of the running test (from another terminal).
 
 ```
-ansible-playbook -i inventory/mytest.inventory show-master-test-status.yml
+ansible-playbook -i inventory/mytest.inventory kstest-master-show-test-status.yml
 ```
 
 6) Fetch test results to local host.
 
 ```
-ansible-playbook -i inventory/mytest.inventory --extra-vars='local_dir=/tmp/kstest-results' sync-results-from-master.yml
+ansible-playbook -i inventory/mytest.inventory --extra-vars='local_dir=/tmp/kstest-results' kstest-master-fetch-results.yml
 ```
 
 #### C) Scheduling nightly tests on *master*
@@ -293,15 +293,15 @@ vim inventory/mytest.inventory
 
 2) Deploy the runners and the master.
 ```
-ansible-playbook -i inventory/mytest.inventory deploy-kstest-runners.yml
-ansible-playbook -i inventory/mytest.inventory deploy-kstest-master.yml
+ansible-playbook -i inventory/mytest.inventory kstest-runners-deploy.yml
+ansible-playbook -i inventory/mytest.inventory kstest-master-deploy.yml
 ```
 
 3) Configure the test.
 
 [Configure the test](#test-configuration) on *master*:
 ```
-ansible-playbook -i inventory/mytest.inventory configure-test-for-kstest-master.yml
+ansible-playbook -i inventory/mytest.inventory kstest-master-configure-test.yml
 ```
 
 4) Configure result synchronization.
@@ -309,7 +309,7 @@ ansible-playbook -i inventory/mytest.inventory configure-test-for-kstest-master.
 See B) of [syncing](#syncing) for details.
 
 ```
-ansible-playbook -i inventory/mytest.inventory --extra-vars='kstest_remote_results_path=user@results_server:results kstest_remote_results_keep_local=no' configure-test-for-kstest-master.yml
+ansible-playbook -i inventory/mytest.inventory --extra-vars='kstest_remote_results_path=user@results_server:results kstest_remote_results_keep_local=no' kstest-master-configure-test.yml
 ```
 
 You need to authorize *master* for accessing the `results_server` with rsync.
@@ -321,6 +321,6 @@ See [scheduling configuration](#scheduling-configuration) for details.
 To use default nightly run just enable the scheduling:
 
 ```
-ansible-playbook -i inventory/mytest.inventory --extra-vars 'kstest_schedule_cron_disabled=false' schedule-test-on-kstest-master.yml
+ansible-playbook -i inventory/mytest.inventory --extra-vars 'kstest_schedule_cron_disabled=false' kstest-master-schedule-test.yml
 
 ```

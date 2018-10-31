@@ -324,12 +324,12 @@ EOF
 
     # Deploy the test runners and master
 
-    ansible-playbook -i ${INVENTORY} ansible/deploy-kstest-runners.yml
+    ansible-playbook -i ${INVENTORY} ansible/kstest-runners-deploy.yml
 
     if [[ ${USE_KEY_FOR_MASTER} == "yes" ]]; then
-        ansible-playbook -i ${INVENTORY} ansible/deploy-kstest-master.yml --extra-vars "master_private_ssh_key=${PRIVATE_KEY_PATH} master_public_ssh_key=${STORED_PUBLIC_KEY_PATH}"
+        ansible-playbook -i ${INVENTORY} ansible/kstest-master-deploy.yml --extra-vars "master_private_ssh_key=${PRIVATE_KEY_PATH} master_public_ssh_key=${STORED_PUBLIC_KEY_PATH}"
     else
-        ansible-playbook -i ${INVENTORY} ansible/deploy-kstest-master.yml
+        ansible-playbook -i ${INVENTORY} ansible/kstest-master-deploy.yml
     fi
 
 fi
@@ -349,19 +349,19 @@ if [[ ${COMMAND} == "test" || ${COMMAND} == "run" ]]; then
     # Configure and the test
 
     if [[ -n ${TEST_CONFIGURATION_FILE} ]]; then
-        ansible-playbook -i ${INVENTORY} ansible/configure-test-for-kstest-master.yml --extra-vars "kstest_result_run_dir_prefix=${TARGET}. test_configuration=${TEST_CONFIGURATION_FILE}"
+        ansible-playbook -i ${INVENTORY} ansible/kstest-master-configure-test.yml --extra-vars "kstest_result_run_dir_prefix=${TARGET}. test_configuration=${TEST_CONFIGURATION_FILE}"
     else
-        ansible-playbook -i ${INVENTORY} ansible/configure-test-for-kstest-master.yml --extra-vars "kstest_result_run_dir_prefix=${TARGET}."
+        ansible-playbook -i ${INVENTORY} ansible/kstest-master-configure-test.yml --extra-vars "kstest_result_run_dir_prefix=${TARGET}."
     fi
 
     # Run the test
 
-    ansible-playbook -i ${INVENTORY} ansible/run-test-from-kstest-master.yml
+    ansible-playbook -i ${INVENTORY} ansible/kstest-master-run-test.yml
 
     # Fetch results
 
     if [[ -n ${RESULTS_DIR} ]]; then
-        ansible-playbook -i ${INVENTORY} ansible/sync-results-from-master.yml --extra-vars "local_dir=${RESULTS_DIR}"
+        ansible-playbook -i ${INVENTORY} ansible/kstest-master-fetch-results.yml --extra-vars "local_dir=${RESULTS_DIR}"
     fi
 
 fi
@@ -408,6 +408,6 @@ if [[ ${COMMAND} == "status" ]]; then
 
     # Show status of test run
 
-    ansible-playbook -i ${INVENTORY} ansible/kstest-status.yml
+    ansible-playbook -i ${INVENTORY} ansible/kstest-master-show-test-status.yml
 
 fi

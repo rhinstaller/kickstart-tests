@@ -60,12 +60,21 @@ boot_args() {
     echo ""
 }
 
+run_with_timeout() {
+    # Sends TERM after duration time and eventually KILL after 10s
+    # to the process run by cmd.
+    # Returns 124 status if timeout was reached.
+    duration="$1"
+    cmd="$2"
+    timeout -k 10s ${duration} ${cmd}
+}
+
 copy_file() {
     disks="$1"
     file="$2"
     dir="$3"
 
-    virt-copy-out ${disks} ${file} ${dir}
+    run_with_timeout 1000s "virt-copy-out ${disks} ${file} ${dir}"
 }
 
 validate_RESULT() {

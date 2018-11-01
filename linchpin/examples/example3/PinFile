@@ -1,0 +1,8 @@
+---
+network-tests:
+  topology: kstests.yml
+  layout: kstests.yml
+
+network-tests-patched:
+  topology: kstests.yml
+  layout: kstests.yml

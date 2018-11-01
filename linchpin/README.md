@@ -1,21 +1,33 @@
-Provisioning hosts for remote tests in a cloud
-==============================================
+Running kickstart tests in cloud
+================================
 
-Using `linchpin` the hosts can be provisioned and respective inventory created for deployment of the hosts for remote tests using [ansible playbooks](../ansible).
+There is a suite of [ansible playbooks](../ansible) for running kickstart tests on remote hosts (*runners*) deployed by the playbooks.
 
-Linchpin installation
----------------------
+Using `linchpin`, the *runners* can be provisioned in cloud while creating respective inventory for the playbooks.
 
-Linchpin `pip` installation in `virtualenv` is desribed in [documentation](https://linchpin.readthedocs.io)
+To pull *runners* provisioning (linchpin) and deployment (ansible), *test run* configuration (ansible), *test run* execution (ansible), results gathering (ansible), and *runners* teardown (linchpin) together there is a [kstests-in-cloud.sh](../kstests-in-cloud.sh) script available. 
 
-Credentials
+Requirements
 -----------
 
-* The cloud credentials need to be configured in the file and profile reffered by `credentials` variable of [topologies/kstests.yml](topologies/kstests.yml). So the credentials file `clouds.yml` should contain profile `ci-rhos`. The path to the directory containing the file is provided by `linchpin` `--creds-path` option.
+The script requires `linchpin` and `ansible` to be installed. Linchpin `pip` installation in `virtualenv` is desribed in [documentation](https://linchpin.readthedocs.io).
+
+Linchpin target
+---------------
+
+Linchpin *target* is the reference to the group of cloud resources (hosts) used for *test runs*. It is possible to work with multiple *targets* from  a single `kickstart-tests` repository in parallel, but only a single *target* of a given name should be used from a single local host at the same time.
+
+The resources to be provisioned for a *target* are defined in a linchpin *pinfile*. By default the template [PinFile](PinFile) would be used. The file contains one template *target* `kstests`. Custom *targets* can be either added to the file or defined in a separate file which is passed to the [script](../kstests-in-cloud.sh) with `--pinfile` option.
+
+Cloud credentials
+-----------------
+
+The cloud credentials need to be provided in the file and profile referred by `credentials` variable of the *target's* *pinfile*. Example [PinFile](PinFile) names the file `clouds.yml`. The default value of the `cloud_profile` variable is defined in the [script](../kstests-in-cloud.sh) as `kstest` (can be configured by `--cloud` option). By default the file will be looked up in `~/.config/linchpin`. The example of credentials configuration for `kstests` profile:
 
 ```
+$ cat ~/.config/linchpin/clouds.yml
 clouds:
-  ci-rhos:
+  kstests:
     auth:
       auth_url:
       project_name:
@@ -23,140 +35,91 @@ clouds:
       password:
 ```
 
-* Ssh keys for provisioned hosts are defined in [topologies/kstests.yml](topologies/kstests.yml), for example by `keypair` value for openstack. The key will be later needed to [configure](../ansible/ansible.cfg) ansible for running the [deployment playbooks](../ansible) on the provisioned hosts.
+Resources configuration
+-----------------------
 
+#### Resource types
 
-Configuration
--------------
+A kickstart *test run* (a batch of selected individual tests) can be run using two types of remote runners:
 
-* Number of hosts to be provisioned can be configured by `count` variable in [topologies/kstests.yml](topologies/kstests.yml) and [layouts/kstests.yml](layouts/kstests.yml).
+* *runners* - Hosts that can be used as remote runners for individual tests distributed in the *test run*. The tests are run as instrumented kickstart installations in kvm guests on *runner* hypervisors.
+* *master* - Is an enhanced *runner* which can serve as the executor of a *test run*, taking care of the *test run* configuration, distribution to *runners*, and results gathering and forwarding.
 
-  * `kstest` are hosts on which remote tests are to be run (deployed by [kstest](../ansible/roles/kstest) role)
-  * `kstest-master` is a host from which remote tests can be run (deployed by [kstest-master](../ansible/roles/kstest-master))
+For more details see [ansible playbooks](../ansible/README.md) for deployment and running of kickstart tests. The playbooks are applied to *runners* and *master* defined in [inventory](../ansible/inventory/hosts) groups `kstest` and `kstest-master`. The inventory for a *target* is generated automatically when provisioning the hosts with `linchpin`.
 
-* The provisioning parameters (image, host flavor, etc...) are configured in [topologies/kstests.yml](topologies/kstests.yml).
-
-Example 1: a test run from a local host on remote hosts in a cloud
-------------------------------------------------------------------
-
-The test will be run from local host on `kstest` hosts provisioned with `linchpin` and deployed with `kstest` ansible playbook.
-
-* The cloud credentials and number of `kstest` instances should be configured as described above in [Credentials](#credentials) and [Configuration](#configuration). There is no need for `kstest-master` instance.
-* Ansible and the deployment playbook should be configured as described in [kstest](../ansible/roles/kstest#remote-hosts-deployment) role
-
-From the `kickstart-tests` directory provision and deploy remote hosts (`kstest` instances):
-
+To learn the path to the inventory generated for *target* `TARGET` (for example to run the playbooks individually on provisioned *target*), use `status` command:
 ```
-rm linchpin/inventories/kstests-*.inventory
-linchpin -v --creds-path <PATH_TO_CREDENTIALS> --workspace linchpin -c linchpin/linchpin.conf up
-cp linchpin/inventories/kstests-*.inventory ansible/inventory/linchpin.kstests
-cd ansible
-ansible-playbook kstest.yml
-cd -
+kstest-in-cloud.sh status <TARGET>
 ```
 
-IP addresses of provisioned hosts can be found in the inventory generated by `linchpin`:
+#### Resoruces configuration
+
+A *target*'s resources are defined in a *pinfile*. Template [PinFile](PinFile) defines openstack *target* `kstests`. A custom *target* can be either added to the file or defined in another file passed to the script by `--pinfile` option. See [examples](examples). Sometimes it makes more sense to define multiple *targets* in a non-flat [exapmles/example3/PinFile](examples/example3/PinFile) including shared [topology](topologies/kstests.yml) and [inventory layout](layouts/kstests.yml) definitions.
+
+Some of the values need to be configured for used cloud resource pools, for example `fip_pool` and `networks`.
+
+Some of them may be modified depending on the amount of required resources (RAM, storage, CPUs) estimated by the number of tests included in the *test run*:
+
+* `count` - Number of *runners* (including *master*) to be provisioned. [Example](examples/example1/PinFile) of using only one single *runner* which also serves as *master*
+* `flavor` - Size of the *runner* (RAM, CPUs, storage). This value is related to the number of tests (kvm guests) to be run on a *runner* in parallel which is configurable by [`kstest_tests_jobs`](../ansible/roles/kstest-master/defaults/main/test-configuration.yml) variable or [test configuration](#test-run-configuration). For example for running 4 tests in parallel 8 CPUs, 16 GB of RAM, and 40 GB of storage should be enough.
+
+Some of them may require using a *script* parameter:
+
+* `image` - Cloud image to be used as the base for *runners* deployment. This may require setting the default remote user for deployment by `--remote-user` option. (For example Fedora cloud images have `fedora` user, RHEL cloud images have `cloud-user`.)
+
+Ssh keys
+--------
+
+By default all needed keys will be automatically generated when provisioning a *target*, but it is possible to configure keys to be used.
+
+There are two ssh keypairs:
+
+* *Deployment key* - Used by ansible to access *master* and *runners*. By default a new keypair is generated in the cloud. There are options to use existing key or upload a key to the cloud (`--key-use-existing`, `--key-upload`). The key name (of the key to be generated or used or uploaded) is specified by `--key-name` option.
+* *Master key* - Used by *master* to access *runners* for distribution of a *test run*. By default a new throw-away keypair is generated. It is possible to use the *deployment key* with `--key-use-for-master` option. To authorize additional keys on *runners* drop them into [../ansible/roles/kstest/files/authorized_keys](../ansible/roles/kstest/files/authorized_keys) before provisioning (this can be done also after provisioning with [../ansible/kstest-runners-deploy.yml](../ansible/kstest-runners-deploy.yml) playbook) 
+
+
+
+*Test run* configuration
+------------------------
+
+Default test configuration is defined in ansible kstest-master role's [test-configuration.yml](../ansible/roles/kstest-master/defaults/main/test-configuration.yml) file. The default values can be overriden in a file passed to the script with `--test-configuration` option ([example custom configuration](examples/example1/test-configuration.yml)).
+
+The [details](../ansible/README.md#test-configuration).
+
+Results
+-------
+
+The results and logs are stored in directory passed by `--results` option. For the structure of the results see [details](../ansible/README.md#results).
+
+To show the status and temporary results of a *test run* currently running on a *target* run the script with `status` command.
 ```
-cat ansible/inventory/linchpin.kstests
-```
-
-Run the test providing the IP addresses from the inventory:
-```
-$ TEST_REMOTES=<IP1 IP2 ...> TEST_REMOTES_ONLY=yes scripts/run_kickstart_tests.sh -i ../boot.iso -k 1 hostname.sh user.sh
-```
-(see [kstest](../ansible/roles/kstest#running-the-test) role documentation for details)
-
-To remove the hosts from the cloud:
-```
-$ linchpin -v --creds-path <PATH_TO_CREDENTIALS> --workspace linchpin -c linchpin/linchpin.conf destroy
-```
-Example 2: a test run completely in a cloud
--------------------------------------------
-
-The test will be run from `kstest-master` on the master and additional `kstest` hosts.
-
-* The cloud credentials and number of `kstest` instances should be configured as described above in [Credentials](#credentials) and [Configuration](#configuration).
-* Ansible and the deployment playbooks should be configured as described in [../ansible/README.md](../ansible/README.md)
-* The test parameters can be configured as described in [kstest-master](../ansible/roles/kstest-master) role.
-  * either by modifying the [ansible variables file](../ansible/roles/kstest-master/defaults/main.yml) before running the `kstest-master.yml` playbook in the script
-  * or by supplying the values via `--extra-vars` option to the `kstest-master.yml` playbook in the script
-
-Example of a script that would be run from kickstart-tests repository directory.
-
-```
-#!/bin/bash
-
-set -ex
-
-# Clean up linchpin inventory dir
-rm linchpin/inventories/kstests-*.inventory
-
-# Provision the hosts
-linchpin -v --creds-path <PATH_TO_CREDENTIALS> --workspace linchpin -c linchpin/linchpin.conf up
-
-# Pass resulting inventory to ansible
-cp linchpin/inventories/kstests-*.inventory ansible/inventory/linchpin.kstests
-
-cd ansible
-
-# Deploy the hosts
-ansible-playbook kstest.yml
-
-# Deploy the master and configure the test
-ansible-playbook kstest-master.yml
-
-# Run the test
-ansible kstest-master -m shell -a "PATH=$PATH:/usr/sbin ~/run_tests.sh" -u kstest
-
-cd -
-
-# Destroy the provisioned hosts
-linchpin -v --creds-path <PATH_TO_CREDENTIALS> --workspace linchpin -c linchpin/linchpin.conf destroy
+kstest-in-cloud.sh status <TARGET>
 ```
 
-The script updated with configuration checks and hints: [../run_tests_in_cloud.sh](../run_tests_in_cloud.sh)
+Scheduling a *test run*
+-----------------------
 
-Example 3: scheduling tests run completely in cloud
----------------------------------------------------
+To schedule a *test run* on a temporarily provisioned *target* just replace the `test` command with `schedule` and add scheduling related options eventually (as in this [example](examples/example4)):
 
-To schedule tests in cloud, two approaches can be used.
-
-### 3A: One-shot test runners provisioned for test scheduled from local host
-
-The runners are provisioned when the test scheduled (using user systemd timer) from local host is run and are destroyed after the test finishes.
-
-* Configure runners provisioning with linchpin as described above in [Credentials](#credentials) and [Configuration](#configuration).
-* Configure the test and syncing to remote host (`kstest_remote_results_path` variable) with kstest-master role [test config](../ansible/roles/kstest-master/defaults/main.yml).
 ```
-vim ansible/roles/kstest-master/defaults/main.yml
-```
-* Schedule the test from local host using [`schedule_tests.yml`](schedule_tests.yml) playbook and its [configuration file](roles/schedule/defaults/main.yml):
-```
-vim linchpin/roles/schedule/defaults/main.yml
-ansible-playbook linchpin/schedule_tests.yml
+./kstests-in-cloud.sh schedule nightly1 --pinfile examples/example4/PinFile --test-configuration linchpin/examples/example4/test-configuration.yml --results /tmp/kstest-results-nightly --virtualenv /home/rvykydal/work/linchpin/linchpin-latest --logfile /tmp/kstest-results-nightly/sheduled_runs.log --when "Mon-Fri *-*-* 00:00:05"
 ```
 
-* To disable the scheduled test and clean up created files run
-```
-ansible-playbook linchpin/remove_scheduled_tests.yml
-```
+* `--when` - systemd's timer specification
+* `--logfile` - log of the scheduled *script* run
+* `--virtualenv` - required if linchpin is installed in `virtualenv`
 
-### 3B: Persistent test runners in cloud
+To remove a schedule for the *target* run:
+```
+kstest-in-cloud.sh schedule <TARGET> --remove
+```
+As can be seen in the example the results can be configured to be either pulled from local host or to be pushed from the *master* to a remote *results host*.
 
-All runners are persistent, the tests are scheduled (using `cron`) from the master runner.
+In the latter case the *master* has to be authorized to rsync the results to the *results host* so it makes sense to use existing [ssh key](#ssh-keys) that would be added to the *results host's* authorized keys as *master* key (`--key-name=kstests --ansible-ssh-key=~/.ssh/kstests.pem --key-use-for-master`)
 
-* Provision test runners, eg using linchpin as described in the previous [example](#example-2-a-test-run-completely-in-a-cloud).
-* Deploy the runners with ansible playbooks eg as described in the previous [example](#example-2-a-test-run-completely-in-a-cloud).
+It is also possible to set up the scheduling on the *master* of a permanent *target* (using *master's* `cron`). See this [example](examples/example5).
 
-* Configure the test with kstest-master role [test config](../ansible/roles/kstest-master/defaults/main.yml) and apply the configuration to the `kstest-master`. Optionally configure syncing from master runner with `remote_results_path`.
-```
-cd ansible
-vim roles/kstest-master/defaults/main.yml
-ansible-palybook --tags=configure-test kstest-master.yml
-```
-* Schedule test from master in kstest-master role [master config](../ansible/roles/kstest-master/vars/main.yml) (`kstest.master.cron`) and apply the configuration to the `kstest-master`.
-```
-cd ansible
-vim roles/kstest-master/vars/main.yml
-ansible-playbook --tags=schedule-test kstest-master.yml
-```
+Examples
+--------
+
+[examples](examples)

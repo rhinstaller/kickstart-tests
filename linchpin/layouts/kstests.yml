@@ -1,0 +1,14 @@
+---
+inventory_layout:
+  inventory_file: "{{ resource_name }}.inventory"
+  vars:
+    hostname: __IP__
+  hosts:
+    kstest:
+      count: 1
+      host_groups:
+        - kstest
+    kstest-master:
+      count: 1
+      host_groups:
+        - kstest-master

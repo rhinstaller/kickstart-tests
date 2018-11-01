@@ -10,10 +10,12 @@ BOOT_ISO_URL="{{ kstest_boot_iso_url }}"
 TEST_JOBS={{ kstest_test_jobs }}
 KSTESTS="{{ kstest_tests_to_run }}"
 TEST_TYPE="{{ kstest_test_type }}"
+SKIP_TYPES="{{ kstest_skip_test_types }}"
 REMOTE_RESULTS_PATH="{{ kstest_remote_results_path }}"
 REMOTE_RESULTS_KEEP_LOCAL="{{ kstest_remote_results_keep_local }}"
 RESULTS_SUMMARY_SCRIPT="{{ kstest.master.results_summary_script.dest }}"
 UPDATES_IMAGE="{{ kstest_updates_img }}"
+ADDITIONAL_BOOT_OPTIONS="{{ kstest_additional_boot_options }}"
 TEST_DEFAULTS_FILE=scripts/defaults.sh
 
 COMPOSE_BOOT_ISO=images/boot.iso
@@ -134,6 +136,14 @@ if [[ -n "${UPDATES_IMAGE}" ]]; then
     UPDATES_IMAGE_ARG="-u ${UPDATES_IMAGE}"
 fi
 
+
+### Use additional boot options
+
+ADDITIONAL_BOOT_OPTIONS_ARG=""
+if [[ -n "${ADDITIONAL_BOOT_OPTIONS}" ]]; then
+    ADDITIONAL_BOOT_OPTIONS_ARG="-b \"${ADDITIONAL_BOOT_OPTIONS}\""
+fi
+
 ### Run tests of specified type
 
 TEST_TYPE_ARG=""
@@ -141,10 +151,15 @@ if [[ -n "${TEST_TYPE}" ]]; then
     TEST_TYPE_ARG="-t ${TEST_TYPE}"
 fi
 
+SKIP_TEST_TYPES_ARG=""
+if [[ -n "${SKIP_TYPES}" ]]; then
+    SKIP_TEST_TYPES_ARG="-s ${SKIP_TYPES}"
+fi
+
 ### Run the test
 
 RESULT_LOG="${RESULT_PATH}/${LOG_FILENAME}"
-scripts/run_kickstart_tests.sh -i ${BOOT_ISO} -k 1 ${UPDATES_IMAGE_ARG} ${TEST_TYPE_ARG} ${KSTESTS} 2>&1 | tee ${RESULT_LOG}
+scripts/run_kickstart_tests.sh -i ${BOOT_ISO} -k 1 ${UPDATES_IMAGE_ARG} ${ADDITIONAL_BOOT_OPTIONS_ARG} ${TEST_TYPE_ARG} ${SKIP_TEST_TYPES_ARG} ${KSTESTS} 2>&1 | tee ${RESULT_LOG}
 
 
 ### Create result

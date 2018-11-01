@@ -9,6 +9,9 @@ kstest_boot_iso_url: "https://download.fedoraproject.org/pub/fedora/linux/releas
 # Url of updates image to be used.
 kstest_updates_img: ""
 
+# Additional installer boot options to be used
+kstest_additional_boot_options: ""
+
 # Software http repository for tests.
 # In the form of kickstart url command option.
 #kstest_url: "--mirror=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-rawhide\\&arch=$basearch"
@@ -26,6 +29,11 @@ kstest_tests_to_run: ""
 # Category of tests to be run.
 # Applied only if kstest_tests_to_run is empty.
 kstest_test_type: ""
+
+# Categories of tests to be skipped.
+# Applied only if kstest_tests_to_run is empty.
+# Space separated test types.
+kstest_skip_test_types: ""
 
 # kickstart-tests repository and branch to be used.
 kstest_git_repo: https://github.com/rhinstaller/kickstart-tests.git

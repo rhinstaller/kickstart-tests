@@ -248,9 +248,6 @@ if [[ ${COMMAND} == "test" || ${COMMAND} == "provision" ]]; then
         exit 1
     fi
 
-    # Use default ansible.cfg
-    cp ansible/ansible.cfg .
-
     # Set up deployment ssh key
 
     if [[ ! -d ${STORED_PRIVATE_KEYS_DIR} ]]; then
@@ -310,16 +307,17 @@ if [[ ${COMMAND} == "test" || ${COMMAND} == "provision" ]]; then
         exit 1
     fi
 
-    # Update the generated inventory with ssh key for deployment
+    # Update the generated inventory with ssh access configuration
 
-    if [[ -n ${PRIVATE_KEY_PATH} ]]; then
-        for group in kstest kstest-master ; do
-            cat <<EOF >> ${INVENTORY}
-[${group}:vars]
-ansible_ssh_private_key_file=${PRIVATE_KEY_PATH}
-remote_user=${REMOTE_USER}
+    cat <<EOF >> ${INVENTORY}
+[all:vars]
+ansible_ssh_user=${REMOTE_USER}
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 EOF
-        done
+    if [[ -n ${PRIVATE_KEY_PATH} ]]; then
+        cat <<EOF >> ${INVENTORY}
+ansible_ssh_private_key_file=${PRIVATE_KEY_PATH}
+EOF
     fi
 
     # Deploy the test runners and master

@@ -101,35 +101,7 @@ class Runner(object):
         if not self._prepare_test():
             return 99
 
-        kernel_args = self._shell.kernel_args()
-
-        if self._conf.updates_img_path:
-            kernel_args += " inst.updates={}".format(self._conf.updates_img_path)
-
-        if self._conf.hung_task_timeout_secs:
-            kernel_args += " inst.kernel.hung_task_timeout_secs={}".format(
-                self._conf.hung_task_timeout_secs)
-
-        disk_args = self._shell.prepare_disks()
-        nics_args = self._shell.prepare_network()
-        boot_args = self._shell.boot_args()
-
-        target_boot_iso = os.path.join(self._tmp_dir, self._conf.boot_image_name)
-
-        ks = []
-        if self._shell.inject_ks_to_initrd():
-            ks.append(self._ks_file)
-
-        v_conf = VirtualConfiguration(target_boot_iso, ks)
-        v_conf.kernel_args = kernel_args
-        v_conf.test_name = self._conf.ks_test_name
-        v_conf.temp_dir = self._tmp_dir
-        v_conf.log_path = os.path.join(self._tmp_dir, "livemedia.log")
-        v_conf.vnc = "vnc"
-        v_conf.boot_image = boot_args
-        v_conf.timeout = 120
-        v_conf.disk_paths = disk_args
-        v_conf.networks = nics_args
+        v_conf = self._create_virtual_conf()
 
         virt_manager = VirtualManager(v_conf)
 
@@ -152,6 +124,40 @@ class Runner(object):
 
         self._shell.cleanup()
         return ret.return_code
+
+    def _create_virtual_conf(self) -> VirtualConfiguration:
+        kernel_args = self._shell.kernel_args()
+
+        if self._conf.updates_img_path:
+            kernel_args += " inst.updates={}".format(self._conf.updates_img_path)
+
+        if self._conf.hung_task_timeout_secs:
+            kernel_args += " inst.kernel.hung_task_timeout_secs={}".format(
+                self._conf.hung_task_timeout_secs)
+
+        disk_args = self._shell.prepare_disks()
+        nics_args = self._shell.prepare_network()
+        boot_args = self._shell.boot_args()
+
+        target_boot_iso = os.path.join(self._tmp_dir, self._conf.boot_image_name)
+
+        ks = []
+        if self._shell.inject_ks_to_initrd():
+            ks.append(self._ks_file)
+
+        v_conf = VirtualConfiguration(target_boot_iso, ks)
+
+        v_conf.kernel_args = kernel_args
+        v_conf.test_name = self._conf.ks_test_name
+        v_conf.temp_dir = self._tmp_dir
+        v_conf.log_path = os.path.join(self._tmp_dir, "livemedia.log")
+        v_conf.vnc = "vnc"
+        v_conf.boot_image = boot_args
+        v_conf.timeout = 120
+        v_conf.disk_paths = disk_args
+        v_conf.networks = nics_args
+
+        return v_conf
 
     def _validate_logs(self, virt_configuration):
         validator = LogValidator(self._conf.ks_test_name)

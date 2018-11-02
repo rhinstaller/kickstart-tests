@@ -172,15 +172,20 @@ class Runner(object):
         return output
 
 
+def run_test_in_temp(config):
+    with TempManager(config.keep_level, config.ks_test_name) as temp_dir:
+        setup_logger(temp_dir)
+        runner = Runner(config, temp_dir)
+        rc = runner.run_test()
+
+    return rc
+
+
 if __name__ == '__main__':
     parser = RunnerParser()
     config = parser.get_runner_conf_from_params()
 
     print("================================================================")
-
-    with TempManager(config.keep_level, config.ks_test_name) as temp_dir:
-        setup_logger(temp_dir)
-        runner = Runner(config, temp_dir)
-        ret_code = runner.run_test()
+    ret_code = run_test_in_temp(config)
 
     exit(ret_code)

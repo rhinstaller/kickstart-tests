@@ -124,7 +124,8 @@ class RunnerConfiguration(BaseConfiguration):
 
     @property
     def script_path(self):
-        return os.path.dirname(os.path.realpath(__file__))
+        path = os.path.join(__file__, "..")
+        return os.path.dirname(os.path.realpath(path))
 
     @property
     def append_host_id(self):

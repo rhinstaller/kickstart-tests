@@ -38,7 +38,8 @@ import subprocess
 import socket
 
 from lib.temp_manager import TempManager
-from lib.confs.configuration import RunnerConfiguration, VirtualConfiguration
+from lib.confs.configuration import VirtualConfiguration
+from lib.confs.runner_parser import RunnerParser
 from lib.shell_launcher import ShellLauncher
 from lib.virtual_controller import VirtualManager, InstallError
 from lib.validator import KickstartValidator, LogValidator, ResultFormatter
@@ -172,9 +173,8 @@ class Runner(object):
 
 
 if __name__ == '__main__':
-    config = RunnerConfiguration()
-
-    config.process_argument()
+    parser = RunnerParser()
+    config = parser.get_runner_conf_from_params()
 
     print("================================================================")
 

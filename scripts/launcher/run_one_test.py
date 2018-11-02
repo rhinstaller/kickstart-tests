@@ -38,7 +38,7 @@ import subprocess
 import socket
 
 from lib.temp_manager import TempManager
-from lib.configuration import RunnerConfiguration, VirtualConfiguration
+from lib.confs.configuration import RunnerConfiguration, VirtualConfiguration
 from lib.shell_launcher import ShellLauncher
 from lib.virtual_controller import VirtualManager, InstallError
 from lib.validator import KickstartValidator, LogValidator, ResultFormatter

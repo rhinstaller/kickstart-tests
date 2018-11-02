@@ -40,7 +40,7 @@ from pylorax import setup_logging
 from pylorax.monitor import LogMonitor
 from pylorax.mount import IsoMountpoint
 
-from .configuration import VirtualConfiguration
+from lib.confs.configuration import VirtualConfiguration
 from .log_handler import VirtualLogRequestHandler
 from .validator import replace_new_lines
 from .shell_launcher import ProcessLauncher

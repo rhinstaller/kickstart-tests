@@ -21,9 +21,12 @@
 
 # Library for parsing arguments and provides usable output from it.
 
-from enum import Enum
-
 import os
+
+from enum import Enum
+from abc import ABC
+
+__all__ = ["KeepLevel", "RunnerConfiguration", "VirtualConfiguration"]
 
 
 class KeepLevel(Enum):
@@ -32,11 +35,31 @@ class KeepLevel(Enum):
     EVERYTHING = 2
 
 
-class RunnerConfiguration(object):
+class BaseConfiguration(ABC):
+    """Base configuration implementing repr method."""
+    def __init__(self, name):
+        self._name = name
+
+    def __repr__(self):
+        msg = "{}:".format(self._name)
+
+        for p in dir(self.__class__):
+            if p.startswith("_"):
+                continue
+            else:
+                if getattr(self, p):
+                    msg += " {}: {},".format(p, getattr(self, p))
+
+        msg = msg[:-1]
+
+        return msg
+
+
+class RunnerConfiguration(BaseConfiguration):
 
     def __init__(self):
-        """Configuration for the runner of the kickstar test"""
-        super().__init__()
+        """Configuration for the runner of the kickstart test"""
+        super().__init__("Runner Configuration")
 
         self._ks_test_name = ""
         self._sh_path = ""
@@ -120,11 +143,11 @@ class RunnerConfiguration(object):
         self._hung_task_timeout_secs = val
 
 
-class VirtualConfiguration(object):
+class VirtualConfiguration(BaseConfiguration):
 
     def __init__(self, iso_path, ks_paths):
         """Configuration for runner of the virtual machine"""
-        super().__init__()
+        super().__init__("Virtual Configuration")
 
         self._test_name = ""
         self._iso = iso_path
@@ -142,20 +165,6 @@ class VirtualConfiguration(object):
         self._vnc = None
         self._kernel_args = None
         self._timeout = None
-
-    def __repr__(self):
-        msg = "Virtual Configuration:"
-
-        for p in dir(VirtualConfiguration):
-            if p.startswith("_"):
-                continue
-            else:
-                if getattr(self, p):
-                    msg += " {}: {},".format(p, getattr(self, p))
-
-        msg = msg[:-1]
-
-        return msg
 
     @property
     def test_name(self):

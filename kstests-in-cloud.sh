@@ -25,6 +25,7 @@ SCHEDULED="no"
 REMOVE_SCHEDULE="no"
 WHEN=""
 LOGFILE=""
+VIRTUALENV_PATH=""
 
 # Directory to which linchpin generates inventory of provisioned runners.
 # Defined by linchpin layout configuration.
@@ -97,11 +98,13 @@ Options:
     --remove                 remove the timer for TARGET
     --logfile                path of the log with output of the scheduled test;
                              (run_scheduled_kstest-TARGET.log by default)
+    --virtualenv PATH        path to virtualenv location that may be required for linchpin
+                             run by scheduler
 
 HELP_USAGE
 }
 
-options=$(getopt -o k:r:c:p: --long cloud:,results:,key-name:,key-use-existing,key-upload:,ansible-private-key:,key-use-for-master,test-configuration:,pinfile:,when:,remove,logfile:,scheduled,remote-user: -- "$@")
+options=$(getopt -o k:r:c:p: --long cloud:,results:,key-name:,key-use-existing,key-upload:,ansible-private-key:,key-use-for-master,test-configuration:,pinfile:,when:,remove,logfile:,scheduled,remote-user:,virtualenv: -- "$@")
 [ $? -eq 0 ] || {
     echo "Usage:"
     usage
@@ -177,6 +180,10 @@ while true; do
         shift;
         LOGFILE=$1
         ;;
+    --virtualenv)
+        shift;
+        VIRTUALENV_PATH=$1
+        ;;
     --scheduled)
         SCHEDULED="yes"
         ;;
@@ -232,8 +239,12 @@ if [[ ${COMMAND} == "schedule" ]]; then
         if [[ -n ${LOGFILE} ]]; then
             LOGFILE_EXTRA_VAR=" log_file_name=\"${LOGFILE}\""
         fi
+        VIRTUALENV_EXTRA_VAR=""
+        if [[ -n ${VIRTUALENV_PATH} ]]; then
+            VIRTUALENV_EXTRA_VAR=" virtualenv_linchpin_path=\"${VIRTUALENV_PATH}\""
+        fi
 
-        ansible-playbook linchpin/schedule_tests.yml --extra-vars "test_id=${TARGET} cmdline=${CMDLINE}${WHEN_EXTRA_VAR}${LOGFILE_EXTRA_VAR}"
+        ansible-playbook linchpin/schedule_tests.yml --extra-vars "test_id=${TARGET} cmdline=${CMDLINE}${WHEN_EXTRA_VAR}${LOGFILE_EXTRA_VAR}${VIRTUALENV_EXTRA_VAR}"
     fi
 
 fi

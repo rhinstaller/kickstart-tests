@@ -6,7 +6,7 @@ cd {{ run_script_dir_path }}
 source {{virtualenv_linchpin_path}}/bin/activate
 
 # Separator in the log
-echo "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" >> {{ log_file_name }}
+echo "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT" >> {{ log_file_name }}
 echo $(date) >> {{ log_file_name }}
 
 # Run the test

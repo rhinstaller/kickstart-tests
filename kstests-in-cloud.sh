@@ -21,7 +21,6 @@ USE_KEY_FOR_MASTER="no"
 #STORED_PRIVATE_KEYS_DIR=$(mktemp -d -t kstest-deploymen-keys-XXXXXX)
 STORED_PRIVATE_KEYS_DIR="${WORK_BASE_DIR}/linchpin/keys"
 
-SCHEDULED="no"
 REMOVE_SCHEDULE="no"
 WHEN=""
 LOGFILE=""
@@ -97,7 +96,8 @@ Options:
                              creates user systemd timer with given OnCalendar specification
     --remove                 remove the timer for TARGET
     --logfile                path of the log with output of the scheduled test;
-                             (run_scheduled_kstest-TARGET.log by default)
+                             (run_scheduled_kstest-TARGET.log in the current working directory
+                             by default)
     --virtualenv PATH        path to virtualenv location that may be required for linchpin
                              run by scheduler
 
@@ -110,8 +110,6 @@ options=$(getopt -o k:r:c:p: --long cloud:,results:,key-name:,key-use-existing,k
     usage
     exit 1
 }
-
-ARGUMENTS="$@"
 
 eval set -- "$options"
 while true; do
@@ -184,9 +182,6 @@ while true; do
         shift;
         VIRTUALENV_PATH=$1
         ;;
-    --scheduled)
-        SCHEDULED="yes"
-        ;;
     --)
         shift;
         COMMAND=$1
@@ -214,12 +209,6 @@ INVENTORY=${INVENTORY_DIR}/${TARGET}.inventory
 TARGET_KEY_DIR=${STORED_PRIVATE_KEYS_DIR}/${TARGET}
 
 
-# We were scheduled, just modify the "schedule" from scheduling cmdline to "test"
-# and test!
-if [[ $SCHEDULED == "yes" ]]; then
-    COMMAND="test"
-fi
-
 #################################################### schedule test
 
 if [[ ${COMMAND} == "schedule" ]]; then
@@ -227,9 +216,27 @@ if [[ ${COMMAND} == "schedule" ]]; then
     if [[ ${REMOVE_SCHEDULE} == "yes" ]]; then
         ansible-playbook linchpin/remove_scheduled_tests.yml --extra-vars "test_id=${TARGET}"
     else
-        CMDLINE="\"$0 ${ARGUMENTS} --scheduled\""
 
-        echo ${CMDLINE}
+        if [[ -n ${TEST_CONFIGURATION_FILE} ]]; then
+            TEST_CONFIGURATION_FILE_ARG="--test-configuration ${TEST_CONFIGURATION_FILE}"
+        fi
+        if [[ -n ${RESULTS_DIR} ]]; then
+            RESULTS_DIR_ARG="--results ${RESULTS_DIR}"
+        fi
+        if [[ ${USE_KEY_FOR_MASTER} == "yes" ]]; then
+            USE_KEY_FOR_MASTER_ARG="--key-use-for-master"
+        fi
+        if [[ ${KEY_MODE} == "upload" ]]; then
+            KEY_MODE_ARG="--key-upload"
+        elif [[ ${KEY_MODE} == "existing" ]]; then
+            KEY_MODE_ARG="--key-use-existing"
+        fi
+        if [[ -n ${PRIVATE_KEY_PATH} ]]; then
+            PRIVATE_KEY_PATH_ARG="--ansible-private-key ${PRIVATE_KEY_PATH}"
+        fi
+
+
+        CMDLINE="\"$0 test ${TARGET} --cloud ${CLOUD_PROFILE} --pinfile ${PINFILE} --remote-user ${REMOTE_USER} --key-name ${KEY_NAME} ${KEY_MODE_ARG} ${PRIVATE_KEY_PATH_ARG} ${TEST_CONFIGURATION_FILE_ARG} ${RESULTS_DIR_ARG} ${USE_KEY_FOR_MASTER_ARG}\""
 
         WHEN_EXTRA_VAR=""
         if [[ -n ${WHEN} ]]; then

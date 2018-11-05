@@ -45,7 +45,7 @@ COMMANDs:
 
   test               provision TARGET, run tests, destroy TARGET
   schedule           schedule the test on TARGET using local host timer
-  status             show status of the test running on TARGET
+  status             show status of the target TARGET
 
   Breaking down the test into separate stages:
 
@@ -418,12 +418,13 @@ if [[ ${COMMAND} == "status" ]]; then
 
     INVENTORY=${INVENTORY_DIR}/${TARGET}.inventory
     if [[ ! -f ${INVENTORY} ]]; then
-        echo "Can't find inventory ${INVENTORY} generated for target ${TARGET}"
-        exit 1
+        echo "It seems that target ${TARGET} does not exist: can't find generated inventory ${INVENTORY}"
+        exit 0
     fi
 
     # Show status of test run
 
     ansible-playbook -i ${INVENTORY} ansible/kstest-master-show-test-status.yml
+    echo "Target \"${TARGET}\" has generated inventory ${INVENTORY}"
 
 fi

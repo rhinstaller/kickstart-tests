@@ -6,13 +6,13 @@
   become_user: root
 
   tasks:
-  - name: Display number of tests run on kstest hosts
+  - name: Display number of test logs existing on kstest hosts
     shell: ls | grep kstest- | wc -l
     args:
       chdir: /var/tmp
-    register: number_of_tests_run
+    register: number_of_existing_test_logs
   - debug:
-      var: number_of_tests_run.stdout
+      var: number_of_existing_test_logs.stdout
 
 - hosts:
     kstest-master
@@ -22,6 +22,19 @@
   tasks:
   - include_vars: roles/kstest/vars/main.yml
   - include_vars: roles/kstest-master/vars/main/main.yml
+
+  - name: Check that a test is running
+    stat:
+      path: /home/{{ kstest_remote_user }}/{{ kstest.master.file.run }}
+    register: stat_result
+
+  - block:
+      - name: No test is running -> finish
+        debug:
+          msg: "No test run is currently running."
+
+      - meta: end_play
+    when: stat_result.stat.exists == False
 
   - name: Find current results path
     command: cat /home/{{ kstest_remote_user }}/{{ kstest.master.file.run }}

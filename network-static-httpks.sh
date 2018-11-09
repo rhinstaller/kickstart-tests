@@ -29,7 +29,7 @@ TESTTYPE="network"
 
 kernel_args() {
     . ${tmpdir}/ks_url
-    echo vnc debug=1 inst.debug ip=dhcp inst.ks=${ks_url}
+    echo ${DEFAULT_BOOTOPTS} ip=dhcp inst.ks=${ks_url}
 }
 
 prepare() {

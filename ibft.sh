@@ -46,7 +46,7 @@ real_kernel_args() {
     iso=${tmpdir}/$(basename ${IMAGE})
     local label_line="$(isoinfo -d -i ${iso} | egrep "Volume id:")"
     local iso_label=$(udev_escape "${label_line:11}")
-    echo vnc debug=1 inst.debug ip=ibft inst.ks=${httpd_url}ks.cfg stage2=hd:CDLABEL=${iso_label}
+    echo ${DEFAULT_BOOTOPTS} ip=ibft inst.ks=${httpd_url}ks.cfg stage2=hd:CDLABEL=${iso_label}
 }
 
 # arguments for virt-install --network options

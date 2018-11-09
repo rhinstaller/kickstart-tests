@@ -23,7 +23,7 @@ TESTTYPE=${TESTTYPE:-"network"}
 
 
 kernel_args() {
-    echo vnc debug=1 inst.debug
+    echo ${DEFAULT_BOOTOPTS}
 }
 
 # Arguments for virt-install --network options

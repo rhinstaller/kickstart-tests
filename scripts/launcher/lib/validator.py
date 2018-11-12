@@ -43,9 +43,9 @@ class ResultFormatter(object):
     def format_result(self, result, msg):
         text_result = "SUCCESS" if result else "FAILED"
         msg = "RESULT:{name}:{host_id}:{result}:{message}".format(name=self._test_name,
-                                                            host_id=self._host_id,
-                                                            result=text_result,
-                                                            message=msg)
+                                                                  host_id=self._host_id,
+                                                                  result=text_result,
+                                                                  message=msg)
         return msg
 
     def report_result(self, result, msg):
@@ -108,9 +108,6 @@ class KickstartValidator(Validator):
 
 
 class LogValidator(Validator):
-
-    def __init__(self, test_name):
-        super().__init__(test_name)
 
     def check_install_errors(self, install_log):
         ret_code = 0

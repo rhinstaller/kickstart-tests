@@ -1,0 +1,68 @@
+#test name: network-prefixdevname
+url @KSTEST_URL@
+install
+
+%include /tmp/ksinclude
+%pre
+echo "network --device team0 --bootproto dhcp --teamslaves=\"kstest2'{\\\"prio\\\": -10, \\\"sticky\\\": true}',kstest3'{\\\"prio\\\": 100}'\" --teamconfig=\"{\\\"runner\\\": {\\\"name\\\": \\\"activebackup\\\"}}\" --activate --onboot=no" >> /tmp/ksinclude
+%end
+
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+%post --nochroot
+
+@KSINCLUDE@ post-nochroot-lib-network.sh
+
+check_gui_configurations kstest0 kstest1 kstest2 kstest3 team0
+
+%end
+
+%post
+
+@KSINCLUDE@ post-lib-network.sh
+
+# Device activated in initramfs was renamed
+check_device_connected kstest0 yes
+check_device_ifcfg_value kstest0 ONBOOT yes
+
+# Device not activated in initramfs should be renamed as well (#1643515)
+check_device_connected kstest1 no
+
+# Virtual (team) devices created in installer should not be renamed (#1644294)
+check_device_ifcfg_value team0 ONBOOT no
+
+check_device_ifcfg_value team0_slave_1 ONBOOT no
+check_device_ifcfg_value team0_slave_2 ONBOOT no
+check_device_ifcfg_value team0_slave_1 TEAM_MASTER team0
+check_device_ifcfg_value team0_slave_2 TEAM_MASTER team0
+
+check_device_connected team0 yes
+check_team_has_slave team0 kstest2 yes
+check_team_has_slave team0 kstest3 yes
+check_team_option team0 "mode activebackup"
+check_team_option team0 "priority \(port:kstest2\) -10"
+check_team_option team0 "priority \(port:kstest3\) 100"
+
+# Check the extra args.
+grep "^GRUB_CMDLINE_LINUX=" /etc/default/grub | grep "net.ifnames.prefix=kstest"
+if [[ $? -ne 0 ]]; then
+    echo '*** Failed check: boot option is passed to installed system boot arguments' >> /root/RESULT
+fi
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+   echo SUCCESS > /root/RESULT
+fi
+%end

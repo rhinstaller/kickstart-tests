@@ -24,7 +24,7 @@
 # injected in initrd) network devices are not found in sysfs in the time of
 # parsing the kickstart.
 
-TESTTYPE=${TESTTYPE:-"knownfailure network"}
+TESTTYPE=${TESTTYPE:-"network"}
 
 . ${KSTESTDIR}/team.sh
 

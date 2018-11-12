@@ -38,8 +38,8 @@ import subprocess
 import socket
 
 from lib.temp_manager import TempManager
-from lib.confs.configuration import VirtualConfiguration
-from lib.confs.runner_parser import RunnerParser
+from lib.conf.configuration import VirtualConfiguration
+from lib.conf.runner_parser import RunnerParser
 from lib.shell_launcher import ShellLauncher
 from lib.virtual_controller import VirtualManager, InstallError
 from lib.validator import KickstartValidator, LogValidator, ResultFormatter

@@ -22,7 +22,7 @@
 import os
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
-from lib.confs.configuration import RunnerConfiguration, KeepLevel
+from lib.conf.configuration import RunnerConfiguration, KeepLevel
 
 
 class RunnerParser(object):

@@ -34,6 +34,10 @@ class VirtualLogRequestHandler(LogRequestHandler):
         "Out of memory:",
         "Would you like to ignore this and continue with installation?",
         "Some packages, groups or modules are broken, the installation will be aborted.",
+        "Error in POSTIN scriptlet in rpm package",
+        "Error in POSTTRANS scriptlet in rpm package"
+        "Error in <unknown> scriptlet in rpm package"
+        "Transaction check error:",
         "Stream was not specified for a module",
         "Modular dependency problem:",  # broken module
         "The following problem occurred on line",  # kickstart parsing error

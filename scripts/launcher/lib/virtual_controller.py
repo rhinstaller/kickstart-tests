@@ -40,7 +40,7 @@ from pylorax import setup_logging
 from pylorax.monitor import LogMonitor
 from pylorax.mount import IsoMountpoint
 
-from .configuration import VirtualConfiguration
+from lib.conf.configuration import VirtualConfiguration
 from .log_handler import VirtualLogRequestHandler
 from .validator import replace_new_lines
 from .shell_launcher import ProcessLauncher
@@ -161,7 +161,7 @@ class VirtualInstall(object):
 
         channel_args = "tcp,host={0}:{1},mode=connect,target_type=virtio" \
                        ",name=org.fedoraproject.anaconda.log.0".format(
-                       self._virtio_host, self._virtio_port)
+                           self._virtio_host, self._virtio_port)
         args.append("--channel")
         args.append(channel_args)
         return args

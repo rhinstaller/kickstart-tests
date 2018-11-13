@@ -61,7 +61,7 @@ class ArgumentParser(object):
                                   used.""")
         self._parser.add_argument("tests", type=str, nargs='*', default=(),
                                   metavar="/path/to/test1.ks.in /path/to/test2.ks.in ...",
-                                  help="""Specify path to kickstart tests. 
+                                  help="""Specify path to kickstart tests.
                                   If not specified all tests will be used.""")
 
     def parse(self):

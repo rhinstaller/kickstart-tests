@@ -27,7 +27,7 @@ import shutil
 from contextlib import AbstractContextManager
 from tempfile import mkdtemp
 from glob import glob
-from .configuration import KeepLevel
+from lib.conf.configuration import KeepLevel
 
 
 class TempManager(AbstractContextManager):

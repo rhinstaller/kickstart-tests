@@ -21,10 +21,12 @@
 
 # Library for parsing arguments and provides usable output from it.
 
-from argparse import ArgumentParser, RawDescriptionHelpFormatter
-from enum import Enum
-
 import os
+
+from enum import Enum
+from abc import ABC
+
+__all__ = ["KeepLevel", "RunnerConfiguration", "VirtualConfiguration"]
 
 
 class KeepLevel(Enum):
@@ -33,18 +35,31 @@ class KeepLevel(Enum):
     EVERYTHING = 2
 
 
-class RunnerConfiguration(object):
+class BaseConfiguration(ABC):
+    """Base configuration implementing repr method."""
+    def __init__(self, name):
+        self._name = name
+
+    def __repr__(self):
+        msg = "{}:".format(self._name)
+
+        for p in dir(self.__class__):
+            if p.startswith("_"):
+                continue
+            else:
+                if getattr(self, p):
+                    msg += " {}: {},".format(p, getattr(self, p))
+
+        msg = msg[:-1]
+
+        return msg
+
+
+class RunnerConfiguration(BaseConfiguration):
 
     def __init__(self):
-        """Configuration for the runner of the kickstar test"""
-        super().__init__()
-
-        self._parser = ArgumentParser(description="""
-        Run one kickstart test.
-
-        This should be run in parallel by main script. It is not supposed to be invoked manually.
-        """, formatter_class=RawDescriptionHelpFormatter)
-        self._confiure_parser()
+        """Configuration for the runner of the kickstart test"""
+        super().__init__("Runner Configuration")
 
         self._ks_test_name = ""
         self._sh_path = ""
@@ -55,42 +70,37 @@ class RunnerConfiguration(object):
         self._append_host_id = False
         self._hung_task_timeout_secs = 1200
 
-    def _confiure_parser(self):
-        self._parser.add_argument("kickstart_test", metavar="KS test controller",
-                                  type=str, help="Kickstart test to run")
-        self._parser.add_argument("-i", metavar="Image path", type=str, required=True,
-                                  dest="image", help="Image used to run specified kickstart test")
-        self._parser.add_argument("--keep", '-k', metavar="0,1,2", type=int,
-                                  dest="keep", help="""
-                                  Set the level of what should be kept after a test
-
-                                  Valid potions:
-                                  0 - Remove everything
-                                  1 - Remove disk image and kickstart test
-                                  2 - Keep everything
-                                  """)
-        self._parser.add_argument("--updates", '-u', metavar="Path",
-                                  type=str, dest="updates_path",
-                                  help="Updates image path used in the test")
-        self._parser.add_argument("--append-host-id", default=False, action="store_true",
-                                  dest="append_host_id",
-                                  help="append an id of the host running the test to the result")
-
     @property
     def shell_test_path(self):
         return self._sh_path
+
+    @shell_test_path.setter
+    def shell_test_path(self, val):
+        self._sh_path = val
 
     @property
     def ks_test_path(self):
         return self._ks_path
 
+    @ks_test_path.setter
+    def ks_test_path(self, val):
+        self._ks_path = val
+
     @property
     def ks_test_name(self):
         return self._ks_test_name
 
+    @ks_test_name.setter
+    def ks_test_name(self, val):
+        self._ks_test_name = val
+
     @property
     def boot_image_path(self):
         return self._image_path
+
+    @boot_image_path.setter
+    def boot_image_path(self, val):
+        self._image_path = val
 
     @property
     def boot_image_name(self):
@@ -100,60 +110,45 @@ class RunnerConfiguration(object):
     def keep_level(self):
         return self._keep_option
 
+    @keep_level.setter
+    def keep_level(self, val: KeepLevel):
+        self._keep_option = val
+
     @property
     def updates_img_path(self):
         return self._updates_img_path
 
+    @updates_img_path.setter
+    def updates_img_path(self, val):
+        self._updates_img_path = val
+
     @property
     def script_path(self):
-        return os.path.dirname(os.path.realpath(__file__))
+        path = os.path.join(__file__, "..")
+        return os.path.dirname(os.path.realpath(path))
 
     @property
     def append_host_id(self):
         return self._append_host_id
 
+    @append_host_id.setter
+    def append_host_id(self, val: bool):
+        self._append_host_id = val
+
     @property
     def hung_task_timeout_secs(self):
         return self._hung_task_timeout_secs
 
-    def process_argument(self):
-        ns = self._parser.parse_args()
-
-        self._sh_path = os.path.abspath(ns.kickstart_test)
-        self._image_path = os.path.abspath(ns.image)
-
-        base_path = os.path.splitext(self._sh_path)[0]
-        self._ks_path = "{}{}".format(base_path, ".ks")
-
-        self._ks_test_name = os.path.basename(base_path)
-
-        if ns.keep and ns.keep not in [0, 1, 2]:
-            raise ValueError("keep parameter can contain only numbers: 0, 1 or 2 !")
-        elif ns.keep is not None:
-            self._keep_option = KeepLevel(ns.keep)
-
-        if ns.updates_path:
-            self._updates_img_path = ns.updates_path
-
-        if ns.append_host_id:
-            self._append_host_id = ns.append_host_id
-
-        self._check_arguments()
-
-    def _check_arguments(self):
-        if not os.path.exists(self._sh_path):
-            raise IOError("Kickstart test shell file '{}' does not exists!".format(self._sh_path))
-        elif not os.path.exists(self._ks_path):
-            raise IOError("Kickstart file '{}' does not exists!".format(self._ks_path))
-        elif not os.path.exists(self._image_path):
-            raise IOError("Boot iso file '{}' does not exists!".format(self._image_path))
+    @hung_task_timeout_secs.setter
+    def hung_task_timeout_secs(self, val: int):
+        self._hung_task_timeout_secs = val
 
 
-class VirtualConfiguration(object):
+class VirtualConfiguration(BaseConfiguration):
 
     def __init__(self, iso_path, ks_paths):
         """Configuration for runner of the virtual machine"""
-        super().__init__()
+        super().__init__("Virtual Configuration")
 
         self._test_name = ""
         self._iso = iso_path
@@ -171,20 +166,6 @@ class VirtualConfiguration(object):
         self._vnc = None
         self._kernel_args = None
         self._timeout = None
-
-    def __repr__(self):
-        msg = "Virtual Configuration:"
-
-        for p in dir(VirtualConfiguration):
-            if p.startswith("_"):
-                continue
-            else:
-                if getattr(self, p):
-                    msg += " {}: {},".format(p, getattr(self, p))
-
-        msg = msg[:-1]
-
-        return msg
 
     @property
     def test_name(self):

@@ -370,6 +370,14 @@ if [[ "$TEST_REMOTES" != "" ]]; then
     cd ..
 
     echo "starting tests"
+
+    # Parallel aparently tends to import environment shell variables to the
+    # remote shell run environment, which can cause issues if the host that
+    # has initiated a test run has a locale the host running the tests does
+    # not have. So always set a well known locale, which should prevent this
+    # missmatch from happening.
+    export LANG=en_US.UTF-8
+
     parallel --no-notice ${remote_args} --wd kickstart-tests --jobs ${TEST_JOBS:-4} \
              sudo PYTHONPATH=$PYTHONPATH scripts/launcher/run_one_test.py \
                                                                -i ../install_images/${_IMAGE} \

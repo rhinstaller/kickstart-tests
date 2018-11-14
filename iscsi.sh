@@ -24,7 +24,7 @@ TESTTYPE="knownfailure iscsi"
 iscsi_disk_img=iscsi-disk.img
 
 kernel_args() {
-    echo vnc debug=1 inst.debug ip=dhcp
+    echo ${DEFAULT_BOOTOPTS} ip=dhcp
 }
 
 # Arguments for virt-install --network options

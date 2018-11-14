@@ -22,7 +22,7 @@ TESTTYPE="logs"
 . ${KSTESTDIR}/functions.sh
 
 kernel_args() {
-    echo vnc debug=1 inst.debug inst.nosave=logs
+    echo ${DEFAULT_BOOTOPTS} inst.nosave=logs
 }
 
 validate_logs() {

@@ -23,7 +23,7 @@ TESTTYPE="network"
 
 kernel_args() {
     . ${tmpdir}/ks_url
-    echo vnc debug=1 inst.debug ifname=ifname0:52:54:00:12:34:5D ifname=ifname1:52:54:00:12:34:5E ip=ifname0:dhcp inst.ks=${ks_url}
+    echo ${DEFAULT_BOOTOPTS} ifname=ifname0:52:54:00:12:34:5D ifname=ifname1:52:54:00:12:34:5E ip=ifname0:dhcp inst.ks=${ks_url}
 }
 
 # Arguments for virt-install --network options

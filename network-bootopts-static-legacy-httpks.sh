@@ -36,7 +36,7 @@ ip_static_boot_config=""
 kernel_args() {
     . ${tmpdir}/ip_static_boot_config
     . ${tmpdir}/ks_url
-    echo vnc debug=1 inst.debug rd.break=cmdline ${ip_static_boot_config} ks=${ks_url}
+    echo ${DEFAULT_BASIC_BOOTOPTS} rd.break=cmdline ${ip_static_boot_config} ks=${ks_url}
 }
 
 prepare() {

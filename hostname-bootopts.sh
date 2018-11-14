@@ -31,7 +31,7 @@ TESTTYPE="network"
 
 kernel_args() {
     . ${tmpdir}/ip_static_boot_config
-    echo vnc debug=1 inst.debug ip=ens3:dhcp ${ip_static_boot_config}
+    echo ${DEFAULT_BOOTOPTS} ip=ens3:dhcp ${ip_static_boot_config}
 }
 
 prepare() {

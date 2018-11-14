@@ -62,6 +62,8 @@ KEEPIT=${KEEPIT:-0}
 # responsibility, this can break tests.
 UPDATES_IMG=""
 
+PYTHONPATH="lorax/src"
+
 TESTTYPE=""
 SKIP_TESTTYPES=""
 

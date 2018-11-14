@@ -24,7 +24,7 @@ TESTTYPE="method proxy"
 . ${KSTESTDIR}/functions-proxy.sh
 
 kernel_args() {
-    echo vnc inst.proxy=${proxy_url%%/*} inst.debug
+    echo ${DEFAULT_BOOTOPTS} inst.proxy=${proxy_url%%/*}
 }
 
 prepare() {

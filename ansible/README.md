@@ -36,10 +36,11 @@ Before running the playbooks the inventory file has to be populated with hosts. 
 
 [kstest-master]
 
-[kstest:all]
+[all:vars]
+#ansible_python_interpreter=/usr/bin/python3
 #ansible_ssh_private_key_file=
 #ansible_ssh_user=fedora
-#ansible_ssh_common_args='-o StrictHostKeyChecking=no'[kstest-master]
+#ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 ```
 
 Depending on the provisioning, access to the hosts may need to be additionally configured:
@@ -57,6 +58,7 @@ Depending on the provisioning, access to the hosts may need to be additionally c
 
 * *Master* is using a *master key* for accessing the *runners* when distributing the *test run*. By default a new keypair is generated when deploying the *master* with `kstest-master-deploy.yml` playbook. It is possible to use custom keypair by setting the playbook variables `master_private_ssh_key` and `master_public_ssh_key` to the paths to the keys. This can be useful if automatic [syncing](#syncing) of results from master to a remote *resutlts host* is used.
 
+To use python 3 for running the playbooks on deployed hosts set the `ansible_python_interpreter` variable. By default python 2 will be installed to the *runners* during deployment.
 
 NOTE: It is also possible to specify the inventory and configure access to *runners* in `ansible.cfg` file by updating `inventory`, `remote_user` and `ssh_private_key` variables. In this case the inventory does not have to be passed to the playbooks with `-i` option. The file should be placed in current working directory.
 ```

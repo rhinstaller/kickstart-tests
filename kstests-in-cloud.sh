@@ -30,6 +30,7 @@ VIRTUALENV_PATH=""
 # Defined by linchpin layout configuration.
 INVENTORY_DIR="linchpin/inventories"
 
+ANSIBLE_PYTHON_INTERPRETER=""
 
 usage () {
     cat <<HELP_USAGE
@@ -101,10 +102,17 @@ Options:
     --virtualenv PATH        path to virtualenv location that may be required for linchpin
                              run by scheduler
 
+  Ansible options:
+
+    --ansible-python-interpreter PATH
+                             use alternative python interpreter on deployed hosts;
+                             (for example /usr/bin/python3, /usr/libexec/platform-python)
+
+
 HELP_USAGE
 }
 
-options=$(getopt -o k:r:c:p: --long cloud:,results:,key-name:,key-use-existing,key-upload:,ansible-private-key:,key-use-for-master,test-configuration:,pinfile:,when:,remove,logfile:,scheduled,remote-user:,virtualenv: -- "$@")
+options=$(getopt -o k:r:c:p: --long cloud:,results:,key-name:,key-use-existing,key-upload:,ansible-private-key:,key-use-for-master,test-configuration:,pinfile:,when:,remove,logfile:,scheduled,remote-user:,virtualenv:,ansible-python-interpreter: -- "$@")
 [ $? -eq 0 ] || {
     echo "Usage:"
     usage
@@ -181,6 +189,10 @@ while true; do
     --virtualenv)
         shift;
         VIRTUALENV_PATH=$1
+        ;;
+    --ansible-python-interpreter)
+        shift;
+        ANSIBLE_PYTHON_INTERPRETER=$1
         ;;
     --)
         shift;
@@ -335,6 +347,11 @@ EOF
     if [[ -n ${PRIVATE_KEY_PATH} ]]; then
         cat <<EOF >> ${INVENTORY}
 ansible_ssh_private_key_file=${PRIVATE_KEY_PATH}
+EOF
+    fi
+    if [[ -n ${ANSIBLE_PYTHON_INTERPRETER} ]]; then
+        cat <<EOF >> ${INVENTORY}
+ansible_python_interpreter=${ANSIBLE_PYTHON_INTERPRETER}
 EOF
     fi
 

@@ -10,27 +10,30 @@ BOOT_ISO_URL="{{ kstest_boot_iso_url }}"
 TEST_JOBS={{ kstest_test_jobs }}
 KSTESTS="{{ kstest_tests_to_run }}"
 TEST_TYPE="{{ kstest_test_type }}"
+SKIP_TYPES="{{ kstest_skip_test_types }}"
 REMOTE_RESULTS_PATH="{{ kstest_remote_results_path }}"
 REMOTE_RESULTS_KEEP_LOCAL="{{ kstest_remote_results_keep_local }}"
 RESULTS_SUMMARY_SCRIPT="{{ kstest.master.results_summary_script.dest }}"
 UPDATES_IMAGE="{{ kstest_updates_img }}"
+ADDITIONAL_BOOT_OPTIONS="{{ kstest_additional_boot_options }}"
 TEST_DEFAULTS_FILE=scripts/defaults.sh
 
 COMPOSE_BOOT_ISO=images/boot.iso
 KSTEST_USER=kstest
-RESULTS_DIR=results
-KSTEST_REPO_DIR={{ kstest.master.git_repo_dir }}
-GIT_PULL_KSTESTS={{ kstest.master.git_pull }}
+RESULTS_DIR={{ kstest.master.dir.results }}
+KSTEST_REPO_DIR={{ kstest.master.dir.git_repo }}
+GIT_PULL_KSTESTS={{ kstest_git_pull }}
 
 HOME_DIR=/home/${KSTEST_USER}
 KSTEST_REPO_PATH=${HOME_DIR}/${KSTEST_REPO_DIR}
 RESULTS_PATH=${HOME_DIR}/${RESULTS_DIR}
+RESULT_RUN_DIR_PREFIX={{ kstest_result_run_dir_prefix }}
 BOOT_ISO=boot.kstest.iso
 ISOMD5SUM_FILENAME={{ kstest.master.file.isomd5sum }}
 RESULT_REPORT_FILENAME={{ kstest.master.file.result_report }}
 TEST_PARAMETERS_FILENAME={{ kstest.master.file.test_parameters }}
 LOG_FILENAME={{ kstest.master.file.log }}
-RUN_FILENAME={{ kstest.master.file.run }}
+RUN_FILE_PATH=${HOME_DIR}/{{ kstest.master.file.run }}
 
 # Test run id
 START_TIME=$(date +%F-%H_%M_%S)
@@ -39,8 +42,8 @@ TIME_OF_START=$(date +%s)
 
 ### Check run file (indicates a test is running)
 
-if [[ -f ${RUN_FILENAME} ]]; then
-    echo "A test seems to be already running, ${RUN_FILENAME} exists" >2
+if [[ -f ${RUN_FILE_PATH} ]]; then
+    echo "A test seems to be already running, ${RUN_FILE_PATH} exists" >2
     exit 1
 fi
 
@@ -55,13 +58,13 @@ fi
 
 ### Create this test result dir
 
-RESULT_PATH="${RESULTS_RUN_PATH}/${START_TIME}"
+RESULT_PATH="${RESULTS_RUN_PATH}/${RESULT_RUN_DIR_PREFIX}${START_TIME}"
 mkdir ${RESULT_PATH}
 
 
 ### Create run file
 
-echo ${RESULT_PATH} > ${RUN_FILENAME}
+echo ${RESULT_PATH} > ${RUN_FILE_PATH}
 
 
 ### Cd to repository dir
@@ -133,6 +136,14 @@ if [[ -n "${UPDATES_IMAGE}" ]]; then
     UPDATES_IMAGE_ARG="-u ${UPDATES_IMAGE}"
 fi
 
+
+### Use additional boot options
+
+ADDITIONAL_BOOT_OPTIONS_ARG=""
+if [[ -n "${ADDITIONAL_BOOT_OPTIONS}" ]]; then
+    ADDITIONAL_BOOT_OPTIONS_ARG="-b \"${ADDITIONAL_BOOT_OPTIONS}\""
+fi
+
 ### Run tests of specified type
 
 TEST_TYPE_ARG=""
@@ -140,10 +151,15 @@ if [[ -n "${TEST_TYPE}" ]]; then
     TEST_TYPE_ARG="-t ${TEST_TYPE}"
 fi
 
+SKIP_TEST_TYPES_ARG=""
+if [[ -n "${SKIP_TYPES}" ]]; then
+    SKIP_TEST_TYPES_ARG="-s ${SKIP_TYPES}"
+fi
+
 ### Run the test
 
 RESULT_LOG="${RESULT_PATH}/${LOG_FILENAME}"
-scripts/run_kickstart_tests.sh -i ${BOOT_ISO} -k 1 ${UPDATES_IMAGE_ARG} ${TEST_TYPE_ARG} ${KSTESTS} 2>&1 | tee ${RESULT_LOG}
+scripts/run_kickstart_tests.sh -i ${BOOT_ISO} -k 1 ${UPDATES_IMAGE_ARG} ${ADDITIONAL_BOOT_OPTIONS_ARG} ${TEST_TYPE_ARG} ${SKIP_TEST_TYPES_ARG} ${KSTESTS} 2>&1 | tee ${RESULT_LOG}
 
 
 ### Create result
@@ -199,7 +215,7 @@ echo "# Time consumed: ${TINFO}" >> ${TEST_PARAMETERS_FILE}
 
 ### Remove run file
 
-rm ${RUN_FILENAME}
+rm ${RUN_FILE_PATH}
 
 
 ### Sync results to remote host

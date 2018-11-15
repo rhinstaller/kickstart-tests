@@ -1,5 +1,5 @@
 ---
-kstests:
+nightly1:
   topology:
     topology_name: kstests
     resource_groups:

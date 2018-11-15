@@ -1,5 +1,5 @@
 ---
-kstests:
+kstest-runners:
   topology:
     topology_name: kstests
     resource_groups:
@@ -8,7 +8,7 @@ kstests:
           resource_definitions:
             - name: "{{ resource_name }}"
               role: os_server
-              flavor: m1.xlarge
+              flavor: m1.large
               image: Fedora-Cloud-Base-28-1.1
               count: 2
               keypair: "{{ keypair }}"
@@ -25,10 +25,10 @@ kstests:
         hostname: __IP__
       hosts:
         kstest:
-          count: 1
+          count: 2
           host_groups:
             - kstest
         kstest-master:
-          count: 1
+          count: 0
           host_groups:
             - kstest-master

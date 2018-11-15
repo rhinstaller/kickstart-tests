@@ -1,0 +1,12 @@
+---
+
+- hosts: kstest-master
+  become: true
+  become_user: root
+  vars_files:
+    roles/kstest/vars/main.yml
+
+  roles:
+    - role: kstest-master
+      vars:
+        action: run-test

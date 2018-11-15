@@ -4,15 +4,15 @@ resource_groups:
     - resource_group_name: kstests
       resource_group_type: openstack
       resource_definitions:
-        - name: "kstest"
+        - name: "{{ resource_name }}"
           role: os_server
           flavor: m1.xlarge
           image: Fedora-Cloud-Base-28-1.1
           count: 2
-          keypair: kstests
+          keypair: "{{ keypair }}"
           fip_pool: 10.8.240.0
           networks:
             - installer-jenkins-priv-network
       credentials:
         filename: clouds.yml
-        profile: ci-rhos
+        profile: "{{ cloud_profile }}"

@@ -1,2 +1,8 @@
 [kstest]
+
 [kstest-master]
+
+[all:vars]
+#ansible_ssh_private_key_file=
+#ansible_ssh_user=fedora
+#ansible_ssh_common_args='-o StrictHostKeyChecking=no'

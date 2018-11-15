@@ -1,0 +1,71 @@
+---
+# Variables for configuring the test to be run on master
+
+### The subject to be tested.
+
+# Installer boot iso url.
+kstest_boot_iso_url: "https://download.fedoraproject.org/pub/fedora/linux/releases/29/Everything/x86_64/os/images/boot.iso"
+
+# Url of updates image to be used.
+kstest_updates_img: ""
+
+# Additional installer boot options to be used
+kstest_additional_boot_options: ""
+
+# Software http repository for tests.
+# In the form of kickstart url command option.
+#kstest_url: "--mirror=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-rawhide\\&arch=$basearch"
+kstest_url: "--url=https://download.fedoraproject.org/pub/fedora/linux/releases/29/Everything/x86_64/os"
+# Software ftp repository for tests.
+kstest_ftp_url: "ftp://mirror.utexas.edu/pub/fedora/linux/releases/29/Everything/x86_64/os/"
+
+
+### The tests to be run.
+
+# Tests to be run (empty for all).
+# Space separated names of tests.
+kstest_tests_to_run: ""
+
+# Category of tests to be run.
+# Applied only if kstest_tests_to_run is empty.
+kstest_test_type: ""
+
+# Categories of tests to be skipped.
+# Applied only if kstest_tests_to_run is empty.
+# Space separated test types.
+kstest_skip_test_types: ""
+
+# kickstart-tests repository and branch to be used.
+kstest_git_repo: https://github.com/rhinstaller/kickstart-tests.git
+kstest_git_version: master
+
+# Set to "no" to prevent forced pulling the repository before running the test.
+kstest_git_pull: "yes"
+
+
+### Remote runners
+
+# Hosts to be used for running tests (additionally to kstests-master host),
+# If not defined, all hosts from 'kstest' inventory group will be used
+# Multiple hosts are separated by space.
+#kstest_test_remotes:
+
+# Number of jobs to be run in parallel on one host.
+kstest_test_jobs: 4
+
+
+### Results
+
+# Prefix of the subdirectory for a test run results.
+# The subdirectory name is generated from date of the run execution
+kstest_result_run_dir_prefix: ""
+
+# Path to remote destination for sync of results.
+# Kstest user on master has to be authorized for accessing the target
+# (eg with master ssh key).
+#kstest_remote_results_path: "user@host:results"
+kstest_remote_results_path: ""
+
+# Keep results on master after syncing to remote destination.
+# True unless "no".
+kstest_remote_results_keep_local: "yes"

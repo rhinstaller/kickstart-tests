@@ -1,0 +1,7 @@
+---
+kstest_boot_iso_url: "https://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/x86_64/os/images/boot.iso"
+kstest_url: "--url=https://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/x86_64/os"
+kstest_ftp_url: "ftp://mirror.utexas.edu/pub/fedora/linux/development/rawhide/Everything/x86_64/os/"
+kstest_result_run_dir_prefix: "rawhide."
+kstest_remote_results_path: "root@10.43.136.2:/mnt/trees/kstests/nightly-permanent"
+kstest_remote_results_keep_local: "no"

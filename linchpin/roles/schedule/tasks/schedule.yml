@@ -1,5 +1,11 @@
 ---
 
+- name: Create log directory if it does not exist
+  file:
+    state: directory
+    path: "{{ log_file_name | dirname }}"
+  when: log_file_name | dirname != ""
+
 - name: Create run script
   template:
     src: run_scheduled_tests.sh.j2

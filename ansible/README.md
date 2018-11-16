@@ -90,7 +90,7 @@ kstest-master-configure-test.yml
 Scheduling configuration
 ------------------------
 
-A) a test run can scheduled by `cron` on *master* using a playbook:
+A) *Test runs* can be scheduled by `cron` on *master* using a playbook:
 
 ```
 ansible-playbook kstest-master-schedule-test.yml
@@ -106,7 +106,7 @@ ansible-playbook --extra-vars 'kstest_schedule_cron_disabled=true' kstest-master
 
 ```
 
-B) It is also possible to schedule running the *test run* on temporarily provisioned cloud resources with [linchpin](../linchpin/README.md#scheduling-a-test-run) script (setting up local host user systemd timer via a playbook).
+B) It is also possible to schedule running the *test runs* on temporarily provisioned cloud resources with [linchpin](../linchpin/README.md#scheduling-a-test-run) script (setting up local host user systemd timer via a playbook).
 
 Results
 -------

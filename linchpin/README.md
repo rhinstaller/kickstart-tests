@@ -47,9 +47,9 @@ A kickstart *test run* (a batch of selected individual tests) can be run using t
 
 For more details see [ansible playbooks](../ansible/README.md) for deployment and running of kickstart tests. The playbooks are applied to *runners* and *master* defined in [inventory](../ansible/inventory/hosts) groups `kstest` and `kstest-master`. The inventory for a *target* is generated automatically when provisioning the hosts with `linchpin`.
 
-To learn the path to the inventory generated for *target* `TARGET` (for example to run the playbooks individually on provisioned *target*), use `status` command:
+To show the inventory generated for *target* `TARGET` (for example to run the playbooks individually on provisioned *target*), use `status` command:
 ```
-kstest-in-cloud.sh status <TARGET>
+kstest-in-cloud.sh status <TARGET> --show-inventory
 ```
 
 #### Resoruces configuration

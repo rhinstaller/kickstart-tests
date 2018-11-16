@@ -67,6 +67,8 @@ Some of them may require using a *script* parameter:
 
 * `image` - Cloud image to be used as the base for *runners* deployment. This may require setting the default remote user for deployment by `--remote-user` option. (For example Fedora cloud images have `fedora` user, RHEL cloud images have `cloud-user`.)
 
+Depending on the OS image used it may be possible to use python 3 for ansible playbooks on deployed hosts by setting the `--ansible-python-interpreter` to the python 3 interpreter path.
+
 Ssh keys
 --------
 

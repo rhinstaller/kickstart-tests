@@ -16,7 +16,7 @@ parser.add_argument("--report_filename", "-r", metavar="REPORT_FILENAME", type=s
 parser.add_argument("--isomd5sum_filename", "-m", metavar="ISO_MD5_SUM_FILENAME", type=str,
                     default="isomd5sum.txt", help="Name of the file with md5 sum of boot iso")
 parser.add_argument("--status_count", "-s", metavar="NUMBER_OF_LATEST_RESULTS", type=int,
-                    default=3, help="Number of latest results to be used for status")
+                    default=1, help="Number of latest results to be used for status")
 
 args = parser.parse_args()
 

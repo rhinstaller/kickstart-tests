@@ -403,6 +403,7 @@ if [[ "$TEST_REMOTES" != "" ]]; then
         if [[ ${KEEPIT} > 0 ]]; then
             ssh kstest@${remote} sudo chown -R kstest:kstest /var/tmp/kstest-\*
             ssh kstest@${remote} sudo chmod -R a+r /var/tmp/kstest-\*
+            # Fix permissions of log folders gathered via libguestfs
             ssh kstest@${remote} sudo find /var/tmp/kstest-\* -type d -exec chmod 755 {} +
             scp -r kstest@${remote}:/var/tmp/kstest-\* /var/tmp/
         fi
@@ -418,6 +419,10 @@ else
                                                       ${UPDATES_ARG} ${BOOT_ARG} {} ::: ${tests}
     rc=$?
 fi
+
+# Fix permissions of log folders gathered via libguestfs
+# We need to do this also on results created on local host.
+sudo find /var/tmp/kstest-* -type d -exec chmod 755 {} +
 
 # Return exit code from above.  This is structure for future improvement,
 # you can do a cleaning here.

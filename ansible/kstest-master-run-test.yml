@@ -9,4 +9,4 @@
   roles:
     - role: kstest-master
       vars:
-        action: run-test
+        master_action: run-test

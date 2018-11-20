@@ -9,4 +9,4 @@
   roles:
     - role: kstest-master
       vars:
-        action: schedule-test
+        master_action: schedule-test

@@ -2,12 +2,12 @@
 
 - name: Configure test
   import_tasks: configure-test.yml
-  when: action == "configure-test"
+  when: master_action == "configure-test"
 
 - name: Run test
   import_tasks: run-test.yml
-  when: action == "run-test"
+  when: master_action == "run-test"
 
 - name: Schedule test
   import_tasks: schedule-test.yml
-  when: action == "schedule-test"
+  when: master_action == "schedule-test"

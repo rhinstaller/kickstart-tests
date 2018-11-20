@@ -9,5 +9,5 @@
   roles:
     - role: kstest-master
       vars:
-        action: configure-test
+        master_action: configure-test
 

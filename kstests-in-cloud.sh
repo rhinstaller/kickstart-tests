@@ -83,7 +83,7 @@ Options:
 
     --remote-user            remote user for deployment of provisioned runners by ansible;
                              for example for Fedora cloud images it is "fedora";
-                             for RHEL could images it is "cloud-user"
+                             for RHEL cloud images it is "cloud-user"
 
   Test configuration options ("run" command):
 

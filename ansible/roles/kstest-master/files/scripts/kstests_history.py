@@ -25,6 +25,9 @@ report_filename = args.report_filename
 md5sum_filename = args.isomd5sum_filename
 history_length = args.status_count
 
+params_filename = "test_parameters.txt"
+TEST_TIME_RE = re.compile(r'TIME_OF_RUNNING_TESTS:\s([^\s]*)')
+
 header_row = [" "]
 tests = {}
 
@@ -118,9 +121,22 @@ for result_dir in sorted(os.listdir(results_path)):
 
     with open(os.path.join(result_path, md5sum_filename), "r") as f:
         isomd5 = f.read()
-    header_row.append("<a href=\"{}/{}\">{}</a></br>{}</br>{}".format(results_dir, result_dir, result_dir, anaconda_ver,
-                                                                      "[NEW ISO]" if isomd5 != old_isomd5 else "-"))
+    header = "<a href=\"{}/{}\">{}</a></br>{}</br>{}".format(results_dir, result_dir, result_dir, anaconda_ver,
+                                                             "[NEW ISO]" if isomd5 != old_isomd5 else "-")
     old_isomd5 = isomd5
+
+    params_file = os.path.join(result_path, params_filename)
+    if not os.path.isfile(params_file):
+        print("Can't parse out test run time from {}: not found".format(params_file), file=sys.stderr)
+    else:
+        with open(params_file, "r") as f:
+            match = TEST_TIME_RE.search(f.read())
+            if match and match.groups():
+                header += "</br>{}".format(match.groups()[0])
+            else:
+                print("Can't parse out test run time from {}: value not found".format(params_file), file=sys.stderr)
+
+    header_row.append(header)
 
 thead = """
 <tr>

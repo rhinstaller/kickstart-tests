@@ -4,8 +4,8 @@
 # - enable one module (different one this time)
 # - install a second module (different one this time)
 
-url @KSTEST_URL@
-repo --name=modular @KSTEST_MODULAR_URL@
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
 
 install
 network --bootproto=dhcp
@@ -68,15 +68,6 @@ dnf module list --enabled django | grep django || echo "*** django module not ma
 dnf module list --enabled nodejs | grep nodejs || echo "*** nodejs module not marked as enabled" >> /root/RESULT
 dnf module list --installed nodejs | grep nodejs || echo "*** nodejs module not marked as installed" >> /root/RESULT
 
-if [ ! -f /root/RESULT ]
-then
-    # no result file (no errors) -> success
-    echo SUCCESS > /root/RESULT
-else
-    # some errors happened
-    exit 1
-fi
-
-
+%ksappend validation/success_if_result_empty.ks
 
 %end

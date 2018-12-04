@@ -3,22 +3,8 @@
 # try enabling one module multiple times
 # - with same stream spec
 
-url @KSTEST_URL@
-repo --name=modular @KSTEST_MODULAR_URL@
-
-install
-network --bootproto=dhcp
-
-bootloader --timeout=1
-zerombr
-clearpart --all
-autopart
-
-keyboard us
-lang en
-timezone America/New_York
-rootpw qweqwe
-shutdown
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
 
 module --name=nodejs --stream=10
 module --name=nodejs --stream=10

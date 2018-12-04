@@ -7,20 +7,9 @@
 # - that regular packages and groups requested at the same time
 #   are installed correctly
 # - that such an installation finishes successfully
-url @KSTEST_URL@
-install
-network --bootproto=dhcp
 
-bootloader --timeout=1
-zerombr
-clearpart --all --initlabel
-autopart
-
-keyboard us
-lang en_US.UTF-8
-timezone America/New_York --utc
-rootpw testcase
-shutdown
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
 
 %packages --ignoremissing
 fake-package-name-1
@@ -42,12 +31,6 @@ if [[ $? != 0 ]]; then
     echo '*** gcc should have been installed via the c-development package group' >> /root/RESULT
 fi
 
-if [ ! -f /root/RESULT ]
-then
-    # no result file (no errors) -> success
-    echo SUCCESS > /root/RESULT
-else
-    # some errors happened
-    exit 1
-fi
+%ksappend validation/success_if_result_empty.ks
+
 %end

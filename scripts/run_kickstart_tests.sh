@@ -62,12 +62,10 @@ KEEPIT=${KEEPIT:-0}
 # responsibility, this can break tests.
 UPDATES_IMG=""
 
-PYTHONPATH="lorax/src"
-
 TESTTYPE=""
 SKIP_TESTTYPES=""
 
-while getopts ":i:k:t:s:u:b:" opt; do
+while getopts ":i:k:t:s:u:b:p:o:" opt; do
     case $opt in
        i)
            # If this wasn't set from the environment, set it from the command line
@@ -88,7 +86,7 @@ while getopts ":i:k:t:s:u:b:" opt; do
            ;;
        s)
            # Exclude tests of the given test types. Multiple test types can be specified
-           # as a whitespace delimitted string in quotes:
+           # as a white space delimited string in quotes:
            #
            # -s "rhel-only knownfailure"
            SKIP_TESTTYPES=$OPTARG
@@ -103,12 +101,29 @@ while getopts ":i:k:t:s:u:b:" opt; do
            # Use additional boot options. Will be added to kernel_args from .sh file.
            BOOT_ARGS=$OPTARG
            ;;
+       p)
+           # Set platform name, used to configure platform specific behavior such as repository URLs.
+           PLATFORM_NAME=$OPTARG
+           ;;
+       o)
+           # Optionally add ksappend overrides from one or more folders. Individual folders need to
+           # be specified as a white space delimited string in quotes:
+           #
+           # -o "path/to/overrides1 path/to/overrides2"
+           KSAPPEND_OVERRIDES=$OPTARG
+           ;;
        *)
-           echo "Usage: run_kickstart_tests.sh [-i boot.iso] [-k 0|1|2] [-t test_type_to_run] [-s test_types_to_ignore] [-u link_to_updates.img] [-b additional_boot_options] [tests]"
+           echo "Usage: run_kickstart_tests.sh [-i boot.iso] [-k 0|1|2] [-t test_type_to_run] [-s test_types_to_ignore] [-u link_to_updates.img] [-b additional_boot_options] [-p platform_name] [-o ksappend_overrides] [tests]"
            exit 1
            ;;
     esac
 done
+
+# resolve platform name
+if [[ -z "$PLATFORM_NAME" ]]; then
+    # not set from command line, default to Fedora Rawhide
+    PLATFORM_NAME="fedora_rawhide"
+fi
 
 echo "starting kickstart tests"
 date
@@ -271,6 +286,7 @@ export KSTESTDIR=$(pwd)
 # The name of input kickstart (ks.in) file is
 # 1) either defined in the test (.sh) file by KICKSTART_NAME variable
 # 2) or the same as the test (.sh) file name .sh if the variable is not found
+tests_ks=""
 for t in ${tests}; do
     ksname_line=$(grep KICKSTART_NAME= ${t})
     if [[ -n "$ksname_line" ]]; then
@@ -279,8 +295,12 @@ for t in ${tests}; do
     else
         ks=${t/.sh/.ks.in}
     fi
+    tests_ks+="${ks/.ks.in/.ks} "
     sed ${sed_args} ${ks} > ${t/.sh/.ks}
 done
+
+# do %ksappend substition on all the files as well
+./scripts/apply-ksappend.py -p ${PLATFORM_NAME} -o ${KSAPPEND_OVERRIDES} -t ${tests_ks}
 
 # And now, include common stuff with @KSINCLUDE@ <FILE>
 # For example libraries for post scripts gathering the result

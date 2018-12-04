@@ -1,19 +1,8 @@
 #version=DEVEL
 #test name: packages-instlangs-1
-url @KSTEST_URL@
-install
-network --bootproto=dhcp
 
-bootloader --timeout=1
-zerombr
-clearpart --all --initlabel
-autopart
-
-keyboard us
-lang en_US.UTF-8
-timezone America/New_York --utc
-rootpw testcase
-shutdown
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
 
 # Only install the en_US locale
 %packages --instLangs=en_US
@@ -41,7 +30,6 @@ if [ -n "$other_locales" ]; then
     echo "*** non-en locales were installed" >> /root/RESULT
 fi
 
-if [ ! -f /root/RESULT ]; then
-    echo SUCCESS > /root/RESULT
-fi
+%ksappend validation/success_if_result_empty.ks
+
 %end

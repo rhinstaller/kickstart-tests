@@ -1,19 +1,18 @@
 #version=DEVEL
 #test name: container
-url @KSTEST_URL@
-install
-network --bootproto=dhcp
+
+%ksappend repos/default.ks
 
 bootloader --disabled
-zerombr
-clearpart --all --initlabel
-autopart
-
-keyboard us
-lang en_US.UTF-8
-timezone America/New_York --utc
+# the container testcase requires custom
+# bootloader configuration so we use
+# individual fragments here
+%ksappend common/common.ks
+%ksappend l10n/default.ks
+%ksappend users/default.ks
+%ksappend network/default.ks
+%ksappend storage/default.ks
 rootpw testcase
-shutdown
 
 %packages --nocore
 -kernel
@@ -51,7 +50,6 @@ if [[ $count -gt 200 ]]; then
     exit 1
 fi
 
-if [ ! -e /root/RESULT ]; then
-    echo SUCCESS > /root/RESULT
-fi
+%ksappend validation/success_if_result_empty.ks
+
 %end

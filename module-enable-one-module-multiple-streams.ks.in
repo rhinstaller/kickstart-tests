@@ -7,22 +7,8 @@
 # - fails with traceback when the module command is being processed
 #
 
-url @KSTEST_URL@
-repo --name=modular @KSTEST_MODULAR_URL@
-
-install
-network --bootproto=dhcp
-
-bootloader --timeout=1
-zerombr
-clearpart --all
-autopart
-
-keyboard us
-lang en
-timezone America/New_York
-rootpw qweqwe
-shutdown
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
 
 module --name=cri-o --stream=2018.0
 module --name=cri-o --stream=1.11

@@ -1,19 +1,8 @@
 #version=DEVEL
 #test name: packages-excludedocs
-url @KSTEST_URL@
-install
-network --bootproto=dhcp
 
-bootloader --timeout=1
-zerombr
-clearpart --all --initlabel
-autopart
-
-keyboard us
-lang en_US.UTF-8
-timezone America/New_York --utc
-rootpw testcase
-shutdown
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
 
 %packages --excludedocs
 @container-management

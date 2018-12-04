@@ -11,22 +11,8 @@
 # This test is basically checking the current behavior holds that we can catch any changes,
 # both intended and unintended.
 
-url @KSTEST_URL@
-repo --name=modular @KSTEST_MODULAR_URL@
-
-install
-network --bootproto=dhcp
-
-bootloader --timeout=1
-zerombr
-clearpart --all
-autopart
-
-keyboard us
-lang en
-timezone America/New_York
-rootpw qweqwe
-shutdown
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
 
 module --name=cri-o --stream=2018.0
 

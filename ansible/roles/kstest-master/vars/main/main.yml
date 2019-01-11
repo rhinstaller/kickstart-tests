@@ -8,6 +8,11 @@ kstest:
       # relative path in home directory ("" to disable creating summary)
       dest: ""
 
+    # Directory for fragment overrides
+    fragments_override_dir: fragments_override
+    # Fragment to be overriden with repos configured in test configuration
+    override_repos_file_path: repos/default.ks
+
     ### Locations (to be used by other playbooks)
     file:
       run: .run

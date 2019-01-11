@@ -117,7 +117,7 @@ kstest-in-cloud.sh schedule <TARGET> --remove
 ```
 As can be seen in the example the results can be configured to be either pulled from local host or to be pushed from the *master* to a remote *results host*.
 
-In the latter case the *master* has to be authorized to rsync the results to the *results host* so it makes sense to use existing [ssh key](#ssh-keys) that would be added to the *results host's* authorized keys as *master* key (`--key-name=kstests --ansible-ssh-key=~/.ssh/kstests.pem --key-use-for-master`)
+In the latter case the *master* has to be authorized to rsync the results to the *results host* so it makes sense to use existing [ssh key](#ssh-keys) that would be added to the *results host's* authorized keys as *master* key (`--key-name=kstests --ansible-private-key=~/.ssh/kstests.pem --key-use-for-master`)
 
 It is also possible to set up the scheduling on the *master* of a permanent *target* (using *master's* `cron`). See this [example](examples/example5).
 

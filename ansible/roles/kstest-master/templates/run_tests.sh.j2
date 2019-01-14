@@ -4,6 +4,8 @@
 set -x
 
 TEST_REMOTES="{{ kstest_test_remotes | default(groups['kstest']|join(' ')) }}"
+KSTEST_PLATFORM="{{ kstest_platform }}"
+KSTEST_OVERRIDE_REPOS="{{ kstest_override_repos }}"
 KSTEST_URL="{{ kstest_url }}"
 KSTEST_FTP_URL="{{ kstest_ftp_url}}"
 BOOT_ISO_URL="{{ kstest_boot_iso_url }}"
@@ -17,6 +19,7 @@ RESULTS_SUMMARY_SCRIPT="{{ kstest.master.results_summary_script.dest }}"
 UPDATES_IMAGE="{{ kstest_updates_img }}"
 ADDITIONAL_BOOT_OPTIONS="{{ kstest_additional_boot_options }}"
 TEST_DEFAULTS_FILE=scripts/defaults.sh
+FRAGMENTS_OVERRIDE_DIR="{{ kstest.master.fragments_override_dir}}"
 
 COMPOSE_BOOT_ISO=images/boot.iso
 KSTEST_USER=kstest
@@ -34,6 +37,7 @@ RESULT_REPORT_FILENAME={{ kstest.master.file.result_report }}
 TEST_PARAMETERS_FILENAME={{ kstest.master.file.test_parameters }}
 LOG_FILENAME={{ kstest.master.file.log }}
 RUN_FILE_PATH=${HOME_DIR}/{{ kstest.master.file.run }}
+FRAGMENTS_OVERRIDE_PATH=${HOME_DIR}/${FRAGMENTS_OVERRIDE_DIR}
 
 # Test run id
 START_TIME=$(date +%F-%H_%M_%S)
@@ -88,13 +92,17 @@ export TEST_REMOTES=${TEST_REMOTES}
 export TEST_JOBS=${TEST_JOBS}
 EOF
 
-if [[ -n "${KSTEST_URL}" ]]; then
-    echo "export KSTEST_URL=${KSTEST_URL}" >> ${TEST_DEFAULTS_FILE}
-fi
-if [[ -n "${KSTEST_FTP_URL}" ]]; then
-    echo "export KSTEST_FTP_URL=${KSTEST_FTP_URL}" >> ${TEST_DEFAULTS_FILE}
-fi
+if [[ "${KSTEST_OVERRIDE_REPOS}" != "no" ]]; then
 
+    # scripts/defaults.sh
+    if [[ -n "${KSTEST_URL}" ]]; then
+        echo "export KSTEST_URL=${KSTEST_URL}" >> ${TEST_DEFAULTS_FILE}
+    fi
+    if [[ -n "${KSTEST_FTP_URL}" ]]; then
+        echo "export KSTEST_FTP_URL=${KSTEST_FTP_URL}" >> ${TEST_DEFAULTS_FILE}
+    fi
+
+fi
 
 TIME_OF_UPDATING_REPO=$(date +%s)
 
@@ -103,6 +111,7 @@ TIME_OF_UPDATING_REPO=$(date +%s)
 
 TEST_PARAMETERS_FILE="${RESULT_PATH}/test_parameters.txt"
 cat > ${TEST_PARAMETERS_FILE} <<- EOF
+KSTEST_OVERRIDE_REPOS=${KSTEST_OVERRIDE_REPOS}
 KSTEST_URL=${KSTEST_URL}
 BOOT_ISO_URL=${BOOT_ISO_URL}
 TEST_REMOTES=${TEST_REMOTES}
@@ -156,10 +165,24 @@ if [[ -n "${SKIP_TYPES}" ]]; then
     SKIP_TEST_TYPES_ARG="-s ${SKIP_TYPES}"
 fi
 
+### Use platform for tests
+PLATFORM_ARG=""
+if [[ -n "${KSTEST_PLATFORM}" ]]; then
+    PLATFORM_ARG="-p ${KSTEST_PLATFORM}"
+fi
+
+
+### Override software repositories
+OVERRIDE_ARG=""
+if [[ "${KSTEST_OVERRIDE_REPOS}" != "no" ]]; then
+    OVERRIDE_ARG="-o ${FRAGMENTS_OVERRIDE_PATH}"
+fi
+
+
 ### Run the test
 
 RESULT_LOG="${RESULT_PATH}/${LOG_FILENAME}"
-scripts/run_kickstart_tests.sh -i ${BOOT_ISO} -k 1 ${UPDATES_IMAGE_ARG} ${ADDITIONAL_BOOT_OPTIONS_ARG} ${TEST_TYPE_ARG} ${SKIP_TEST_TYPES_ARG} ${KSTESTS} 2>&1 | tee ${RESULT_LOG}
+scripts/run_kickstart_tests.sh -i ${BOOT_ISO} -k 1 ${UPDATES_IMAGE_ARG} ${ADDITIONAL_BOOT_OPTIONS_ARG} ${TEST_TYPE_ARG} ${SKIP_TEST_TYPES_ARG} ${PLATFORM_ARG} ${OVERRIDE_ARG} ${KSTESTS} 2>&1 | tee ${RESULT_LOG}
 
 
 ### Create result

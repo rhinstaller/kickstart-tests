@@ -12,15 +12,32 @@ kstest_updates_img: ""
 # Additional installer boot options to be used
 kstest_additional_boot_options: ""
 
-# Software http repository for tests.
+### Software repositories for tests.
+
+# Override platform defaults with the repositories defined below.
+# True unless "no"
+kstest_override_repos: "yes"
+
+# Base repository url
 # In the form of kickstart url command option.
 #kstest_url: "--mirror=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-rawhide\\&arch=$basearch"
 kstest_url: "--url=https://download.fedoraproject.org/pub/fedora/linux/releases/29/Everything/x86_64/os"
+
 # Software ftp repository for tests.
 kstest_ftp_url: "ftp://mirror.utexas.edu/pub/fedora/linux/releases/29/Everything/x86_64/os/"
 
+# Additional repo commands.
+# Overrides repos/defaults.ks fragment.
+# Set to [] for no additional repositories.
+kstest_repos: []
+#kstest_repos:
+#  - "repo --name=modular --baseurl=https://download.eng.brq.redhat.com/pub/fedora/linux/releases/29/Modular/x86_64/os/"
 
 ### The tests to be run.
+
+# Platform to be tested.
+# Empty string for default.
+kstest_platform: ""
 
 # Tests to be run (empty for all).
 # Space separated names of tests.

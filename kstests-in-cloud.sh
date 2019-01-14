@@ -20,6 +20,7 @@ WORK_BASE_DIR=$(pwd)
 USE_KEY_FOR_MASTER="no"
 #STORED_PRIVATE_KEYS_DIR=$(mktemp -d -t kstest-deploymen-keys-XXXXXX)
 STORED_PRIVATE_KEYS_DIR="${WORK_BASE_DIR}/linchpin/keys"
+PROVISIONED_HOST_CONNECTION_TIMEOUT=60
 
 REMOVE_SCHEDULE="no"
 WHEN=""
@@ -353,6 +354,16 @@ EOF
         cat <<EOF >> ${INVENTORY}
 ansible_python_interpreter=${ANSIBLE_PYTHON_INTERPRETER}
 EOF
+    fi
+
+    # Wait for provisioned hosts ssh service
+
+    if [[ -n ${ANSIBLE_PYTHON_INTERPRETER} ]]; then
+        # Being given the option suppose python is available for ansible on the host
+        ansible all -i ${INVENTORY} -m wait_for_connection -a "timeout=${PROVISIONED_HOST_CONNECTION_TIMEOUT}"
+    else
+        # Maybe there is no python2 available for ansible, use only local ansible modules
+        ansible-playbook -i ${INVENTORY} --extra-vars "timeout=${PROVISIONED_HOST_CONNECTION_TIMEOUT}" linchpin/wait_for_hosts.yml
     fi
 
     # Deploy the test runners and master

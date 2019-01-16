@@ -37,7 +37,7 @@ import shutil
 import subprocess
 import socket
 
-from lib.temp_manager import TempManager
+from lib.utils import TempManager
 from lib.conf.configuration import VirtualConfiguration
 from lib.conf.runner_parser import RunnerParser
 from lib.shell_launcher import ShellLauncher

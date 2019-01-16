@@ -19,8 +19,6 @@
 #
 # Red Hat Author(s): Jiri Konecny <jkonecny@redhat.com>
 
-# This is library for working with temp directory.
-
 import os
 import shutil
 
@@ -64,4 +62,3 @@ class TempManager(AbstractContextManager):
 
     def _change_permission(self):
         os.chmod(self._tmp_dir, 0o755)
-

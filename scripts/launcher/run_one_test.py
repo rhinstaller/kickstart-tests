@@ -189,7 +189,7 @@ def run_test_in_temp(config):
 
 if __name__ == '__main__':
     parser = RunnerParser()
-    config = parser.get_runner_conf_from_params()
+    config = parser.get_configuration()
 
     print("================================================================")
     ret_code = run_test_in_temp(config)

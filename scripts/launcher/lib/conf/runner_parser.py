@@ -20,25 +20,56 @@
 # Red Hat Author(s): Jiri Konecny <jkonecny@redhat.com>
 
 import os
+from abc import ABC, abstractmethod
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
-from lib.conf.configuration import RunnerConfiguration, KeepLevel
+from lib.conf.configuration import RunnerConfiguration, KeepLevel, dry_run
 
 
-class RunnerParser(object):
+class BaseParser(ABC):
+
+    def __init__(self, parser_description):
+        """Base configuration for parser implementing common options"""
+        self._parser = ArgumentParser(description=parser_description,
+                                      formatter_class=RawDescriptionHelpFormatter)
+        self._configure_parser()
+        self._add_dry_run()
+
+    @abstractmethod
+    def _configure_parser(self):
+        pass
+
+    @abstractmethod
+    def get_configuration(self):
+        """Return configuration object based on BaseConfiguration"""
+        pass
+
+    def _add_dry_run(self):
+        self._parser.add_argument("--dry-run", default=False, action="store_true",
+                                  dest="dry_run",
+                                  help="prepare everything for the run but do not start the VM")
+
+    def _parse_args(self):
+        ns = self._parser.parse_args()
+
+        if ns.dry_run:
+            global dry_run
+            dry_run = ns.dry_run
+
+        return ns
+
+
+class RunnerParser(BaseParser):
     """Parse arguments for the run_one_test script and return back RunnerConfiguration."""
 
     def __init__(self):
-        super().__init__()
-
-        self._parser = ArgumentParser(description="""
+        super().__init__("""
         Run one kickstart test.
 
         This should be run in parallel by main script. It is not supposed to be invoked manually.
-        """, formatter_class=RawDescriptionHelpFormatter)
-        self._confiure_parser()
+        """)
 
-    def _confiure_parser(self):
+    def _configure_parser(self):
         self._parser.add_argument("kickstart_test", metavar="KS test controller",
                                   type=str, help="Kickstart test to run")
         self._parser.add_argument("-i", metavar="Image path", type=str, required=True,
@@ -59,8 +90,12 @@ class RunnerParser(object):
                                   dest="append_host_id",
                                   help="append an id of the host running the test to the result")
 
-    def get_runner_conf_from_params(self) -> RunnerConfiguration:
-        ns = self._parser.parse_args()
+    def get_configuration(self):
+        """Parse arguments and return configuration object.
+
+        :returns: RunnerConfiguration object.
+        """
+        ns = self._parse_args()
         conf = RunnerConfiguration()
 
         conf.shell_test_path = os.path.abspath(ns.kickstart_test)

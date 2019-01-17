@@ -37,12 +37,12 @@ import shutil
 import subprocess
 import socket
 
-from lib.utils import TempManager
+from lib.utils import TempManager, disable_on_dry_run
 from lib.conf.configuration import VirtualConfiguration
 from lib.conf.runner_parser import RunnerParser
 from lib.shell_launcher import ShellLauncher
 from lib.virtual_controller import VirtualManager, InstallError
-from lib.validator import KickstartValidator, LogValidator, ResultFormatter
+from lib.validator import KickstartValidator, LogValidator, ResultFormatter, Validator
 from lib.test_logging import setup_logger, get_logger
 
 log = get_logger()
@@ -111,19 +111,14 @@ class Runner(object):
             self._result_formatter.report_result(False, str(e))
             return 1
 
-        validator = self._validate_logs(v_conf)
+        ret = self._validate_all(v_conf)
 
-        if not validator.result:
-            validator.report_result()
-            self._shell.cleanup()
-            return validator.return_code
-
-        ret = self._validate_result()
-        if ret.check_ret_code():
-            self._result_formatter.report_result(True, "test done")
-
-        self._shell.cleanup()
+        self._cleanup()
         return ret.return_code
+
+    @disable_on_dry_run
+    def _cleanup(self):
+        self._shell.cleanup()
 
     def _create_virtual_conf(self) -> VirtualConfiguration:
         kernel_args = self._shell.kernel_args()
@@ -158,6 +153,21 @@ class Runner(object):
         v_conf.networks = nics_args
 
         return v_conf
+
+    @disable_on_dry_run(returns=Validator("dry-run validator"))
+    def _validate_all(self, v_conf):
+        validator = self._validate_logs(v_conf)
+
+        if validator and not validator.result:
+            validator.report_result()
+            self._shell.cleanup()
+            return validator.return_code
+
+        ret = self._validate_result()
+        if ret.check_ret_code():
+            self._result_formatter.report_result(True, "test done")
+
+        return ret
 
     def _validate_logs(self, virt_configuration):
         validator = LogValidator(self._conf.ks_test_name)

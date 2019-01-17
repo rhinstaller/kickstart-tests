@@ -41,6 +41,7 @@ from pylorax.monitor import LogMonitor
 from pylorax.mount import IsoMountpoint
 
 from lib.conf.configuration import VirtualConfiguration
+from lib.utils import disable_on_dry_run
 from .log_handler import VirtualLogRequestHandler
 from .validator import replace_new_lines
 from .shell_launcher import ProcessLauncher
@@ -171,11 +172,8 @@ class VirtualInstall(object):
 
         log.info("Running virt-install.")
         log.info("virt-install %s", args)
-        try:
-            execWithRedirect("virt-install", args, raise_err=True)
-        except subprocess.CalledProcessError as e:
-            raise InstallError("Problem starting virtual install: %s" % e)
 
+        self._start_vm(args)
         conn = libvirt.openReadOnly(None)
         dom = conn.lookupByName(self._virt_name)
 
@@ -192,6 +190,14 @@ class VirtualInstall(object):
         else:
             log.info("Install finished. Or at least virt shut down.")
 
+    @disable_on_dry_run
+    def _start_vm(self, args):
+        try:
+            execWithRedirect("virt-install", args, raise_err=True)
+        except subprocess.CalledProcessError as e:
+            raise InstallError("Problem starting virtual install: %s" % e)
+
+    @disable_on_dry_run
     def destroy(self, pool_name):
         """
         Make sure the virt has been shut down and destroyed
@@ -334,6 +340,7 @@ class VirtualManager(object):
                     line = replace_new_lines(line)
                     out_file.write(line)
 
+    @disable_on_dry_run(False)
     def _check_setup(self):
         errors = []
 

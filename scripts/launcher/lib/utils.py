@@ -25,7 +25,19 @@ import shutil
 from contextlib import AbstractContextManager
 from tempfile import mkdtemp
 from glob import glob
-from lib.conf.configuration import KeepLevel
+from lib.conf.configuration import KeepLevel, GlobalConfiguration
+
+
+def disable_on_dry_run(returns=None):
+    """Disable this function if dry_run is enabled"""
+    def decorator_func(func):
+        def inner_func(*args, **kwargs):
+            if GlobalConfiguration.dry_run():
+                return returns
+            else:
+                return func(*args, **kwargs)
+        return inner_func
+    return decorator_func
 
 
 class TempManager(AbstractContextManager):

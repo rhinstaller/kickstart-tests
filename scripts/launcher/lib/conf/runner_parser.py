@@ -23,7 +23,7 @@ import os
 from abc import ABC, abstractmethod
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
-from lib.conf.configuration import RunnerConfiguration, KeepLevel, dry_run
+from lib.conf.configuration import RunnerConfiguration, KeepLevel, GlobalConfiguration
 
 
 class BaseParser(ABC):
@@ -53,8 +53,7 @@ class BaseParser(ABC):
         ns = self._parser.parse_args()
 
         if ns.dry_run:
-            global dry_run
-            dry_run = ns.dry_run
+            GlobalConfiguration.set_dry_run(ns.dry_run)
 
         return ns
 

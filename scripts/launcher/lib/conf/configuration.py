@@ -26,7 +26,7 @@ import os
 from enum import Enum
 from abc import ABC
 
-__all__ = ["KeepLevel", "RunnerConfiguration", "VirtualConfiguration", "dry_run"]
+__all__ = ["KeepLevel", "RunnerConfiguration", "VirtualConfiguration"]
 
 
 class KeepLevel(Enum):
@@ -53,6 +53,22 @@ class BaseConfiguration(ABC):
         msg = msg[:-1]
 
         return msg
+
+
+class GlobalConfiguration(BaseConfiguration):
+    """Global static configuration usable from all parts of the program"""
+    _dry_run = False
+
+    def __init__(self):
+        super().__init__("Global Configuration")
+
+    @classmethod
+    def set_dry_run(cls, value):
+        cls._dry_run = value
+
+    @classmethod
+    def dry_run(cls):
+        return cls._dry_run
 
 
 class RunnerConfiguration(BaseConfiguration):
@@ -343,8 +359,3 @@ class VirtualConfiguration(BaseConfiguration):
     def timeout(self, value: int):
         """Set cancel installer after X minutes"""
         self._timeout = value
-
-
-# Global variable for dry_run mode
-# This will be set in a base class by parser
-dry_run = False

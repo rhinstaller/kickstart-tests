@@ -38,10 +38,10 @@ from pylorax.executils import execWithRedirect
 
 from pylorax import setup_logging
 from pylorax.monitor import LogMonitor
-from pylorax.mount import IsoMountpoint
 
 from lib.conf.configuration import VirtualConfiguration
 from lib.utils import disable_on_dry_run
+from lib.utils.iso_dev import IsoDev
 from .log_handler import VirtualLogRequestHandler
 from .validator import replace_new_lines
 from .shell_launcher import ProcessLauncher
@@ -70,7 +70,7 @@ class VirtualInstall(object):
         Start the installation
 
         :param iso: Information about the iso to use for the installation
-        :type iso: IsoMountpoint
+        :type iso: IsoDev
         :param list ks_paths: Paths to kickstart files. All are injected, the
            first one is the one executed.
         :param log_check: Method that returns True if the installation fails
@@ -227,7 +227,7 @@ class VirtualManager(object):
         This uses virt-install with a boot.iso and a kickstart to create a disk
         image.
         """
-        iso_mount = IsoMountpoint(self._conf.iso_path, self._conf.location)
+        iso_dev = IsoDev(self._conf.iso_path)
 
         log_monitor = LogMonitor(
             install_log,
@@ -241,10 +241,12 @@ class VirtualManager(object):
         if self._conf.proxy:
             kernel_args += " proxy=" + self._conf.proxy
 
+        iso_dev.mount()
+
         try:
             log.info("Starting virtual machine")
             virt = VirtualInstall(self._conf.test_name,
-                                  iso_mount, self._conf.ks_paths,
+                                  iso_dev, self._conf.ks_paths,
                                   disk_paths=self._conf.disk_paths,
                                   kernel_args=kernel_args,
                                   vcpu_count=self._conf.vcpu_count,
@@ -264,7 +266,7 @@ class VirtualManager(object):
             raise
         finally:
             log.info("unmounting the iso")
-            iso_mount.umount()
+            iso_dev.unmount()
 
         if log_monitor.server.log_check():
             if not log_monitor.server.error_line and self._conf.timeout:

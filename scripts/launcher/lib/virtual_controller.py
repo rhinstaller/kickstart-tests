@@ -174,17 +174,8 @@ class VirtualInstall(object):
         log.info("virt-install %s", args)
 
         self._start_vm(args)
-        conn = libvirt.openReadOnly(None)
-        dom = conn.lookupByName(self._virt_name)
 
-        # TODO: If vnc has been passed, we should look up the port and print that
-        # for the user at this point
-        while dom.isActive() and not self._log_check():
-            sys.stdout.write(".")
-            sys.stdout.flush()
-            sleep(10)
         print()
-
         if self._log_check():
             log.info("Installation error detected. See logfile.")
         else:
@@ -196,6 +187,16 @@ class VirtualInstall(object):
             execWithRedirect("virt-install", args, raise_err=True)
         except subprocess.CalledProcessError as e:
             raise InstallError("Problem starting virtual install: %s" % e)
+
+        conn = libvirt.openReadOnly(None)
+        dom = conn.lookupByName(self._virt_name)
+
+        # TODO: If vnc has been passed, we should look up the port and print that
+        # for the user at this point
+        while dom.isActive() and not self._log_check():
+            sys.stdout.write(".")
+            sys.stdout.flush()
+            sleep(10)
 
     @disable_on_dry_run
     def destroy(self, pool_name):

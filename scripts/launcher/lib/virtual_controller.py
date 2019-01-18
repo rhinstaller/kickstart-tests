@@ -342,7 +342,7 @@ class VirtualManager(object):
                     line = replace_new_lines(line)
                     out_file.write(line)
 
-    @disable_on_dry_run(False)
+    @disable_on_dry_run(returns=[])
     def _check_setup(self):
         errors = []
 

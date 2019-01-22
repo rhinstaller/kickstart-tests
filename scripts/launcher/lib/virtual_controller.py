@@ -332,6 +332,10 @@ class VirtualManager(object):
 
     def _create_human_log(self):
         output_log = os.path.join(self._conf.temp_dir, "virt-install-human.log")
+        if not os.path.exists(self._conf.install_logpath):
+            log.debug("Can't create virt-install-human.log")
+            return
+
         with open(self._conf.install_logpath, 'rt') as in_file:
             with open(output_log, 'wt') as out_file:
                 for line in in_file:

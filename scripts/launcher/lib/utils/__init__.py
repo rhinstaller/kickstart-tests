@@ -29,6 +29,11 @@ from glob import glob
 from lib.conf.configuration import KeepLevel, GlobalConfiguration
 
 
+def is_dry_run():
+    """Is the dry_run mode enabled?"""
+    return GlobalConfiguration.dry_run()
+
+
 def disable_on_dry_run(original_func=None, *, returns=None):
     """Disable this function if dry_run is enabled"""
     def decorator_func(f):

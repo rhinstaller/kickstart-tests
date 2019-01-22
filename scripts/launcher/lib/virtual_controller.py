@@ -37,15 +37,14 @@ from pylorax.treebuilder import udev_escape
 from pylorax.executils import execWithRedirect
 
 from pylorax import setup_logging
-from pylorax.monitor import LogMonitor
 
 from lib.conf.configuration import VirtualConfiguration
 from lib.utils import disable_on_dry_run
 from lib.utils.iso_dev import IsoDev
-from .log_handler import VirtualLogRequestHandler
 from .validator import replace_new_lines
 from .shell_launcher import ProcessLauncher
 from .test_logging import get_logger
+from .log_monitor import LogMonitor
 
 
 log = get_logger()
@@ -230,11 +229,7 @@ class VirtualManager(object):
         """
         iso_dev = IsoDev(self._conf.iso_path)
 
-        log_monitor = LogMonitor(
-            install_log,
-            timeout=self._conf.timeout,
-            log_request_handler_class=VirtualLogRequestHandler
-        )
+        log_monitor = LogMonitor(install_log, timeout=self._conf.timeout)
 
         kernel_args = ""
         if self._conf.kernel_args:
@@ -253,7 +248,7 @@ class VirtualManager(object):
                                   vcpu_count=self._conf.vcpu_count,
                                   memory=self._conf.ram,
                                   vnc=self._conf.vnc,
-                                  log_check=log_monitor.server.log_check,
+                                  log_check=log_monitor.log_check,
                                   virtio_host=log_monitor.host,
                                   virtio_port=log_monitor.port,
                                   nics=self._conf.networks,
@@ -269,11 +264,11 @@ class VirtualManager(object):
             log.info("unmounting the iso")
             iso_dev.unmount()
 
-        if log_monitor.server.log_check():
-            if not log_monitor.server.error_line and self._conf.timeout:
+        if log_monitor.log_check():
+            if not log_monitor.error_line and self._conf.timeout:
                 msg = "Test timed out"
             else:
-                msg = "Test failed on line: %s" % log_monitor.server.error_line
+                msg = "Test failed on line: %s" % log_monitor.error_line
             raise InstallError(msg)
 
     def _prepare_and_run(self):

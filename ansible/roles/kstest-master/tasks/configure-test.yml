@@ -11,7 +11,8 @@
     repo: "{{ kstest_git_repo }}"
     dest: "/home/{{ kstest_remote_user }}/{{ kstest.master.dir.git_repo }}"
     version: "{{ kstest_git_version }}"
-    update: no
+    update: yes
+    force: yes
 
 - name: Install and configure script for remote run
   template:

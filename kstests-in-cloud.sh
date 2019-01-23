@@ -73,11 +73,12 @@ Options:
     -k, --key-name NAME      name of the ssh key used for provisioning in cloud;
                              by default new key is generated on the cloud provider
     --key-use-existing       use the existing key --key-name from cloud
-    --key-upload PATH        upload public ssh key defined by PATH (as --key-name if defined)
+    --public-key-upload PATH upload public ssh key defined by PATH (as --key-name if defined)
     --ansible-private-key PATH
                              path to private ssh key to be used for ansible deployment;
                              if not defined generated key or user's default ssh key is used;
-                             this option may be required with --key-use-existing or --key-upload
+                             this option may be required with --key-use-existing or
+                             --public-key-upload
     --key-use-for-master     use the deployment key also as master runner key which
                              is used by master to access other test runners;
                              without the option a new temporary master runner key is generated;
@@ -128,7 +129,7 @@ Options:
 HELP_USAGE
 }
 
-options=$(getopt -o k:r:c:p: --long cloud:,results:,key-name:,key-use-existing,key-upload:,\
+options=$(getopt -o k:r:c:p: --long cloud:,results:,key-name:,key-use-existing,public-key-upload:,\
 ansible-private-key:,key-use-for-master,test-configuration:,pinfile:,when:,remove,logfile:,\
 scheduled,remote-user:,virtualenv:,ansible-python-interpreter:,test-run-timeout:,show-inventory,\
 force -- "$@")
@@ -149,14 +150,14 @@ while true; do
         ;;
     --key-use-existing)
         [[ ${KEY_MODE} == "upload" ]] && {
-            echo "Only one of --key-use-existing or --key-upload options can be used."
+            echo "Only one of --key-use-existing or --public-key-upload options can be used."
             exit 1
         }
         KEY_MODE=existing
         ;;
-    --key-upload)
+    --public-key-upload)
         [[ ${KEY_MODE} == "existing" ]] && {
-            echo "Only one of --key-use-existing or --key-upload options can be used."
+            echo "Only one of --key-use-existing or --public-key-upload options can be used."
             exit 1
         }
         shift;
@@ -269,7 +270,7 @@ if [[ ${COMMAND} == "schedule" ]]; then
             USE_KEY_FOR_MASTER_ARG="--key-use-for-master"
         fi
         if [[ ${KEY_MODE} == "upload" ]]; then
-            KEY_MODE_ARG="--key-upload"
+            KEY_MODE_ARG="--public-key-upload"
         elif [[ ${KEY_MODE} == "existing" ]]; then
             KEY_MODE_ARG="--key-use-existing"
         fi

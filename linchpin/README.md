@@ -76,7 +76,7 @@ By default all needed keys will be automatically generated when provisioning a *
 
 There are two ssh keypairs:
 
-* *Deployment key* - Used by ansible to access *master* and *runners*. By default a new keypair is generated in the cloud. There are options to use existing key or upload a key to the cloud (`--key-use-existing`, `--key-upload`). The key name (of the key to be generated or used or uploaded) is specified by `--key-name` option.
+* *Deployment key* - Used by ansible to access *master* and *runners*. By default a new keypair is generated in the cloud. There are options to use existing key or upload a key to the cloud (`--key-use-existing`, `--public-key-upload`). The key name (of the key to be generated or used or uploaded) is specified by `--key-name` option.
 * *Master key* - Used by *master* to access *runners* for distribution of a *test run*. By default a new throw-away keypair is generated. It is possible to use the *deployment key* with `--key-use-for-master` option. To authorize additional keys on *runners* drop them into [../ansible/roles/kstest/files/authorized_keys](../ansible/roles/kstest/files/authorized_keys) before provisioning (this can be done also after provisioning with [../ansible/kstest-runners-deploy.yml](../ansible/kstest-runners-deploy.yml) playbook) 
 
 

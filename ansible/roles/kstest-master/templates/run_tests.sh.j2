@@ -125,7 +125,7 @@ EOF
 ### Download the boot.iso
 
 rm -f ${BOOT_ISO}
-curl "${BOOT_ISO_URL}" -o ${BOOT_ISO}
+curl -Lf "${BOOT_ISO_URL}" -o ${BOOT_ISO}
 
 ISO_MD5_SUM=$(md5sum ${BOOT_ISO})
 

@@ -43,7 +43,8 @@ usage () {
 $(basename $0) [options] COMMAND TARGET
 
 Run kickstart tests on runners temporarily provisioned by linchpin in cloud.
-Linchpin target name TARGET is defined in PinFile (linchpin/PinFile).
+Linchpin target (group of test runners) name TARGET is defined in PinFile. See the value
+of the top-level element in the linchpin/PinFile for the name.
 
 These commands for running a test can be used:
 

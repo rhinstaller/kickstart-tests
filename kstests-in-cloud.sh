@@ -125,6 +125,23 @@ Options:
                              use alternative python interpreter on deployed hosts;
                              (for example /usr/bin/python3, /usr/libexec/platform-python)
 
+USAGE:
+
+Basic usage examples are described in this section.
+
+To run kickstart tests on TARGET created by linchpin with generated ssh keys:
+
+./$(basename $0) --results <path_to_local_folder_to_save_logs> --remote-user <user_to_connect_on_provisioned_machines> test [TARGET]
+
+
+To run kickstart tests on TARGET with a ssh key already uploaded:
+
+./$(basename $0) --key-name <target_key_name> --key-use-existing --ansible-private-key <path_to_the_private_key_part> test TARGET
+
+
+To run kickstart tests on TARGET with uploading your local ssh key:
+
+./$(basename $0) --public-key-upload <path_to_the_public_key> --ansible-private-key <path_to_the_private_key_part> test TARGET
 
 HELP_USAGE
 }

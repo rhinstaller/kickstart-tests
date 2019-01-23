@@ -125,3 +125,10 @@ Examples
 --------
 
 [examples](examples)
+
+Hints
+------
+
+For more verbose logging from ansible modules used by linchpin with the *censored* parts visible you can enable [Ansible debug](https://docs.ansible.com/ansible/latest/reference_appendices/config.html?highlight=ansible_debug#envvar-ANSIBLE_DEBUG) mode.
+
+You can do that by exporting environment variable `ANSIBLE_DEBUG=true`.

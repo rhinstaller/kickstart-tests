@@ -1,0 +1,7 @@
+---
+kstest_boot_iso_url: "https://download.fedoraproject.org/pub/fedora/linux/releases/29/Everything/x86_64/os/images/boot.iso"
+kstest_url: "--url=https://download.fedoraproject.org/pub/fedora/linux/releases/29/Everything/x86_64/os"
+kstest_tests_to_run: "new-test"
+kstest_test_jobs: 1
+kstest_git_repo: https://github.com/rvykydal/kickstart-tests.git
+kstest_git_version: new-test

@@ -3,6 +3,7 @@
 COMMAND="test"
 RESULTS_DIR=""
 TEST_CONFIGURATION_FILE=""
+TEST_RUN_TIMEOUT=0
 
 CLOUD_CONFIG_DIR=~/.config/linchpin/
 CLOUD_CONFIG_FILE=clouds.yml
@@ -91,6 +92,8 @@ Options:
                              (ansible/roles/kstest-master/defaults/main/test-configuration.yml)
                              which can be overriden also by file
                              ansible/roles/kstest-master/vars/main/test-configuration.yml
+    --test-run-timeout SECONDS
+                             timeout for the test run
 
   Scheduling the test ("schedule" command):
 
@@ -113,7 +116,7 @@ Options:
 HELP_USAGE
 }
 
-options=$(getopt -o k:r:c:p: --long cloud:,results:,key-name:,key-use-existing,key-upload:,ansible-private-key:,key-use-for-master,test-configuration:,pinfile:,when:,remove,logfile:,scheduled,remote-user:,virtualenv:,ansible-python-interpreter: -- "$@")
+options=$(getopt -o k:r:c:p: --long cloud:,results:,key-name:,key-use-existing,key-upload:,ansible-private-key:,key-use-for-master,test-configuration:,pinfile:,when:,remove,logfile:,scheduled,remote-user:,virtualenv:,ansible-python-interpreter:,test-run-timeout: -- "$@")
 [ $? -eq 0 ] || {
     echo "Usage:"
     usage
@@ -195,6 +198,10 @@ while true; do
         shift;
         ANSIBLE_PYTHON_INTERPRETER=$1
         ;;
+    --test-run-timeout)
+        shift;
+        TEST_RUN_TIMEOUT=$1
+        ;;
     --)
         shift;
         COMMAND=$1
@@ -248,8 +255,16 @@ if [[ ${COMMAND} == "schedule" ]]; then
             PRIVATE_KEY_PATH_ARG="--ansible-private-key ${PRIVATE_KEY_PATH}"
         fi
 
-
-        CMDLINE="\"$0 test ${TARGET} --cloud ${CLOUD_PROFILE} --pinfile ${PINFILE} --remote-user ${REMOTE_USER} --key-name ${KEY_NAME} ${KEY_MODE_ARG} ${PRIVATE_KEY_PATH_ARG} ${TEST_CONFIGURATION_FILE_ARG} ${RESULTS_DIR_ARG} ${USE_KEY_FOR_MASTER_ARG}\""
+        CMDLINE="\"$0 test ${TARGET} \
+                --timeout ${TEST_RUN_TIMEOUT} \
+                --cloud ${CLOUD_PROFILE} \
+                --pinfile ${PINFILE} \
+                --remote-user ${REMOTE_USER} \
+                --key-name ${KEY_NAME} ${KEY_MODE_ARG} \
+                ${PRIVATE_KEY_PATH_ARG} \
+                ${TEST_CONFIGURATION_FILE_ARG} \
+                ${RESULTS_DIR_ARG} \
+                ${USE_KEY_FOR_MASTER_ARG}\""
 
         WHEN_EXTRA_VAR=""
         if [[ -n ${WHEN} ]]; then
@@ -400,7 +415,10 @@ if [[ ${COMMAND} == "test" || ${COMMAND} == "run" ]]; then
 
     # Run the test
 
-    ansible-playbook -i ${INVENTORY} ansible/kstest-master-run-test.yml
+    timeout ${TEST_RUN_TIMEOUT}s  ansible-playbook -i ${INVENTORY} ansible/kstest-master-run-test.yml
+    if [[ $? == "124" ]]; then
+        echo "Test run was terminated: TIMEOUT of ${TEST_RUN_TIMEOUT} seconds was reached."
+    fi
 
     # Fetch results
 

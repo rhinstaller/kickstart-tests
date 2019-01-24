@@ -71,7 +71,10 @@ Options:
                              the file is located in linchpin directory, default is "PinFile"
 
     -k, --key-name NAME      name of the ssh key used for provisioning in cloud;
-                             by default new key is generated on the cloud provider
+                             this name will be used for:
+                             - newly generated key on a cloud provider (default)
+                             - or to an already existing key that should be used (--key-use-existing)
+                             - or to the name under which a key will be uploaded (--public-key-upload)
     --key-use-existing       use the existing key --key-name from cloud
     --public-key-upload PATH upload public ssh key defined by PATH (as --key-name if defined)
     --ansible-private-key PATH
@@ -139,9 +142,9 @@ To run kickstart tests on TARGET with a ssh key already uploaded:
 ./$(basename $0) --key-name <target_key_name> --key-use-existing --ansible-private-key <path_to_the_private_key_part> test TARGET
 
 
-To run kickstart tests on TARGET with uploading your local ssh key:
+To run kickstart tests on TARGET with uploading your local ssh key with given name:
 
-./$(basename $0) --public-key-upload <path_to_the_public_key> --ansible-private-key <path_to_the_private_key_part> test TARGET
+./$(basename $0) --public-key-upload <path_to_the_public_key> --key-name <target_key_name> --ansible-private-key <path_to_the_private_key_part> test TARGET
 
 HELP_USAGE
 }

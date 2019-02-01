@@ -365,7 +365,7 @@ if [[ "$TEST_REMOTES" != "" ]]; then
         ssh kstest@${remote} mkdir -p kickstart-tests
         ssh kstest@${remote} mkdir -p install_images
         echo "synchronizing tests"
-        rsync -az --delete . kstest@${remote}:kickstart-tests/
+        rsync -az --delete-after --exclude "__pycache__" --exclude ".git/" . kstest@${remote}:kickstart-tests/
         echo "synchronizing installation image"
         rsync -az ${IMAGE} kstest@${remote}:install_images/
     done

@@ -5,6 +5,14 @@
     file: "{{ test_configuration }}"
   when: test_configuration is defined
 
+# This will prevent problems during checkout (__pycache__ folders will be owned by root)
+- name: Fix permissions on kickstart tests repo
+  file:
+    path: "{{ kstest_git_repo }}"
+    owner: "{{ kstest_remote_user }}"
+    group: "{{ kstest_remote_user }}"
+    recurse: yes
+
 - name: Checkout kickstart tests repo
   become_user: "{{ kstest_remote_user }}"
   git:

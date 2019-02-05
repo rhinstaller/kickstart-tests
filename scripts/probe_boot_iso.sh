@@ -58,7 +58,7 @@ if [[ -n $ISO_TMP ]]; then
 
     # 1) Mount boot.iso
     mkdir $ISO_TMP/iso
-    mount -o ro $IMAGE $ISO_TMP/iso
+    mount -o loop,ro $IMAGE $ISO_TMP/iso
     if [[ $? -ne 0 ]]; then
         clean_and_exit "Error: Can't mount boot iso" $ISO_TMP
     fi

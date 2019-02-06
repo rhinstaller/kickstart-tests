@@ -21,11 +21,10 @@ shutdown
 %post
 # Check the cipher name of /dev/sda2.
 crypted="/dev/sda2"
-cipher="$(cryptsetup luksDump ${crypted} | grep 'Cipher name:')"
 
-echo "${cipher}" | grep "^Cipher name:[[:space:]]*aes$"
+cipher="$(cryptsetup luksDump ${crypted} | awk '{ if ($1 == "Cipher:") print $2; }' )"
 
-if [[ $? != 0 ]] ; then
+if [[ "$cipher" != "aes-xts-plain64" ]] ; then
     echo "*** unexpected cipher ${cipher} of ${crypted}" > /root/RESULT
     exit 1
 fi

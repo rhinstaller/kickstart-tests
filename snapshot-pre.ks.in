@@ -1,0 +1,97 @@
+#test name: snapshot-pre
+url @KSTEST_URL@
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1
+part /boot --fstype=ext4 --size=600
+volgroup testvg --useexisting --noformat
+logvol swap --name=swap --vgname=testvg --size=500 --fstype=swap
+logvol none --thinpool  --name=ThinPool --vgname=testvg --useexisting --noformat
+logvol / --name=testLV --thin --vgname=testvg --poolname=ThinPool --useexisting --fstype=xfs
+
+snapshot testvg/testLV --name=snap-test --when=pre-install
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+%pre
+# Create vg which will be origin of the snapshot and used for the installation
+echo "Clean partition"
+vgremove -f testvg
+wipefs --all /dev/sda
+
+echo "Create partition"
+parted -s /dev/sda mklabel msdos
+parted -s /dev/sda mkpart primary 1M 80%
+
+echo "Create pv & vg"
+vgcreate testvg /dev/sda1
+
+echo "Create thin lvm"
+lvcreate -n ThinPool -l 70%FREE testvg
+lvconvert -y -f --type thin-pool testvg/ThinPool
+lvcreate -n testLV -V 20g --thinpool ThinPool testvg
+
+echo "Create FS"
+mkfs.xfs -L TEST /dev/mapper/testvg-testLV
+
+echo "Store test file"
+mkdir -p test
+mount /dev/mapper/testvg-testLV test
+echo "TEST FILE" > ./test/a.txt
+umount ./test
+%end
+
+%post
+SNAP_NAME="snap-test"
+VG="testvg"
+MOUNT_DIR="mount-test"
+
+# verify if snapshot exists
+if [ -z $(lvs -a | grep $SNAP_NAME) ]; then
+    echo "*** snapshot wasn't created properly" > /root/RESULT
+fi
+
+# try to activate snapshot
+if ! lvchange -ay -K $VG/$SNAP_NAME ; then
+    echo "*** snapshot can't be activated" >> /root/RESULT
+fi
+
+mkdir /$MOUNT_DIR
+
+# try to mount test snapshot
+if ! mount /dev/$VG/$SNAP_NAME /$MOUNT_DIR ; then
+    echo "*** snapshot can't be mounted" >> /root/RESULT
+fi
+
+# test the original file is present
+if [ ! -f /$MOUNT_DIR/a.txt ]; then
+    echo "*** file doesn't exists" >> /root/RESULT
+fi
+
+# test there aren't files from the installation
+if [ -f /$MOUNT_DIR/etc/passwd ]; then
+    echo "*** files from the installation shouldn't be available in the snapshot" >> /root/RESULT
+fi
+
+# Test that UUID of snapshot have to differ from the original LV
+ORIG_UUID=$(findmnt -o UUID /)
+SNAP_UUID=$(findmnt -o UUID /$MOUNT_DIR/)
+
+if [ "$ORIG_UUID" == "$SNAP_UUID" ]; then
+    echo "*** snapshot and origin LV UUID must differ" >> /root/RESULT
+fi
+
+# If we made it post, that's good enough
+if [ ! -e /root/RESULT ]; then
+    echo SUCCESS > /root/RESULT
+fi
+
+%end

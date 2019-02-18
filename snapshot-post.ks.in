@@ -1,0 +1,78 @@
+#test name: snapshot-post
+url @KSTEST_URL@
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+clearpart --all
+part /boot --fstype=ext4 --size=600
+part pv.1 --fstype=lvmpv --size=6000 --grow
+
+volgroup testvg pv.1
+logvol swap --name=swap --vgname=testvg --size=500 --fstype=swap
+logvol none --thinpool  --name=ThinPool --vgname=testvg --size=5000 --grow
+logvol / --name=testLV --thin --vgname=testvg --poolname=ThinPool --size=5000 --fstype=xfs
+
+snapshot testvg/testLV --name=snap-test --when=post-install
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+%post
+SNAP_NAME="snap-test"
+VG="testvg"
+MOUNT_DIR="mount-test"
+
+# verify if snapshot exists
+if [ -z $(lvs -a | grep $SNAP_NAME) ]; then
+    echo "*** snapshot wasn't created properly" > /root/RESULT
+fi
+
+# try to activate snapshot
+if ! lvchange -ay -K $VG/$SNAP_NAME ; then
+    echo "*** snapshot can't be activated" >> /root/RESULT
+fi
+
+mkdir /$MOUNT_DIR
+
+# try to mount test snapshot
+if ! mount /dev/$VG/$SNAP_NAME /$MOUNT_DIR ; then
+    echo "*** snapshot can't be mounted" >> /root/RESULT
+fi
+
+# test there aren't files from the installation
+if [ -z "$(diff -q --no-dereference /etc/ /$MOUNT_DIR/etc/)" ]; then
+    echo "*** files at /etc/ in the snapshot and installed system differs" >> /root/RESULT
+fi
+
+# test there aren't files from the installation
+if [ -z "$(diff -q --no-dereference /var/ /$MOUNT_DIR/var/)" ]; then
+    echo "*** files at /var/ in the snapshot and installed system differs" >> /root/RESULT
+fi
+
+# test there aren't files from the installation
+if [ -z "$(diff -q --no-dereference /usr/ /$MOUNT_DIR/usr/)" ]; then
+    echo "*** files at /usr/ in the snapshot and installed system differs" >> /root/RESULT
+fi
+
+# Test that UUID of snapshot have to differ from the original LV
+ORIG_UUID=$(findmnt -o UUID /)
+SNAP_UUID=$(findmnt -o UUID /$MOUNT_DIR/)
+
+if [ "$ORIG_UUID" == "$SNAP_UUID" ]; then
+    echo "*** snapshot and origin LV UUID must differ" >> /root/RESULT
+fi
+
+# If we made it post, that's good enough
+if [ ! -e /root/RESULT ]; then
+    echo SUCCESS > /root/RESULT
+fi
+
+%end

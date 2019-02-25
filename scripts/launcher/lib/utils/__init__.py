@@ -19,15 +19,37 @@
 #
 # Red Hat Author(s): Jiri Konecny <jkonecny@redhat.com>
 
-# This is library for working with temp directory.
-
 import os
 import shutil
 
+from functools import wraps
 from contextlib import AbstractContextManager
 from tempfile import mkdtemp
 from glob import glob
-from lib.conf.configuration import KeepLevel
+from lib.conf.configuration import KeepLevel, GlobalConfiguration
+
+
+def is_dry_run():
+    """Is the dry_run mode enabled?"""
+    return GlobalConfiguration.dry_run()
+
+
+def disable_on_dry_run(original_func=None, *, returns=None):
+    """Disable this function if dry_run is enabled"""
+    def decorator_func(f):
+
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            if GlobalConfiguration.dry_run():
+                return returns
+            else:
+                return f(*args, **kwargs)
+        return wrapper
+
+    if original_func:
+        return decorator_func(original_func)
+
+    return decorator_func
 
 
 class TempManager(AbstractContextManager):
@@ -64,4 +86,3 @@ class TempManager(AbstractContextManager):
 
     def _change_permission(self):
         os.chmod(self._tmp_dir, 0o755)
-

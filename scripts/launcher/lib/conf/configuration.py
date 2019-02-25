@@ -55,6 +55,22 @@ class BaseConfiguration(ABC):
         return msg
 
 
+class GlobalConfiguration(BaseConfiguration):
+    """Global static configuration usable from all parts of the program"""
+    _dry_run = False
+
+    def __init__(self):
+        super().__init__("Global Configuration")
+
+    @classmethod
+    def set_dry_run(cls, value):
+        cls._dry_run = value
+
+    @classmethod
+    def dry_run(cls):
+        return cls._dry_run
+
+
 class RunnerConfiguration(BaseConfiguration):
 
     def __init__(self):

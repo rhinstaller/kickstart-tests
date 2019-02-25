@@ -37,14 +37,14 @@ from pylorax.treebuilder import udev_escape
 from pylorax.executils import execWithRedirect
 
 from pylorax import setup_logging
-from pylorax.monitor import LogMonitor
-from pylorax.mount import IsoMountpoint
 
 from lib.conf.configuration import VirtualConfiguration
-from .log_handler import VirtualLogRequestHandler
+from lib.utils import disable_on_dry_run
+from lib.utils.iso_dev import IsoDev
 from .validator import replace_new_lines
 from .shell_launcher import ProcessLauncher
 from .test_logging import get_logger
+from .log_monitor import LogMonitor
 
 
 log = get_logger()
@@ -69,7 +69,7 @@ class VirtualInstall(object):
         Start the installation
 
         :param iso: Information about the iso to use for the installation
-        :type iso: IsoMountpoint
+        :type iso: IsoDev
         :param list ks_paths: Paths to kickstart files. All are injected, the
            first one is the one executed.
         :param log_check: Method that returns True if the installation fails
@@ -171,6 +171,17 @@ class VirtualInstall(object):
 
         log.info("Running virt-install.")
         log.info("virt-install %s", args)
+
+        self._start_vm(args)
+
+        print()
+        if self._log_check():
+            log.info("Installation error detected. See logfile.")
+        else:
+            log.info("Install finished. Or at least virt shut down.")
+
+    @disable_on_dry_run
+    def _start_vm(self, args):
         try:
             execWithRedirect("virt-install", args, raise_err=True)
         except subprocess.CalledProcessError as e:
@@ -185,13 +196,8 @@ class VirtualInstall(object):
             sys.stdout.write(".")
             sys.stdout.flush()
             sleep(10)
-        print()
 
-        if self._log_check():
-            log.info("Installation error detected. See logfile.")
-        else:
-            log.info("Install finished. Or at least virt shut down.")
-
+    @disable_on_dry_run
     def destroy(self, pool_name):
         """
         Make sure the virt has been shut down and destroyed
@@ -221,13 +227,9 @@ class VirtualManager(object):
         This uses virt-install with a boot.iso and a kickstart to create a disk
         image.
         """
-        iso_mount = IsoMountpoint(self._conf.iso_path, self._conf.location)
+        iso_dev = IsoDev(self._conf.iso_path)
 
-        log_monitor = LogMonitor(
-            install_log,
-            timeout=self._conf.timeout,
-            log_request_handler_class=VirtualLogRequestHandler
-        )
+        log_monitor = LogMonitor(install_log, timeout=self._conf.timeout)
 
         kernel_args = ""
         if self._conf.kernel_args:
@@ -235,16 +237,18 @@ class VirtualManager(object):
         if self._conf.proxy:
             kernel_args += " proxy=" + self._conf.proxy
 
+        iso_dev.mount()
+
         try:
             log.info("Starting virtual machine")
             virt = VirtualInstall(self._conf.test_name,
-                                  iso_mount, self._conf.ks_paths,
+                                  iso_dev, self._conf.ks_paths,
                                   disk_paths=self._conf.disk_paths,
                                   kernel_args=kernel_args,
                                   vcpu_count=self._conf.vcpu_count,
                                   memory=self._conf.ram,
                                   vnc=self._conf.vnc,
-                                  log_check=log_monitor.server.log_check,
+                                  log_check=log_monitor.log_check,
                                   virtio_host=log_monitor.host,
                                   virtio_port=log_monitor.port,
                                   nics=self._conf.networks,
@@ -258,13 +262,13 @@ class VirtualManager(object):
             raise
         finally:
             log.info("unmounting the iso")
-            iso_mount.umount()
+            iso_dev.unmount()
 
-        if log_monitor.server.log_check():
-            if not log_monitor.server.error_line and self._conf.timeout:
+        if log_monitor.log_check():
+            if not log_monitor.error_line and self._conf.timeout:
                 msg = "Test timed out"
             else:
-                msg = "Test failed on line: %s" % log_monitor.server.error_line
+                msg = "Test failed on line: %s" % log_monitor.error_line
             raise InstallError(msg)
 
     def _prepare_and_run(self):
@@ -328,12 +332,17 @@ class VirtualManager(object):
 
     def _create_human_log(self):
         output_log = os.path.join(self._conf.temp_dir, "virt-install-human.log")
+        if not os.path.exists(self._conf.install_logpath):
+            log.debug("Can't create virt-install-human.log")
+            return
+
         with open(self._conf.install_logpath, 'rt') as in_file:
             with open(output_log, 'wt') as out_file:
                 for line in in_file:
                     line = replace_new_lines(line)
                     out_file.write(line)
 
+    @disable_on_dry_run(returns=[])
     def _check_setup(self):
         errors = []
 

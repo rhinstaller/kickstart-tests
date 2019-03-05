@@ -28,6 +28,8 @@ WHEN=""
 LOGFILE=""
 VIRTUALENV_PATH=""
 
+STATUS_MODE=""
+
 # Directory to which linchpin generates inventory of provisioned runners.
 # Defined by linchpin layout configuration.
 INVENTORY_DIR="linchpin/inventories"
@@ -81,7 +83,7 @@ Options:
 
     --remote-user            remote user for deployment of provisioned runners by ansible;
                              for example for Fedora cloud images it is "fedora";
-                             for RHEL could images it is "cloud-user"
+                             for RHEL cloud images it is "cloud-user"
 
   Test configuration options ("run" command):
 
@@ -106,6 +108,10 @@ Options:
     --virtualenv PATH        path to virtualenv location that may be required for linchpin
                              run by scheduler
 
+  Info options ("status" command):
+
+    --show-inventory         prints the content of inventory file for the target
+
   Ansible options:
 
     --ansible-python-interpreter PATH
@@ -116,7 +122,10 @@ Options:
 HELP_USAGE
 }
 
-options=$(getopt -o k:r:c:p: --long cloud:,results:,key-name:,key-use-existing,key-upload:,ansible-private-key:,key-use-for-master,test-configuration:,pinfile:,when:,remove,logfile:,scheduled,remote-user:,virtualenv:,ansible-python-interpreter:,test-run-timeout: -- "$@")
+options=$(getopt -o k:r:c:p: --long cloud:,results:,key-name:,key-use-existing,key-upload:,\
+ansible-private-key:,key-use-for-master,test-configuration:,pinfile:,when:,remove,logfile:,\
+scheduled,remote-user:,virtualenv:,ansible-python-interpreter:,test-run-timeout:,show-inventory -- "$@")
+
 [ $? -eq 0 ] || {
     echo "Usage:"
     usage
@@ -201,6 +210,9 @@ while true; do
     --test-run-timeout)
         shift;
         TEST_RUN_TIMEOUT=$1
+        ;;
+    --show-inventory)
+        STATUS_MODE="inventory"
         ;;
     --)
         shift;
@@ -470,7 +482,10 @@ if [[ ${COMMAND} == "status" ]]; then
 
     # Show status of test run
 
-    ansible-playbook -i ${INVENTORY} ansible/kstest-master-show-test-status.yml
-    echo "Target \"${TARGET}\" has generated inventory ${INVENTORY}"
-
+    if [[ ${STATUS_MODE} == "inventory" ]]; then
+        echo "Target \"${TARGET}\" has generated inventory ${INVENTORY}:"
+        cat ${INVENTORY}
+    else
+        ansible-playbook -i ${INVENTORY} ansible/kstest-master-show-test-status.yml
+    fi
 fi

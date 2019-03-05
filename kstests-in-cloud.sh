@@ -29,6 +29,7 @@ LOGFILE=""
 VIRTUALENV_PATH=""
 
 STATUS_MODE=""
+FORCE="no"
 
 # Directory to which linchpin generates inventory of provisioned runners.
 # Defined by linchpin layout configuration.
@@ -112,6 +113,10 @@ Options:
 
     --show-inventory         prints the content of inventory file for the target
 
+  Destroying the target ("destroy" command):
+
+    --force                  force destroying of the target
+
   Ansible options:
 
     --ansible-python-interpreter PATH
@@ -124,7 +129,8 @@ HELP_USAGE
 
 options=$(getopt -o k:r:c:p: --long cloud:,results:,key-name:,key-use-existing,key-upload:,\
 ansible-private-key:,key-use-for-master,test-configuration:,pinfile:,when:,remove,logfile:,\
-scheduled,remote-user:,virtualenv:,ansible-python-interpreter:,test-run-timeout:,show-inventory -- "$@")
+scheduled,remote-user:,virtualenv:,ansible-python-interpreter:,test-run-timeout:,show-inventory,\
+force -- "$@")
 
 [ $? -eq 0 ] || {
     echo "Usage:"
@@ -213,6 +219,9 @@ while true; do
         ;;
     --show-inventory)
         STATUS_MODE="inventory"
+        ;;
+    --force)
+        FORCE="yes"
         ;;
     --)
         shift;
@@ -448,8 +457,10 @@ if [[ ${COMMAND} == "test" || ${COMMAND} == "destroy" ]]; then
 
     INVENTORY=${INVENTORY_DIR}/${TARGET}.inventory
     if [[ ! -f ${INVENTORY} ]]; then
-        echo "Can't find inventory ${INVENTORY} generated for target ${TARGET}"
-        exit 1
+        if [[ ${FORCE} != "yes" ]];  then
+            echo "Can't find inventory ${INVENTORY} generated for target ${TARGET}. The target may not actually exist. If you still want to destroy the target, use --force option."
+            exit 1
+        fi
     fi
 
     # Destroy the provisioned hosts

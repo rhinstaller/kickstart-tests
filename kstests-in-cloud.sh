@@ -275,6 +275,9 @@ if [[ ${COMMAND} == "schedule" ]]; then
         if [[ -n ${PRIVATE_KEY_PATH} ]]; then
             PRIVATE_KEY_PATH_ARG="--ansible-private-key ${PRIVATE_KEY_PATH}"
         fi
+        if [[ -n ${ANSIBLE_PYTHON_INTERPRETER} ]]; then
+            INTERPRETER_ARG="--ansible-python-interpreter ${ANSIBLE_PYTHON_INTERPRETER}"
+        fi
 
         CMDLINE="\"$0 test ${TARGET} \
                 --timeout ${TEST_RUN_TIMEOUT} \
@@ -285,7 +288,8 @@ if [[ ${COMMAND} == "schedule" ]]; then
                 ${PRIVATE_KEY_PATH_ARG} \
                 ${TEST_CONFIGURATION_FILE_ARG} \
                 ${RESULTS_DIR_ARG} \
-                ${USE_KEY_FOR_MASTER_ARG}\""
+                ${USE_KEY_FOR_MASTER_ARG} \
+                ${ANSIBLE_INTERPRETER_ARG}\""
 
         WHEN_EXTRA_VAR=""
         if [[ -n ${WHEN} ]]; then

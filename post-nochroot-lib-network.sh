@@ -41,6 +41,19 @@ function check_gui_configurations() {
     done
     IFS=$old_IFS
 
+    # TODO: remove when network module is used in all tested releases
+    # If no messages were found fall back to older version of log messages.
+    if [[ -z ${dev_cons} && -z ${cons_without_devs} ]];
+        old_IFS=$IFS
+        IFS=$'\n'
+        # use \s so that it does not match itself in the log
+        for line in $(egrep -o "device\sconfiguration added.*" /tmp/anaconda.log); do
+            local device=$(echo $line | cut -d" " -f7)
+            local con=$(echo $line | cut -d" " -f5)
+            dev_cons="${dev_cons} ${device}:${con} "
+        done
+        IFS=$old_IFS
+
     # bash version with process substitiutuion
     #while read -r line; do
     #    local device=$(echo $line | cut -d" " -f8)
@@ -48,6 +61,19 @@ function check_gui_configurations() {
     #    dev_cons="${dev_cons} ${device}:${con} "
     # use \s so that it does not match itself in the log
     #done < <(egrep -o "GUI, device\sconfiguration added.*" /tmp/anaconda.log)
+
+        # take into account connections attached to devices later (like regular connections
+        # for devices being slaves)
+        old_IFS=$IFS
+        IFS=$'\n'
+        # use \s so that it does not match itself in the log
+        for line in $(egrep -o "attaching\sconnection.*" /tmp/anaconda.log); do
+            local device=$(echo $line | cut -d" " -f6)
+            local con=$(echo $line | cut -d" " -f3)
+            dev_cons=$(echo $dev_cons | sed -e "s/$device:None/$device:$con/")
+        done
+        IFS=$old_IFS
+    fi
 
     # check that all requested devices supplied as arguments were added to GUI
     # and if ifcfg file exists it corresponds to the connection added
@@ -61,7 +87,7 @@ function check_gui_configurations() {
             if [[ ${con} != ${dev_con} ]]; then
                 found="yes"
                 local ifcfg_file="$SYSROOT/etc/sysconfig/network-scripts/ifcfg-${devname}"
-                if [[ ${con} != "" ]]; then
+                if [[ ${con} != "" && ${con} != "None" ]]; then
                     if [[ -e ${ifcfg_file} ]]; then
                         egrep -q '^UUID="?'${con}'"?$' ${ifcfg_file}
                         if [[ $? -ne 0 ]]; then

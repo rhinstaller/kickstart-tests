@@ -1,0 +1,86 @@
+#test name: vlan-httpks
+url @KSTEST_URL@
+install
+
+# Parent configured and activated in initramfs
+network --device ens4 --vlanid 104 --bootproto dhcp --no-activate
+# Parent not configured / activated in initramfs
+network --device ens5 --vlanid 105 --bootproto dhcp
+
+# Parent configured via kickstart, do not activate, onboot yes
+network --device ens6 --bootproto dhcp
+network --device ens6 --vlanid 106 --bootproto dhcp
+
+# Parent not configured via kickstart, activate, onboot no
+network --device ens7 --vlanid 107 --bootproto dhcp --activate --onboot no
+
+# Parent not configured via kickstart, interfacename
+network --device ens8 --vlanid 1008 --bootproto dhcp --interfacename myvlan1008
+
+
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+%post --nochroot
+
+@KSINCLUDE@ post-nochroot-lib-network.sh
+
+check_gui_configurations ens3 ens4 ens5 ens6 ens7 ens8 ens4.104 ens5.105 ens6.106 ens7.107 myvlan1008
+
+%end
+
+%post
+
+@KSINCLUDE@ post-lib-network.sh
+
+check_device_ifcfg_value ens4.104 TYPE Vlan
+check_device_ifcfg_value ens4.104 VLAN yes
+check_device_ifcfg_value ens4.104 ONBOOT yes
+check_device_ifcfg_value ens4.104 PHYSDEV ens4
+check_device_ifcfg_value ens4.104 VLAN_ID 104
+check_ifcfg_key_exists DEVICE ens4.104 no
+
+check_device_ifcfg_value ens5.105 TYPE Vlan
+check_device_ifcfg_value ens5.105 VLAN yes
+check_device_ifcfg_value ens5.105 ONBOOT yes
+check_device_ifcfg_value ens5.105 PHYSDEV ens5
+check_device_ifcfg_value ens5.105 VLAN_ID 105
+check_ifcfg_key_exists DEVICE ens5.105 no
+
+check_device_ifcfg_value ens6.106 TYPE Vlan
+check_device_ifcfg_value ens6.106 VLAN yes
+check_device_ifcfg_value ens6.106 ONBOOT yes
+check_device_ifcfg_value ens6.106 PHYSDEV ens6
+check_device_ifcfg_value ens6.106 VLAN_ID 106
+check_ifcfg_key_exists DEVICE ens6.106 no
+
+check_device_ifcfg_value ens7.107 TYPE Vlan
+check_device_ifcfg_value ens7.107 VLAN yes
+check_device_ifcfg_value ens7.107 ONBOOT no
+check_device_ifcfg_value ens7.107 PHYSDEV ens7
+check_device_ifcfg_value ens7.107 VLAN_ID 107
+check_ifcfg_key_exists DEVICE ens7.107 no
+
+check_device_ifcfg_value myvlan1008 TYPE Vlan
+check_device_ifcfg_value myvlan1008 VLAN yes
+check_device_ifcfg_value myvlan1008 ONBOOT yes
+check_device_ifcfg_value myvlan1008 PHYSDEV ens8
+check_device_ifcfg_value myvlan1008 VLAN_ID 1008
+check_device_ifcfg_value myvlan1008 DEVICE myvlan1008
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+   echo SUCCESS > /root/RESULT
+fi
+%end

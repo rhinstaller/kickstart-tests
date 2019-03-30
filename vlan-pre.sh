@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015  Red Hat, Inc.
+# Copyright (C) 2019  Red Hat, Inc.
 #
 # This copyrighted material is made available to anyone wishing to use,
 # modify, copy, or redistribute it subject to the terms and conditions of
@@ -15,8 +15,24 @@
 # License and may only be used or replicated with the express permission of
 # Red Hat, Inc.
 #
-# Red Hat Author(s): Chris Lumens <clumens@redhat.com>
+# Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
-TESTTYPE="network"
+TESTTYPE=${TESTTYPE:-"network"}
 
 . ${KSTESTDIR}/functions.sh
+
+
+kernel_args() {
+    . ${tmpdir}/ks_url
+    echo ${DEFAULT_BOOTOPTS} ip=ens3:dhcp ip=ens4:dhcp inst.ks=${ks_url}
+}
+
+# Arguments for virt-install --network options
+prepare_network() {
+    echo "network:default"
+    echo "network:default"
+    echo "network:default"
+    echo "network:default"
+    echo "network:default"
+    echo "network:default"
+}

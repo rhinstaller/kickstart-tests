@@ -43,7 +43,7 @@ function check_gui_configurations() {
 
     # TODO: remove when network module is used in all tested releases
     # If no messages were found fall back to older version of log messages.
-    if [[ -z ${dev_cons} && -z ${cons_without_devs} ]];
+    if [[ -z ${dev_cons} && -z ${cons_without_devs} ]]; then
         old_IFS=$IFS
         IFS=$'\n'
         # use \s so that it does not match itself in the log

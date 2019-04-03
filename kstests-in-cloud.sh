@@ -280,16 +280,16 @@ if [[ ${COMMAND} == "schedule" ]]; then
         fi
 
         CMDLINE="\"$0 test ${TARGET} \
-                --timeout ${TEST_RUN_TIMEOUT} \
-                --cloud ${CLOUD_PROFILE} \
-                --pinfile ${PINFILE} \
-                --remote-user ${REMOTE_USER} \
-                --key-name ${KEY_NAME} ${KEY_MODE_ARG} \
-                ${PRIVATE_KEY_PATH_ARG} \
-                ${TEST_CONFIGURATION_FILE_ARG} \
-                ${RESULTS_DIR_ARG} \
-                ${USE_KEY_FOR_MASTER_ARG} \
-                ${ANSIBLE_INTERPRETER_ARG}\""
+--test-run-timeout ${TEST_RUN_TIMEOUT} \
+--cloud ${CLOUD_PROFILE} \
+--pinfile ${PINFILE} \
+--remote-user ${REMOTE_USER} \
+--key-name ${KEY_NAME} ${KEY_MODE_ARG} \
+${PRIVATE_KEY_PATH_ARG} \
+${TEST_CONFIGURATION_FILE_ARG} \
+${RESULTS_DIR_ARG} \
+${USE_KEY_FOR_MASTER_ARG} \
+${ANSIBLE_INTERPRETER_ARG}\""
 
         WHEN_EXTRA_VAR=""
         if [[ -n ${WHEN} ]]; then

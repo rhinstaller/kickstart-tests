@@ -280,7 +280,7 @@ if [[ ${COMMAND} == "schedule" ]]; then
         fi
 
         CMDLINE="\"$0 test ${TARGET} \
-                --timeout ${TEST_RUN_TIMEOUT} \
+                --test-run-timeout ${TEST_RUN_TIMEOUT} \
                 --cloud ${CLOUD_PROFILE} \
                 --pinfile ${PINFILE} \
                 --remote-user ${REMOTE_USER} \

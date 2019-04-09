@@ -80,8 +80,8 @@ if ! grep -q $swap_md /proc/swaps ; then
 fi
 
 # verify swap entry in /etc/fstab is correct
-swap_md_entry="$(grep ^$swap_md\\sswap\\s /etc/fstab)"
-swap_uuid_entry="$(grep ^$swap_uuid\\sswap\\s /etc/fstab)"
+swap_md_entry="$(grep ^$swap_md\\s\\+none\\s\\+swap\\s /etc/fstab)"
+swap_uuid_entry="$(grep ^$swap_uuid\\s\\+none\\s\\+swap\\s /etc/fstab)"
 if [ -z "$swap_md_entry" -a -z "$swap_uuid_entry" ] ; then
     echo "*** swap md is not in /etc/fstab" >> /root/RESULT
 fi

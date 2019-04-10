@@ -41,8 +41,8 @@ if ! grep -q "$swap_part_dm" /proc/swaps ; then
 fi
 
 # verify that the swap entry in /etc/fstab is correct
-swap_part_regular_entry="^${swap_part_luks}\\s\\+swap\\s"
-swap_part_uuid_entry="^UUID=$(blkid -o value -s UUID $swap_part_luks)\\s\\+swap\\s"
+swap_part_regular_entry="^${swap_part_luks}\\s\\+none\\s\\+swap\\s"
+swap_part_uuid_entry="^UUID=$(blkid -o value -s UUID $swap_part_luks)\\s\\+none\\s\\+swap\\s"
 if ! ( grep -q "$swap_part_regular_entry" /etc/fstab || grep -q "$swap_part_uuid_entry" /etc/fstab ) ; then
     echo "*** encrypted swap partition not found in /etc/fstab" >> /root/RESULT
 fi
@@ -63,8 +63,8 @@ if ! grep -q "$swap_lv_dm" /proc/swaps ; then
 fi
 
 # verify that the swap entry in /etc/fstab is correct
-swap_lv_regular_entry="^${swap_lv_luks}\\s\\+swap\\s"
-swap_lv_uuid_entry="^UUID=$(blkid -o value -s UUID $swap_lv_luks)\\s\\+swap\\s"
+swap_lv_regular_entry="^${swap_lv_luks}\\s\\+none\\s\\+swap\\s"
+swap_lv_uuid_entry="^UUID=$(blkid -o value -s UUID $swap_lv_luks)\\s\\+none\\s\\+swap\\s"
 if ! ( grep -q "$swap_lv_regular_entry" /etc/fstab || grep -q "$swap_lv_uuid_entry" /etc/fstab ) ; then
     echo "*** encrypted swap LV is not in /etc/fstab" >> /root/RESULT
 fi
@@ -81,8 +81,8 @@ if ! grep -q "$swap_md_dm" /proc/swaps ; then
     echo "*** encrypted swap MD is not active" >> /root/RESULT
 fi
 
-swap_md_regular_entry="^${swap_md_luks}\\s\\+swap\\s"
-swap_md_uuid_entry="^UUID=$(blkid -o value -s UUID $swap_md_luks)\\s\\+swap\\s"
+swap_md_regular_entry="^${swap_md_luks}\\s\\+none\\s\\+swap\\s"
+swap_md_uuid_entry="^UUID=$(blkid -o value -s UUID $swap_md_luks)\\s\\+none\\s\\+swap\\s"
 if ! ( grep -q "$swap_md_regular_entry" /etc/fstab || grep -q "$swap_md_uuid_entry" /etc/fstab ) ; then
     echo "*** encrypted swap MD is not in /etc/fstab" >> /root/RESULT
 fi

@@ -65,7 +65,7 @@ When applying the configuration for the first time it can be useful to set up th
 To get the path of the `nightly-parmanent` *target*'s inventory run:
 
 ```
-./kstests-in-cloud.sh status nightly-permanent
+./kstests-in-cloud.sh status --show-inventory nightly-permanent
 ```
 showing:
 ```

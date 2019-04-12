@@ -24,6 +24,11 @@
       - rsync
     state: latest
 
+- name: Update all packages
+  dnf:
+    name: "*"
+    state: latest
+
 - name: Install kernel-modules (reboot if updated)
   dnf:
     name: "kernel-modules"
@@ -99,9 +104,15 @@
   notify:
     - Reboot machine
 
-- name: Disable network service
+- name: Collect facts about system services
+  service_facts:
+  register: services_state
+
+# This would happen on Fedora 28 cloud image. F29 does not have network service.
+- name: Disable network service if needed
   service:
     name: network
     enabled: no
   notify:
     - Reboot machine
+  when: services_state.ansible_facts.services["network.service"] is defined

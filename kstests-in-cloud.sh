@@ -276,7 +276,7 @@ if [[ ${COMMAND} == "schedule" ]]; then
             PRIVATE_KEY_PATH_ARG="--ansible-private-key ${PRIVATE_KEY_PATH}"
         fi
         if [[ -n ${ANSIBLE_PYTHON_INTERPRETER} ]]; then
-            INTERPRETER_ARG="--ansible-python-interpreter ${ANSIBLE_PYTHON_INTERPRETER}"
+            ANSIBLE_INTERPRETER_ARG="--ansible-python-interpreter ${ANSIBLE_PYTHON_INTERPRETER}"
         fi
 
         CMDLINE="\"$0 test ${TARGET} \

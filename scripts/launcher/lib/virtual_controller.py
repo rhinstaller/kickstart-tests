@@ -126,7 +126,7 @@ class VirtualInstall(object):
 
         for disk in self._disk_paths:
             args.append("--disk")
-            args.append("path={0}".format(disk))
+            args.append("path={0},bus=sata".format(disk))
 
         for nic in self._nics or []:
             args.append("--network")

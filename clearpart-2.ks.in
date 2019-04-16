@@ -4,7 +4,7 @@ url @KSTEST_URL@
 install
 network --bootproto=dhcp
 
-bootloader --timeout=1
+bootloader --timeout=1 --boot-drive=sda
 clearpart --all --drives=sda --initlabel
 autopart
 

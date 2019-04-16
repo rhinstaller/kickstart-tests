@@ -6,6 +6,7 @@
 #
 # CAUTION: the sed expression we currently use does not like white-space in the strings
 
+source network-device-names.cfg
 export KSTEST_URL='--mirror=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-rawhide\\&arch=$basearch'
 export KSTEST_MODULAR_URL='--mirror=http://mirrors.fedoraproject.org/mirrorlist?repo=rawhide-modular\\&arch=$basearch'
 export KSTEST_FTP_URL='ftp://mirror.utexas.edu/pub/fedora/linux/development/rawhide/Everything/$basearch/os/'

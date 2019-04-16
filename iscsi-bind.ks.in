@@ -4,7 +4,7 @@ url @KSTEST_URL@
 install
 
 iscsiname @KSTEST_ISCSINAME@
-iscsi --ipaddr @KSTEST_ISCSI_IP@ --port @KSTEST_ISCSI_PORT@ --target @KSTEST_ISCSI_TARGET@ --iface=ens3
+iscsi --ipaddr @KSTEST_ISCSI_IP@ --port @KSTEST_ISCSI_PORT@ --target @KSTEST_ISCSI_TARGET@ --iface=@KSTEST_NETDEV1@
 
 bootloader --timeout=1
 zerombr

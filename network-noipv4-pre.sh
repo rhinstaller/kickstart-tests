@@ -23,7 +23,7 @@ TESTTYPE="network"
 
 
 kernel_args() {
-    echo ${DEFAULT_BOOTOPTS} ip=ens3:dhcp ip=ens4:dhcp
+    echo ${DEFAULT_BOOTOPTS} ip=${KSTEST_NETDEV1}:dhcp ip=${KSTEST_NETDEV2}:dhcp
 }
 
 # Arguments for virt-install --network options

@@ -30,7 +30,7 @@ TESTTYPE=${TESTTYPE:-"network"}
 
 kernel_args() {
     . ${tmpdir}/ks_url
-    echo ${DEFAULT_BOOTOPTS} ip=ens3:dhcp ip=ens4:dhcp ip=ens5:dhcp inst.ks=${ks_url}
+    echo ${DEFAULT_BOOTOPTS} ip=${KSTEST_NETDEV1}:dhcp ip=${KSTEST_NETDEV2}:dhcp ip=${KSTEST_NETDEV3}:dhcp inst.ks=${ks_url}
 }
 
 prepare() {

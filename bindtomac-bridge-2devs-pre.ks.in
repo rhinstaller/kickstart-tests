@@ -6,8 +6,8 @@ install
 
 %include /tmp/ksinclude
 %pre
-echo "network --device=bridge0  --bridgeslaves=ens3 --bootproto=dhcp --onboot=no --bindto=mac" >> /tmp/ksinclude
-echo "network --device=bridge1  --bridgeslaves=ens4 --bootproto=dhcp --bindto=mac" >> /tmp/ksinclude
+echo "network --device=bridge0  --bridgeslaves=@KSTEST_NETDEV1@ --bootproto=dhcp --onboot=no --bindto=mac" >> /tmp/ksinclude
+echo "network --device=bridge1  --bridgeslaves=@KSTEST_NETDEV2@ --bootproto=dhcp --bindto=mac" >> /tmp/ksinclude
 %end
 
 bootloader --timeout=1
@@ -28,9 +28,9 @@ shutdown
 
 @KSINCLUDE@ post-nochroot-lib-network.sh
 
-check_bridge_has_slave_nochroot bridge0 ens3 yes
-check_bridge_has_slave_nochroot bridge1 ens4 yes
-check_gui_configurations ens3 ens4 bridge0 bridge1
+check_bridge_has_slave_nochroot bridge0 @KSTEST_NETDEV1@ yes
+check_bridge_has_slave_nochroot bridge1 @KSTEST_NETDEV2@ yes
+check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ bridge0 bridge1
 
 %end
 
@@ -41,12 +41,12 @@ check_gui_configurations ens3 ens4 bridge0 bridge1
 # bridge0
 
 check_device_connected bridge0 yes
-check_device_connected ens3 yes
+check_device_connected @KSTEST_NETDEV1@ yes
 check_device_ifcfg_value bridge0_slave_1 BRIDGE bridge0
 
 check_device_has_ipv4_address bridge0 yes
-check_device_has_ipv4_address ens3 no
-check_device_ifcfg_value ens3 ONBOOT yes
+check_device_has_ipv4_address @KSTEST_NETDEV1@ no
+check_device_ifcfg_value @KSTEST_NETDEV1@ ONBOOT yes
 
 check_device_ifcfg_value bridge0 ONBOOT no
 check_device_ifcfg_value bridge0_slave_1 ONBOOT no
@@ -56,11 +56,11 @@ check_device_ifcfg_value bridge0_slave_1 ONBOOT no
 check_device_connected bridge1 no
 
 if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
-    check_device_connected ens4 no
-    check_device_has_ipv4_address ens4 no
+    check_device_connected @KSTEST_NETDEV2@ no
+    check_device_has_ipv4_address @KSTEST_NETDEV2@ no
 else
     # On Fedora NM automatically activates devices without ifcfgs with default connection
-    check_device_connected ens4 yes
+    check_device_connected @KSTEST_NETDEV2@ yes
 fi
 
 check_device_ifcfg_value bridge1_slave_1 BRIDGE bridge1
@@ -69,7 +69,7 @@ check_device_ifcfg_value bridge1 ONBOOT yes
 check_device_ifcfg_value bridge1_slave_1 ONBOOT yes
 
 # anaconda does not create default ifcfg file for enslaved device
-check_ifcfg_exists ens4 no
+check_ifcfg_exists @KSTEST_NETDEV2@ no
 
 check_device_ifcfg_bound_to_mac bridge0_slave_1
 check_device_ifcfg_bound_to_mac bridge1_slave_1

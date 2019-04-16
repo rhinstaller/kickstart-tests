@@ -2,8 +2,8 @@
 url @KSTEST_URL@
 install
 
-network --device=ens3 --bootproto=dhcp --onboot=yes --activate
-network --device=bond0   --bondslaves=ens4,ens5 --bondopts=mode=balance-tlb --noipv4 --activate
+network --device=@KSTEST_NETDEV1@ --bootproto=dhcp --onboot=yes --activate
+network --device=bond0   --bondslaves=@KSTEST_NETDEV2@,@KSTEST_NETDEV3@ --bondopts=mode=balance-tlb --noipv4 --activate
 #network --device=bridge0  --bridgeslaves=bond0 --bootproto=static --ip=192.168.124.233 --netmask=255.255.255.0 --gateway=192.168.124.1 --hostname=devel --nameserver=10.34.39.2 --activate
 network --device=bridge0  --bridgeslaves=bond0 --bootproto=dhcp --activate
 
@@ -27,7 +27,7 @@ shutdown
 
 check_bridge_has_slave_nochroot bridge0 bond0 yes
 # TODO fix
-check_gui_configurations ens3 ens4 ens5 bond0 bridge0
+check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@ bond0 bridge0
 
 %end
 
@@ -39,9 +39,9 @@ check_device_connected bridge0 yes
 check_device_ifcfg_value bond0 BRIDGE bridge0
 check_device_ifcfg_value bond0 BONDING_OPTS mode=balance-tlb
 check_ifcfg_exists bridge0_slave_1 no
-check_bond_has_slave bond0 ens4 yes
-check_bond_has_slave bond0 ens5 yes
-check_bond_has_slave bond0 ens3 no
+check_bond_has_slave bond0 @KSTEST_NETDEV2@ yes
+check_bond_has_slave bond0 @KSTEST_NETDEV3@ yes
+check_bond_has_slave bond0 @KSTEST_NETDEV1@ no
 check_device_has_ipv4_address bridge0 yes
 check_device_has_ipv4_address bond0 no
 

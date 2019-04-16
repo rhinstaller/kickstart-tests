@@ -29,7 +29,7 @@ shutdown
 
 @KSINCLUDE@ post-nochroot-lib-network.sh
 
-check_gui_configurations ens3 ens4
+check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@
 
 %end
 
@@ -37,7 +37,7 @@ check_gui_configurations ens3 ens4
 
 @KSINCLUDE@ post-lib-network.sh
 
-check_device_ifcfg_value ens4 IPV6ADDR 2001:cafe:cafe::1/64
+check_device_ifcfg_value @KSTEST_NETDEV2@ IPV6ADDR 2001:cafe:cafe::1/64
 
 # No error was written to /root/RESULT file, everything is OK
 if [[ ! -e /root/RESULT ]]; then

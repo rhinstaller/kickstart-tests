@@ -5,8 +5,8 @@ install
 
 %include /tmp/ksinclude
 %pre
-echo "network --device bond0 --bootproto dhcp --bondslaves=ens4,ens5 --bondopts=mode=active-backup,primary=ens4 --activate --onboot=no --bindto=mac" >> /tmp/ksinclude
-echo "network --device bond1 --bootproto dhcp --bondslaves=ens6,ens7 --bondopts=mode=active-backup,primary=ens6,miimon=100,fail_over_mac=2 --bindto=mac" >> /tmp/ksinclude
+echo "network --device bond0 --bootproto dhcp --bondslaves=@KSTEST_NETDEV2@,@KSTEST_NETDEV3@ --bondopts=mode=active-backup,primary=@KSTEST_NETDEV2@ --activate --onboot=no --bindto=mac" >> /tmp/ksinclude
+echo "network --device bond1 --bootproto dhcp --bondslaves=@KSTEST_NETDEV4@,@KSTEST_NETDEV5@ --bondopts=mode=active-backup,primary=@KSTEST_NETDEV4@,miimon=100,fail_over_mac=2 --bindto=mac" >> /tmp/ksinclude
 %end
 
 bootloader --timeout=1
@@ -27,7 +27,7 @@ shutdown
 
 @KSINCLUDE@ post-nochroot-lib-network.sh
 
-check_gui_configurations ens3 ens4 ens5 ens6 ens7 bond0 bond1
+check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@ @KSTEST_NETDEV4@ @KSTEST_NETDEV5@ bond0 bond1
 
 %end
 
@@ -43,11 +43,11 @@ check_device_ifcfg_value bond0_slave_1 MASTER bond0
 check_device_ifcfg_value bond0_slave_2 MASTER bond0
 
 check_device_connected bond0 yes
-check_bond_has_slave bond0 ens4 yes
-check_bond_has_slave bond0 ens5 yes
-check_bond_has_slave bond0 ens3 no
-check_bond_has_slave bond0 ens6 no
-check_bond_has_slave bond0 ens7 no
+check_bond_has_slave bond0 @KSTEST_NETDEV2@ yes
+check_bond_has_slave bond0 @KSTEST_NETDEV3@ yes
+check_bond_has_slave bond0 @KSTEST_NETDEV1@ no
+check_bond_has_slave bond0 @KSTEST_NETDEV4@ no
+check_bond_has_slave bond0 @KSTEST_NETDEV5@ no
 
 check_device_ifcfg_value bond1 ONBOOT yes
 

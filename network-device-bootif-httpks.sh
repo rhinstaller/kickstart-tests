@@ -23,7 +23,7 @@ TESTTYPE="network"
 
 kernel_args() {
     . ${tmpdir}/ks_url
-    echo ${DEFAULT_BOOTOPTS} ip=ens3:dhcp BOOTIF=01-52-54-00-12-34-55 inst.ks=${ks_url}
+    echo ${DEFAULT_BOOTOPTS} ip=${KSTEST_NETDEV1}:dhcp BOOTIF=01-52-54-00-12-34-55 inst.ks=${ks_url}
 }
 
 # Arguments for virt-install --network options

@@ -23,7 +23,7 @@ TESTTYPE="network"
 
 kernel_args() {
     . ${tmpdir}/ks_url
-    echo ${DEFAULT_BOOTOPTS} ksdevice=ens4
+    echo ${DEFAULT_BOOTOPTS} ksdevice=${KSTEST_NETDEV2}
 }
 
 # Arguments for virt-install --network options

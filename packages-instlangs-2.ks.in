@@ -12,7 +12,7 @@
 # Make sure no .mo files were installed
 molist="$(find /usr/share/locale -name '*.mo')"
 if [ -n "$molist" ]; then
-    echo "*** .mo files were installed" >> /root/RESULT
+    echo "*** .mo files were installed: $molist" >> /root/RESULT
 fi
 
 %ksappend validation/success_if_result_empty.ks

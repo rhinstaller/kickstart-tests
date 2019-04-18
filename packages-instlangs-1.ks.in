@@ -12,7 +12,7 @@
 # Make sure no non-english .mo files were installed
 molist="$(find /usr/share/locale \( -name 'en' -type d -prune \) -o \( -name 'en[@_]*' -type d -prune \) -o \( -name '*.mo' -print \) )"
 if [ -n "$molist" ]; then
-    echo "*** non-en .mo files were installed" >> /root/RESULT
+    echo "*** non-en .mo files were installed: $molist" >> /root/RESULT
 fi
 
 # Check that the en_US locale was installed

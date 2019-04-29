@@ -4,7 +4,7 @@ url @KSTEST_URL@
 install
 %include /tmp/ksinclude
 %pre
-echo "network --device=ens3 --bootproto dhcp --activate --bindto=mac" >> /tmp/ksinclude
+echo "network --device=@KSTEST_NETDEV1@ --bootproto dhcp --activate --bindto=mac" >> /tmp/ksinclude
 %end
 
 
@@ -26,7 +26,7 @@ shutdown
 
 @KSINCLUDE@ post-nochroot-lib-network.sh
 
-check_gui_configurations ens3
+check_gui_configurations @KSTEST_NETDEV1@
 
 %end
 
@@ -34,14 +34,14 @@ check_gui_configurations ens3
 
 @KSINCLUDE@ post-lib-network.sh
 
-check_device_connected ens3 yes
-check_ifcfg_key_exists ens3 IPADDR no
-check_ifcfg_key_exists ens3 PREFIX no
-check_ifcfg_key_exists ens3 NETMASK no
-check_ifcfg_key_exists ens3 GATEWAY no
-check_device_connected ens3 yes
-check_number_of_device_ipv4_addresses ens3 1
-check_device_ifcfg_bound_to_mac ens3
+check_device_connected @KSTEST_NETDEV1@ yes
+check_ifcfg_key_exists @KSTEST_NETDEV1@ IPADDR no
+check_ifcfg_key_exists @KSTEST_NETDEV1@ PREFIX no
+check_ifcfg_key_exists @KSTEST_NETDEV1@ NETMASK no
+check_ifcfg_key_exists @KSTEST_NETDEV1@ GATEWAY no
+check_device_connected @KSTEST_NETDEV1@ yes
+check_number_of_device_ipv4_addresses @KSTEST_NETDEV1@ 1
+check_device_ifcfg_bound_to_mac @KSTEST_NETDEV1@
 
 # No error was written to /root/RESULT file, everything is OK
 if [[ ! -e /root/RESULT ]]; then

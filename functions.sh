@@ -17,6 +17,8 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
+source network-device-names.cfg
+
 prereqs() {
     # No prereqs by default
     echo

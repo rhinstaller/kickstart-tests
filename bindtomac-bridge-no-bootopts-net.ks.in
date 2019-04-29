@@ -6,7 +6,7 @@ url @KSTEST_URL@
 install
 
 # --onboot=no doesn't make much sense as a use case but we want to test that it works in this test
-network --device=bridge0  --bridgeslaves=ens3 --bootproto=dhcp --bindto=mac
+network --device=bridge0  --bridgeslaves=@KSTEST_NETDEV1@ --bootproto=dhcp --bindto=mac
 
 bootloader --timeout=1
 zerombr
@@ -26,8 +26,8 @@ shutdown
 
 @KSINCLUDE@ post-nochroot-lib-network.sh
 
-check_bridge_has_slave_nochroot bridge0 ens3 yes
-check_gui_configurations ens3 bridge0
+check_bridge_has_slave_nochroot bridge0 @KSTEST_NETDEV1@ yes
+check_gui_configurations @KSTEST_NETDEV1@ bridge0
 
 %end
 
@@ -36,10 +36,10 @@ check_gui_configurations ens3 bridge0
 @KSINCLUDE@ post-lib-network.sh
 
 check_device_connected bridge0 yes
-check_device_connected ens3 yes
+check_device_connected @KSTEST_NETDEV1@ yes
 check_device_ifcfg_value bridge0_slave_1 BRIDGE bridge0
 check_device_has_ipv4_address bridge0 yes
-check_device_has_ipv4_address ens3 no
+check_device_has_ipv4_address @KSTEST_NETDEV1@ no
 
 check_device_ifcfg_bound_to_mac bridge0_slave_1
 

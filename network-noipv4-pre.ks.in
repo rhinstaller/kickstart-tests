@@ -4,8 +4,8 @@ install
 
 %include /tmp/ksinclude
 %pre
-echo "network --device=ens4 --noipv4 --no-activate --onboot=yes" >> /tmp/ksinclude
-echo "network --device=ens5 --noipv4 --activate --onboot=no" >> /tmp/ksinclude
+echo "network --device=@KSTEST_NETDEV2@ --noipv4 --no-activate --onboot=yes" >> /tmp/ksinclude
+echo "network --device=@KSTEST_NETDEV3@ --noipv4 --activate --onboot=no" >> /tmp/ksinclude
 %end
 
 bootloader --timeout=1
@@ -26,7 +26,7 @@ shutdown
 
 @KSINCLUDE@ post-nochroot-lib-network.sh
 
-check_gui_configurations ens3 ens4 ens5
+check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@
 
 %end
 
@@ -34,18 +34,18 @@ check_gui_configurations ens3 ens4 ens5
 
 @KSINCLUDE@ post-lib-network.sh
 
-check_ifcfg_key_exists ens4 BOOTPROTO no
-check_ifcfg_key_exists ens5 BOOTPROTO no
+check_ifcfg_key_exists @KSTEST_NETDEV2@ BOOTPROTO no
+check_ifcfg_key_exists @KSTEST_NETDEV3@ BOOTPROTO no
 # TODO create test with virtual network having ipv6 enabled (ipv6 only connection)
 #      libvirt default net does not have ipv6 enabled
 if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
-    check_device_connected ens5 no
-    check_device_has_ipv4_address ens5 no
+    check_device_connected @KSTEST_NETDEV3@ no
+    check_device_has_ipv4_address @KSTEST_NETDEV3@ no
 else
     # Fedora: connection from %pre fails to activate (RA timeout, no ip config)
     # and default con. created by NM (Wired connection 1) is autoactivated again
-    check_device_connected ens5 yes
-    check_device_has_ipv4_address ens5 yes
+    check_device_connected @KSTEST_NETDEV3@ yes
+    check_device_has_ipv4_address @KSTEST_NETDEV3@ yes
 fi
 
 # No error was written to /root/RESULT file, everything is OK

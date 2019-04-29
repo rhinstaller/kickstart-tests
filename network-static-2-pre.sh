@@ -22,7 +22,7 @@ TESTTYPE="network"
 . ${KSTESTDIR}/functions.sh
 
 kernel_args() {
-    echo ${DEFAULT_BOOTOPTS} ip=ens3:dhcp ip=ens4:dhcp ip=ens5:dhcp
+    echo ${DEFAULT_BOOTOPTS} ip=${KSTEST_NETDEV1}:dhcp ip=${KSTEST_NETDEV2}:dhcp ip=${KSTEST_NETDEV3}:dhcp
 }
 
 prepare() {

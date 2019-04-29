@@ -5,8 +5,8 @@ install
 
 %include /tmp/ksinclude
 %pre
-echo "network --device team0 --bootproto dhcp --teamslaves=\"ens4'{\\\"prio\\\": -10, \\\"sticky\\\": true}',ens5'{\\\"prio\\\": 100}'\" --teamconfig=\"{\\\"runner\\\": {\\\"name\\\": \\\"activebackup\\\"}}\" --activate --onboot=no" >> /tmp/ksinclude
-echo 'network --device team1 --bootproto dhcp --teamslaves=ens6,ens7 --teamconfig="{\"runner\": {\"name\": \"roundrobin\"}}"' >> /tmp/ksinclude
+echo "network --device team0 --bootproto dhcp --teamslaves=\"@KSTEST_NETDEV2@'{\\\"prio\\\": -10, \\\"sticky\\\": true}',@KSTEST_NETDEV3@'{\\\"prio\\\": 100}'\" --teamconfig=\"{\\\"runner\\\": {\\\"name\\\": \\\"activebackup\\\"}}\" --activate --onboot=no" >> /tmp/ksinclude
+echo 'network --device team1 --bootproto dhcp --teamslaves=@KSTEST_NETDEV4@,@KSTEST_NETDEV5@ --teamconfig="{\"runner\": {\"name\": \"roundrobin\"}}"' >> /tmp/ksinclude
 %end
 
 bootloader --timeout=1
@@ -27,7 +27,7 @@ shutdown
 
 @KSINCLUDE@ post-nochroot-lib-network.sh
 
-check_gui_configurations ens3 ens4 ens5 ens6 ens7 team0 team1
+check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@ @KSTEST_NETDEV4@ @KSTEST_NETDEV5@ team0 team1
 
 %end
 
@@ -43,14 +43,14 @@ check_device_ifcfg_value team0_slave_1 TEAM_MASTER team0
 check_device_ifcfg_value team0_slave_2 TEAM_MASTER team0
 
 check_device_connected team0 yes
-check_team_has_slave team0 ens3 no
-check_team_has_slave team0 ens4 yes
-check_team_has_slave team0 ens5 yes
-check_team_has_slave team0 ens6 no
-check_team_has_slave team0 ens7 no
+check_team_has_slave team0 @KSTEST_NETDEV1@ no
+check_team_has_slave team0 @KSTEST_NETDEV2@ yes
+check_team_has_slave team0 @KSTEST_NETDEV3@ yes
+check_team_has_slave team0 @KSTEST_NETDEV4@ no
+check_team_has_slave team0 @KSTEST_NETDEV5@ no
 check_team_option team0 "mode activebackup"
-check_team_option team0 "priority \(port:ens4\) -10"
-check_team_option team0 "priority \(port:ens5\) 100"
+check_team_option team0 "priority \(port:@KSTEST_NETDEV2@\) -10"
+check_team_option team0 "priority \(port:@KSTEST_NETDEV3@\) 100"
 
 check_device_ifcfg_value team1 ONBOOT yes
 

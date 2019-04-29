@@ -33,7 +33,7 @@ ip_static_boot_config=""
 
 kernel_args() {
     . ${tmpdir}/ip_static_boot_config
-    echo ${DEFAULT_BOOTOPTS} ip=ens3:dhcp ${ip_static_boot_config}
+    echo ${DEFAULT_BOOTOPTS} ip=${KSTEST_NETDEV1}:dhcp ${ip_static_boot_config}
 }
 
 prepare() {
@@ -53,7 +53,7 @@ prepare() {
     # Substitute IP ranges of created network in kickstart
     sed -i -e s#@KSTEST_STATIC_IP@#${ip}# -e s#@KSTEST_STATIC_NETMASK@#${netmask}# -e s#@KSTEST_STATIC_GATEWAY@#${gateway}# ${ks}
     #ip=10.34.102.233::10.34.102.254:255.255.255.0::ens9:none
-    echo "ip_static_boot_config=ip=${ip}::${gateway}:${netmask}::ens4:none" > ${tmpdir}/ip_static_boot_config
+    echo "ip_static_boot_config=ip=${ip}::${gateway}:${netmask}::${KSTEST_NETDEV2}:none" > ${tmpdir}/ip_static_boot_config
 
     echo ${ks}
 }

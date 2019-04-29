@@ -21,7 +21,7 @@ shutdown
 
 @KSINCLUDE@ post-nochroot-lib-network.sh
 
-check_gui_configurations ens3 ens4
+check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@
 
 %end
 
@@ -29,22 +29,22 @@ check_gui_configurations ens3 ens4
 
 @KSINCLUDE@ post-lib-network.sh
 
-check_device_ifcfg_value ens3 DEVICE ens3
-check_device_ifcfg_value ens3 ONBOOT yes
-check_ifcfg_key_exists ens3 HWADDR no
-check_device_connected ens3 yes
+check_device_ifcfg_value @KSTEST_NETDEV1@ DEVICE @KSTEST_NETDEV1@
+check_device_ifcfg_value @KSTEST_NETDEV1@ ONBOOT yes
+check_ifcfg_key_exists @KSTEST_NETDEV1@ HWADDR no
+check_device_connected @KSTEST_NETDEV1@ yes
 
-# ens4 is configured neigher via boot options nor via kickstart so anaconda
+# @KSTEST_NETDEV2@ is configured neigher via boot options nor via kickstart so anaconda
 # creates default ifcfg file (rhel) or dumps it from default connection created
 # by NM on Fedora
-check_device_ifcfg_value ens4 DEVICE ens4
-check_ifcfg_key_exists ens4 HWADDR no
+check_device_ifcfg_value @KSTEST_NETDEV2@ DEVICE @KSTEST_NETDEV2@
+check_ifcfg_key_exists @KSTEST_NETDEV2@ HWADDR no
 if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
-    check_device_ifcfg_value ens4 ONBOOT no
-    check_device_connected ens4 no
+    check_device_ifcfg_value @KSTEST_NETDEV2@ ONBOOT no
+    check_device_connected @KSTEST_NETDEV2@ no
 else
-    check_device_ifcfg_value ens4 ONBOOT yes
-    check_device_connected ens4 yes
+    check_device_ifcfg_value @KSTEST_NETDEV2@ ONBOOT yes
+    check_device_connected @KSTEST_NETDEV2@ yes
 fi
 
 # No error was written to /root/RESULT file, everything is OK

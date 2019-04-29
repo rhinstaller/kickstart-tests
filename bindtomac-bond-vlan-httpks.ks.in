@@ -2,7 +2,7 @@
 url @KSTEST_URL@
 install
 
-network --device bond0 --bootproto static --ip @KSTEST_STATIC_IP@ --netmask @KSTEST_STATIC_NETMASK@ --gateway @KSTEST_STATIC_GATEWAY@ --bondslaves=ens4,ens5 --bondopts=mode=active-backup,miimon-100,primary=ens4 --activate --vlanid=222 --activate --onboot=no --bindto=mac
+network --device bond0 --bootproto static --ip @KSTEST_STATIC_IP@ --netmask @KSTEST_STATIC_NETMASK@ --gateway @KSTEST_STATIC_GATEWAY@ --bondslaves=@KSTEST_NETDEV2@,@KSTEST_NETDEV3@ --bondopts=mode=active-backup,miimon-100,primary=@KSTEST_NETDEV2@ --activate --vlanid=222 --activate --onboot=no --bindto=mac
 
 bootloader --timeout=1
 zerombr
@@ -22,7 +22,7 @@ shutdown
 
 @KSINCLUDE@ post-nochroot-lib-network.sh
 
-check_gui_configurations ens3 ens4 ens5 bond0 bond0.222
+check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@ bond0 bond0.222
 
 %end
 
@@ -36,9 +36,9 @@ check_device_ifcfg_value bond0_slave_1 ONBOOT no
 check_device_ifcfg_value bond0_slave_2 ONBOOT no
 check_device_connected bond0 yes
 check_device_connected bond0.222 yes
-check_bond_has_slave bond0 ens4 yes
-check_bond_has_slave bond0 ens5 yes
-check_bond_has_slave bond0 ens3 no
+check_bond_has_slave bond0 @KSTEST_NETDEV2@ yes
+check_bond_has_slave bond0 @KSTEST_NETDEV3@ yes
+check_bond_has_slave bond0 @KSTEST_NETDEV1@ no
 check_device_ipv4_address bond0.222 @KSTEST_STATIC_IP@
 check_device_has_ipv4_address bond0 no
 

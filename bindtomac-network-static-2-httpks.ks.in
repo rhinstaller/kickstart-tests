@@ -3,13 +3,13 @@
 url @KSTEST_URL@
 install
 # activated in initramfs with dhcp, reactivated in stage 2
-network --device=ens4 --bootproto static --ip @KSTEST_STATIC_IP1@ --netmask @KSTEST_STATIC_NETMASK@ --gateway @KSTEST_STATIC_GATEWAY@ --bindto mac
+network --device=@KSTEST_NETDEV2@ --bootproto static --ip @KSTEST_STATIC_IP1@ --netmask @KSTEST_STATIC_NETMASK@ --gateway @KSTEST_STATIC_GATEWAY@ --bindto mac
 # activated in initramfs with dhcp, not reactivated in stage 2
-network --device=ens5 --bootproto static --ip @KSTEST_STATIC_IP2@ --netmask @KSTEST_STATIC_NETMASK@ --gateway @KSTEST_STATIC_GATEWAY@ --bindto mac
+network --device=@KSTEST_NETDEV3@ --bootproto static --ip @KSTEST_STATIC_IP2@ --netmask @KSTEST_STATIC_NETMASK@ --gateway @KSTEST_STATIC_GATEWAY@ --bindto mac
 # not activated in initramfs with dhcp, reactivated in stage 2
-network --device=ens6 --bootproto static --ip @KSTEST_STATIC_IP3@ --netmask @KSTEST_STATIC_NETMASK@ --gateway @KSTEST_STATIC_GATEWAY@ --activate --bindto mac
+network --device=@KSTEST_NETDEV4@ --bootproto static --ip @KSTEST_STATIC_IP3@ --netmask @KSTEST_STATIC_NETMASK@ --gateway @KSTEST_STATIC_GATEWAY@ --activate --bindto mac
 # not activated in initramfs with dhcp, not reactivated in stage 2
-network --device=ens7 --bootproto static --ip @KSTEST_STATIC_IP4@ --netmask @KSTEST_STATIC_NETMASK@ --gateway @KSTEST_STATIC_GATEWAY@ --bindto mac
+network --device=@KSTEST_NETDEV5@ --bootproto static --ip @KSTEST_STATIC_IP4@ --netmask @KSTEST_STATIC_NETMASK@ --gateway @KSTEST_STATIC_GATEWAY@ --bindto mac
 
 bootloader --timeout=1
 zerombr
@@ -29,7 +29,7 @@ shutdown
 
 @KSINCLUDE@ post-nochroot-lib-network.sh
 
-check_gui_configurations ens3 ens4 ens5 ens6 ens7
+check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@ @KSTEST_NETDEV4@ @KSTEST_NETDEV5@
 
 %end
 
@@ -37,25 +37,25 @@ check_gui_configurations ens3 ens4 ens5 ens6 ens7
 
 @KSINCLUDE@ post-lib-network.sh
 
-check_device_connected ens3 yes
+check_device_connected @KSTEST_NETDEV1@ yes
 
-check_device_ifcfg_value ens4 IPADDR @KSTEST_STATIC_IP1@
-check_device_connected ens4 yes
-check_device_ipv4_address ens4 @KSTEST_STATIC_IP1@
-check_device_ifcfg_bound_to_mac ens4
+check_device_ifcfg_value @KSTEST_NETDEV2@ IPADDR @KSTEST_STATIC_IP1@
+check_device_connected @KSTEST_NETDEV2@ yes
+check_device_ipv4_address @KSTEST_NETDEV2@ @KSTEST_STATIC_IP1@
+check_device_ifcfg_bound_to_mac @KSTEST_NETDEV2@
 
-check_device_ifcfg_value ens5 IPADDR @KSTEST_STATIC_IP2@
-check_device_connected ens5 yes
-check_device_ifcfg_bound_to_mac ens5
+check_device_ifcfg_value @KSTEST_NETDEV3@ IPADDR @KSTEST_STATIC_IP2@
+check_device_connected @KSTEST_NETDEV3@ yes
+check_device_ifcfg_bound_to_mac @KSTEST_NETDEV3@
 
-check_device_ifcfg_value ens6 IPADDR @KSTEST_STATIC_IP3@
-check_device_connected ens6 yes
-check_device_ipv4_address ens6 @KSTEST_STATIC_IP3@
-check_device_ifcfg_bound_to_mac ens6
+check_device_ifcfg_value @KSTEST_NETDEV4@ IPADDR @KSTEST_STATIC_IP3@
+check_device_connected @KSTEST_NETDEV4@ yes
+check_device_ipv4_address @KSTEST_NETDEV4@ @KSTEST_STATIC_IP3@
+check_device_ifcfg_bound_to_mac @KSTEST_NETDEV4@
 
-check_device_ifcfg_value ens7 IPADDR @KSTEST_STATIC_IP4@
-check_device_connected ens7 no
-check_device_ifcfg_bound_to_mac ens7
+check_device_ifcfg_value @KSTEST_NETDEV5@ IPADDR @KSTEST_STATIC_IP4@
+check_device_connected @KSTEST_NETDEV5@ no
+check_device_ifcfg_bound_to_mac @KSTEST_NETDEV5@
 
 # No error was written to /root/RESULT file, everything is OK
 if [[ ! -e /root/RESULT ]]; then

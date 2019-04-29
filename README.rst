@@ -244,6 +244,17 @@ configuration.  In some test cases special or additional network devices and
 virtual networks for test/virt-install instance are defined in prepare() and
 prepare_network() functions of .sh test file.
 
+Network device names
+--------------------
+
+Network device names used in guest may differ for tested os variants (eg RHEL
+vs Fedora).  Actual naming scheme to be used by the tests is defined in
+network-device-names.cfg snippet which is sourced both in .sh files for boot
+options network configuration (via functions.sh) and .ks.in files for kickstart
+network configuration (via @KSTEST_ substitution). The variables used in .sh and
+.ks.in files have the form of KSTEST_NETDEV<INDEX> where <INDEX> is the
+numerical index of the device, starting from 1.
+
 Static IP configuration
 -----------------------
 

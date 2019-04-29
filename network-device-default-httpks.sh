@@ -29,7 +29,7 @@ KICKSTART_NAME=network-device-default
 
 kernel_args() {
     . ${tmpdir}/ks_url
-    echo ${DEFAULT_BOOTOPTS} ip=ens3:dhcp inst.ks=${ks_url}
+    echo ${DEFAULT_BOOTOPTS} ip=${KSTEST_NETDEV1}:dhcp inst.ks=${ks_url}
 }
 
 prepare() {

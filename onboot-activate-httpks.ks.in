@@ -1,9 +1,9 @@
 #test name: onboot-activate-httpks
 url @KSTEST_URL@
 install
-network --device=ens4 --bootproto=dhcp --no-activate --onboot=yes
-network --device=ens3 --bootproto=dhcp --onboot=no
-network --device=ens5 --bootproto=dhcp --activate --onboot=no
+network --device=@KSTEST_NETDEV2@ --bootproto=dhcp --no-activate --onboot=yes
+network --device=@KSTEST_NETDEV1@ --bootproto=dhcp --onboot=no
+network --device=@KSTEST_NETDEV3@ --bootproto=dhcp --activate --onboot=no
 
 bootloader --timeout=1
 zerombr
@@ -23,7 +23,7 @@ shutdown
 
 @KSINCLUDE@ post-nochroot-lib-network.sh
 
-check_gui_configurations ens3 ens4 ens5
+check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@
 
 %end
 
@@ -31,11 +31,11 @@ check_gui_configurations ens3 ens4 ens5
 
 @KSINCLUDE@ post-lib-network.sh
 
-check_device_ifcfg_value ens3 ONBOOT no
-check_device_ifcfg_value ens4 ONBOOT yes
-check_device_ifcfg_value ens5 ONBOOT no
-check_device_connected ens4 no
-check_device_connected ens5 yes
+check_device_ifcfg_value @KSTEST_NETDEV1@ ONBOOT no
+check_device_ifcfg_value @KSTEST_NETDEV2@ ONBOOT yes
+check_device_ifcfg_value @KSTEST_NETDEV3@ ONBOOT no
+check_device_connected @KSTEST_NETDEV2@ no
+check_device_connected @KSTEST_NETDEV3@ yes
 
 # No error was written to /root/RESULT file, everything is OK
 if [[ ! -e /root/RESULT ]]; then

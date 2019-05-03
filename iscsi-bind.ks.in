@@ -1,6 +1,6 @@
 #test name: iscsi-bind
 
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 
 iscsiname @KSTEST_ISCSINAME@

@@ -1,5 +1,5 @@
 #test name: autopart-fstype
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 network --bootproto=dhcp
 

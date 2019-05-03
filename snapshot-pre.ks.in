@@ -1,5 +1,5 @@
 #test name: snapshot-pre
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 network --bootproto=dhcp
 

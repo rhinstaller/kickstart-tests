@@ -1,6 +1,6 @@
 #test name: part-luks-3
 
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 network --bootproto=dhcp
 

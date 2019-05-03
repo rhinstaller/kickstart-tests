@@ -1,6 +1,6 @@
 #test name: network-missing-ifcfg
 #creating missing ifcfg files (devices not activated in initramfs and not configured in kickstart)
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 
 bootloader --timeout=1

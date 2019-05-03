@@ -1,5 +1,5 @@
 #test name: network-prefixdevname
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 
 %include /tmp/ksinclude

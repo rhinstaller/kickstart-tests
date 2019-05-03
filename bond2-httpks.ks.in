@@ -1,5 +1,5 @@
 #test name: bond2
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 
 network --device bond0 --bootproto dhcp --bondslaves=@KSTEST_NETDEV2@,@KSTEST_NETDEV3@ --bondopts=mode=active-backup,primary=@KSTEST_NETDEV2@ --activate --onboot=no

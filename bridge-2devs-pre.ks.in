@@ -1,7 +1,7 @@
 #test name bridge-2devs-pre
 # One bridge with slave activated in dracut,
 # the other one with slave activated only with the bridge
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 
 %include /tmp/ksinclude

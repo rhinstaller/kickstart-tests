@@ -1,6 +1,6 @@
 #test name: vlan-pre
 # variant with commands run in %pre section
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 
 %include /tmp/ksinclude

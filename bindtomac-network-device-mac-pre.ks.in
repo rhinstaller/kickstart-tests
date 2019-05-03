@@ -1,5 +1,5 @@
 #test name: bindtomac-network-device-mac-pre
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 
 %include /tmp/ksinclude

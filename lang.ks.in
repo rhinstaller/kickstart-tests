@@ -1,6 +1,6 @@
 #version=DEVEL
 #test name: lang
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 network --bootproto=dhcp
 

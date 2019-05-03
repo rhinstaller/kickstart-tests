@@ -1,6 +1,6 @@
 #version=DEVEL
 #test name: selinux-disabled
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 network --bootproto=dhcp
 

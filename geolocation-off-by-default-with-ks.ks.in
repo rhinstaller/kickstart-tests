@@ -1,5 +1,5 @@
 #test name: geolocation-off-by-default-with-ks
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 network --bootproto=dhcp
 

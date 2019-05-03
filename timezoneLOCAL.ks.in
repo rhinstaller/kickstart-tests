@@ -1,6 +1,6 @@
 #version=DEVEL
 #test name: timezoneLOCAL
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 network --bootproto=dhcp
 

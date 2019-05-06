@@ -1,6 +1,6 @@
 #test name: ibft
 
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 
 bootloader --timeout=1

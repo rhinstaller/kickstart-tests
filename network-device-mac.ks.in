@@ -1,5 +1,5 @@
 #test name: network-device-mac
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 
 network --bootproto=dhcp --device=52:54:00:12:34:56

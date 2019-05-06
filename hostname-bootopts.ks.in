@@ -1,6 +1,6 @@
 #test name: hostname-bootopts
 # rhbz#1441337
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 
 bootloader --timeout=1

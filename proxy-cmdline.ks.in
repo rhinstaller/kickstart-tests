@@ -1,5 +1,5 @@
 #test name: proxy-cmdline
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 network --bootproto=dhcp
 

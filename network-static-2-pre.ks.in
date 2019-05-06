@@ -1,6 +1,6 @@
 #test name: network-static-2-pre
 #various combinations of activation in initramfs and stage 2
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 
 %include /tmp/ksinclude

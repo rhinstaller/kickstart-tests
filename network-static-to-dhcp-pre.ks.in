@@ -1,7 +1,7 @@
 #test name: network-static-to-dhcp-pre
 # rhbz#1433891
 # rhbz#1432886
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 %include /tmp/ksinclude
 %pre

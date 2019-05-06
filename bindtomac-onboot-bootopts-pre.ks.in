@@ -1,5 +1,5 @@
 #test name: bindtomac-onboot-bootopts-pre
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 
 %include /tmp/ksinclude

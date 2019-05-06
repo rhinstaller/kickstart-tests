@@ -1,7 +1,7 @@
 #test name bridge-2devs
 # One bridge with slave activated in dracut,
 # the other one with slave activated only with the bridge
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 
 # --onboot=no doesn't make much sense as a use case but we want to test that it works in this test

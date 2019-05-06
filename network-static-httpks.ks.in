@@ -1,5 +1,5 @@
 #test name: network-static
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 network --device=@KSTEST_NETDEV2@ --bootproto static --ip @KSTEST_STATIC_IP@ --netmask @KSTEST_STATIC_NETMASK@ --gateway @KSTEST_STATIC_GATEWAY@ --onboot=no
 

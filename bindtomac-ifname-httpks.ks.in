@@ -1,5 +1,5 @@
 #test name: bindtomac-ifname-httpks
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 
 network --bootproto=dhcp --device=ifname0 --ipv6=2001:cafe:cafe::2/64 --bindto=mac

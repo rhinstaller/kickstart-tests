@@ -1,5 +1,5 @@
 #test name bridged-bond
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 
 network --device=@KSTEST_NETDEV1@ --bootproto=dhcp --onboot=yes --activate

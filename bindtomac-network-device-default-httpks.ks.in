@@ -3,7 +3,7 @@
 #      in initrafs (ifcfg files created by parse-kickstart). The parse-kickstart
 #      code actually ignores the command without --device specified
 #      (and no ksdevice set), so it will be applied in anaconda.
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 
 network --bootproto=dhcp --ipv6=2001:cafe:cafe::1/64 --bindto=mac

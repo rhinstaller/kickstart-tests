@@ -1,6 +1,6 @@
 #version=DEVEL
 #test name: ntp-with-nontp-gui
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 network --bootproto=dhcp
 

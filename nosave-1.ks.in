@@ -1,5 +1,5 @@
 #test name: nosave-1
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 network --bootproto=dhcp
 

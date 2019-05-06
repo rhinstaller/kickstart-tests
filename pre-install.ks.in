@@ -1,5 +1,5 @@
 #test name: pre-install
-url @KSTEST_URL@
+%ksappend repos/default.ks
 
 install
 

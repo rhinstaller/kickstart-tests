@@ -1,5 +1,5 @@
 #test name: screen-access-advanced
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 network --bootproto=dhcp
 

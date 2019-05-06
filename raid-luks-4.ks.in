@@ -1,7 +1,7 @@
 #version=DEVEL
 #test name: raid-luks-4
 
-url @KSTEST_URL@
+%ksappend repos/default.ks
 install
 network --bootproto=dhcp
 

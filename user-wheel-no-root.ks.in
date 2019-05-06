@@ -1,0 +1,44 @@
+#test name: user-wheel-no-root
+#
+# Check that we can install a system without specifying the root account
+# (this should lock the root account) but with a user that is an admin.
+%ksappend repos/default.ks
+
+install
+
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+
+clearpart --all --initlabel
+autopart
+
+keyboard us
+lang en
+timezone America/New_York
+
+user --name=user1 --homedir=/home/user1 --password="user1_password" --plaintext --uid=7010 --gid=7010 --groups=wheel
+
+shutdown
+
+%packages
+python3 # needed by the python3 root locked check
+%end
+
+# first check root is lcoked
+%ksappend users/python3_check_root_locked.ks
+
+# then check admin user exists
+%post
+
+# check the user exists
+id -u user1 || echo "*** expected user1 has not been created" >> /root/RESULT
+[ -d "/home/user1" ] || echo "*** home for user1 has not been created" >> /root/RESULT
+egrep -i "^user1" /etc/group || echo "*** expected group user1 has not been created" >> /root/RESULT
+
+# check wheel group is not empty
+grep 'wheel' /etc/group || echo "** wheel group should not be empty" >> /root/RESULT
+%end
+
+%ksappend validation/success_if_result_empty_standalone.ks

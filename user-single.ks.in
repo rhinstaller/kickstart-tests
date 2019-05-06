@@ -1,5 +1,5 @@
-#test name: user
-url @KSTEST_URL@
+#test name: user-single
+%ksappend repos/default.ks
 
 install
 

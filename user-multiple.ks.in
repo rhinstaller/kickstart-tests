@@ -1,0 +1,69 @@
+#test name: user-multiple
+#
+# Test that we can correctly create multiple users via kickstart.
+# This also includes checking that we ignore any errors in the
+# user specifications and simply skip creation of such users.
+%ksappend repos/default.ks
+
+install
+
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+
+clearpart --all --initlabel
+autopart
+
+keyboard us
+lang en
+timezone America/New_York
+
+rootpw qweqwe
+
+%packages --default
+%end
+
+# Create multiple users, including incorrect user specifications that should be skipped
+user --name=user1 --homedir=/home/user1 --password="user1_password" --plaintext --uid=7010 --gid=7010
+user --name=user2 --homedir=/home/user2 --password="user2_password" --plaintext --uid=7020 --gid=7020
+# this user should be skipped as user with name user1 already exists
+user --name=user1 --homedir=/home/user1_duplicate_name --password="user1_password" --plaintext
+# existing uid
+user --name=user1 --homedir=/home/user1_duplicate_uid --password="user1_password" --plaintext --uid=7001
+# existing gid
+user --name=user1 --homedir=/home/user1_duplicate_gid --password="user1_password" --plaintext --gid=7001
+# folder exists but user is called differently
+user --name=user1samehome --gecos="gecos1" --homedir=/home/user1 --password="user1_password" --plaintext --gid=7001
+# check valid user can be still created after all the failures
+user --name=user3 --homedir=/home/user3 --password="user3_password" --plaintext --uid=7030 --gid=7030
+shutdown
+
+%post
+
+# check the valid users exist
+id -u user1 || echo "*** expected user1 has not been created" >> /root/RESULT
+id -u user2 || echo "*** expected user2 has not been created" >> /root/RESULT
+id -u user3 || echo "*** expected user3 has not been created" >> /root/RESULT
+
+# check valid groups exist
+egrep -i "^user1" /etc/group || echo "*** expected group user1 has not been created" >> /root/RESULT
+egrep -i "^user2" /etc/group || echo "*** expected group user2 has not been created" >> /root/RESULT
+egrep -i "^user3" /etc/group || echo "*** expected group user3 has not been created" >> /root/RESULT
+
+# check duplicate user is skipped (user with name user1 already exists)
+[ -d "/home/user1_duplicate_name" ] && echo "*** duplicate created - should have been skipped" >> /root/RESULT
+
+# check user with existing uid is skipped
+[ -d "/home/user1_duplicate_uid" ] && echo "*** user with duplicate uid created - should have been skipped" >> /root/RESULT
+
+# check user with existing gid is skipped
+[ -d "/home/user1_duplicate_gid" ] && echo "*** user with duplicate gid created - should have been skipped" >> /root/RESULT
+
+# check user with different name but home that already exists is created (yes, this apparently works)
+id -u user1samehome || echo "*** user not created for existing home dir - should have been created" >> /root/RESULT
+egrep -i "^user1samehome" /etc/group || echo "*** expected group user1amehome has not been created" >> /root/RESULT
+%end
+
+%ksappend validation/success_if_result_empty_standalone.ks
+

@@ -1,0 +1,59 @@
+#test name: user-multiple-wheel-no-root
+#
+# Check that we can install a system without specifying the root account
+# (this should lock the root account) but with a user that is an admin.
+# There are multiple users but only one of them is the admin.
+# Also, just in case, the admin users is not the first user to be created.
+%ksappend repos/default.ks
+
+install
+
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+
+clearpart --all --initlabel
+autopart
+
+keyboard us
+lang en
+timezone America/New_York
+
+%packages
+python3
+%end
+
+# Create a user without admin priviledges
+user --name=user1 --homedir=/home/user1 --password="user1_password" --plaintext --uid=7010 --gid=7010
+user --name=user2 --homedir=/home/user2 --password="user2_password" --plaintext --uid=7020 --gid=7020 --groups=wheel
+user --name=user3 --homedir=/home/user3 --password="user3_password" --plaintext --uid=7030 --gid=7030
+
+shutdown
+
+%packages
+python3 # needed by the python3 root locked check
+%end
+
+# first check root is locked
+%ksappend users/python3_check_root_locked.ks
+
+# then check admin user exists
+%post
+
+# check the users exist
+id -u user1 || echo "*** expected user1 has not been created" >> /root/RESULT
+[ -d "/home/user1" ] || echo "*** home for user1 has not been created" >> /root/RESULT
+egrep -i "^user1" /etc/group || echo "*** expected group user1 has not been created" >> /root/RESULT
+id -u user2 || echo "*** expected user2 has not been created" >> /root/RESULT
+[ -d "/home/user2" ] || echo "*** home for user2 has not been created" >> /root/RESULT
+egrep -i "^user2" /etc/group || echo "*** expected group user2 has not been created" >> /root/RESULT
+id -u user3 || echo "*** expected user3 has not been created" >> /root/RESULT
+[ -d "/home/user3" ] || echo "*** home for user3 has not been created" >> /root/RESULT
+egrep -i "^user3" /etc/group || echo "*** expected group user3 has not been created" >> /root/RESULT
+
+# check wheel group is not empty
+grep 'wheel' /etc/group || echo "** wheel group should not be empty" >> /root/RESULT
+%end
+
+%ksappend validation/success_if_result_empty_standalone.ks

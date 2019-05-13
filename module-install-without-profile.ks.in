@@ -1,8 +1,11 @@
-#test name: module-enable-many
+#test name: module-install-without-profile
 #
 # test installing many modules with stream but not profiles specification
 # - a default profile should be selected automatically based on module
-#   metadata
+#   metadata if the given module has a default profile
+# - for modules without a default profile (such as mysql & postgresql)
+#   the module should be only marked as enabled, but no profiles
+#   and packages belonging to it should be marked as installed
 
 %ksappend repos/default.ks
 %ksappend common/common_no_payload.ks
@@ -12,9 +15,9 @@
 kernel
 vim
 @nodejs:10
-#@postgresql:9.6
-@mongodb:3.6
-@mysql:5.7
+@postgresql:9.6
+@meson:latest
+@mysql:5.6
 @gimp:2.10
 %end
 
@@ -45,29 +48,29 @@ if [[ $? == 0 ]]; then
     echo '*** nodejs-devel for module nodejs default profile installed' >> /root/RESULT
 fi
 
-#rpm -q postgresql-server
-#if [[ $? != 0 ]]; then
-#    echo '*** postgresql-server for the postgresql module default profile not installed' >> /root/RESULT
-#fi
-
-rpm -q mongodb-server
-if [[ $? != 0 ]]; then
-    echo '*** mongodb-server for the mongodb module default profile not installed' >> /root/RESULT
+rpm -q postgresql
+if [[ $? == 0 ]]; then
+    echo '*** postgresql installed, but postgresql module has no default profile and no profile was set' >> /root/RESULT
 fi
 
-rpm -q mongodb
+rpm -q postgresql-server
+if [[ $? == 0 ]]; then
+    echo '*** postgresql-server installed, but postgresql module has no default profile and no profile was set' >> /root/RESULT
+fi
+
+rpm -q meson
 if [[ $? != 0 ]]; then
-    echo '*** mongodb for the mongodb module default profile not installed' >> /root/RESULT
+    echo '*** meson for the meson module default profile not installed' >> /root/RESULT
 fi
 
 rpm -q community-mysql-server
-if [[ $? != 0 ]]; then
-    echo '*** community-mysql-server for the mysql module default profile not installed' >> /root/RESULT
+if [[ $? == 0 ]]; then
+    echo '*** community-mysql-server installed, but mysql module has no default profile and no profile was set' >> /root/RESULT
 fi
 
 rpm -q community-mysql
-if [[ $? != 0 ]]; then
-    echo '*** community-mysql for the mysql module default profile installed' >> /root/RESULT
+if [[ $? == 0 ]]; then
+    echo '*** community-mysql installed, but mysql module has no default profile and no profile was set' >> /root/RESULT
 fi
 
 rpm -q gimp
@@ -88,17 +91,21 @@ dnf module list
 
 # all installed modules should be also enabled
 dnf module list --enabled nodejs | grep nodejs || echo "*** nodejs module not marked as enabled" >> /root/RESULT
-#dnf module list --enabled postgresql | grep postgresql  || echo "*** postgresql module not marked as enabled" >> /root/RESULT
-dnf module list --enabled mongodb | grep mongodb  || echo "*** mongodb module not marked as enabled" >> /root/RESULT
+dnf module list --enabled postgresql | grep postgresql  || echo "*** postgresql module not marked as enabled" >> /root/RESULT
+dnf module list --enabled meson | grep meson  || echo "*** meson module not marked as enabled" >> /root/RESULT
 dnf module list --enabled mysql | grep mysql || echo "*** mysql module not marked as enabled" >> /root/RESULT
 dnf module list --enabled gimp | grep gimp || echo "*** gimp module not marked as enabled" >> /root/RESULT
 
+# check all modules are also marked as installed
+# - the postgresql and mysql modules don't have a default profile and thus should not be marked as installed
+dnf module list --installed nodejs | grep nodejs || echo "*** nodejs module not marked as installed" >> /root/RESULT
+dnf module list --installed meson | grep meson || echo "*** meson module not marked as installed" >> /root/RESULT
+dnf module list --installed gimp | grep gimp || echo "*** gimp module not marked as installed" >> /root/RESULT
+
 # check all modules are also marked as installed with the correct profile
-dnf module list --installed nodejs | grep "default \[i\]" || echo "*** nodejs module profile not marked as installed" >> /root/RESULT
-#dnf module list --installed postgresql | grep "default \[i\]" || echo "*** postgresql module profile not marked as installed" >> /root/RESULT
-dnf module list --installed mongodb | grep "default \[i\]" || echo "*** mongodb profile not marked as installed" >> /root/RESULT
-dnf module list --installed mysql | grep "default \[i\]" || echo "*** mysql module profile not marked as installed" >> /root/RESULT
-dnf module list --installed gimp | grep "default \[i\]" || echo "*** gimp module profile not marked as installed" >> /root/RESULT
+dnf module list --installed nodejs | grep "default \[d\] \[i\]" || echo "*** nodejs module profile not marked as installed" >> /root/RESULT
+dnf module list --installed meson | grep "default \[d\] \[i\]" || echo "*** meson profile not marked as installed" >> /root/RESULT
+dnf module list --installed gimp | grep "default \[d\] \[i\]" || echo "*** gimp module profile not marked as installed" >> /root/RESULT
 
 %ksappend validation/success_if_result_empty.ks
 

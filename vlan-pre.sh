@@ -23,8 +23,7 @@ TESTTYPE=${TESTTYPE:-"network"}
 
 
 kernel_args() {
-    . ${tmpdir}/ks_url
-    echo ${DEFAULT_BOOTOPTS} ip=${KSTEST_NETDEV1}:dhcp ip=${KSTEST_NETDEV2}:dhcp inst.ks=${ks_url}
+    echo ${DEFAULT_BOOTOPTS} ip=${KSTEST_NETDEV1}:dhcp ip=${KSTEST_NETDEV2}:dhcp
 }
 
 # Arguments for virt-install --network options

@@ -1,0 +1,45 @@
+#test name: initial-setup-default
+#
+# Check that Initial Setup is configured correctly if the firstboot command
+# is not present in the installation kickstart.
+#
+# The expected behavior is:
+# - the initial-setup and initial-setup-gui packages are not installed
+# - the initial-setup.service is not present and thus not enabled
+# - /etc/reconfigSys does not exist
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
+
+%packages
+vim
+%end
+
+%post
+# check that initial-setup RPM is installed
+rpm -q initial-setup
+if [[ $? == 0 ]]; then
+    echo '*** the initial-setup package should not be installed' >> /root/RESULT
+fi
+
+# check that initial-setup-gui RPM is not installed
+# (it was not specified in the %packages section
+#  and should not be pulled in automatically)
+rpm -q initial-setup-gui
+if [[ $? == 0 ]]; then
+    echo '*** initial-setup-gui package should not be installed' >> /root/RESULT
+fi
+
+# check that the initial-setup service is enabled
+systemctl is-enabled initial-setup
+if [[ $? == 0 ]]; then
+    echo "*** initial-setup.service should not be enabled" >> /root/RESULT
+fi
+
+# the reconfig file should only be present if the --reconfig option was
+# passed to the firstboot kickstart command
+if [ -f /etc/reconfigSys ]; then
+    echo "*** /etc/reconfigSys should not exist when --reconfig is not used" >> /root/RESULT
+fi
+
+%ksappend validation/success_if_result_empty.ks
+%end

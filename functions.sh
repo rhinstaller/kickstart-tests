@@ -31,7 +31,7 @@ inject_ks_to_initrd() {
     echo "true"
 }
 
-DEFAULT_BASIC_BOOTOPTS="inst.noninteractive debug=1 inst.debug"
+DEFAULT_BASIC_BOOTOPTS="vnc debug=1 inst.debug"
 
 DEFAULT_DRACUT_BOOTOPTS="rd.shell=0 rd.emergency=poweroff"
 

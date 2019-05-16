@@ -17,58 +17,6 @@
 #
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
-# This is actually testing application of kickstart network commands in
-# anaconda (which would normally be triggered by defining networking in %pre
-# and %including it into kickstart).  It is caused by network kickstart
-# commands not being applied in dracut because for ks=file:/ks.cfg (kickstart
-# injected in initrd) network devices are not found in sysfs in the time of
-# parsing the kickstart.
-
 TESTTYPE="network"
 
-. ${KSTESTDIR}/functions.sh
-
-
-ip_static_boot_config=""
-
-kernel_args() {
-    . ${tmpdir}/ip_static_boot_config
-    echo ${DEFAULT_BOOTOPTS} ${ip_static_boot_config}
-}
-
-prepare() {
-    local ks=$1
-    local tmpdir=$2
-
-    ### Create dedicated network to prevent IP address conflicts for parallel tests
-
-    local network=$(basename ${tmpdir})
-
-    local scriptdir=${PWD}/scripts
-    local ips="$(${scriptdir}/create-network.py "${network}")"
-    local ip="$(echo "$ips" | cut -d ' ' -f 1)"
-    local netmask="$(echo "$ips" | cut -d ' ' -f 2)"
-    local gateway="$(echo "$ips" | cut -d ' ' -f 3)"
-
-    # Substitute IP ranges of created network in kickstart
-    sed -i -e s#@KSTEST_STATIC_IP@#${ip}# -e s#@KSTEST_STATIC_NETMASK@#${netmask}# -e s#@KSTEST_STATIC_GATEWAY@#${gateway}# ${ks}
-    #ip=10.34.102.233::10.34.102.254:255.255.255.0::ens9:none
-    echo "ip_static_boot_config=ip=${ip}::${gateway}:${netmask}::${KSTEST_NETDEV1}:none nameserver=${gateway}" > ${tmpdir}/ip_static_boot_config
-
-    echo ${ks}
-}
-
-# Arguments for virt-install --network options
-prepare_network() {
-    local tmpdir=$1
-    local network=$(basename ${tmpdir})
-    echo "network:${network}"
-}
-
-cleanup() {
-    local tmpdir=$1
-
-    ### Destroy dedicated network
-    local network=$(basename ${tmpdir})
-    virsh net-destroy ${network}
-}
+. ${KSTESTDIR}/network-static-to-dhcp-pre-single.sh

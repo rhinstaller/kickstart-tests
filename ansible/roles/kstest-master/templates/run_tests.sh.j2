@@ -31,6 +31,7 @@ HOME_DIR=/home/${KSTEST_USER}
 KSTEST_REPO_PATH=${HOME_DIR}/${KSTEST_REPO_DIR}
 RESULTS_PATH=${HOME_DIR}/${RESULTS_DIR}
 RESULT_RUN_DIR_PREFIX={{ kstest_result_run_dir_prefix }}
+RESULT_RUN_DIR_SUFFIX={{ kstest_result_run_dir_suffix }}
 BOOT_ISO=boot.kstest.iso
 ISOMD5SUM_FILENAME={{ kstest.master.file.isomd5sum }}
 RESULT_REPORT_FILENAME={{ kstest.master.file.result_report }}
@@ -62,7 +63,7 @@ fi
 
 ### Create this test result dir
 
-RESULT_PATH="${RESULTS_RUN_PATH}/${RESULT_RUN_DIR_PREFIX}${START_TIME}"
+RESULT_PATH="${RESULTS_RUN_PATH}/${RESULT_RUN_DIR_PREFIX}${START_TIME}${RESULT_RUN_DIR_SUFFIX}"
 mkdir ${RESULT_PATH}
 
 

@@ -1,0 +1,45 @@
+#test name: initial-setup-disable
+#
+# Check that Initial Setup is correctly disabled if specified in kickstart.
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
+
+# disable initial setup
+firstboot --disable
+
+# make sure the initial setup package is installed
+%packages
+initial-setup
+%end
+
+%post
+# check that initial-setup RPM is installed
+# - this is specified in the %packages section and is not
+#   conditional on Initial Setup being enabled
+rpm -q initial-setup
+if [[ $? != 0 ]]; then
+    echo '*** the initial-setup package should be installed' >> /root/RESULT
+fi
+
+# check that initial-setup-gui RPM is not installed
+# (it was not specified in the %packages section
+#  and should not be pulled in automatically)
+rpm -q initial-setup-gui
+if [[ $? == 0 ]]; then
+    echo '*** initial-setup-gui package should not be installed' >> /root/RESULT
+fi
+
+# check that the initial-setup service is disabled
+systemctl is-enabled initial-setup
+if [[ $? == 0 ]]; then
+    echo "*** initial-setup.service should be disabled" >> /root/RESULT
+fi
+
+# the reconfig file should only be present if the --reconfig option was
+# passed to the firstboot kickstart command
+if [ -f /etc/reconfigSys ]; then
+    echo "*** /etc/reconfigSys should not exist when --reconfig is not used" >> /root/RESULT
+fi
+
+%ksappend validation/success_if_result_empty.ks
+%end

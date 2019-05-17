@@ -1,2 +1,5 @@
-*.ks
+/*.ks
+fragments/runtime
+*.log
+*.retry
 __pycache__

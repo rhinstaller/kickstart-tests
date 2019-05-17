@@ -30,7 +30,7 @@ TESTTYPE=${TESTTYPE:-"network rhel-only"}
 
 
 kernel_args() {
-    echo vnc debug=1 inst.debug ip=kstest0:dhcp net.ifnames.prefix=kstest
+    echo ${DEFAULT_BOOTOPTS} ip=kstest0:dhcp net.ifnames.prefix=kstest
 }
 
 # Arguments for virt-install --network options

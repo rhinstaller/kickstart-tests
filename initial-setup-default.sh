@@ -20,3 +20,22 @@
 TESTTYPE="initial-setup"
 
 . ${KSTESTDIR}/functions.sh
+. ${KSTESTDIR}/validate-lib-initial-setup.sh
+
+validate() {
+    # check IS is disabled via validation library function
+    validate_post_install_tools $1 0
+    if [[ $? != 0 ]]; then
+        cat ${1}/RESULT
+        return 1
+    fi
+
+    # check output kickstart via validation library function
+    validate_no_firstboot_command_in_ks $1
+    if [[ $? != 0 ]]; then
+        cat ${1}/RESULT
+        return 1
+    fi
+
+    return $(validate_RESULT ${disksdir})
+}

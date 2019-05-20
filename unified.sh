@@ -17,8 +17,6 @@
 #
 # Red Hat Author(s): Jiri Konecny <jkonecny@redhat.com>
 
-#TESTTYPE="packaging"
-
-TESTTYPE="knownfailure"
+TESTTYPE="packaging rhel-only"
 
 . ${KSTESTDIR}/functions.sh

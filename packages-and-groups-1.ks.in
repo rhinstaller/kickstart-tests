@@ -1,4 +1,6 @@
 #test name: packages-and-groups-1
+#
+# Check package exclusion works correctly.
 
 %ksappend repos/default.ks
 %ksappend common/common_no_payload.ks

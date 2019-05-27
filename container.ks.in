@@ -1,5 +1,12 @@
 #version=DEVEL
 #test name: container
+#
+# Test that a very minimal installation,
+# generally targetting constainer base images,
+# can be successfully done.
+# - the --nocore option is used
+# - no kernel is installed, thus
+#   bootloader installation is disabled
 
 %ksappend repos/default.ks
 

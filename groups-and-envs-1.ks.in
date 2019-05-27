@@ -1,4 +1,6 @@
 #test name: groups-and-envs-1
+#
+# Check that groups and an environment can both be installed.
 
 %ksappend repos/default.ks
 %ksappend common/common_no_payload.ks

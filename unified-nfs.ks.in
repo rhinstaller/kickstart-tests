@@ -1,0 +1,25 @@
+#version=DEVEL
+#test name: unified-nfs
+
+# This test is for testing the install from an unified repository.
+#
+# You have to have unified ISO as a source mounted on the NFS server.
+# To create unified ISO for Fedora you can use this tool:
+# https://github.com/rhinstaller/devel-tools/tree/master/create_unified_iso
+#
+# This test has to have access to the NFS server. However NFS won't mount
+# if the VM is behind a NAT (NFS problem). So this test won't work on our setup
+# right now.
+#
+
+%ksappend common/common_no_payload.ks
+
+%ksappend repos/unified-nfs.ks
+
+%ksappend payload/unified_packages.ks
+
+%post
+%ksappend validation/unified.ks
+
+%ksappend validation/success_if_result_empty.ks
+%end

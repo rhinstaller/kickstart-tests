@@ -26,6 +26,12 @@ function check_gui_configurations() {
     local dev_cons=""
     local cons_without_devs=""
 
+    # Pass the test if not in graphical mode
+    grep -q "Display mode is set to.* graphical mode" /tmp/anaconda.log
+    if [[ $? -ne 0 ]]; then
+        return
+    fi
+
     old_IFS=$IFS
     IFS=$'\n'
     # use \s so that it does not match itself in the log

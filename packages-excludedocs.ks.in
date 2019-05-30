@@ -1,5 +1,10 @@
 #version=DEVEL
 #test name: packages-excludedocs
+#
+# Check that the %packages section --excludedocs options
+# correctly excludes all docs.
+#
+# (Also detects packages that have incorrect %files section in their spec file.)
 
 %ksappend repos/default.ks
 %ksappend common/common_no_payload.ks

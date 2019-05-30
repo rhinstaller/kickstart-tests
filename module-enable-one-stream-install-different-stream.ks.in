@@ -1,12 +1,11 @@
-#test name: module-install
+#test name: module-enable-one-stream-install-different-stream
 #
-# generic module install test:
 # - enable one module with a stream
 # - install the same module with a different stream
 #
-# expected result for this stream missmatch
-# - stream id from module command is used
-# - module spec in packages section is ignored if it specifies a different stream id
+# expected result for this stream missmatch:
+# - DNF raises a MarkinErrors() exception with a note that it's not possible
+#   to enable different streams for a module
 #
 # This test is basically checking the current behavior holds that we can catch any changes,
 # both intended and unintended.
@@ -14,11 +13,11 @@
 %ksappend repos/default.ks
 %ksappend common/common_no_payload.ks
 
-module --name=cri-o --stream=2018.0
+module --name=postgresql --stream=9.6
 
 %packages
 @^Fedora Server Edition
-@cri-o:1.11/default
+@postgresql:10/server
 kernel
 vim
 %end
@@ -40,19 +39,19 @@ if [[ $? != 0 ]]; then
     echo '*** kernel package not installed' >> /root/RESULT
 fi
 
-# module should be just enabled due to the miss-match
-rpm -q cri-o
+# packages section should win over enable, resulting in the package being installed
+rpm -q postgresql
 if [[ $? != 0 ]]; then
-    echo '*** cri-o package for cri-o module should be installed' >> /root/RESULT
+    echo '*** postgresql package for postgresql module client profile should be installed' >> /root/RESULT
 fi
 
 # next we will check if the module is seen as enabled/installed from the
 # metadata/DNF point of view
-dnf module list --enabled cri-o | grep cri-o || echo "*** cri-o module not marked as enabled" >> /root/RESULT
-dnf module list --installed cri-o | grep cri-o || echo "*** cri-o module not marked as installed" >> /root/RESULT
+dnf module list --enabled postgresql | grep postgresql || echo "*** postgresql module not marked as enabled" >> /root/RESULT
+dnf module list --installed postgresql | grep postgresql || echo "*** postgresql module not marked as installed" >> /root/RESULT
 
 # check the stream
-dnf module list --enabled cri-o | grep "2018.0 \[e\]" || echo "*** cri-o stream id 2018.0 not marked as enabled (stream id from packages section should win)" >> /root/RESULT
+dnf module list --enabled postgresql | grep "10 \[e\]" || echo "*** postgresql stream id 10 not marked as enabled (stream id from packages section should win)" >> /root/RESULT
 
 if [ ! -f /root/RESULT ]
 then

@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Martin Kolman <mkolman@redhat.com>
 
-TESTTYPE="packaging modularity"
+TESTTYPE="packaging modularity knownfailure"
 
 . ${KSTESTDIR}/functions.sh

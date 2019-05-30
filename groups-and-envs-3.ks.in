@@ -1,5 +1,7 @@
 #version=DEVEL
 #test name: groups-and-envs-3
+#
+# Check that default environment is installed correctly.
 
 %ksappend repos/default.ks
 %ksappend common/common_no_payload.ks

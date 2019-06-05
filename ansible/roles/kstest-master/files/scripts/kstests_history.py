@@ -35,6 +35,7 @@ history_data = {}
 HISTORY_SUCCESS = 0
 HISTORY_FAILED = 1
 HISTORY_UNKNOWN = 2
+HISTORY_NOT_RUN = 3
 
 ANACONDA_VER_RE = re.compile(r'.*main:\s*/sbin/anaconda\s*(.*)')
 
@@ -65,7 +66,7 @@ for result_dir in sorted(os.listdir(results_path)):
     with open(report_file) as f:
         for test, results in tests.items():
             results.append(" ")
-            history_data[test].append(HISTORY_UNKNOWN)
+            history_data[test].append(HISTORY_NOT_RUN)
         state = "start"
         for line in f.readlines():
             if state == "start":
@@ -100,7 +101,7 @@ for result_dir in sorted(os.listdir(results_path)):
 
                 if not test in tests:
                     tests[test] = [" "] * count
-                    history_data[test] = [HISTORY_UNKNOWN] * count
+                    history_data[test] = [HISTORY_NOT_RUN] * (count - 1) + [HISTORY_UNKNOWN]
                 ref = ""
                 test_log_dirs = [d for d in os.listdir(result_path) if d.startswith("kstest-{}.".format(test))]
                 if test_log_dirs:
@@ -114,10 +115,12 @@ for result_dir in sorted(os.listdir(results_path)):
                 if result == "SUCCESS":
                     history_data[test].pop()
                     history_data[test].append(HISTORY_SUCCESS)
-                elif result == "FAILED":
-                    if not detail:
-                        history_data[test].pop()
-                        history_data[test].append(HISTORY_FAILED)
+                elif result == "FAILED" and not detail:
+                    history_data[test].pop()
+                    history_data[test].append(HISTORY_FAILED)
+                else:
+                    history_data[test].pop()
+                    history_data[test].append(HISTORY_UNKNOWN)
 
     with open(os.path.join(result_path, md5sum_filename), "r") as f:
         isomd5 = f.read()
@@ -150,11 +153,14 @@ for test in sorted(tests):
     current_history = history_data[test][-history_length:]
     worth_looking_failed = HISTORY_FAILED in current_history
     worth_looking_no_success = HISTORY_SUCCESS not in current_history
+    test_not_run = all(h == HISTORY_NOT_RUN for h in current_history)
     new_failed = HISTORY_FAILED not in current_history[:-1] \
         and current_history[-1] == HISTORY_FAILED
     cols = ["<td>{}</td>".format(result) for result in tests[test]]
     cols.insert(0, "<td>{}</td>".format(test))
-    if new_failed:
+    if test_not_run:
+        cols.append("<td>{}</td>".format(test))
+    elif new_failed:
         cols.append("<td bgcolor=\"#ff00dc\">{}</td>".format(test))
     elif worth_looking_failed:
         cols.append("<td bgcolor=\"#ff3e00\">{}</td>".format(test))

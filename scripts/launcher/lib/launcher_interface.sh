@@ -105,7 +105,7 @@ case $1 in
         ret=$?
         ;;
     kernel_args)
-        msg="$(kernel_args)"
+        msg="$(kernel_args ${tmpdir})"
         ret=$?
         ;;
     boot_args)

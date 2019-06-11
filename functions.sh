@@ -138,7 +138,7 @@ start_httpd() {
 
     # Starts a http server rooted in $httpd_root. The PID of the server will be
     # written to $tmpdir/httpd-pid, and the URL for the server will be set in
-    # $httpd_url
+    # $httpd_url and also written to $tmpdir/httpd_url file.
 
     local scriptdir=${PWD}/scripts
     local httpd_info="$(${scriptdir}/httpd.py "${httpd_root}")"
@@ -152,6 +152,9 @@ start_httpd() {
 
     # Construct a URL
     httpd_url="http://$(${scriptdir}/find-ip):${httpd_port}/"
+
+    # Save the URL
+    echo "${httpd_url}" > ${tmpdir}/httpd_url
 }
 
 start_proxy() {

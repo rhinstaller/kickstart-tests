@@ -1,0 +1,34 @@
+#version=DEVEL
+#test name: addrepo
+
+# This test will check the installation with addrepo kernel parameter functionality.
+# The inst.addrepo boot option will add additional software repository,
+# which will be used for the installation.
+#
+
+%ksappend common/common_no_payload.ks
+%ksappend repos/default.ks
+
+%packages
+testpkg-http-core
+testpkg-share1
+%end
+
+%post
+
+rpm -q testpkg-http-core
+if [[ $? != 0 ]]; then
+    echo '*** testpkg-http-core was not installed' >> /root/RESULT
+fi
+
+rpm -q testpkg-share1
+if [[ $? != 0 ]]; then
+    echo '*** testpkg-share1 was not installed' >> /root/RESULT
+fi
+
+if [[ -e /etc/LOCAL.repo ]]; then
+    echo '*** LOCAL.repo should not be installed to the system' >> /root/RESULT
+fi
+
+%ksappend validation/success_if_result_empty.ks
+%end

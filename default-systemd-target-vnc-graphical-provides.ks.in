@@ -1,0 +1,31 @@
+#version=DEVEL
+#test name: default-systemd-target-vnc-graphical-provides
+#
+# Test multi-user.target is set as the default systemd target if:
+# - the installation runs in VNC mode
+# - the installation transaction contains a package providing service(graphical-login)
+# Text mode overrides the provides & for this VNC installation is considered to be
+# similar to textmode, as while controlled remotely over VNC, the installation run
+# itself runs in text mode.
+
+%ksappend repos/default.ks
+
+%ksappend common/common_no_payload.ks
+
+# run the installation in VNC mode
+vnc
+
+# the gdm package provides service(graphical-login)
+%packages
+gdm
+%end
+
+%post
+
+systemctl get-default | grep multi-user.target
+if [[ $? != 0 ]]; then
+    echo "*** multi-user.target should be set for VNC installs even is package with service(graphical-login) is installed" >> /root/RESULT
+fi
+
+%ksappend validation/success_if_result_empty.ks
+%end

@@ -1,0 +1,20 @@
+#version=DEVEL
+#test name: default-systemd-target-startxonboot
+#
+# Test default systemd target configuration via the xconfig --startxonboot command.
+%ksappend repos/default.ks
+
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+xconfig --startxonboot
+
+%post
+
+systemctl get-default | grep graphical.target
+if [[ $? != 0 ]]; then
+    echo "*** graphical.target should be set as the default systemd target" >> /root/RESULT
+fi
+
+%ksappend validation/success_if_result_empty.ks
+%end

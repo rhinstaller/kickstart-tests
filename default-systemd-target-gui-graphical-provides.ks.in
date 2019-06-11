@@ -1,0 +1,28 @@
+#version=DEVEL
+#test name: default-systemd-target-gui-graphical-login-provides
+#
+# Test graphical.target is set as the default systemd target if:
+# - the installation runs in GUI mode
+# - contains a package with provides == service(graphical-login).
+
+%ksappend repos/default.ks
+
+%ksappend common/common_no_payload.ks
+
+# run installation in GUI mode
+graphical
+
+# the gdm package provides service(graphical-login)
+%packages
+gdm
+%end
+
+%post
+
+systemctl get-default | grep graphical.target
+if [[ $? != 0 ]]; then
+    echo "*** graphical.target should be set if package with provides == service(graphical-login) is installed" >> /root/RESULT
+fi
+
+%ksappend validation/success_if_result_empty.ks
+%end

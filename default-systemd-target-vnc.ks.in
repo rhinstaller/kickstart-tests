@@ -1,0 +1,24 @@
+#version=DEVEL
+#test name: default-systemd-target-vnc
+#
+# Test multi-user.target should be set by default as the default systemd target
+# for VNC installs. While controlled remotely over VNC the installation itslef runs
+# in text mode and should behave as such.
+
+%ksappend repos/default.ks
+
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+# run the installation in VNC mode
+vnc
+
+%post
+
+systemctl get-default | grep multi-user.target
+if [[ $? != 0 ]]; then
+    echo "*** multi-user.target should be set as the default systemd target for VNC installs" >> /root/RESULT
+fi
+
+%ksappend validation/success_if_result_empty.ks
+%end

@@ -1,0 +1,24 @@
+#version=DEVEL
+#test name: default-systemd-target-tui
+#
+# Test multi-user.target should be set by default as the default systemd target when:
+# - the installation runs in text mode
+# - no package providing service(graphical-login) is installed
+
+%ksappend repos/default.ks
+
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+# run the installation in text mode
+text
+
+%post
+
+systemctl get-default | grep multi-user.target
+if [[ $? != 0 ]]; then
+    echo "*** multi-user.target should be set as the default systemd target for text mode installations" >> /root/RESULT
+fi
+
+%ksappend validation/success_if_result_empty.ks
+%end

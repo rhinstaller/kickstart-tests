@@ -15,9 +15,22 @@
 # License and may only be used or replicated with the express permission of
 # Red Hat, Inc.
 #
-# Red Hat Author(s): Chris Lumens <clumens@redhat.com>
-#                    Martin Kolman <mkolman@redhat.com>
+# Red Hat Author(s): Martin Kolman <mkolman@redhat.com>
 
 TESTTYPE="network firewall"
 
 . ${KSTESTDIR}/functions.sh
+
+validate() {
+    # check if installation journal contains the expected
+    # "using system defaults" log message
+    regexp="ks file instructs to use system defaults for firewall, skipping configuration"
+    error="*** expected skipping-configuration message not found in installation journal"
+    validate_journal_contains $1 "${regexp}" "${error}"
+    if [[ $? != 0 ]]; then
+        cat ${1}/RESULT
+        return 1
+    fi
+
+    return $(validate_RESULT ${disksdir})
+}

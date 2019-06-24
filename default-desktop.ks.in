@@ -1,0 +1,20 @@
+#version=DEVEL
+#test name: default-desktop
+#
+# Test default desktop configuration via the xconfig command.
+%ksappend repos/default.ks
+
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+xconfig --defaultdesktop GNOME
+
+%post
+
+cat /etc/sysconfig/desktop | grep GNOME
+if [[ $? -ne 0 ]]; then
+    echo "*** Default desktop environment not set to GNOME" >> /root/RESULT
+fi
+
+%ksappend validation/success_if_result_empty.ks
+%end

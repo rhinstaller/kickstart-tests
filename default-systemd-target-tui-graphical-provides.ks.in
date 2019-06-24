@@ -1,0 +1,29 @@
+#version=DEVEL
+#test name: default-systemd-target-tui-graphical-provides
+#
+# Test multi-user.target is set as the default systemd target if:
+# - the installation tuns in text mode
+# - the installation transaction contains a package which provides service(graphical-login)
+# Basically the text mode should override the provides.
+
+%ksappend repos/default.ks
+
+%ksappend common/common_no_payload.ks
+
+# run the installation in text mode
+text
+
+# the gdm package provides service(graphical-login)
+%packages
+gdm
+%end
+
+%post
+
+systemctl get-default | grep multi-user.target
+if [[ $? != 0 ]]; then
+    echo "*** multi-user.target should be set for text installs even if package with service(graphical-login) is installed" >> /root/RESULT
+fi
+
+%ksappend validation/success_if_result_empty.ks
+%end

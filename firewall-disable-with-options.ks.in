@@ -1,16 +1,28 @@
 #version=DEVEL
-#test name: firewall
+#test name: firewall-disable-with-options
+#
+# Test that firewall can be properly disabled & all the
+# firewall options are still set correctly on the target system.
 %ksappend repos/default.ks
 
 %ksappend common/common_no_payload.ks
 %ksappend payload/default_packages.ks
 
-# test the firewall command
-firewall --enable --port=22001:tcp,6400:udp --service=tftp,smtp
+# TEST: firewall
+firewall --disable --port=22001:tcp,6400:udp --service=tftp,smtp
 
 %post
+# The firewall --disable kickstart command gets translated into firewall-offline-cmd --disable,
+# which simply disables the firewalld systemd unit. So by checking if the unit is disabled,
+# we can check if the kickstart command works correctly.
+systemctl is-enabled firewalld
+if [[ $? -eq 0 ]]; then
+    echo "*** firewalld.service should be disabled" >> /root/RESULT
+fi
 
-## TEST PROCEDURE
+# Even though we disable the firewall, we still forward the options
+# to firewall-offline-cmd & they should be set properly.
+
 # Test for 22001/TCP
 firewall-offline-cmd --list-ports | grep 22001/tcp
 if [[ $? -ne 0 ]]; then
@@ -38,7 +50,7 @@ fi
 # Test for service sane (disabled)
 firewall-offline-cmd --list-services | grep sane
 if [[ $? -ne 1 ]]; then
-    echo "*** Service sane allowed through the firewall, should be disabled" >> /root/RESULT
+    echo "*** Service sane is allowed through the firewall enabled, should be disabled" >> /root/RESULT
 fi
 
 %ksappend validation/success_if_result_empty.ks

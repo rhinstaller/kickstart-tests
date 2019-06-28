@@ -128,6 +128,23 @@ validate() {
     return $?
 }
 
+validate_journal_contains() {
+    # Check if journal from the installation contains a regexp,
+    # write error message and return with 1 if the message has
+    # not been found.
+    disksdir=$1
+    regexp=$2
+    error=$3
+    args=$(for d in ${disksdir}/disk-*img; do echo -a ${d}; done)
+    # Copy the journal.log file
+    run_with_timeout 1000s "virt-copy-out ${args} /var/log/anaconda/journal.log ${disksdir}"
+    egrep -i "${regexp}" ${disksdir}/journal.log
+    if [[ $? != 0 ]]; then
+        echo "${error}" >> ${disksdir}/RESULT
+        return 1
+    fi
+}
+
 cleanup() {
     tmpdir=$1
 }

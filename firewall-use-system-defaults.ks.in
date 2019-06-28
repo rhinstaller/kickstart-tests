@@ -1,0 +1,25 @@
+#version=DEVEL
+#test name: firewall-use-system-defaults
+#
+# Test that firewall can be properly configured to use
+# system defaults. This basically means avoiding any
+# firewall-offline-cmd --enable/--disable calls and
+# simply leaving default distro provided firewall
+# configuration in place.
+%ksappend repos/default.ks
+
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+# disable firewall
+firewall --use-system-defaults
+
+%post
+# On Fedora firewall is enabled by default.
+systemctl is-enabled firewalld
+if [[ $? -eq 0 ]]; then
+    echo "*** firewall should be enabled" >> /root/RESULT
+fi
+
+%ksappend validation/success_if_result_empty.ks
+%end

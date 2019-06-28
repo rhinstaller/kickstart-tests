@@ -1,0 +1,57 @@
+
+#version=DEVEL
+#test name: firewall-use-system-defaults-ignore-options
+#
+# Test that firewall can be properly configured to use
+# system defaults. This basically means avoiding any
+# firewall-offline-cmd --enable/--disable calls and
+# simply leaving default distro provided firewall
+# configuration in place.
+%ksappend repos/default.ks
+
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+
+# Check no options are set to the target system when the
+# --use-system-defaults option is in place.
+firewall --use-system-defaults --port=22001:tcp,6400:udp --service=tftp,smtp
+
+%packages
+%end
+
+%post
+
+## TEST PROCEDURE
+# Test for 22001/TCP
+firewall-offline-cmd --list-ports | grep 22001/tcp
+if [[ $? -eq 0 ]]; then
+    echo "*** Port 22001/tcp should not be allowed through the firewall" >> /root/RESULT
+fi
+
+# Test for 6400/UDP
+firewall-offline-cmd --list-ports | grep 6400/udp
+if [[ $? -eq 0 ]]; then
+    echo "*** Port 6400/udp should not be allowed through the firewall" >> /root/RESULT
+fi
+
+# Test for service tftp
+firewall-offline-cmd --list-services | grep tftp
+if [[ $? -eq 0 ]]; then
+    echo "*** Service tftp should not be allowed through the firewall" >> /root/RESULT
+fi
+
+# Test for service smtp
+firewall-offline-cmd --list-services | grep smtp
+if [[ $? -eq 0 ]]; then
+    echo "*** Service smtp should not be allowed through the firewall" >> /root/RESULT
+fi
+
+# Test for service sane (disabled)
+firewall-offline-cmd --list-services | grep sane
+if [[ $? -eq 0 ]]; then
+    echo "*** Service sane is allowed through the firewall, which is different from the default (disabled)" >> /root/RESULT
+fi
+
+%ksappend validation/success_if_result_empty.ks
+%end

@@ -433,9 +433,9 @@ if [[ ${COMMAND} == "test" || ${COMMAND} == "run" ]]; then
     # Configure and the test
 
     if [[ -n ${TEST_CONFIGURATION_FILE} ]]; then
-        ansible-playbook -i ${INVENTORY} ansible/kstest-master-configure-test.yml --extra-vars "kstest_result_run_dir_prefix=${TARGET}. test_configuration=${TEST_CONFIGURATION_FILE}"
+        ansible-playbook -i ${INVENTORY} ansible/kstest-master-configure-test.yml --extra-vars "test_configuration=${TEST_CONFIGURATION_FILE}"
     else
-        ansible-playbook -i ${INVENTORY} ansible/kstest-master-configure-test.yml --extra-vars "kstest_result_run_dir_prefix=${TARGET}."
+        ansible-playbook -i ${INVENTORY} ansible/kstest-master-configure-test.yml
     fi
 
     # Run the test

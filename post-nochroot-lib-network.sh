@@ -1,8 +1,8 @@
 SYSROOT=${ANA_INSTALL_PATH:-/mnt/sysimage}
 
-# check_bridge_has_slave BRIDGE SLAVE "yes|no"
+# check_bridge_has_slave_nochroot BRIDGE SLAVE "yes|no"
 # Check that the bridge device BRIDGE has ("yes") or has not ("no") a slave device SLAVE
-function check_bridge_has_slave() {
+function check_bridge_has_slave_nochroot() {
     local bridge="$1"
     local slave="$2"
     local expected_result="$3"

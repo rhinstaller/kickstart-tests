@@ -135,6 +135,9 @@ A kickstart test consists of two files:
   NOTE: possible redefinintions of KICKSTART_NAME value in files included in
   the the .sh file (eg to reuse .sh file of another test) are ignored.
 
+  NOTE: The fragments (%ksappend) mechanism does not work together with
+  KICKSTART_NAME setting (%ksappend is not applied).
+
 Chapter 2. Environment Variables
 ================================
 

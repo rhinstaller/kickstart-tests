@@ -45,9 +45,11 @@ prepare() {
     start_httpd ${tmpdir}/http $tmpdir
 
     echo ks_url=${httpd_url}ks.cfg > ${tmpdir}/ks_url
-    # Return empty path to kickstart file which will result in ks not
-    # being injected into initrd.
-    echo ""
+    echo "${ks}"
+}
+
+inject_ks_to_initrd() {
+    echo "false"
 }
 
 cleanup() {

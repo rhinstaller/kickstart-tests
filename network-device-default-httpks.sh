@@ -23,7 +23,6 @@
 #      (and no ksdevice set), so it will be applied in anaconda.
 
 TESTTYPE=${TESTTYPE:-"network"}
-KICKSTART_NAME=network-device-default
 
 . ${KSTESTDIR}/functions.sh
 

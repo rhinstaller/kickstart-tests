@@ -18,6 +18,5 @@
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
 TESTTYPE="network"
-KICKSTART_NAME=bindtomac-network-device-default-httpks
 
 . ${KSTESTDIR}/network-device-default-httpks.sh

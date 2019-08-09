@@ -168,7 +168,7 @@ for test in sorted(tests):
         cols.append("<td bgcolor=\"#ffc500\">{}</td>".format(test))
     else:
         cols.append("<td>{}</td>".format(test))
-    row = "<tr>{}</tr>".format("".join(cols))
+    row = "<tr>{}</tr>\n".format("".join(cols))
     rows.append(row)
 
 tbody = "".join(rows)

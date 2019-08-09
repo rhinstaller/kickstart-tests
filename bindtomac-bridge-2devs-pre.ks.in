@@ -46,7 +46,10 @@ check_device_ifcfg_value bridge0_slave_1 BRIDGE bridge0
 
 check_device_has_ipv4_address bridge0 yes
 check_device_has_ipv4_address @KSTEST_NETDEV1@ no
-check_device_ifcfg_value @KSTEST_NETDEV1@ ONBOOT yes
+
+# This check is removed because since NM in initramfs the slave's (non-bridge)
+# configuration from initramfs does not produce corresponding ifcfg file
+# check_device_ifcfg_value @KSTEST_NETDEV1@ ONBOOT yes
 
 check_device_ifcfg_value bridge0 ONBOOT no
 check_device_ifcfg_value bridge0_slave_1 ONBOOT no

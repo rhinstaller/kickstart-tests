@@ -53,7 +53,6 @@ def get_anconda_ver(result_path):
 count = 0
 old_isomd5 = ""
 for result_dir in sorted(os.listdir(results_path)):
-    count = count + 1
     result_path = os.path.join(results_path, result_dir)
 
     report_file = os.path.join(result_path, report_filename)
@@ -61,6 +60,7 @@ for result_dir in sorted(os.listdir(results_path)):
         print("No {} found, skipping".format(report_file), file=sys.stderr)
         continue
 
+    count = count + 1
     anaconda_ver = ""
 
     with open(report_file) as f:

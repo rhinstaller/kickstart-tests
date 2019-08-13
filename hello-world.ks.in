@@ -1,0 +1,44 @@
+#test name: hello-world
+
+%ksappend common/common.ks
+%ksappend repos/default.ks
+%ksappend l10n/default.ks
+%ksappend users/default.ks
+%ksappend network/default.ks
+%ksappend storage/default.ks
+%ksappend payload/default_packages.ks
+
+%addon org_fedora_hello_world --reverse
+It is raining cats and dogs!
+%end
+
+%pre
+# Set ADDON_SOURCE with an URL to the archived repository of Hello Word.
+%ksappend section-data/hello-world.ks
+
+# The path to addons on the system.
+ADDON_TARGET="/usr/share/anaconda/addons/"
+
+# Copy the content of the repository on stage2.
+mkdir -p "${ADDON_TARGET}"
+curl -L "${ADDON_SOURCE}" | tar -xzvf - -C "${ADDON_TARGET}" --strip-components=1
+%end
+
+%post
+# Check the existence of the output file.
+addon_file="/root/hello_world_addon_output.txt"
+
+if [[ ! -e "${addon_file}" ]]; then
+    echo "*** missing file: ${addon_file}" >> /root/RESULT
+fi
+
+# Check the content of the output file.
+addon_text="$(cat ${addon_file})"
+
+if [[ "${addon_text}" != "It is raining cats and dogs!" ]] ; then
+    echo "*** unexpected text: ${addon_text}" >> /root/RESULT
+fi
+
+# The test was successful.
+%ksappend validation/success_if_result_empty.ks
+%end

@@ -11,7 +11,13 @@ function check_bridge_has_slave_nochroot() {
         exit_code=1
     fi
 
-    brctl show ${bridge} | egrep -q '^'${bridge}'.*'${slave}'$'
+    command -v brctl > /dev/null 2>&1
+    if [[ $? -eq 0 ]]; then
+        brctl show ${bridge} | egrep -q '^'${bridge}'.*'${slave}'$'
+    else
+        ip addr show ${slave} | egrep -q "master[[:space:]]*${bridge}"
+    fi
+
     if [[ $? -ne ${exit_code} ]]; then
         echo "*** Failed check: ${bridge} has slave ${slave} ${expected_result}" >> $SYSROOT/root/RESULT
     fi

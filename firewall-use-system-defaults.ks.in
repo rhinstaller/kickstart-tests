@@ -15,6 +15,13 @@
 firewall --use-system-defaults
 
 %post
+# firewalld package should be installed as long as the firewall command is present
+# in the input kickstart, regardless of its options
+rpm -q firewalld
+if [[ $? != 0 ]]; then
+    echo '*** firewalld package should have been installed' >> /root/RESULT
+fi
+
 # On Fedora firewall is enabled by default.
 systemctl is-enabled firewall
 if [[ $? -eq 0 ]]; then

@@ -12,6 +12,13 @@
 firewall --disable --port=22001:tcp,6400:udp --service=tftp,smtp
 
 %post
+# firewalld package should be installed as long as the firewall command is present
+# in the input kickstart, regardless of its options
+rpm -q firewalld
+if [[ $? != 0 ]]; then
+    echo '*** firewalld package should have been installed' >> /root/RESULT
+fi
+
 # The firewall --disable kickstart command gets translated into firewall-offline-cmd --disable,
 # which simply disables the firewalld systemd unit. So by checking if the unit is disabled,
 # we can check if the kickstart command works correctly.

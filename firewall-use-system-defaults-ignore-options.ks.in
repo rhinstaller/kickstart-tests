@@ -21,6 +21,12 @@ firewall --use-system-defaults --port=22001:tcp,6400:udp --service=tftp,smtp
 %end
 
 %post
+# firewalld package should be installed as long as the firewall command is present
+# in the input kickstart, regardless of its options
+rpm -q firewalld
+if [[ $? != 0 ]]; then
+    echo '*** firewalld package should have been installed' >> /root/RESULT
+fi
 
 ## TEST PROCEDURE
 # Test for 22001/TCP

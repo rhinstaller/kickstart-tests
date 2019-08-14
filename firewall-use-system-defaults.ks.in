@@ -16,7 +16,7 @@ firewall --use-system-defaults
 
 %post
 # On Fedora firewall is enabled by default.
-systemctl is-enabled firewalld
+systemctl is-enabled firewall
 if [[ $? -eq 0 ]]; then
     echo "*** firewall should be enabled" >> /root/RESULT
 fi

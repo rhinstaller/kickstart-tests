@@ -61,6 +61,12 @@ check_device_ifcfg_value team1_slave_2 TEAM_MASTER team1
 
 check_device_connected team1 no
 
+# teamd package should have been installed as long as team devices are present
+rpm -q teamd
+if [[ $? != 0 ]]; then
+    echo '*** teamd package should have been installed' >> /root/RESULT
+fi
+
 # No error was written to /root/RESULT file, everything is OK
 if [[ ! -e /root/RESULT ]]; then
    echo SUCCESS > /root/RESULT

@@ -5,7 +5,7 @@ install
 %include /tmp/ksinclude
 %pre
 echo "network --bootproto=dhcp --device=52:54:00:12:34:59" >> /tmp/ksinclude
-echo "network --bootproto=dhcp --device=52:54:00:12:34:5A --activate" >> /tmp/ksinclude
+echo "network --bootproto=dhcp --device=52:54:00:12:34:44 --activate" >> /tmp/ksinclude
 %end
 
 bootloader --timeout=1

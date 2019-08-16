@@ -35,7 +35,7 @@ fi
 @KSINCLUDE@ post-lib-network.sh
 
 check_device_ifcfg_value ifname0 IPV6ADDR 2001:cafe:cafe::2/64
-check_device_ifcfg_value ifname0 HWADDR 52:54:00:12:34:5d
+check_device_ifcfg_value ifname0 HWADDR 52:54:00:12:34:40
 check_device_ifcfg_value ifname0 DEVICE ifname0
 check_device_connected ifname0 yes
 
@@ -49,7 +49,7 @@ if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
     check_device_ifcfg_value @KSTEST_NETDEV2@ ONBOOT no
     check_device_connected @KSTEST_NETDEV2@ no
 else
-    check_device_ifcfg_value ifname1 HWADDR 52:54:00:12:34:5E
+    check_device_ifcfg_value ifname1 HWADDR 52:54:00:12:34:41
     check_device_ifcfg_value ifname1 DEVICE ifname1
     check_device_ifcfg_value ifname1 ONBOOT yes
     check_device_connected ifname1 yes

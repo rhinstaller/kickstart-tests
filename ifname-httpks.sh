@@ -23,13 +23,13 @@ TESTTYPE="network"
 
 kernel_args() {
     . ${tmpdir}/ks_url
-    echo ${DEFAULT_BOOTOPTS} ifname=ifname0:52:54:00:12:34:5B ifname=ifname1:52:54:00:12:34:5C ip=ifname0:dhcp inst.ks=${ks_url}
+    echo ${DEFAULT_BOOTOPTS} ifname=ifname0:52:54:00:12:34:42 ifname=ifname1:52:54:00:12:34:43 ip=ifname0:dhcp inst.ks=${ks_url}
 }
 
 # Arguments for virt-install --network options
 prepare_network() {
-    echo "network=default,mac=52:54:00:12:34:5B"
-    echo "network=default,mac=52:54:00:12:34:5C"
+    echo "network=default,mac=52:54:00:12:34:42"
+    echo "network=default,mac=52:54:00:12:34:43"
 }
 
 prepare() {

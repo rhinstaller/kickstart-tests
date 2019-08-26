@@ -9,20 +9,27 @@
 #   bootloader installation is disabled
 
 %ksappend repos/default.ks
-
-bootloader --disabled
-# the container testcase requires custom
-# bootloader configuration so we use
-# individual fragments here
 %ksappend common/common.ks
-%ksappend l10n/default.ks
 %ksappend users/default.ks
 %ksappend network/default.ks
-%ksappend storage/default.ks
-rootpw testcase
 
+# Disable the boot loader.
+bootloader --disabled
+
+# Disable the NTP service.
+keyboard us
+lang en_US.UTF-8
+timezone Etc/UTC --utc --nontp
+
+# Create only / with the ext4 filesystem type.
+autopart --type=plain --fstype=ext4 --nohome --noboot --noswap
+zerombr
+clearpart --all
+
+# Don't install kernel and systemd.
 %packages --nocore
 -kernel
+-systemd
 bash
 %end
 

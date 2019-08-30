@@ -138,13 +138,18 @@ function check_gui_configurations() {
     # TODO check that no other devices were added
 }
 
-ANACONDA_NM_CONFIG_FILE_PATH=/etc/NetworkManager/conf.d/90-anaconda-no-auto-default.conf
-CHROOT_ANACONDA_NM_CONFIG_FILE_PATH=/root/90-anaconda-no-auto-default.conf
+# Copy result from the %pre stage
 function copy_pre_stage_result() {
-    # Copy result from the %pre stage
     if [[ -e /root/RESULT ]]; then
        cp /root/RESULT $SYSROOT/root/RESULT
     fi
+}
+
+# Pass information about autoconnections configuration to target system chroot
+# to be available for detect_nm_has_autoconnection_off
+ANACONDA_NM_CONFIG_FILE_PATH=/etc/NetworkManager/conf.d/90-anaconda-no-auto-default.conf
+CHROOT_ANACONDA_NM_CONFIG_FILE_PATH=/root/90-anaconda-no-auto-default.conf
+function pass_autoconnections_info_to_chroot() {
     if [[ -e ${ANACONDA_NM_CONFIG_FILE_PATH} ]]; then
         cp ${ANACONDA_NM_CONFIG_FILE_PATH} ${SYSROOT}${CHROOT_ANACONDA_NM_CONFIG_FILE_PATH}
     else

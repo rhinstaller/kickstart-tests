@@ -221,12 +221,16 @@ function check_connection_setting () {
 
 ANACONDA_NM_CONFIG_FILE_PATH=/etc/NetworkManager/conf.d/90-anaconda-no-auto-default.conf
 CHROOT_ANACONDA_NM_CONFIG_FILE_PATH=/root/90-anaconda-no-auto-default.conf
-# Check if NetworkManager has autoconnections turned off
+# Detect if NetworkManager has autoconnections turned off
+# If run in chroot, requires pass_autoconnection_info_to_chroot to be run in nochroot.
 # Returns 0 if yes, 1 of not
-function check_nm_has_autoconnections_off() {
+function detect_nm_has_autoconnections_off() {
     local config_file=${CHROOT_ANACONDA_NM_CONFIG_FILE_PATH}
     if [[ ! -e $config_file ]]; then
         config_file=${ANACONDA_NM_CONFIG_FILE_PATH}
+        if [[ ! -e $config_file ]]; then
+            echo "*** Broken check: can't find info about autoconnections. Was pass_autoconnection_info_to_chroot run?" >> /root/RESULT
+        fi
     fi
     egrep -q ^[[:space:]]*no-auto-default=\\*[[:space:]]*$ ${config_file}
 }

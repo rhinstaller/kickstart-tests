@@ -44,7 +44,7 @@ check_connection_setting "Wired Connection" connection.interface-name --
 check_connection_setting "Wired Connection" connection.autoconnect yes
 check_connection_setting "Wired Connection" 802-3-ethernet.mac-address --
 
-check_nm_has_autoconnections_off
+detect_nm_has_autoconnections_off
 nm_has_autoconnections_off=$?
 if [[ $nm_has_autoconnections_off -eq 0 ]]; then
     check_number_of_connections 2
@@ -73,9 +73,11 @@ fi
 @KSINCLUDE@ post-nochroot-lib-network.sh
 
 # First copy result from %pre stage to chroot
+copy_pre_stage_result
+pass_autoconnections_info_to_chroot
+
 check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@
 
-copy_pre_stage_result
 
 %end
 
@@ -95,7 +97,7 @@ check_device_connected @KSTEST_NETDEV3@ yes
 check_connection_device "Wired Connection" @KSTEST_NETDEV2@
 check_connection_device "System @KSTEST_NETDEV2@"
 
-check_nm_has_autoconnections_off
+detect_nm_has_autoconnections_off
 nm_has_autoconnections_off=$?
 if [[ $nm_has_autoconnections_off -eq 0 ]]; then
     check_number_of_connections 4

@@ -43,7 +43,7 @@ check_connection_setting "@KSTEST_NETDEV1@" connection.interface-name @KSTEST_NE
 check_connection_setting "@KSTEST_NETDEV1@" connection.autoconnect yes
 check_connection_setting "@KSTEST_NETDEV1@" 802-3-ethernet.mac-address --
 
-check_nm_has_autoconnections_off
+detect_nm_has_autoconnections_off
 nm_has_autoconnections_off=$?
 if [[ $nm_has_autoconnections_off -eq 0 ]]; then
     check_number_of_connections 2
@@ -67,6 +67,7 @@ fi
 
 # First copy result from %pre stage to chroot
 copy_pre_stage_result
+pass_autoconnections_info_to_chroot
 
 check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@
 
@@ -80,7 +81,7 @@ check_device_ifcfg_value @KSTEST_NETDEV1@ ONBOOT yes
 check_device_ifcfg_value @KSTEST_NETDEV2@ ONBOOT yes
 check_device_ifcfg_value @KSTEST_NETDEV2@ DNS1 10.43.26.2
 
-check_nm_has_autoconnections_off
+detect_nm_has_autoconnections_off
 nm_has_autoconnections_off=$?
 if [[ $nm_has_autoconnections_off -eq 0 ]]; then
     check_device_ifcfg_value @KSTEST_NETDEV3@ ONBOOT no

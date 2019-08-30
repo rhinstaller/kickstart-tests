@@ -28,6 +28,8 @@ shutdown
 
 @KSINCLUDE@ post-nochroot-lib-network.sh
 
+pass_autoconnections_info_to_chroot
+
 check_bridge_has_slave_nochroot bridge0 @KSTEST_NETDEV1@ yes
 check_bridge_has_slave_nochroot bridge1 @KSTEST_NETDEV2@ yes
 check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ bridge0 bridge1
@@ -58,11 +60,12 @@ check_device_ifcfg_value bridge0_slave_1 ONBOOT no
 
 check_device_connected bridge1 no
 
-if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
+detect_nm_has_autoconnections_off
+nm_has_autoconnections_off=$?
+if [[ $nm_has_autoconnections_off -eq 0 ]]; then
     check_device_connected @KSTEST_NETDEV2@ no
     check_device_has_ipv4_address @KSTEST_NETDEV2@ no
 else
-    # On Fedora NM automatically activates devices without ifcfgs with default connection
     check_device_connected @KSTEST_NETDEV2@ yes
 fi
 

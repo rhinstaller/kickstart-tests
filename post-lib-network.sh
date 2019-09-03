@@ -179,3 +179,58 @@ function check_hostname() {
         echo "*** Failed check: ${hostname} is set in /etc/hostname" >> /root/RESULT
     fi
 }
+
+# check_number_of_connections NUMBER
+# Check that there is exactly NUMBER of NM connections
+function check_number_of_connections() {
+    local number="$1"
+
+    local ncons=$(nmcli -t -f NAME con | wc -l)
+
+    if [[ ${ncons} -ne ${number} ]]; then
+        echo "*** Failed check: number of connections upon start: ${number}" >> /root/RESULT
+    fi
+}
+
+# check_connection_device CONNECTION DEVICE
+# Check that CONNECTION exists and is active on DEVICE
+# Provide empty DEVICE ('')  for connection not active on any device.
+function check_connection_device() {
+    local con=$1
+    local dev=$2
+
+    nmcli -t -f NAME,DEVICE con | egrep -q ^${con}:${dev}$
+    if [[ $? -ne 0 ]]; then
+        echo "*** Failed check: connection ${con} exists and is active on ${dev}" >> /root/RESULT
+    fi
+}
+
+# check_connection_setting CONNECTION SETTING VALUE
+# Check that NM CONNECTION has SETTING set to VALUE ("--" for default/not set)
+# The value can be an egrep regexp
+function check_connection_setting () {
+    local con=$1
+    local setting=$2
+    local value=$3
+
+    nmcli -f ${setting} con show "${con}" | egrep -q ^[[:space:]]*${setting}:[[:space:]]*${value}[[:space:]]*$
+    if [[ $? -ne 0 ]]; then
+        echo "*** Failed check: connection ${con} setting ${setting} has value ${value}" >> /root/RESULT
+    fi
+}
+
+ANACONDA_NM_CONFIG_FILE_PATH=/etc/NetworkManager/conf.d/90-anaconda-no-auto-default.conf
+CHROOT_ANACONDA_NM_CONFIG_FILE_PATH=/root/90-anaconda-no-auto-default.conf
+# Detect if NetworkManager has autoconnections turned off
+# If run in chroot, requires pass_autoconnection_info_to_chroot to be run in nochroot.
+# Returns 0 if yes, 1 of not
+function detect_nm_has_autoconnections_off() {
+    local config_file=${CHROOT_ANACONDA_NM_CONFIG_FILE_PATH}
+    if [[ ! -e $config_file ]]; then
+        config_file=${ANACONDA_NM_CONFIG_FILE_PATH}
+        if [[ ! -e $config_file ]]; then
+            echo "*** Broken check: can't find info about autoconnections. Was pass_autoconnection_info_to_chroot run?" >> /root/RESULT
+        fi
+    fi
+    egrep -q ^[[:space:]]*no-auto-default=\\*[[:space:]]*$ ${config_file}
+}

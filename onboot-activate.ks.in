@@ -23,6 +23,8 @@ shutdown
 
 @KSINCLUDE@ post-nochroot-lib-network.sh
 
+pass_autoconnections_info_to_chroot
+
 check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@
 
 %end
@@ -35,7 +37,9 @@ check_device_ifcfg_value @KSTEST_NETDEV1@ ONBOOT no
 check_device_ifcfg_value @KSTEST_NETDEV2@ ONBOOT yes
 check_device_ifcfg_value @KSTEST_NETDEV3@ ONBOOT no
 
-if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
+detect_nm_has_autoconnections_off
+nm_has_autoconnections_off=$?
+if [[ $nm_has_autoconnections_off -eq 0 ]]; then
     check_device_connected @KSTEST_NETDEV2@ no
 else
     # On Fedora, default autoconnection "Wired connection 1" is activated

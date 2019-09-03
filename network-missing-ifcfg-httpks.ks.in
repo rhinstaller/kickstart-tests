@@ -21,6 +21,8 @@ shutdown
 
 @KSINCLUDE@ post-nochroot-lib-network.sh
 
+pass_autoconnections_info_to_chroot
+
 check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@
 
 %end
@@ -34,12 +36,15 @@ check_device_ifcfg_value @KSTEST_NETDEV1@ ONBOOT yes
 check_ifcfg_key_exists @KSTEST_NETDEV1@ HWADDR no
 check_device_connected @KSTEST_NETDEV1@ yes
 
-# @KSTEST_NETDEV2@ is configured neigher via boot options nor via kickstart so anaconda
+# @KSTEST_NETDEV2@ is configured neither via boot options nor via kickstart so anaconda
 # creates default ifcfg file (rhel) or dumps it from default connection created
 # by NM on Fedora
 check_device_ifcfg_value @KSTEST_NETDEV2@ DEVICE @KSTEST_NETDEV2@
 check_ifcfg_key_exists @KSTEST_NETDEV2@ HWADDR no
-if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
+
+detect_nm_has_autoconnections_off
+nm_has_autoconnections_off=$?
+if [[ $nm_has_autoconnections_off -eq 0 ]]; then
     check_device_ifcfg_value @KSTEST_NETDEV2@ ONBOOT no
     check_device_connected @KSTEST_NETDEV2@ no
 else

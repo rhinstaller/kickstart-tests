@@ -228,9 +228,6 @@ function detect_nm_has_autoconnections_off() {
     local config_file=${CHROOT_ANACONDA_NM_CONFIG_FILE_PATH}
     if [[ ! -e $config_file ]]; then
         config_file=${ANACONDA_NM_CONFIG_FILE_PATH}
-        if [[ ! -e $config_file ]]; then
-            echo "*** Broken check: can't find info about autoconnections. Was pass_autoconnection_info_to_chroot run?" >> /root/RESULT
-        fi
     fi
     egrep -q ^[[:space:]]*no-auto-default=\\*[[:space:]]*$ ${config_file}
 }

@@ -43,7 +43,8 @@ usage () {
 $(basename $0) [options] COMMAND TARGET
 
 Run kickstart tests on runners temporarily provisioned by linchpin in cloud.
-Linchpin target name TARGET is defined in PinFile (linchpin/PinFile).
+Linchpin target (group of test runners) name TARGET is defined in PinFile. See the value
+of the top-level element in the linchpin/PinFile for the name.
 
 These commands for running a test can be used:
 
@@ -70,13 +71,17 @@ Options:
                              the file is located in linchpin directory, default is "PinFile"
 
     -k, --key-name NAME      name of the ssh key used for provisioning in cloud;
-                             by default new key is generated on the cloud provider
+                             this name will be used for:
+                             - newly generated key on a cloud provider (default)
+                             - or to an already existing key that should be used (--key-use-existing)
+                             - or to the name under which a key will be uploaded (--public-key-upload)
     --key-use-existing       use the existing key --key-name from cloud
-    --key-upload PATH        upload public ssh key defined by PATH (as --key-name if defined)
+    --public-key-upload PATH upload public ssh key defined by PATH (as --key-name if defined)
     --ansible-private-key PATH
                              path to private ssh key to be used for ansible deployment;
                              if not defined generated key or user's default ssh key is used;
-                             this option may be required with --key-use-existing or --key-upload
+                             this option may be required with --key-use-existing or
+                             --public-key-upload
     --key-use-for-master     use the deployment key also as master runner key which
                              is used by master to access other test runners;
                              without the option a new temporary master runner key is generated;
@@ -123,11 +128,28 @@ Options:
                              use alternative python interpreter on deployed hosts;
                              (for example /usr/bin/python3, /usr/libexec/platform-python)
 
+USAGE:
+
+Basic usage examples are described in this section.
+
+To run kickstart tests on TARGET created by linchpin with generated ssh keys:
+
+./$(basename $0) --results <path_to_local_folder_to_save_logs> --remote-user <user_to_connect_on_provisioned_machines> test [TARGET]
+
+
+To run kickstart tests on TARGET with a ssh key already uploaded:
+
+./$(basename $0) --key-name <target_key_name> --key-use-existing --ansible-private-key <path_to_the_private_key_part> test TARGET
+
+
+To run kickstart tests on TARGET with uploading your local ssh key with given name:
+
+./$(basename $0) --public-key-upload <path_to_the_public_key> --key-name <target_key_name> --ansible-private-key <path_to_the_private_key_part> test TARGET
 
 HELP_USAGE
 }
 
-options=$(getopt -o k:r:c:p: --long cloud:,results:,key-name:,key-use-existing,key-upload:,\
+options=$(getopt -o k:r:c:p: --long cloud:,results:,key-name:,key-use-existing,public-key-upload:,\
 ansible-private-key:,key-use-for-master,test-configuration:,pinfile:,when:,remove,logfile:,\
 scheduled,remote-user:,virtualenv:,ansible-python-interpreter:,test-run-timeout:,show-inventory,\
 force -- "$@")
@@ -148,14 +170,14 @@ while true; do
         ;;
     --key-use-existing)
         [[ ${KEY_MODE} == "upload" ]] && {
-            echo "Only one of --key-use-existing or --key-upload options can be used."
+            echo "Only one of --key-use-existing or --public-key-upload options can be used."
             exit 1
         }
         KEY_MODE=existing
         ;;
-    --key-upload)
+    --public-key-upload)
         [[ ${KEY_MODE} == "existing" ]] && {
-            echo "Only one of --key-use-existing or --key-upload options can be used."
+            echo "Only one of --key-use-existing or --public-key-upload options can be used."
             exit 1
         }
         shift;
@@ -268,7 +290,7 @@ if [[ ${COMMAND} == "schedule" ]]; then
             USE_KEY_FOR_MASTER_ARG="--key-use-for-master"
         fi
         if [[ ${KEY_MODE} == "upload" ]]; then
-            KEY_MODE_ARG="--key-upload"
+            KEY_MODE_ARG="--public-key-upload"
         elif [[ ${KEY_MODE} == "existing" ]]; then
             KEY_MODE_ARG="--key-use-existing"
         fi

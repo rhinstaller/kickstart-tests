@@ -73,8 +73,8 @@ Options:
     -k, --key-name NAME      name of the ssh key used for provisioning in cloud;
                              this name will be used for:
                              - newly generated key on a cloud provider (default)
-                             - or to an already existing key that should be used (--key-use-existing)
-                             - or to the name under which a key will be uploaded (--public-key-upload)
+                             - or an already existing key that should be used (--key-use-existing)
+                             - or the name under which a key will be uploaded (--public-key-upload)
     --key-use-existing       use the existing key --key-name from cloud
     --public-key-upload PATH upload public ssh key defined by PATH (as --key-name if defined)
     --ansible-private-key PATH

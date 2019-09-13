@@ -110,7 +110,10 @@ for result_dir in sorted(os.listdir(results_path)):
                         res_path = os.path.join(results_path, result_dir, test_log_dirs[0])
                         anaconda_ver = get_anconda_ver(res_path)
                 tests[test].pop()
-                tests[test].append("<a href={}>{}</a> {}".format(ref, result, detail))
+                if ref:
+                    tests[test].append("<a href={}>{}</a> {}".format(ref, result, detail))
+                else:
+                    tests[test].append("{} {}".format(result, detail))
 
                 if result == "SUCCESS":
                     history_data[test].pop()

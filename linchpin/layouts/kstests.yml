@@ -1,6 +1,6 @@
 ---
 inventory_layout:
-  inventory_file: "{{ resource_name }}.inventory"
+  inventory_file: "{% raw -%}{{ workspace }}{%- endraw %}/inventories/{{ resource_name }}.inventory"
   vars:
     hostname: __IP__
   hosts:

@@ -1,0 +1,168 @@
+---
+
+### Install required packages
+
+- name: Install packages
+  dnf:
+    name:
+      - git
+      - vim
+      - ansible
+      - screen
+      - rsync
+#      - linchpin
+    state: latest
+
+- name: Update all packages
+  dnf:
+    name: "*"
+    state: latest
+
+- name: Install kernel-modules (reboot if updated)
+  dnf:
+    name: "kernel-modules"
+    state: present
+  notify:
+    - Reboot machine
+
+### Create kstests user which can sudo without password
+
+- name: Create {{ kstest_controller_user }} user
+  user:
+    name: "{{ kstest_controller_user }}"
+
+- name: Create {{ kstest_controller_user }} .ssh dir
+  file:
+    path: /home/{{ kstest_controller_user}}/.ssh
+    state: directory
+    owner: "{{ kstest_controller_user }}"
+    group: "{{ kstest_controller_user }}"
+    mode: 0700
+
+- name: Disable lecture message from sudo
+  copy:
+    src: files/sudoers.d.lecture
+    dest: /etc/sudoers.d/lecture
+    owner: root
+    group: root
+    mode: 0440
+
+- name: Make sure there is a 'wheel' group
+  group:
+    name: wheel
+    state: present
+
+- name: Allow 'wheel' group to have passwordless sudo
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%wheel'
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+
+- name: Add controller user to wheel group
+  user:
+    name: "{{ kstest_controller_user }}"
+    groups: wheel
+    append: yes
+
+- name: Add authorized key for controller user
+  authorized_key:
+    user: "{{ kstest_controller_user }}"
+    key: "{{ lookup('file', item) }}"
+  with_fileglob:
+    - "files/authorized_keys/*"
+  tags:
+    - ssh-keys
+
+- name: Add authorized key for root
+  authorized_key:
+    user: root
+    key: "{{ lookup('file', item) }}"
+  with_fileglob:
+    - "files/authorized_keys/*"
+  tags:
+    - ssh-keys
+
+
+### Install linchpin with pip in virtualenv
+
+# Install linchpin with pip in virtualenv
+# Until linchpin is packaged #1441843
+
+- name: Install packages required for linchpin
+  dnf:
+    name:
+      - python3-virtualenv
+      - libffi-devel
+      - openssl-devel
+      - libyaml-devel
+      - gmp-devel
+      - libselinux-python
+      - make
+      - gcc
+      - redhat-rpm-config
+      - libxml2-python
+      - libxslt-python
+    state: present
+
+- name: Install linchpin with pip
+  become: yes
+  become_user: "{{ linchpin_user }}"
+  pip:
+    name: linchpin>1.6.0
+    virtualenv: "{{ virtualenv_path }}"
+    virtualenv_python: "{{ virtualenv_python }}"
+
+- name: Selinux workaround (symlinks to system libraries)
+  become: yes
+  become_user: "{{ linchpin_user }}"
+  file:
+    src: "{{ libselinux_path }}/{{ item }}"
+    dest: "{{ virtualenv_path }}/{{ venv_lib_path }}/{{ item }}"
+    state: link
+  with_items:
+    - selinux
+    - _selinux.so
+
+
+### Upload cloud credentials for linchpin
+
+- block:
+    - name: Create cloud config directory
+      file:
+        path: "{{ cloud_config_dir }}"
+        state: directory
+        mode: 0755
+
+    - name: Install cloud credentials
+      copy:
+        src: "{{ cloud_config_file }}"
+        dest: "{{ cloud_config_dir }}"
+        mode: 0755
+  become: yes
+  become_user: "{{ linchpin_user }}"
+  when: cloud_config_file != ""
+
+
+### Upload ssh keys
+
+- name: Upload private keys
+  copy:
+    src: "{{ item }}"
+    dest: /home/{{ kstest_controller_user }}/.ssh/
+    owner: "{{ kstest_controller_user }}"
+    group: "{{ kstest_controller_user }}"
+    mode: 0600
+  with_items: "{{ private_keys_to_upload }}"
+
+- name: Upload public keys
+  copy:
+    src: "{{ item }}"
+    dest: /home/{{ kstest_controller_user }}/.ssh/
+    owner: "{{ kstest_controller_user }}"
+    group: "{{ kstest_controller_user }}"
+    mode: 0644
+  with_items: "{{ public_keys_to_upload }}"
+
+

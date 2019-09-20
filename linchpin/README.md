@@ -30,7 +30,9 @@ clouds:
   kstests:
     auth:
       auth_url:
+      project_domain_name:
       project_name:
+      user_domain_name:
       username:
       password:
 ```

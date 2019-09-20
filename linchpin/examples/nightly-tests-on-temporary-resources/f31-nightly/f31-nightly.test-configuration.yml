@@ -1,0 +1,14 @@
+---
+kstest_boot_iso_url: "http://download.englab.brq.redhat.com/pub/fedora/development/31/Everything/x86_64/os/images/boot.iso"
+kstest_url: "--url=http://download.eng.brq.redhat.com/pub/fedora/development/31/Everything/x86_64/os/"
+kstest_repos:
+  - "repo --name=modular --baseurl=http://download.eng.brq.redhat.com/pub/fedora/development/31/Modular/x86_64/os/"
+kstest_ftp_url: "ftp://download.eng.brq.redhat.com/pub/fedora/development/f31/Everything/x86_64/os/"
+kstest_remote_results_path: "root@10.43.136.2:/mnt/trees/kstests/f31"
+kstest_remote_results_keep_local: "no"
+kstest_skip_test_types: "rhel-only"
+#kstest_tests_to_run: "lang"
+
+#kstest_updates_img: http://10.43.136.2/ks/rv/updates.sysrootreg.img
+#kstest_git_repo: https://github.com/rvykydal/kickstart-tests.git
+#kstest_git_version: master-text-bootopt

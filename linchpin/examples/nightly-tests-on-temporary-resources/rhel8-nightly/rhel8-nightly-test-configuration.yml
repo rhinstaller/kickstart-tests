@@ -1,0 +1,17 @@
+---
+kstest_boot_iso_url: "http://download.devel.redhat.com/rhel-8/nightly/RHEL-8/latest-RHEL-8/compose/BaseOS/x86_64/os/images/boot.iso"
+kstest_url: "--url=http://download.devel.redhat.com/rhel-8/nightly/RHEL-8/latest-RHEL-8/compose/BaseOS/x86_64/os/"
+kstest_repos:
+  - "repo --name=appstream --baseurl=http://download.devel.redhat.com/rhel-8/nightly/RHEL-8/latest-RHEL-8/compose/AppStream/x86_64/os/"
+kstest_ftp_url: "ftp://download.devel.redhat.com/mnt/redhat/nightly/latest-RHEL-8/compose/BaseOS/x86_64/os/"
+kstest_remote_results_path: "root@10.43.136.2:/mnt/trees/kstests/rhel8"
+kstest_remote_results_keep_local: "no"
+kstest_skip_test_types: "fedora-only"
+kstest_platform: rhel8
+kstest_test_jobs: 1
+kstest_result_run_dir_prefix: "rhel8-nightly."
+kstest_result_run_dir_suffix: ".medium"
+
+#kstest_updates_img: http://10.43.136.2/ks/rv/updates.sysrootreg.img
+#kstest_git_repo: https://github.com/rvykydal/kickstart-tests.git
+#kstest_git_version: master-interactive-bootopt

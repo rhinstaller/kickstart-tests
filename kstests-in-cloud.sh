@@ -500,6 +500,18 @@ if [[ ${COMMAND} == "test" || ${COMMAND} == "destroy" ]]; then
     # Remove generated deployment private key
 
     if [[ -e ${TARGET_KEY_DIR} ]]; then
+        number_of_keys_found=$(ls ${TARGET_KEY_DIR} | wc -l)
+        # If the deployment key was generated (ie also private key is found)
+        if [[ ${number_of_keys_found} -gt 1 ]]; then
+            # Remove it from cloud
+            pub_key=$(find ${TARGET_KEY_DIR} | grep "\.pub")
+            if [[ -e ${pub_key} ]]; then
+                FOUND_GENERATED_KEY_NAME=$(basename ${pub_key%.pub})
+                export OS_CLIENT_CONFIG_FILE=${CLOUD_CONFIG_DIR}/${CLOUD_CONFIG_FILE}
+                ansible-playbook linchpin/handle-ssh-key.yml --extra-vars "key_name=${FOUND_GENERATED_KEY_NAME} key_mode=delete cloud_profile=${CLOUD_PROFILE}"
+            fi
+        fi
+        # Remove locally stored keypair
         rm -rf ${TARGET_KEY_DIR}
     fi
 

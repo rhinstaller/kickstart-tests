@@ -10,5 +10,5 @@ linchpin_user: kstest
 
 private_keys_to_upload: []
 public_keys_to_upload: []
-cloud_config_file: ""
+cloud_config_file: "{{ '~' | expanduser }}/.config/openstack/clouds.yml"
 

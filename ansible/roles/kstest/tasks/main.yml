@@ -2,6 +2,11 @@
 
 ### Install required packages
 
+- name: Update all packages
+  dnf:
+    name: "*"
+    state: latest
+
 - name: Install required groups
   dnf:
     name:
@@ -22,11 +27,6 @@
       - libguestfs-tools # kstests
       - vim
       - rsync
-    state: latest
-
-- name: Update all packages
-  dnf:
-    name: "*"
     state: latest
 
 - name: Install kernel-modules (reboot if updated)

@@ -10,7 +10,21 @@ To pull *runners* provisioning (linchpin) and deployment (ansible), *test run* c
 Requirements
 -----------
 
-The script requires `linchpin` and `ansible` to be installed. Linchpin `pip` installation in `virtualenv` is desribed in [documentation](https://linchpin.readthedocs.io).
+The script requires `linchpin` and `ansible` to be installed. Linchpin `pip` installation in `virtualenv` is described in [documentation](https://linchpin.readthedocs.io). 
+
+There is a [../ansible/kstest-controller-deploy.yml](../ansible/kstest-controller-deploy.yml) playbook for deployment of a host for running the tests in cloud. Let's call such a host [*Controller*](#controller).
+
+Controller
+----------
+
+The *controller* is the host from which *runners* and *master* can be further deployed in cloud. The deployment can require having some credentials passed to the *controller* which can be done by configuring playbook variables `private_keys_to_upload` `public_keys_to_upload` `cloud_config_file` (empty defaults are in [../ansible/roles/kstest-controller/defaults/main.yml](../ansible/roles/kstest-controller/defaults/main.yml))
+
+
+![Picture of kstest hosts](./kstest-controller.svg)
+
+Example of deployment of the *controller* on VM installed with kickstart: [examples/controller-provisioning](examples/controller-provisioning)
+
+Example of deployment of the *controller* in cloud using linchpin: [examples/controller-provisioning-linchpin](examples/controller-provisioning-linchpin)
 
 Linchpin target
 ---------------
@@ -124,7 +138,20 @@ It is also possible to set up the scheduling on the *master* of a permanent *tar
 Examples
 --------
 
-[examples](examples)
+[Testing a change running a single test on temporary target](examples/example1)
+
+[Testing a change running a single test repeatedly on permanent target](examples/example2)
+
+[Testing a change on subset of tests run parallelly on two temporary targets](examples/example3)
+
+[Schedule nightly test run on a temporary target](examples/example4)
+
+[Schedule nightly test runs on permanent a target](examples/example5)
+
+[Provision only runners in a permanent target](examples/example6)
+
+[Adding a new kickstart test](examples/example7)
+
 
 Hints
 ------

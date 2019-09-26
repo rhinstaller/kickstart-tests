@@ -4,6 +4,14 @@
   become: false
 
   tasks:
+  - name: Delete OpenStack public key
+    os_keypair:
+      cloud: "{{ cloud_profile }}"
+      state: absent
+      name: "{{ key_name }}"
+    when:
+      key_mode == "delete"
+
   - name: Generate or use OpenStack public key
     block:
       - os_keypair:

@@ -66,7 +66,15 @@
     groups: wheel
     append: yes
 
-- name: Add authorized key for controller user
+- name: Add authorized key for controller
+  authorized_key:
+    user: "{{ kstest_controller_user }}"
+    key: "{{ lookup('file', kstest_controller_user_authorized_key) }}"
+  when: kstest_controller_user_authorized_key != ""
+  tags:
+    - ssh-keys
+
+- name: Add authorized key for controller user from drop directory
   authorized_key:
     user: "{{ kstest_controller_user }}"
     key: "{{ lookup('file', item) }}"
@@ -75,7 +83,7 @@
   tags:
     - ssh-keys
 
-- name: Add authorized key for root
+- name: Add authorized key for root from drop directory
   authorized_key:
     user: root
     key: "{{ lookup('file', item) }}"

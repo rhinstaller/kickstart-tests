@@ -17,10 +17,11 @@ There is a [../ansible/kstest-controller-deploy.yml](../ansible/kstest-controlle
 Controller
 ----------
 
-The *controller* is the host from which *runners* and *master* can be further deployed in cloud. The deployment can require having some credentials passed to the *controller* which can be done by configuring playbook variables `private_keys_to_upload` `public_keys_to_upload` `cloud_config_file` (empty defaults are in [../ansible/roles/kstest-controller/defaults/main.yml](../ansible/roles/kstest-controller/defaults/main.yml))
-
+The *controller* is the host from which *runners* and *master* can be further deployed in cloud.
 
 ![Picture of kstest hosts](./kstest-controller.svg)
+
+ The deployment can require having some credentials passed to the *controller* which can be done by configuring playbook variables `private_keys_to_upload` `public_keys_to_upload` `cloud_config_file` (empty defaults are in [../ansible/roles/kstest-controller/defaults/main.yml](../ansible/roles/kstest-controller/defaults/main.yml))
 
 Example of deployment of the *controller* on VM installed with kickstart: [examples/controller-provisioning](examples/controller-provisioning)
 

@@ -13,17 +13,20 @@ The playbooks
 
 *runner*:
 
-* `kstest-runners-deploy.yml` - deploys *runners* - hosts on which the tests can be run remotely
+* [`kstest-runners-deploy.yml`](kstest-runners-deploy.yml) - deploys *runners* - hosts on which the tests can be run remotely
 
 *master*:
 
-* `kstest-master-deploy.yml` - deploys *master* runner (on top of a *runner*) from which the tests can be run or scheduled and which can also store and forward test results
-* `kstest-master-configure-test.yml` - [configures a *test run*](#test-configuration) to be run from *master* on *runners*
-* `kstest-master-run-test.yml` - runs a *test run* from *master* on *runners* (including the *master*)
-* `kstest-master-show-test-status.yml` - shows the status of a *test run* initatiated from *master*
-* `kstest-master-fetch-results.yml` - synchronizes test [results](#results) from *master* to local host
-* `kstest-master-schedule-test.yml` - [schedules](#scheduling-configuration) *test runs* on *master*
+* [`kstest-master-deploy.yml`](kstest-master-deploy.yml) - deploys *master* runner (on top of a *runner*) from which the tests can be run or scheduled and which can also store and forward test results
+* [`kstest-master-configure-test.yml`](kstest-master-configure-test.yml) - [configures a *test run*](#test-configuration) to be run from *master* on *runners*
+* [`kstest-master-run-test.yml`](kstest-master-run-test.yml) - runs a *test run* from *master* on *runners* (including the *master*)
+* [`kstest-master-show-test-status.yml`](kstest-master-show-test-status.yml) - shows the status of a *test run* initatiated from *master*
+* [`kstest-master-fetch-results.yml`](kstest-master-fetch-results.yml) - synchronizes test [results](#results) from *master* to local host
+* [`kstest-master-schedule-test.yml`](kstest-master-schedule-test.yml) - [schedules](#scheduling-configuration) *test runs* on *master*
 
+*controller*:
+
+* [`kstest-controller-deploy.yml`](kstest-controller-deploy.yml) - deploys [*controller*](../linchpin/README.md#controller) - a host from which the *master* and/or *runners* can be provisioned and tests scheduled and run using [linchpin tooling](../linchpin).
 
 Deployment configuration
 ------------------------

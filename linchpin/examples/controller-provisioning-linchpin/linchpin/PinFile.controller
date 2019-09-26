@@ -1,0 +1,29 @@
+---
+kstest-controller:
+  topology:
+    topology_name: kstest-controller
+    resource_groups:
+        - resource_group_name: kstest-controller
+          resource_group_type: openstack
+          resource_definitions:
+            - name: kstest-controller
+              role: os_server
+              flavor: m1.medium
+              image: "Fedora 29"
+              count: 1
+              keypair: kstests
+              networks:
+                - provider_net_cci_2
+          credentials:
+            filename: clouds.yml
+            profile: kstests
+  layout:
+    inventory_layout:
+      inventory_file: "{% raw -%}{{ workspace }}{%- endraw %}/inventories/kstest-controller.inventory"
+      vars:
+        hostname: __IP__
+      hosts:
+        kstest-controller:
+          count: 1
+          host_groups:
+            - kstest-controller

@@ -1,0 +1,19 @@
+---
+
+- name: Reboot machine
+  shell: sleep 1 && shutdown -r now "Ansible reboot"
+  async: 1
+  poll: 0
+  ignore_errors: yes
+  notify:
+      - Wait for reboot
+
+- name: Wait for reboot
+  local_action:
+      module: wait_for
+      host: "{{ inventory_hostname }}"
+      state: started
+      port: 22
+      delay: 15
+      timeout: 300
+  become: no

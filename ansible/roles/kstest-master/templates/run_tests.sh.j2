@@ -48,7 +48,7 @@ TIME_OF_START=$(date +%s)
 ### Check run file (indicates a test is running)
 
 if [[ -f ${RUN_FILE_PATH} ]]; then
-    echo "A test seems to be already running, ${RUN_FILE_PATH} exists" >2
+    echo "A test seems to be already running, ${RUN_FILE_PATH} exists" >&2
     exit 1
 fi
 

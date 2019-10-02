@@ -147,23 +147,11 @@ if [[ -n "${UPDATES_IMAGE}" ]]; then
 fi
 
 
-### Use additional boot options
-
-ADDITIONAL_BOOT_OPTIONS_ARG=""
-if [[ -n "${ADDITIONAL_BOOT_OPTIONS}" ]]; then
-    ADDITIONAL_BOOT_OPTIONS_ARG="-b \"${ADDITIONAL_BOOT_OPTIONS}\""
-fi
-
 ### Run tests of specified type
 
 TEST_TYPE_ARG=""
 if [[ -n "${TEST_TYPE}" ]]; then
     TEST_TYPE_ARG="-t ${TEST_TYPE}"
-fi
-
-SKIP_TEST_TYPES_ARG=""
-if [[ -n "${SKIP_TYPES}" ]]; then
-    SKIP_TEST_TYPES_ARG="-s ${SKIP_TYPES}"
 fi
 
 ### Use platform for tests
@@ -183,7 +171,7 @@ fi
 ### Run the test
 
 RESULT_LOG="${RESULT_PATH}/${LOG_FILENAME}"
-scripts/run_kickstart_tests.sh -i ${BOOT_ISO} -k 1 ${UPDATES_IMAGE_ARG} ${ADDITIONAL_BOOT_OPTIONS_ARG} ${TEST_TYPE_ARG} ${SKIP_TEST_TYPES_ARG} ${PLATFORM_ARG} ${OVERRIDE_ARG} ${KSTESTS} 2>&1 | tee ${RESULT_LOG}
+scripts/run_kickstart_tests.sh -i ${BOOT_ISO} -k 1 ${UPDATES_IMAGE_ARG} ${ADDITIONAL_BOOT_OPTIONS:+-b "$ADDITIONAL_BOOT_OPTIONS"} ${TEST_TYPE_ARG} ${SKIP_TYPES:+-s "$SKIP_TYPES"} ${PLATFORM_ARG} ${OVERRIDE_ARG} ${KSTESTS} 2>&1 | tee ${RESULT_LOG}
 
 
 ### Create result

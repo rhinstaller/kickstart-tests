@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="network"
+TESTTYPE="network coverage"
 
 . ${KSTESTDIR}/functions.sh

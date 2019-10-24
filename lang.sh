@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="language i18n"
+TESTTYPE="language i18n coverage"
 
 . ${KSTESTDIR}/functions.sh

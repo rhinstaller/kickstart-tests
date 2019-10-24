@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="bootloader packaging"
+TESTTYPE="bootloader packaging coverage"
 
 . ${KSTESTDIR}/functions.sh

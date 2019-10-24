@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
-TESTTYPE=${TESTTYPE:-"network"}
+TESTTYPE="${TESTTYPE:-"network"} coverage"
 
 . ${KSTESTDIR}/functions.sh
 

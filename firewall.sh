@@ -18,6 +18,6 @@
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 #                    Martin Kolman <mkolman@redhat.com>
 
-TESTTYPE="network firewall"
+TESTTYPE="network firewall coverage"
 
 . ${KSTESTDIR}/functions.sh

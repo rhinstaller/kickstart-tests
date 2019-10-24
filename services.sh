@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="services"
+TESTTYPE="services coverage"
 
 . ${KSTESTDIR}/functions.sh

@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="time"
+TESTTYPE="time coverage"
 
 . ${KSTESTDIR}/functions.sh

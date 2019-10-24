@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Vendula Poncova <vponcova@redhat.com>
 
-TESTTYPE="clearpart storage"
+TESTTYPE="clearpart storage coverage"
 
 . ${KSTESTDIR}/functions.sh
 

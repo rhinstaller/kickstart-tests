@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="users"
+TESTTYPE="users coverage"
 
 . ${KSTESTDIR}/functions.sh

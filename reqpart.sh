@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="storage"
+TESTTYPE="storage coverage"
 
 . ${KSTESTDIR}/functions.sh

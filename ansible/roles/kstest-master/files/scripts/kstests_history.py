@@ -141,6 +141,9 @@ for result_dir in sorted(os.listdir(results_path)):
                     history_data[test].pop()
                     history_data[test].append(HISTORY_UNKNOWN)
 
+    if params.get('UPDATES_IMAGE'):
+        anaconda_ver += " + updates.img"
+
     with open(os.path.join(result_path, md5sum_filename), "r") as f:
         isomd5 = f.read()
     header = "<a href=\"{}/{}\">{}</a></br>{}</br>{}".format(results_dir, result_dir, result_dir, anaconda_ver,

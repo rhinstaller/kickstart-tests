@@ -12,6 +12,32 @@ kstest_updates_img: ""
 # Additional installer boot options to be used
 kstest_additional_boot_options: ""
 
+### Generating of updates image
+
+# Should the updates image be automatically generated?
+# Ignored if kstest_updates_img is set.
+# False unless "yes"
+kstest_updates_generate: ""
+
+# Installer repo from which the updates will be generated
+kstest_updates_repo: https://github.com/rhinstaller/anaconda.git
+
+# Head of the image update
+kstest_updates_head: master
+
+# Base of the image update
+# Defaults to the version of anaconda detected in the installer iso
+kstest_updates_base: ""
+
+# Path to remote destination for updates image upload
+# Kstest user on master has to be authorized for accessing the target
+# (eg with master ssh key).
+#kstest_updates_upload_path: "user@host:updates"
+kstest_updates_upload_path: ""
+
+# Url from where updates image of generated name will be available for tests after upload
+kstest_updates_dir_url: ""
+
 ### Software repositories for tests.
 
 # Override platform defaults with the repositories defined below.

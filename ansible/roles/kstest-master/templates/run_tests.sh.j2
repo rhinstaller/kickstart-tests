@@ -21,6 +21,13 @@ ADDITIONAL_BOOT_OPTIONS="{{ kstest_additional_boot_options }}"
 TEST_DEFAULTS_FILE=scripts/defaults.sh
 FRAGMENTS_OVERRIDE_DIR="{{ kstest.master.fragments_override_dir}}"
 
+UPDATES_GENERATE="{{ kstest_updates_generate }}"
+UPDATES_REPO="{{ kstest_updates_repo }}"
+UPDATES_HEAD="{{ kstest_updates_head }}"
+UPDATES_BASE="{{ kstest_updates_base }}"
+UPDATES_UPLOAD_PATH="{{ kstest_updates_upload_path }}"
+UPDATES_DIR_URL="{{ kstest_updates_dir_url }}"
+
 COMPOSE_BOOT_ISO=images/boot.iso
 KSTEST_USER=kstest
 RESULTS_DIR={{ kstest.master.dir.results }}
@@ -122,7 +129,6 @@ KSTEST_URL=${KSTEST_URL}
 BOOT_ISO_URL=${BOOT_ISO_URL}
 TEST_REMOTES=${TEST_REMOTES}
 TEST_JOBS=${TEST_JOBS}
-UPDATES_IMAGE=${UPDATES_IMAGE}
 GIT_REPO=${GIT_REPO}
 GIT_BRANCH=${GIT_BRANCH}
 EOF
@@ -174,11 +180,47 @@ rm -rf ${BOOT_ISO_MOUNT_DIR}
 ANACONDA_VERSION=$(egrep '^anaconda-[0-9]' ${LORAX_PACKAGES_PATH} | rev | cut -d"." -f1-2 --complement | rev)
 echo "ANACONDA_VERSION=${ANACONDA_VERSION}" >> ${TEST_PARAMETERS_FILE}
 
+
+### Generate updates image
+
+if [[ -z "${UPDATES_IMAGE}" && "${UPDATES_GENERATE}" == "yes" ]]; then
+
+    if [[ -z "${UPDATES_BASE}" ]]; then
+        UPDATES_BASE=${ANACONDA_VERSION}
+    fi
+
+    ANACONDA_CHECKOUT_TMP_DIR=$(mktemp -d)
+    pushd ${ANACONDA_CHECKOUT_TMP_DIR}
+    git clone ${UPDATES_REPO}
+    cd anaconda
+    git checkout ${UPDATES_HEAD}
+    UPDATES_HEAD_HASH=$(git rev-parse HEAD)
+    scripts/makeupdates -t ${UPDATES_BASE}
+    UPDATES_GENERATED_IMG_NAME=updates.${UPDATES_HEAD_HASH}.img
+
+    scp updates.img ${UPDATES_UPLOAD_PATH}/${UPDATES_GENERATED_IMG_NAME}
+    popd
+    rm -rf ${ANACONDA_CHECKOUT_TMP_DIR}
+
+    UPDATES_IMAGE=${UPDATES_DIR_URL}/${UPDATES_GENERATED_IMG_NAME}
+
+    cat >> ${TEST_PARAMETERS_FILE} <<- EOF
+UPDATES_REPO=${UPDATES_REPO}
+UPDATES_HEAD=${UPDATES_HEAD}
+UPDATES_BASE=${UPDATES_BASE}
+UPDATES_UPLOAD_PATH=${UPDATES_UPLOAD_PATH}
+EOF
+
+fi
+
+TIME_OF_GENERATIG_UPDATES_IMAGE=$(date +%s)
+
 ### Use updates image
 
 UPDATES_IMAGE_ARG=""
 if [[ -n "${UPDATES_IMAGE}" ]]; then
     UPDATES_IMAGE_ARG="-u ${UPDATES_IMAGE}"
+    echo "UPDATES_IMAGE=${UPDATES_IMAGE}" >> ${TEST_PARAMETERS_FILE}
 fi
 
 

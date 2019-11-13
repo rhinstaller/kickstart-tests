@@ -4,6 +4,7 @@ import os
 import sys
 import re
 from argparse import ArgumentParser
+from configparser import ConfigParser
 
 parser = ArgumentParser(description="""
 Create summary html page from directory containing results of kickstart test runs.
@@ -37,18 +38,29 @@ HISTORY_FAILED = 1
 HISTORY_UNKNOWN = 2
 HISTORY_NOT_RUN = 3
 
-ANACONDA_VER_RE = re.compile(r'.*main:\s*/sbin/anaconda\s*(.*)')
+ANACONDA_VERSION_IN_ANACONDA_LOG_RE = re.compile(r'.*main:\s*/sbin/anaconda\s*(.*)')
 
 results_dir = os.path.basename(results_path)
 
-def get_anconda_ver(result_path):
+def get_anconda_version_from_log(result_path):
     anaconda_log = os.path.join(result_path, "anaconda/anaconda.log")
     if os.path.exists(anaconda_log):
         with open(anaconda_log, "r") as flog:
             for line in flog:
-                m = ANACONDA_VER_RE.match(line)
+                m = ANACONDA_VERSION_IN_ANACONDA_LOG_RE.match(line)
                 if m:
                     return (m.groups(1)[0])
+    return ""
+
+def get_params_from_file(filename):
+    config = ConfigParser()
+    if not os.path.isfile(filename):
+        print("Can't get test parameters from {}: not found".format(params_file), file=sys.stderr)
+        config.read_string("[top]\n")
+    else:
+        with open(filename) as stream:
+            config.read_string("[top]\n" + stream.read())
+    return config['top']
 
 count = 0
 old_isomd5 = ""
@@ -61,7 +73,11 @@ for result_dir in sorted(os.listdir(results_path)):
         continue
 
     count = count + 1
-    anaconda_ver = ""
+
+    params_file = os.path.join(result_path, params_filename)
+    params = get_params_from_file(params_file)
+
+    anaconda_ver = params.get('ANACONDA_VERSION') or ""
 
     with open(report_file) as f:
         for test, results in tests.items():
@@ -108,7 +124,7 @@ for result_dir in sorted(os.listdir(results_path)):
                     ref = "{}/{}/{}".format(results_dir, result_dir, test_log_dirs[0])
                     if not anaconda_ver:
                         res_path = os.path.join(results_path, result_dir, test_log_dirs[0])
-                        anaconda_ver = get_anconda_ver(res_path)
+                        anaconda_ver = get_anconda_version_from_log(res_path)
                 tests[test].pop()
                 if ref:
                     tests[test].append("<a href={}>{}</a> {}".format(ref, result, detail))
@@ -125,13 +141,15 @@ for result_dir in sorted(os.listdir(results_path)):
                     history_data[test].pop()
                     history_data[test].append(HISTORY_UNKNOWN)
 
+    if params.get('UPDATES_IMAGE'):
+        anaconda_ver += " + updates.img"
+
     with open(os.path.join(result_path, md5sum_filename), "r") as f:
         isomd5 = f.read()
     header = "<a href=\"{}/{}\">{}</a></br>{}</br>{}".format(results_dir, result_dir, result_dir, anaconda_ver,
                                                              "[NEW ISO]" if isomd5 != old_isomd5 else "-")
     old_isomd5 = isomd5
 
-    params_file = os.path.join(result_path, params_filename)
     if not os.path.isfile(params_file):
         print("Can't parse out test run time from {}: not found".format(params_file), file=sys.stderr)
     else:

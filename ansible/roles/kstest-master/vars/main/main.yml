@@ -20,7 +20,17 @@ kstest:
       result_report: result_report.txt
       test_parameters: test_parameters.txt
       isomd5sum: isomd5sum.txt
+      lorax_packages: lorax-packages.log
     # relative path in home directory
     dir:
       results: results
       git_repo: git/kickstart-tests
+
+    ### Facts about installer iso image structure
+    iso:
+      # path to the image on the iso
+      image_path: /images/install.img
+      # rootfs path inside the image
+      rootfs_path: /LiveOS/rootfs.img
+      # path to file containing rpm versions used to build to the image
+      lorax_packages_path: /root/lorax-packages.log

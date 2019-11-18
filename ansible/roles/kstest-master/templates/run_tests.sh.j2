@@ -86,7 +86,7 @@ echo ${RESULT_PATH} > ${RUN_FILE_PATH}
 
 ### Cd to repository dir
 
-cd ${KSTEST_REPO_PATH}
+pushd ${KSTEST_REPO_PATH}
 
 
 ### Update git repository
@@ -192,13 +192,14 @@ if [[ -z "${UPDATES_IMAGE}" && "${UPDATES_GENERATE}" == "yes" ]]; then
     ANACONDA_CHECKOUT_TMP_DIR=$(mktemp -d)
     pushd ${ANACONDA_CHECKOUT_TMP_DIR}
     git clone ${UPDATES_REPO}
-    cd anaconda
+    pushd anaconda
     git checkout ${UPDATES_HEAD}
     UPDATES_HEAD_HASH=$(git rev-parse HEAD)
     scripts/makeupdates -t ${UPDATES_BASE}
     UPDATES_GENERATED_IMG_NAME=updates.${UPDATES_HEAD_HASH}.img
 
     scp updates.img ${UPDATES_UPLOAD_PATH}/${UPDATES_GENERATED_IMG_NAME}
+    popd
     popd
     rm -rf ${ANACONDA_CHECKOUT_TMP_DIR}
 
@@ -261,7 +262,7 @@ TIME_OF_RUNNING_TESTS=$(date +%s)
 
 ### Cd back from the repository dir
 
-cd -
+popd
 
 
 ### Store logs

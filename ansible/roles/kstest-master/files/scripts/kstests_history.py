@@ -49,6 +49,10 @@ HISTORY_FAILED = 1
 HISTORY_UNKNOWN = 2
 HISTORY_NOT_RUN = 3
 
+COLOR_NEW_FAILED = "#ff00dc"
+COLOR_NO_SUCCESS = "#ffc500"
+COLOR_SOME_FAILED = "#ff3e00"
+
 ANACONDA_VERSION_IN_ANACONDA_LOG_RE = re.compile(r'.*main:\s*/sbin/anaconda\s*(.*)')
 
 results_dir = os.path.basename(results_path)
@@ -234,9 +238,20 @@ thead = """
 
 <tr>
 {}
-<td>STATUS from last {} runs</td>
+<td>
+STATUS from last {} runs
+</br><span style=\"background-color:{};\">new FAILED</span>
+</br><span style=\"background-color:{};\">some FAILED</span>
+</br><span style=\"background-color:{};\">no SUCCESS</span>
+</td>
 </tr>
-""".format("\n".join(["<td>{}</td>".format(label) for label in header_row]), history_length)
+""".format(
+    "\n".join(["<td>{}</td>".format(label) for label in header_row]),
+    history_length,
+    COLOR_NEW_FAILED,
+    COLOR_SOME_FAILED,
+    COLOR_NO_SUCCESS
+)
 
 rows = []
 for test in sorted(tests):
@@ -254,11 +269,11 @@ for test in sorted(tests):
     if test_not_run:
         cols.append("<td>{}</td>".format(test))
     elif new_failed:
-        cols.append("<td bgcolor=\"#ff00dc\">{}</td>".format(test))
+        cols.append("<td bgcolor=\"{}\">{}</td>".format(COLOR_NEW_FAILED, test))
     elif worth_looking_failed:
-        cols.append("<td bgcolor=\"#ff3e00\">{}</td>".format(test))
+        cols.append("<td bgcolor=\"{}\">{}</td>".format(COLOR_SOME_FAILED, test))
     elif worth_looking_no_success:
-        cols.append("<td bgcolor=\"#ffc500\">{}</td>".format(test))
+        cols.append("<td bgcolor=\"{}\">{}</td>".format(COLOR_NO_SUCCESS, test))
     else:
         cols.append("<td>{}</td>".format(test))
     row = "<tr>{}</tr>\n".format("".join(cols))

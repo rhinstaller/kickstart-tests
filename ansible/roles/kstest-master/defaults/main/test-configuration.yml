@@ -107,6 +107,9 @@ kstest_result_run_dir_prefix: ""
 # The subdirectory name is generated from date of the run execution
 kstest_result_run_dir_suffix: ""
 
+# Name of the subdirectory for a test run results.
+kstest_result_run_dir_name: ""
+
 # Path to remote destination for sync of results.
 # Kstest user on master has to be authorized for accessing the target
 # (eg with master ssh key).

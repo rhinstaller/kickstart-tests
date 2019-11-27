@@ -293,8 +293,12 @@ for timevar in $(awk -F"=" '/^TIME_OF_*/ {print $1}' $0); do
     timestamp=${!timevar}
     if [ -n "$LAST" ]; then
         secs=$(($timestamp - $LAST))
-        human=$(date -u -d @${secs} +"%T")
-        TINFO+=" $timevar: ${human} (${secs}s)"
+        days=$(( $secs / (3600*24) ))
+        human_hours=$(date -u -d @${secs} +"%T")
+        if [ $days -gt 0 ]; then
+            human_hours="${days}d + ${human_hours}"
+        fi
+        TINFO+=" $timevar: ${human_hours} (${secs}s)"
     fi
     LAST=$timestamp
 done

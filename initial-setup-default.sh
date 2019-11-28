@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Martin Kolman <mkolman@redhat.com>
 
-TESTTYPE="initial-setup"
+TESTTYPE="initial-setup coverage"
 
 . ${KSTESTDIR}/functions.sh
 . ${KSTESTDIR}/validate-lib-initial-setup.sh

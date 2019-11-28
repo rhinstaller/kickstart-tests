@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Martin Kolman <mkolman@redhat.com>
 
-TESTTYPE="services"
+TESTTYPE="services coverage"
 
 . ${KSTESTDIR}/functions.sh
 . ${KSTESTDIR}/validate-lib-services.sh

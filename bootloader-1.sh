@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Vendula Poncova <vponcova@redhat.com>
 
-TESTTYPE="bootloader storage"
+TESTTYPE="bootloader storage coverage"
 
 . ${KSTESTDIR}/functions.sh

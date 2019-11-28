@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Vendula Poncova <vponcova@redhat.com>
 
-TESTTYPE="logs"
+TESTTYPE="logs coverage"
 
 . ${KSTESTDIR}/functions.sh
 

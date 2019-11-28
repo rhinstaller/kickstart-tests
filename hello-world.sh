@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Vendula Poncova <vponcova@redhat.com>
 
-TESTTYPE="addon"
+TESTTYPE="addon coverage"
 
 . ${KSTESTDIR}/functions.sh

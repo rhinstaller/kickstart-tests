@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="selinux"
+TESTTYPE="selinux coverage"
 
 . ${KSTESTDIR}/functions.sh

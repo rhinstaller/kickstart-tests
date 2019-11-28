@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Vendula Poncova <vponcova@redhat.com>
 
-TESTTYPE="mount storage"
+TESTTYPE="mount storage coverage"
 
 . ${KSTESTDIR}/functions.sh

@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="keyboard i18n"
+TESTTYPE="keyboard i18n coverage"
 
 . ${KSTESTDIR}/functions.sh

@@ -1,0 +1,46 @@
+#version=DEVEL
+#test name: keyboard
+%ksappend repos/default.ks
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+clearpart --all --initlabel
+autopart
+
+keyboard --xlayouts='cz (qwerty)' --switch=grp:alt_shift_toggle
+lang cs_CZ.UTF-8
+timezone America/New_York --utc
+rootpw testcase
+shutdown
+
+%packages
+@core
+%end
+
+%post --nochroot
+
+@KSINCLUDE@ post-nochroot-lib-keyboard.sh
+
+check_current_vc_keymap cz-qwerty yes
+check_current_x11_layouts cz yes
+check_current_x11_variants qwerty yes
+check_current_x11_options grp:alt_shift_toggle yes
+
+%end
+
+%post
+
+@KSINCLUDE@ post-lib-keyboard.sh
+
+check_vc_keymap_config cz-qwerty yes
+check_x11_layouts_config cz yes
+check_x11_variants_config qwerty yes
+check_x11_options_config grp:alt_shift_toggle yes
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+    echo SUCCESS > /root/RESULT
+fi
+%end

@@ -20,3 +20,7 @@
 TESTTYPE="keyboard i18n"
 
 . ${KSTESTDIR}/functions.sh
+
+kernel_args() {
+    echo ${DEFAULT_BOOTOPTS} inst.keymap=fr
+}

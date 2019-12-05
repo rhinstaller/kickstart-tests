@@ -9,7 +9,7 @@ zerombr
 clearpart --all --initlabel
 autopart
 
-keyboard --vckeymap cz --xlayouts=cz
+keyboard --xlayouts='cz (qwerty),us (euro)' --vckeymap=us --switch=grp:alt_shift_toggle
 lang cs_CZ.UTF-8
 timezone America/New_York --utc
 rootpw testcase
@@ -19,15 +19,27 @@ shutdown
 @core
 %end
 
+%post --nochroot
+
+@KSINCLUDE@ post-nochroot-lib-keyboard.sh
+
+check_current_vc_keymap us yes
+check_current_x11_layouts cz,us yes
+check_current_x11_variants qwerty,euro yes
+check_current_x11_options grp:alt_shift_toggle yes
+
+%end
+
 %post
-INSTKBD="cz"
-KBD=`grep KEYMAP /etc/vconsole.conf | awk -F\" '{ print $2 }'`
-echo "$KBD"
 
-if [[ "$KBD" != "$INSTKBD" ]]; then
-    echo '*** specified keyboard was not set' >> /root/RESULT
-fi
+@KSINCLUDE@ post-lib-keyboard.sh
 
+check_vc_keymap_config us yes
+check_x11_layouts_config cz,us yes
+check_x11_variants_config qwerty,euro yes
+check_x11_options_config grp:alt_shift_toggle yes
+
+# No error was written to /root/RESULT file, everything is OK
 if [[ ! -e /root/RESULT ]]; then
     echo SUCCESS > /root/RESULT
 fi

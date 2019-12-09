@@ -1,0 +1,42 @@
+#version=DEVEL
+#test name: keyboard-bootopt-only
+# Test setting keyboard from boot options (no kickstart command)
+%ksappend repos/default.ks
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+clearpart --all --initlabel
+autopart
+
+lang cs_CZ.UTF-8
+timezone America/New_York --utc
+rootpw testcase
+shutdown
+
+%packages
+@core
+%end
+
+%post --nochroot
+
+@KSINCLUDE@ post-nochroot-lib-keyboard.sh
+
+check_current_vc_keymap fr yes
+check_current_x11_layouts fr yes
+
+%end
+
+%post
+
+@KSINCLUDE@ post-lib-keyboard.sh
+
+check_vc_keymap_config fr yes
+check_x11_layouts_config fr yes
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+   echo SUCCESS > /root/RESULT
+fi
+%end

@@ -1,5 +1,7 @@
 #version=DEVEL
-#test name: keyboard
+#test name: keyboard-convert-x-override-bootopt
+# Test conversion from x layouts to vc keymap and overriding of boot option by
+# kickstart command
 %ksappend repos/default.ks
 install
 network --bootproto=dhcp
@@ -9,7 +11,7 @@ zerombr
 clearpart --all --initlabel
 autopart
 
-keyboard --xlayouts='cz (qwerty),us (euro)' --vckeymap=us --switch=grp:alt_shift_toggle
+keyboard --xlayouts='cz (qwerty)' --switch=grp:alt_shift_toggle
 lang cs_CZ.UTF-8
 timezone America/New_York --utc
 rootpw testcase
@@ -23,9 +25,9 @@ shutdown
 
 @KSINCLUDE@ post-nochroot-lib-keyboard.sh
 
-check_current_vc_keymap us yes
-check_current_x11_layouts cz,us yes
-check_current_x11_variants qwerty,euro yes
+check_current_vc_keymap cz-qwerty yes
+check_current_x11_layouts cz yes
+check_current_x11_variants qwerty yes
 check_current_x11_options grp:alt_shift_toggle yes
 
 %end
@@ -34,9 +36,9 @@ check_current_x11_options grp:alt_shift_toggle yes
 
 @KSINCLUDE@ post-lib-keyboard.sh
 
-check_vc_keymap_config us yes
-check_x11_layouts_config cz,us yes
-check_x11_variants_config qwerty,euro yes
+check_vc_keymap_config cz-qwerty yes
+check_x11_layouts_config cz yes
+check_x11_variants_config qwerty yes
 check_x11_options_config grp:alt_shift_toggle yes
 
 # No error was written to /root/RESULT file, everything is OK

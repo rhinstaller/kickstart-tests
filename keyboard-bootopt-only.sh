@@ -17,7 +17,8 @@
 #
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
-TESTTYPE="keyboard i18n"
+# On RHEL, boot option is not enough for unattended installation
+TESTTYPE="keyboard i18n fedora-only"
 
 . ${KSTESTDIR}/functions.sh
 

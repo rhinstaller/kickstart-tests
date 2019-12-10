@@ -28,7 +28,10 @@ shutdown
 check_current_vc_keymap cz-qwerty yes
 check_current_x11_layouts cz yes
 check_current_x11_variants qwerty yes
-check_current_x11_options grp:alt_shift_toggle yes
+# rhbz#1781547
+if [[ "@KSTEST_OS_NAME@" != "rhel" ]]; then
+    check_current_x11_options grp:alt_shift_toggle yes
+fi
 
 %end
 

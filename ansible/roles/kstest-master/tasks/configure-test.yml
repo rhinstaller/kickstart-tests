@@ -22,6 +22,26 @@
     update: yes
     force: yes
 
+- name: Install script for runners deployment check
+  template:
+    src: check_deployed_runners.sh.j2
+    dest: "/home/{{ kstest_remote_user }}/{{ kstest.master.runners_check_script.dest }}"
+    owner: "{{ kstest_remote_user }}"
+    group: "{{ kstest_remote_user }}"
+    mode: 0755
+
+- name: Get list of successfully deployed remote runners
+  become_user: "{{ kstest_remote_user }}"
+  command: "/home/{{ kstest_remote_user }}/{{ kstest.master.runners_check_script.dest }} \"{{ groups['kstest']|join(' ') }}\""
+  register: remotes_check_result
+
+- name: Set remotes to be used
+  set_fact:
+    # The variable is used in the run_tests script template
+    kstest_test_remotes: "{{ remotes_check_result.stdout }}"
+  when:
+    remotes_check_result.rc == 0
+
 - name: Install and configure script for remote run
   template:
     src: run_tests.sh.j2

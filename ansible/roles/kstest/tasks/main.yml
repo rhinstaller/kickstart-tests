@@ -95,6 +95,14 @@
   tags:
     - ssh-keys
 
+- name: Indicate successful deployment by a drop file
+  copy:
+    content: ""
+    dest: "{{ kstest_successful_deployment_file_path }}"
+    force: no
+    owner: "{{ kstest_remote_user }}"
+    group: "{{ kstest_remote_user }}"
+
 ### This is probably not required but we like NM
 
 - name: Enable NetworkManager service

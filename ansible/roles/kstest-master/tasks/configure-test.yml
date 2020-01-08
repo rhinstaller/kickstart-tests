@@ -36,9 +36,14 @@
   register: remotes_check_result
 
 - name: Set remotes to be used
-  set_fact:
-    # The variable is used in the run_tests script template
-    kstest_test_remotes: "{{ remotes_check_result.stdout }}"
+  block:
+    - set_fact:
+        # The variable is used in the run_tests script template
+        kstest_test_remotes: "{{ remotes_check_result.stdout }}"
+        all_runners: "{{ groups['kstest']|join(' ') }}"
+    - debug:
+        msg: "WARNING: deployment check failed for some of the remote runners: ALL: '{{all_runners}}' DEPLOYED: '{{kstest_test_remotes}}'"
+      when: kstest_test_remotes != all_runners
   when:
     remotes_check_result.rc == 0
 

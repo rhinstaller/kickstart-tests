@@ -1,3 +1,6 @@
 ---
 # vars file for kstest
 kstest_remote_user: kstest
+
+# file dropped upon successful runner deployment for check by master
+kstest_successful_deployment_file_path: "/home/{{kstest_remote_user}}/.runner_deployment_successful"

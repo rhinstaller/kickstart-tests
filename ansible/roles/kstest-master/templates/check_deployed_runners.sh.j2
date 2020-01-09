@@ -1,0 +1,16 @@
+#!/bin/bash
+#Ansible managed
+# The script checks that the runners for kstests were deployed successfully
+
+RUNNERS=$1
+CHECKED_RUNNERS=""
+FILE_DROPPED_AFTER_DEPLOYMENT="{{ kstest_successful_deployment_file_path }}"
+for runner in ${RUNNERS}; do
+    ssh kstest@${runner} test -f ${FILE_DROPPED_AFTER_DEPLOYMENT}
+    rc=$?
+    if [[ ${rc} == 0 ]]; then
+        CHECKED_RUNNERS="${CHECKED_RUNNERS} ${runner}"
+    fi
+done
+
+echo ${CHECKED_RUNNERS}

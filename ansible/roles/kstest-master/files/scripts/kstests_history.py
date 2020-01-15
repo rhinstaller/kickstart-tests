@@ -6,8 +6,12 @@ import re
 from argparse import ArgumentParser
 from configparser import ConfigParser
 
-import dnf.subject
-import hawkey
+dnf_available = True
+try:
+    import dnf.subject
+    import hawkey
+except ImportError:
+    dnf_available = False
 
 parser = ArgumentParser(description="""
 Create summary html page from directory containing results of kickstart test runs.
@@ -212,12 +216,15 @@ for result_dir in sorted(os.listdir(results_path)):
     file_ref = "<a href=\"{}/{}/{}\">{}</a> diff:</br>".format(results_dir, result_dir, packages_filename, packages_filename)
     if new_iso:
         if os.path.exists(packages_file_path) and os.path.exists(previous_packages_file_path):
-            rpms = ImageRpms(packages_file_path)
-            previous_rpms = ImageRpms(previous_packages_file_path)
-            changed = "</br>".join(p for p in rpms.changed(previous_rpms))
-            added = "".join("</br>+{}".format(p) for p in rpms.added(previous_rpms))
-            removed = "".join("</br>-{}".format(p) for p in rpms.removed(previous_rpms))
-            package_diff_infos.append("{}{}{}{}".format(file_ref, changed, added, removed))
+            if dnf_available:
+                rpms = ImageRpms(packages_file_path)
+                previous_rpms = ImageRpms(previous_packages_file_path)
+                changed = "</br>".join(p for p in rpms.changed(previous_rpms))
+                added = "".join("</br>+{}".format(p) for p in rpms.added(previous_rpms))
+                removed = "".join("</br>-{}".format(p) for p in rpms.removed(previous_rpms))
+                package_diff_infos.append("{}{}{}{}".format(file_ref, changed, added, removed))
+            else:
+                package_diff_infos.append("{}N/A - missing dnf or hawkey module".format(file_ref))
         else:
             package_diff_infos.append("{}N/A".format(file_ref))
     else:

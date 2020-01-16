@@ -6,6 +6,13 @@ import re
 from argparse import ArgumentParser
 from configparser import ConfigParser
 
+dnf_available = True
+try:
+    import dnf.subject
+    import hawkey
+except ImportError:
+    dnf_available = False
+
 parser = ArgumentParser(description="""
 Create summary html page from directory containing results of kickstart test runs.
 """)
@@ -16,6 +23,8 @@ parser.add_argument("--report_filename", "-r", metavar="REPORT_FILENAME", type=s
                     default="result_report.txt", help="Name of the file with run result report")
 parser.add_argument("--isomd5sum_filename", "-m", metavar="ISO_MD5_SUM_FILENAME", type=str,
                     default="isomd5sum.txt", help="Name of the file with md5 sum of boot iso")
+parser.add_argument("--packages_filename", "-p", metavar="PACKAGES_FILENAME", type=str,
+                    default="lorax-packages.log", help="Name of the file with installer image packages list")
 parser.add_argument("--status_count", "-s", metavar="NUMBER_OF_LATEST_RESULTS", type=int,
                     default=3, help="Number of latest results to be used for status")
 
@@ -24,12 +33,14 @@ args = parser.parse_args()
 results_path = args.runs_directory
 report_filename = args.report_filename
 md5sum_filename = args.isomd5sum_filename
+packages_filename = args.packages_filename
 history_length = args.status_count
 
 params_filename = "test_parameters.txt"
 TEST_TIME_RE = re.compile(r'TIME_OF_RUNNING_TESTS:\s([^\s]*)')
 
 header_row = [" "]
+package_diff_infos = []
 tests = {}
 
 history_data = {}
@@ -42,6 +53,37 @@ ANACONDA_VERSION_IN_ANACONDA_LOG_RE = re.compile(r'.*main:\s*/sbin/anaconda\s*(.
 
 results_dir = os.path.basename(results_path)
 
+
+class ImageRpms():
+    def __init__(self, file_path):
+        self._file_path = file_path
+        self._rpms = {}
+        pass
+
+    @property
+    def rpms(self):
+        if not self._rpms:
+            self._read_rpms(self._file_path)
+        return self._rpms
+
+    def _read_rpms(self, file_path):
+        with open(file_path, "r") as f:
+            for line in f:
+                subject = dnf.subject.Subject(line.strip())
+                nevra = subject.get_nevra_possibilities(forms=[hawkey.FORM_NEVRA])[0]
+                self._rpms[nevra.name] = "{}-{}".format(nevra.version, nevra.release)
+
+    def added(self, image_rpms):
+        return [p for p in self.rpms if p not in image_rpms.rpms]
+
+    def removed(self, image_rpms):
+        return [p for p in image_rpms.rpms if p not in self.rpms]
+
+    def changed(self, image_rpms):
+        return [p for p in self.rpms
+                if p in image_rpms.rpms and self.rpms[p] != image_rpms.rpms[p]]
+
+
 def get_anconda_version_from_log(result_path):
     anaconda_log = os.path.join(result_path, "anaconda/anaconda.log")
     if os.path.exists(anaconda_log):
@@ -51,6 +93,7 @@ def get_anconda_version_from_log(result_path):
                 if m:
                     return (m.groups(1)[0])
     return ""
+
 
 def get_params_from_file(filename):
     config = ConfigParser()
@@ -62,8 +105,10 @@ def get_params_from_file(filename):
             config.read_string("[top]\n" + stream.read())
     return config['top']
 
+
 count = 0
-old_isomd5 = ""
+isomd5 = ""
+packages_file_path = ""
 for result_dir in sorted(os.listdir(results_path)):
     result_path = os.path.join(results_path, result_dir)
 
@@ -78,6 +123,14 @@ for result_dir in sorted(os.listdir(results_path)):
     params = get_params_from_file(params_file)
 
     anaconda_ver = params.get('ANACONDA_VERSION') or ""
+
+    previous_packages_file_path = packages_file_path
+    packages_file_path = os.path.join(result_path, packages_filename)
+
+    previous_isomd5 = isomd5
+    with open(os.path.join(result_path, md5sum_filename), "r") as f:
+        isomd5 = f.read()
+    new_iso = previous_isomd5 != isomd5
 
     with open(report_file) as f:
         for test, results in tests.items():
@@ -144,11 +197,9 @@ for result_dir in sorted(os.listdir(results_path)):
     if params.get('UPDATES_IMAGE'):
         anaconda_ver += " + updates.img"
 
-    with open(os.path.join(result_path, md5sum_filename), "r") as f:
-        isomd5 = f.read()
     header = "<a href=\"{}/{}\">{}</a></br>{}</br>{}".format(results_dir, result_dir, result_dir, anaconda_ver,
-                                                             "[NEW ISO]" if isomd5 != old_isomd5 else "-")
-    old_isomd5 = isomd5
+                                                             "[NEW ISO]" if new_iso else "-")
+
 
     if not os.path.isfile(params_file):
         print("Can't parse out test run time from {}: not found".format(params_file), file=sys.stderr)
@@ -162,7 +213,25 @@ for result_dir in sorted(os.listdir(results_path)):
 
     header_row.append(header)
 
+    file_ref = "<a href=\"{}/{}/{}\">{}</a> diff:</br>".format(results_dir, result_dir, packages_filename, packages_filename)
+    if new_iso:
+        if os.path.exists(packages_file_path) and os.path.exists(previous_packages_file_path):
+            if dnf_available:
+                rpms = ImageRpms(packages_file_path)
+                previous_rpms = ImageRpms(previous_packages_file_path)
+                changed = "</br>".join(p for p in rpms.changed(previous_rpms))
+                added = "".join("</br>+{}".format(p) for p in rpms.added(previous_rpms))
+                removed = "".join("</br>-{}".format(p) for p in rpms.removed(previous_rpms))
+                package_diff_infos.append("{}{}{}{}".format(file_ref, changed, added, removed))
+            else:
+                package_diff_infos.append("{}N/A - missing dnf or hawkey module".format(file_ref))
+        else:
+            package_diff_infos.append("{}N/A".format(file_ref))
+    else:
+        package_diff_infos.append("{}".format(file_ref))
+
 thead = """
+
 <tr>
 {}
 <td>STATUS from last {} runs</td>
@@ -171,12 +240,15 @@ thead = """
 
 rows = []
 for test in sorted(tests):
+
     current_history = history_data[test][-history_length:]
     worth_looking_failed = HISTORY_FAILED in current_history
     worth_looking_no_success = HISTORY_SUCCESS not in current_history
     test_not_run = all(h == HISTORY_NOT_RUN for h in current_history)
     new_failed = HISTORY_FAILED not in current_history[:-1] \
         and current_history[-1] == HISTORY_FAILED
+
+    # Append row with the test results
     cols = ["<td>{}</td>".format(result) for result in tests[test]]
     cols.insert(0, "<td>{}</td>".format(test))
     if test_not_run:
@@ -191,6 +263,15 @@ for test in sorted(tests):
         cols.append("<td>{}</td>".format(test))
     row = "<tr>{}</tr>\n".format("".join(cols))
     rows.append(row)
+
+# Append row with package diffs
+package_diff_cols = ["<td>{}</td>".format(diff_info) for diff_info in package_diff_infos]
+package_diff_label_col = "<td>{}</td>".format("PACKAGE_DIFF")
+package_diff_cols.insert(0, package_diff_label_col)
+package_diff_cols.append(package_diff_label_col)
+package_diff_row = "<tr valign=\"top\">{}</tr>\n".format("".join(package_diff_cols))
+rows.append(package_diff_row)
+
 
 tbody = "".join(rows)
 

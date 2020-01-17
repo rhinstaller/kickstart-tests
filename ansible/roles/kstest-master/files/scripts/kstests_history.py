@@ -112,6 +112,7 @@ def get_params_from_file(filename):
 
 count = 0
 isomd5 = ""
+updates_img = ""
 packages_file_path = ""
 for result_dir in sorted(os.listdir(results_path)):
     result_path = os.path.join(results_path, result_dir)
@@ -135,6 +136,9 @@ for result_dir in sorted(os.listdir(results_path)):
     with open(os.path.join(result_path, md5sum_filename), "r") as f:
         isomd5 = f.read()
     new_iso = previous_isomd5 != isomd5
+
+    previous_updates_img = updates_img
+    updates_img = params.get('UPDATES_IMAGE') or ""
 
     with open(report_file) as f:
         for test, results in tests.items():
@@ -198,8 +202,11 @@ for result_dir in sorted(os.listdir(results_path)):
                     history_data[test].pop()
                     history_data[test].append(HISTORY_UNKNOWN)
 
-    if params.get('UPDATES_IMAGE'):
-        anaconda_ver += " + updates.img"
+    if updates_img:
+        anaconda_ver = "{} +&nbsp;updates{}".format(
+            anaconda_ver,
+            "&nbsp;(NEW)" if updates_img != previous_updates_img else "",
+        )
 
     header = "<a href=\"{}/{}\">{}</a></br>{}</br>{}".format(results_dir, result_dir, result_dir, anaconda_ver,
                                                              "[NEW ISO]" if new_iso else "-")
@@ -236,7 +243,7 @@ for result_dir in sorted(os.listdir(results_path)):
 
 thead = """
 
-<tr>
+<tr valign=\"top\">
 {}
 <td>
 STATUS from last {} runs

@@ -1,0 +1,39 @@
+#version=DEVEL
+#test name: authselect
+%ksappend repos/default.ks
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+clearpart --all --initlabel
+autopart
+
+keyboard --vckeymap cz --xlayouts=cz
+lang cs_CZ.UTF-8
+timezone America/New_York --utc
+rootpw testcase
+
+authselect select sssd with-mkhomedir
+
+shutdown
+
+%packages
+%end
+
+%post
+
+authselect current | egrep -q "Profile ID: sssd"
+if [[ $? -ne 0 ]]; then
+    echo "*** Failed check: Default authselect profile: sssd" >> /root/RESULT
+fi
+
+authselect current | egrep -q -- "- with-mkhomedir"
+if [[ $? -ne 0 ]]; then
+    echo "*** Failed check: Enabled features: - with-mkhomedir" >> /root/RESULT
+fi
+
+if [[ ! -e /root/RESULT ]]; then
+    echo SUCCESS > /root/RESULT
+fi
+%end

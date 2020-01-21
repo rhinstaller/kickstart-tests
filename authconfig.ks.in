@@ -1,0 +1,40 @@
+#version=DEVEL
+#test name: authconfig
+%ksappend repos/default.ks
+install
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+clearpart --all --initlabel
+autopart
+
+keyboard --vckeymap cz --xlayouts=cz
+lang cs_CZ.UTF-8
+timezone America/New_York --utc
+rootpw testcase
+
+# Test deprecated command
+authconfig --passalgo=sha512 --useshadow
+
+shutdown
+
+%packages
+%end
+
+%post
+
+authselect current | egrep -q "Profile ID: sssd"
+if [[ $? -ne 0 ]]; then
+    echo "*** Failed check: Default authselect profile: sssd" >> /root/RESULT
+fi
+
+authselect current | egrep -q "Enabled features: None"
+if [[ $? -ne 0 ]]; then
+    echo "*** Failed check: Enabled features: None" >> /root/RESULT
+fi
+
+if [[ ! -e /root/RESULT ]]; then
+    echo SUCCESS > /root/RESULT
+fi
+%end

@@ -78,7 +78,7 @@ Some of the values need to be configured for used cloud resource pools, for exam
 Some of them may be modified depending on the amount of required resources (RAM, storage, CPUs) estimated by the number of tests included in the *test run*:
 
 * `count` - Number of *runners* (including *master*) to be provisioned. [Example](examples/example1/PinFile) of using only one single *runner* which also serves as *master*
-* `flavor` - Size of the *runner* (RAM, CPUs, storage). This value is related to the number of tests (kvm guests) to be run on a *runner* in parallel which is configurable by [`kstest_tests_jobs`](../ansible/roles/kstest-master/defaults/main/test-configuration.yml) variable or [test configuration](#test-run-configuration). For example for running 4 tests in parallel 8 CPUs, 16 GB of RAM, and 40 GB of storage should be enough.
+* `flavor` - Size of the *runner* (RAM, CPUs, storage). This value is related to the number of tests (kvm guests) to be run on a *runner* in parallel which is configurable by [`kstest_tests_jobs`](../ansible/roles/kstest-master/defaults/main/test-configuration.yml) variable or [test configuration](#test-run-configuration). For example for running 6 tests in parallel 8 CPUs, 16 GB of RAM, and 40 GB of storage should be enough.
 
 Some of them may require using a *script* parameter:
 

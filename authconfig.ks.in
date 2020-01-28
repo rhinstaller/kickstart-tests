@@ -1,26 +1,12 @@
 #version=DEVEL
 #test name: authconfig
 %ksappend repos/default.ks
-install
-network --bootproto=dhcp
 
-bootloader --timeout=1
-zerombr
-clearpart --all --initlabel
-autopart
-
-keyboard --vckeymap cz --xlayouts=cz
-lang cs_CZ.UTF-8
-timezone America/New_York --utc
-rootpw testcase
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
 
 # Test deprecated command
 authconfig --passalgo=sha512 --useshadow
-
-shutdown
-
-%packages
-%end
 
 %post
 

@@ -2,26 +2,12 @@
 #test name: authselect-not-set
 #Test that authselect is not configured if authselect is not set in kickstart
 %ksappend repos/default.ks
-install
-network --bootproto=dhcp
 
-bootloader --timeout=1
-zerombr
-clearpart --all --initlabel
-autopart
-
-keyboard --vckeymap cz --xlayouts=cz
-lang cs_CZ.UTF-8
-timezone America/New_York --utc
-rootpw testcase
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
 
 # Test authselect not set
 #authselect select sssd with-mkhomedir
-
-shutdown
-
-%packages
-%end
 
 %post
 

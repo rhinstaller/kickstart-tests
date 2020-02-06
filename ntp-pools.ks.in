@@ -32,6 +32,12 @@ if [ $? -ne 0 ]; then
     echo '*** 0.pool.ntp.org not configured as an NTP pool' >> /root/RESULT
 fi
 
+# Check that the chronyd service is enabled
+systemctl list-unit-files --type service --state enabled | egrep -q "chronyd.service"
+if [[ $? -ne 0 ]]; then
+    echo "*** Failed check: chronyd.service is enabled" >> /root/RESULT
+fi
+
 if [ ! -e /root/RESULT ]; then
    echo SUCCESS > /root/RESULT
 fi

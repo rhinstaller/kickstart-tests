@@ -1,0 +1,25 @@
+#version=DEVEL
+#test name: authselect-not-set
+#Test that authselect is not configured if authselect is not set in kickstart
+%ksappend repos/default.ks
+
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+# Test authselect not set
+#authselect select sssd with-mkhomedir
+
+%post
+
+command -v authselect > /dev/null 2>&1
+if [[ $? -eq 0 ]]; then
+    authselect current | egrep -q "No existing configuration detected"
+    if [[ $? -ne 0 ]]; then
+        echo "*** Failed check: authselect not installed or no existing configuration detected" >> /root/RESULT
+    fi
+fi
+
+if [[ ! -e /root/RESULT ]]; then
+    echo SUCCESS > /root/RESULT
+fi
+%end

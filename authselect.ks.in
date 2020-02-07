@@ -1,0 +1,25 @@
+#version=DEVEL
+#test name: authselect
+%ksappend repos/default.ks
+
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+authselect select sssd with-mkhomedir
+
+%post
+
+authselect current | egrep -q "Profile ID: sssd"
+if [[ $? -ne 0 ]]; then
+    echo "*** Failed check: Default authselect profile: sssd" >> /root/RESULT
+fi
+
+authselect current | egrep -q -- "- with-mkhomedir"
+if [[ $? -ne 0 ]]; then
+    echo "*** Failed check: Enabled features: - with-mkhomedir" >> /root/RESULT
+fi
+
+if [[ ! -e /root/RESULT ]]; then
+    echo SUCCESS > /root/RESULT
+fi
+%end

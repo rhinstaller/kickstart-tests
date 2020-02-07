@@ -23,6 +23,7 @@ The playbooks
 * [`kstest-master-show-test-status.yml`](kstest-master-show-test-status.yml) - shows the status of a *test run* initatiated from *master*
 * [`kstest-master-fetch-results.yml`](kstest-master-fetch-results.yml) - synchronizes test [results](#results) from *master* to local host
 * [`kstest-master-schedule-test.yml`](kstest-master-schedule-test.yml) - [schedules](#scheduling-configuration) *test runs* on *master*
+* [`kstest-master-stop-test.yml`](kstest-master-stop-test.yml) - stops a  *test run* in progress waiting for currently running tests to finish and gathering the incomplete results
 
 *controller*:
 

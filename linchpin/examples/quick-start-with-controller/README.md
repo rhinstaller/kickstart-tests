@@ -337,21 +337,23 @@ openstack --os-cloud kstests server list
 
 ##### Stop running test.
 
-If the test is run from controller as in [run.sh](run.sh) or [test.sh](test.sh) just interrupt (CTRL-C) or terminate the ansible process.
+There is a playbook [kstest-master-stop-tests.yml](../../../ansible/kstest-master-stop-tests.yml) for master that would stop the *test run*, waiting for currently running tests to finish and fetching the incomplete results.
 
-If the test was scheduled from controller stop the service:
+```
+./kstests-in-cloud.sh stop quick-start
+```
+
+It works only when the tests are actually running (ie not during provisioning, downloading boot.iso etc...).
+
+For *bigger hammer* (if the test run is not in phase of running some tests, or if you don't want to wait for finishing current tests, or if you are not interested in the results):
+
+* If the test is run from controller as in [run.sh](run.sh) or [test.sh](test.sh) just interrupt (CTRL-C) or terminate the ansible process.
+
+* If the test was scheduled from controller stop the service:
 ```
 systemctl --user stop kstests-cloud-quick-start.service
 ```
 
-If the test was scheduled from master just [destroy](destroy.sh) the runners.
+* If the test was scheduled from master just [destroy](destroy.sh) the runners.
 
-##### Clean up interrupted test or provisioning.
-
-For now the only really safe option after [stopping a running test](#stop-running-test) is [destroying](destroy.sh) the target and re-provisioning the target.
-
-I'd like to add playbooks for better interrupted or broken test handling:
-
-- stop the test run with processing of results obtained so far
-- stop the test run and clean up the runners for the next test run
-- clean up runners for the next run
+After using the *big hammer* the runners are in an unclean state so they should not be used for another test runs. I'd like to come with a cleanup playbook so they could be reused.

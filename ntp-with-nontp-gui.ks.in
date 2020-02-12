@@ -18,8 +18,7 @@ lang en_US.UTF-8
 rootpw testcase
 shutdown
 
-%packages --default
-%end
+%ksappend payload/default_packages.ks
 
 %post
 if [ -e /usr/bin/chronyc ]; then

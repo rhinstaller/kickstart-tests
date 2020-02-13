@@ -17,6 +17,8 @@ kstest:
     fragments_override_dir: fragments_override
     # Fragment to be overriden with repos configured in test configuration
     override_repos_file_path: repos/default.ks
+    # Fragment to be overriden with unified repo configured in test configuration
+    override_unified_repo_file_path: repos/unified.ks
 
     ### Locations (to be used by other playbooks)
     file:

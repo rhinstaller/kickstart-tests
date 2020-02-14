@@ -17,7 +17,11 @@ fake-package-name-2
 @fake-group-name-1
 @fake-group-name-2
 vim
-@c-development
+
+# Another group that is common for Fedora and RHEL could be @anaconda-tools
+# (checking eg presence of cryptsetup package). The number of packages would
+# grow from 432 to 702 though.
+@dial-up
 %end
 
 %post
@@ -26,9 +30,9 @@ if [[ $? != 0 ]]; then
     echo '*** vim package was not installed' >> /root/RESULT
 fi
 
-rpm -q gcc
+rpm -q ppp
 if [[ $? != 0 ]]; then
-    echo '*** gcc should have been installed via the c-development package group' >> /root/RESULT
+    echo '*** ppp should have been installed via the dial-up package group' >> /root/RESULT
 fi
 
 %ksappend validation/success_if_result_empty.ks

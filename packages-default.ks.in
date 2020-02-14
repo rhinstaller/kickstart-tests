@@ -10,10 +10,16 @@
 %end
 
 %post
-rpm -q fedora-release
+if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
+   PKG_NAME="redhat-release"
+else
+   PKG_NAME="fedora-release"
+fi
+
+rpm -q ${PKG_NAME}
 if [ $? -eq 0 ]; then
     echo SUCCESS > /root/RESULT
 else
-    echo '*** fedora-release package was not installed' > /root/RESULT
+    echo '*** ${PKG_NAME} package was not installed' > /root/RESULT
 fi
 %end

@@ -10,13 +10,6 @@
 %ksappend common/common_no_payload.ks
 
 %packages --excludedocs
-@container-management
-@core
-@domain-client
-@hardware-support
-@headless-management
-@server-product
-@standard
 %end
 
 %post

@@ -10,16 +10,12 @@
 %end
 
 %post
-if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
-   PKG_NAME="redhat-release"
-else
-   PKG_NAME="fedora-release"
-fi
 
-rpm -q ${PKG_NAME}
+# Check that there is any environment installed
+dnf group list --installed | egrep -q "Installed Environment Groups"
 if [ $? -eq 0 ]; then
     echo SUCCESS > /root/RESULT
 else
-    echo '*** ${PKG_NAME} package was not installed' > /root/RESULT
+    echo '*** Failed check: there is any environment installed.' > /root/RESULT
 fi
 %end

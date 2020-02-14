@@ -6,54 +6,56 @@
 %ksappend common/common_no_payload.ks
 
 %packages
-@^xfce-desktop-environment
+@^server-product-environment
 
 # (1) Test that you can remove a package that's part of a group
-@c-development
--valgrind
+#@anaconda-tools
+#-kdump-anaconda-addon
+@container-management
+-buildah
 
 # (2) Test that you can add and then remove the same package.
-qemu-kvm
--qemu-kvm
+tmux
+-tmux
 
 # (3) Test that you can add packages with a glob.
 kacst*
 
 # (4) Test that you can remove packages with a glob.
--ibus*
+-grub2-efi*
 %end
 
 %post
 # We don't have a way of determining if a group/env is installed or not.
 # These sentinel packages will have to do.
 
-# Testing #1 - gcc should be installed, but not valgrind
-rpm -q gcc
+# Testing #1 - podman should be installed, but not buildah
+rpm -q podman
 if [[ $? != 0 ]]; then
-    echo '*** c-development group was not installed' >> /root/RESULT
+    echo '*** podman group was not installed' >> /root/RESULT
 fi
 
-rpm -q valgrind
+rpm -q buildah
 if [[ $? == 0 ]]; then
-    echo '*** valgrind package should not have been installed' >> /root/RESULT
+    echo '*** buildah package should not have been installed' >> /root/RESULT
 fi
 
 # Testing #2 - qemu-kvm should not be installed.
-rpm -q qemu-kvm
+rpm -q tmux
 if [[ $? == 0 ]]; then
-    echo '*** qemu-kvm package should not have been installed' >> /root/RESULT
+    echo '*** tmux package should not have been installed' >> /root/RESULT
 fi
 
 # Testing #3 - kacst font stuff should be installed.
 count=$(rpm -qa kacst\* | wc -l)
 if [[ $count -lt 5 ]]; then
-    echo '*** kacst glob was not installed' >> /root/RESULT
+    echo '*** kacst* glob was not installed' >> /root/RESULT
 fi
 
-# Testing #4 - ibus stuff should not be installed.
-count=$(rpm -qa ibus\* | wc -l)
+# Testing #4 - grub2-efi stuff should not be installed.
+count=$(rpm -qa grub2-efi\* | wc -l)
 if [[ $count -gt 0 ]]; then
-    echo '*** ibus glob should not have been installed' >> /root/RESULT
+    echo '*** grub2-efi* glob should not have been installed' >> /root/RESULT
 fi
 
 %ksappend validation/success_if_result_empty.ks

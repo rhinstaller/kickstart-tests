@@ -20,8 +20,7 @@ timezone America/New_York --utc
 rootpw testcase
 shutdown
 
-%packages --default
-%end
+%ksappend payload/default_packages.ks
 
 %post
 root_lv_type=$(blkid -ovalue -sTYPE /dev/mapper/vg01-root_lv)

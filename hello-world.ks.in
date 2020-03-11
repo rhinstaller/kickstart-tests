@@ -16,17 +16,35 @@ It is raining cats and dogs!
 # Set ADDON_SOURCE with an URL to the archived repository of Hello Word.
 %ksappend section-data/hello-world.ks
 
-# The path to addons on the system.
-ADDON_TARGET="/usr/share/anaconda/addons/"
+# Set ADDON_TEMPORARY with a path to a temporary directory on the system.
+ADDON_TEMPORARY="/tmp/hello_world"
+mkdir -p "${ADDON_TEMPORARY}"
 
-# Copy the content of the repository on stage2.
-mkdir -p "${ADDON_TARGET}"
-curl -L "${ADDON_SOURCE}" | tar -xzvf - -C "${ADDON_TARGET}" --strip-components=1
+# Download the addon.
+curl -L "${ADDON_SOURCE}" | tar -xzvf - -C "${ADDON_TEMPORARY}" --strip-components=1
+
+# Install the addon.
+mkdir -p /usr/share/anaconda/addons/
+cp -r ${ADDON_TEMPORARY}/org_fedora_hello_world /usr/share/anaconda/addons/
+cp ${ADDON_TEMPORARY}/data/*.service /usr/share/anaconda/dbus/services/
+cp ${ADDON_TEMPORARY}/data/*.conf /usr/share/anaconda/dbus/confs/
+%end
+
+%pre --interpreter=/usr/bin/python3
+# Start the Anaconda DBus modules again.
+from pyanaconda.modules.common.constants.services import BOSS
+from pyanaconda.modules.common.task import sync_run_task
+
+boss_proxy = BOSS.get_proxy()
+task_path = boss_proxy.StartModulesWithTask()
+
+task_proxy = BOSS.get_proxy(task_path)
+sync_run_task(task_proxy)
 %end
 
 %post
 # Check the existence of the output file.
-addon_file="/root/hello_world_addon_output.txt"
+addon_file="/root/hello_world.txt"
 
 if [[ ! -e "${addon_file}" ]]; then
     echo "*** missing file: ${addon_file}" >> /root/RESULT

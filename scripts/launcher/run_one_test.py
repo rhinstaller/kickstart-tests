@@ -160,8 +160,7 @@ class Runner(object):
 
         if validator and not validator.result:
             validator.report_result()
-            self._shell.cleanup()
-            return validator.return_code
+            return validator
 
         ret = self._validate_result()
         if ret.check_ret_code():

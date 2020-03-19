@@ -74,8 +74,13 @@ class ImageRpms():
         with open(file_path, "r") as f:
             for line in f:
                 subject = dnf.subject.Subject(line.strip())
-                nevra = subject.get_nevra_possibilities(forms=[hawkey.FORM_NEVRA])[0]
-                self._rpms[nevra.name] = "{}-{}".format(nevra.version, nevra.release)
+                nevra_possibilities = subject.get_nevra_possibilities(forms=[hawkey.FORM_NEVRA,
+                                                                             hawkey.FORM_NEVR])
+                if nevra_possibilities:
+                    nevra = nevra_possibilities[0]
+                    self._rpms[nevra.name] = "{}-{}".format(nevra.version, nevra.release)
+                else:
+                    print("Can't get nevra from line {}".format(line), file=sys.stderr)
 
     def added(self, image_rpms):
         return [p for p in self.rpms if p not in image_rpms.rpms]

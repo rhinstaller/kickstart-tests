@@ -52,6 +52,9 @@ kstest_url: "--url=https://download.fedoraproject.org/pub/fedora/linux/releases/
 # Software ftp repository for tests.
 kstest_ftp_url: "ftp://mirror.utexas.edu/pub/fedora/linux/releases/29/Everything/x86_64/os/"
 
+# Unified repository url
+kstest_unified_url: "--url=http://example.com"
+
 # Additional repo commands.
 # Overrides repos/defaults.ks fragment.
 # Set to [] for no additional repositories.

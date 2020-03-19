@@ -71,6 +71,15 @@
     group: "{{ kstest_remote_user }}"
     mode: 0755
 
+- name: Create unified repo override fragment
+  template:
+    src: override_repos_unified.ks.j2
+    dest: /home/{{ kstest_remote_user }}/{{ kstest.master.fragments_override_dir }}/{{ kstest.master.override_unified_repo_file_path }}
+    owner: "{{ kstest_remote_user }}"
+    group: "{{ kstest_remote_user }}"
+    mode: 0755
+
+
 - name: Install script for creating tests history summary
   copy:
     src: "{{ kstest.master.results_summary_script.src }}"

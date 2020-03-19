@@ -182,7 +182,7 @@ rm -rf ${BOOT_ISO_MOUNT_DIR}
 
 ### Get anaconda version info
 
-ANACONDA_VERSION=$(egrep '^anaconda-[0-9]' ${LORAX_PACKAGES_PATH} | rev | cut -d"." -f1-2 --complement | rev)
+ANACONDA_VERSION=$(egrep '^anaconda-[0-9]' ${LORAX_PACKAGES_PATH} | rev | cut -d"." -f1 --complement | rev)
 echo "ANACONDA_VERSION=${ANACONDA_VERSION}" >> ${TEST_PARAMETERS_FILE}
 
 

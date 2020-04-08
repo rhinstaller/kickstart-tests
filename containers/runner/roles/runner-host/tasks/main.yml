@@ -1,0 +1,18 @@
+- name: Update all packages
+  dnf:
+    name: "*"
+    state: latest
+
+- name: Install packages
+  dnf:
+    name: "{{ host_packages }}"
+    state: latest
+
+- name: Install kernel-modules (reboot if updated)
+  dnf:
+    name: "kernel-modules"
+    state: present
+  notify:
+    - Reboot machine
+
+

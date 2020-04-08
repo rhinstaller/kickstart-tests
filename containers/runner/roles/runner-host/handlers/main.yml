@@ -1,0 +1,6 @@
+---
+
+- name: Reboot machine
+  reboot:
+    reboot_timeout: 300
+    msg: "Reboot after kernel modules installation"

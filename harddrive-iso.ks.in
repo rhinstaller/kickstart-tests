@@ -1,0 +1,54 @@
+#version=DEVEL
+#test name: harddrive-iso
+
+# This test is for testing the install from an harddrive ks command with ISO.
+#
+# Server dvd is downloaded during the test execution. This test can be resource demanding!
+#
+
+%ksappend common/common_no_storage_and_payload.ks
+
+# FIXME: ignoredisk is much better solution to avoid using the installation source HDD removal.
+# However, payload is using devicetree data to work with source so the source disk won't be
+# visible to Anaconda. Fix this when this behavior is fixed in the payload.
+
+zerombr
+clearpart --all --initlabel --drives=/dev/sda
+
+part / --fstype=ext4 --grow --size=4400 --ondisk=/dev/sda
+part /boot --fstype=ext4 --size=500 --ondisk=/dev/sda
+part swap --fstype=swap --size=500 --ondisk=/dev/sda
+
+harddrive --partition=/dev/sdb --dir=/
+
+%ksappend payload/default_packages.ks
+
+%pre
+# This will add ISO_LOCATION with link to an ISO
+%ksappend section-data/server-dvd-link.ks
+
+DISK="/dev/sdb"
+
+wipefs -a $DISK
+mkfs.ext4 -F $DISK
+mkdir /prep-mount
+
+
+pushd /prep-mount
+
+# Mount the new source
+mkdir hdd-mount
+mount $DISK hdd-mount
+
+# Download iso to the DVD
+curl -L "$ISO_LOCATION" -o hdd-mount/dvd.iso
+
+# Clean up
+umount hdd-mount
+popd
+rm -rf /prep-mount
+%end
+
+%post
+%ksappend validation/success_if_result_empty.ks
+%end

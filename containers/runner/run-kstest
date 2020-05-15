@@ -1,0 +1,40 @@
+#!/bin/sh
+
+set -x
+
+KSTESTS_REPOSITORY=${KSTESTS_REPOSITORY:-https://github.com/rhinstaller/kickstart-tests}
+KSTESTS_BRANCH=${KSTESTS_BRANCH:-master}
+KSTESTS_DIR=${APP_ROOT}/kickstart-tests
+KSTESTS_TEST=${KSTESTS_TEST:-team}
+
+UPDATES_IMAGE=${UPDATES_IMAGE:-""}
+BOOT_ISO=${BOOT_ISO:-boot.iso}
+ISO_DIR=${APP_DATA}/images
+LOGS_DIR=${APP_DATA}/logs
+
+runlibvirt
+
+git clone ${KSTESTS_REPOSITORY} ${KSTESTS_DIR}
+git -C ${KSTESTS_DIR} checkout ${KSTESTS_BRANCH}
+git -C ${KSTESTS_DIR} remote -v
+
+# Prepare the configuration
+UPDATES_IMAGE_ARG=""
+if [[ -n "${UPDATES_IMAGE}" ]]; then
+  UPDATES_IMAGE_ARG="-u ${UPDATES_IMAGE}"
+fi
+
+# Run the test
+pushd ${KSTESTS_DIR}
+scripts/run_kickstart_tests.sh -k 2 -i ${ISO_DIR}/${BOOT_ISO} ${UPDATES_IMAGE_ARG} ${KSTESTS_TEST}
+popd
+
+# Copy logs to a volume
+# Fixup permissions
+sudo chown -R ${KSTEST_USER}:${KSTEST_USER} /var/tmp/kstest-*
+sudo chmod -R a+r /var/tmp/kstest-*
+# Clean up (artifacts from broken test)
+find /var/tmp/kstest-${KSTESTS_TEST}* -name "*.iso" -delete
+find /var/tmp/kstest-${KSTESTS_TEST}* -name "*.img" -delete
+# Move to target logs directory
+sudo cp -r /var/tmp/kstest-${KSTESTS_TEST}* ${LOGS_DIR}

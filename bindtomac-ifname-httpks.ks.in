@@ -22,6 +22,8 @@ shutdown
 
 @KSINCLUDE@ post-nochroot-lib-network.sh
 
+pass_autoconnections_info_to_chroot
+
 # For RHEL <= 8.2: if the device is not activated in initramfs, ifname from boot options is not applied
 # check_gui_configurations ifname0 @KSTEST_NETDEV2@
 check_gui_configurations ifname0 ifname1
@@ -43,7 +45,9 @@ check_device_connected ifname0 yes
 # check_device_connected @KSTEST_NETDEV2@ no
 check_device_ifcfg_value ifname1 HWADDR 52:54:00:12:34:41
 check_device_ifcfg_value ifname1 DEVICE ifname1
-if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
+detect_nm_has_autoconnections_off
+nm_has_autoconnections_off=$?
+if [[ $nm_has_autoconnections_off -eq 0 ]]; then
     check_device_ifcfg_value ifname1 ONBOOT no
     check_device_connected ifname1 no
 else

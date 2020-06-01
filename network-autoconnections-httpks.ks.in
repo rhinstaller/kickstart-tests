@@ -27,12 +27,9 @@ shutdown
 
 # We will copy /root/RESULT to /mnt/sysimage/root/RESULT at the beginning of the %post (--nochroot) checks
 @KSINCLUDE@ post-lib-network.sh
-if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
-    # No NM in initramfs in RHEL8.2 => ifcfg file is created by dracut network module
-    check_ifcfg_exists @KSTEST_NETDEV1@ yes
-else
-    check_ifcfg_exists @KSTEST_NETDEV1@ no
-fi
+# Note: up to RHEL8.2 the file was created by dracut network module
+# check_ifcfg_exists @KSTEST_NETDEV1@ yes
+check_ifcfg_exists @KSTEST_NETDEV1@ no
 check_ifcfg_exists @KSTEST_NETDEV2@ yes
 check_ifcfg_exists @KSTEST_NETDEV3@ no
 
@@ -42,12 +39,9 @@ check_connection_device @KSTEST_NETDEV1@ @KSTEST_NETDEV1@
 check_connection_device "System @KSTEST_NETDEV2@"
 
 check_connection_setting "@KSTEST_NETDEV1@" ipv4.method auto
-if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
-    # No NM in initramfs in RHEL8.2 - the default differs!
-    check_connection_setting "@KSTEST_NETDEV1@" ipv6.method auto
-else
-    check_connection_setting "@KSTEST_NETDEV1@" ipv6.method disabled
-fi
+# Note: up to RHEL8.2 (dracut network module) the default was different
+# check_connection_setting "@KSTEST_NETDEV1@" ipv6.method auto
+check_connection_setting "@KSTEST_NETDEV1@" ipv6.method disabled
 check_connection_setting "@KSTEST_NETDEV1@" connection.interface-name @KSTEST_NETDEV1@
 check_connection_setting "@KSTEST_NETDEV1@" connection.autoconnect yes
 check_connection_setting "@KSTEST_NETDEV1@" 802-3-ethernet.mac-address --

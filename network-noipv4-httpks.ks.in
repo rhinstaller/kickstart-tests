@@ -31,14 +31,8 @@ check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@
 
 @KSINCLUDE@ post-lib-network.sh
 
-if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
-    check_device_ifcfg_value @KSTEST_NETDEV2@ BOOTPROTO none
-    # BOOTPROTO is removed from the ifcfg when real ONBOOT value is updated via NM api
-    check_ifcfg_key_exists @KSTEST_NETDEV3@ BOOTPROTO no
-else
-    check_ifcfg_key_exists @KSTEST_NETDEV2@ BOOTPROTO no
-    check_ifcfg_key_exists @KSTEST_NETDEV3@ BOOTPROTO no
-fi
+check_ifcfg_key_exists @KSTEST_NETDEV2@ BOOTPROTO no
+check_ifcfg_key_exists @KSTEST_NETDEV3@ BOOTPROTO no
 
 # TODO create test with virtual network having ipv6 enabled (ipv6 only connection)
 #      libvirt default net does not have ipv6 enabled

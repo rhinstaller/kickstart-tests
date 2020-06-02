@@ -22,12 +22,11 @@ shutdown
 
 @KSINCLUDE@ post-nochroot-lib-network.sh
 
-if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
-    # If the device is not activated in initramfs, ifname from boot options is not applied
-    check_gui_configurations ifname0 @KSTEST_NETDEV2@
-else
-    check_gui_configurations ifname0 ifname1
-fi
+pass_autoconnections_info_to_chroot
+
+# For RHEL <= 8.2: if the device is not activated in initramfs, ifname from boot options is not applied
+# check_gui_configurations ifname0 @KSTEST_NETDEV2@
+check_gui_configurations ifname0 ifname1
 
 %end
 %post
@@ -39,18 +38,19 @@ check_device_ifcfg_value ifname0 HWADDR 52:54:00:12:34:40
 check_device_ifcfg_value ifname0 DEVICE ifname0
 check_device_connected ifname0 yes
 
-if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
-    # If the device is not activated in initramfs, ifname from boot options is not applied
-    # TODO: should it be bind to mac then?
-    #check_device_ifcfg_bound_to_mac @KSTEST_NETDEV2@
-    # instead of the two following
-    check_device_ifcfg_value @KSTEST_NETDEV2@ DEVICE @KSTEST_NETDEV2@
-    check_ifcfg_key_exists @KSTEST_NETDEV2@ HWADDR no
-    check_device_ifcfg_value @KSTEST_NETDEV2@ ONBOOT no
-    check_device_connected @KSTEST_NETDEV2@ no
+# For RHEL <= 8.2: if the device is not activated in initramfs, ifname from boot options is not applied
+# check_device_ifcfg_value @KSTEST_NETDEV2@ DEVICE @KSTEST_NETDEV2@
+# check_ifcfg_key_exists @KSTEST_NETDEV2@ HWADDR no
+# check_device_ifcfg_value @KSTEST_NETDEV2@ ONBOOT no
+# check_device_connected @KSTEST_NETDEV2@ no
+check_device_ifcfg_value ifname1 HWADDR 52:54:00:12:34:41
+check_device_ifcfg_value ifname1 DEVICE ifname1
+detect_nm_has_autoconnections_off
+nm_has_autoconnections_off=$?
+if [[ $nm_has_autoconnections_off -eq 0 ]]; then
+    check_device_ifcfg_value ifname1 ONBOOT no
+    check_device_connected ifname1 no
 else
-    check_device_ifcfg_value ifname1 HWADDR 52:54:00:12:34:41
-    check_device_ifcfg_value ifname1 DEVICE ifname1
     check_device_ifcfg_value ifname1 ONBOOT yes
     check_device_connected ifname1 yes
 fi

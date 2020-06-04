@@ -16,6 +16,8 @@ Kickstart tests are one way of testing the Anaconda Installer, by running an aut
 Setting up
 ----------
 
+Tooling for running tests on remote hosts is in linchpin_ and ansible_. For running tests in a container, see containers_. Here we describe how to run the tests on local host.
+
 First you need to install the needed dependencies:
 
 - livemedia-creator
@@ -288,3 +290,7 @@ inject into initramfs - which is the default approach used in tests.  The
 reason is that using the inject method the network devices are not initialized
 in time of parsing kickstart and obtaining information from sysfs (mostly
 getting hw address) fails which results in incomplete ifcfg file generated.
+
+.. _linchpin: ./linchpin
+.. _ansible: ./ansible
+.. _containers: ./containers

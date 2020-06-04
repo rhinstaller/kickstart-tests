@@ -18,7 +18,9 @@
   dnf:
     name:
       - git
-      - libselinux-python
+      # Fedora-Cloud-Base version <= 30
+      #- libselinux-python
+      - python3-libselinux
       - NetworkManager
       - lorax-lmc-virt # kstests livemedia-creator
       - openssh-clients # kstests scp
@@ -103,24 +105,3 @@
     owner: "{{ kstest_remote_user }}"
     group: "{{ kstest_remote_user }}"
 
-### This is probably not required but we like NM
-
-- name: Enable NetworkManager service
-  service:
-    name: NetworkManager
-    enabled: yes
-  notify:
-    - Reboot machine
-
-- name: Collect facts about system services
-  service_facts:
-  register: services_state
-
-# This would happen on Fedora 28 cloud image. F29 does not have network service.
-- name: Disable network service if needed
-  service:
-    name: network
-    enabled: no
-  notify:
-    - Reboot machine
-  when: services_state.ansible_facts.services["network.service"] is defined

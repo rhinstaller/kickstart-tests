@@ -41,7 +41,7 @@ check_connection_device "System @KSTEST_NETDEV2@"
 check_connection_setting "@KSTEST_NETDEV1@" ipv4.method auto
 # Note: up to RHEL8.2 (dracut network module) the default was different
 # check_connection_setting "@KSTEST_NETDEV1@" ipv6.method auto
-check_connection_setting "@KSTEST_NETDEV1@" ipv6.method disabled
+check_connection_setting "@KSTEST_NETDEV1@" ipv6.method ignore
 check_connection_setting "@KSTEST_NETDEV1@" connection.interface-name @KSTEST_NETDEV1@
 check_connection_setting "@KSTEST_NETDEV1@" connection.autoconnect yes
 check_connection_setting "@KSTEST_NETDEV1@" 802-3-ethernet.mac-address --

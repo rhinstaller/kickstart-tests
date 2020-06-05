@@ -1,0 +1,13 @@
+#test name: selinux-contexts
+%ksappend repos/default.ks
+
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+%post
+
+# Collect files with bad contexts
+restorecon -rvn / -e /dev -e /mnt -e /proc -e /run -e /sys > /root/RESULT
+
+%ksappend validation/success_if_result_empty.ks
+%end

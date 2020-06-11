@@ -99,10 +99,13 @@ validate_RESULT() {
     #
     # logs from Anaconda - whole /var/log/anaconda/ directory is copied out,
     #                      this can be used for saving specific test output
-    # anaconda.coverage
-    # RESULT file from the test
-    for item in /root/anaconda.coverage \
-                /var/log/anaconda/      \
+    # original-ks.cfg - the kickstart used for the test
+    # anaconda-ks.cfg - the kickstart saved after installation, useful for
+    #                   debugging
+    # RESULT - file from the test
+    for item in /root/original-ks.cfg \
+                /root/anaconda-ks.cfg \
+                /var/log/anaconda/    \
                 /root/RESULT
     do
         copy_file "${args}" "${item}" "${disksdir}"

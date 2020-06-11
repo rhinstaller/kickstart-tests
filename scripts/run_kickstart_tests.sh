@@ -446,7 +446,7 @@ sudo find /var/tmp/kstest-* -type d -exec chmod 755 {} +
 
 # Return exit code from above.  This is structure for future improvement,
 # you can do a cleaning here.
-echo "test fisnihed"
+echo "test finished"
 date
 
 exit ${rc}

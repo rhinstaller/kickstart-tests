@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (C) 2015  Red Hat, Inc.
+# Copyright (C) 2020  Red Hat, Inc.
 # # This copyrighted material is made available to anyone wishing to use,
 # modify, copy, or redistribute it subject to the terms and conditions of
 # the GNU General Public License v.2, or (at your option) any later version.
@@ -85,14 +85,9 @@ copy_file() {
     run_with_timeout 1000s "virt-copy-out ${disks} ${file} ${dir}"
 }
 
-validate_RESULT() {
-    disksdir=$1
-    args=$(for d in ${disksdir}/disk-*img; do echo -a ${d}; done)
-
-    # Use also iscsi disk if there is any
-    if [[ -n ${iscsi_disk_img} ]]; then
-        args="${args} -a ${disksdir}/${iscsi_disk_img}"
-    fi
+copy_interesting_files_from_system() {
+    args="$1"
+    disksdir="$2"
 
     # Grab files out of the installed system while it still exists.
     # Grab these files:
@@ -108,8 +103,24 @@ validate_RESULT() {
                 /var/log/anaconda/    \
                 /root/RESULT
     do
-        copy_file "${args}" "${item}" "${disksdir}"
+        if [[ -z "$3" ]]; then
+            copy_file "${args}" "${item}" "${disksdir}"
+        else
+            copy_file "${args}" "${item}" "${disksdir}" 2>/dev/null
+        fi
     done
+}
+
+validate_RESULT() {
+    disksdir=$1
+    args=$(for d in ${disksdir}/disk-*img; do echo -a ${d}; done)
+
+    # Use also iscsi disk if there is any
+    if [[ -n ${iscsi_disk_img} ]]; then
+        args="${args} -a ${disksdir}/${iscsi_disk_img}"
+    fi
+
+    copy_interesting_files_from_system "${args}" "${disksdir}"
 
     # The /root/RESULT file was saved from the VM.  Check its contents
     # and decide whether the test finally succeeded or not.

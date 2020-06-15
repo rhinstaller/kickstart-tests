@@ -44,10 +44,10 @@ validate() {
     #
     # logs from Anaconda - whole /var/log/anaconda/ directory is copied out,
     #                      this can be used for saving specific test output
-    # anaconda.coverage
     # RESULT file from the test
-    for item in /root/anaconda.coverage \
-                /var/log/anaconda/      \
+    for item in /root/original-ks.cfg \
+                /root/anaconda-ks.cfg \
+                /var/log/anaconda/    \
                 /root/RESULT
     do
         run_with_timeout 1000s "virt-copy-out ${args} ${item} ${disksdir}" 2>/dev/null

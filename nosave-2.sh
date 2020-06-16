@@ -39,7 +39,7 @@ validate() {
     disksdir=$1
     args=$(for d in ${disksdir}/disk-*img; do echo -a ${d}; done)
 
-    copy_interesting_files_from_system "${args}" "${disksdir}" "redirect"
+    copy_interesting_files_from_system "${args}" "${disksdir}"
 
     # The /root/RESULT file was saved from the VM.  Check its contents
     # and decide whether the test finally succeeded or not.

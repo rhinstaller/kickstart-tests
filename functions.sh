@@ -103,11 +103,7 @@ copy_interesting_files_from_system() {
                 /var/log/anaconda/    \
                 /root/RESULT
     do
-        if [[ -z "$3" ]]; then
-            copy_file "${args}" "${item}" "${disksdir}"
-        else
-            copy_file "${args}" "${item}" "${disksdir}" 2>/dev/null
-        fi
+        copy_file "${args}" "${item}" "${disksdir}" 2>/dev/null
     done
 }
 

@@ -1,13 +1,28 @@
 #test name: selinux-contexts
-%ksappend repos/default.ks
 
+%ksappend repos/default.ks
 %ksappend common/common_no_payload.ks
 %ksappend payload/default_packages.ks
 
+# Check files with wrong SElinux contexts. This *must* run in %post after the
+# "stock" %post script 80-setfilecons.ks. Thus, include that file before our
+# code, to make sure it is executed in the right order.
+
+%include /usr/share/anaconda/post-scripts/80-setfilecons.ks
+
 %post
 
-# Collect files with bad contexts
-restorecon -rvn / -e /dev -e /mnt -e /proc -e /run -e /sys > /root/RESULT
+echo "Listing files with wrong SElinux contexts..."
+restorecon -rvn / -e /mnt -e /proc -e /run -e /sys > /root/RESULT
 
-%ksappend validation/success_if_result_empty.ks
+# Report success if no errors have been reported to /root/RESULT
+if [ ! -s /root/RESULT ]
+then
+    # result file empty or none -> success
+    echo SUCCESS > /root/RESULT
+else
+    # some errors happened
+    exit 1
+fi
+
 %end

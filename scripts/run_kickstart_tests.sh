@@ -175,16 +175,16 @@ sed_args+=$(printenv | while read line; do
     [[ "${key}" =~ ^KSTEST_ ]] && echo -n " -e s#@${key}@#${val}#g"
  done)
 
- # Check if the given test should be skipped based on "test type blacklist" or not.
- function should_skip_test() {
-     filepath=$1
-     for testtype in ${SKIP_TESTTYPES}; do
-        if [[ "$(grep TESTTYPE= ${filepath})" =~ "$testtype" ]]; then
-            return 0
-        fi
-     done
-     # no test type to skip found if test types of the given kickstart test
-     return 1
+# Check if the given test should be skipped based on "test type blacklist" or not.
+function should_skip_test() {
+    filepath=$1
+    for testtype in ${SKIP_TESTTYPES}; do
+       if [[ "$(grep TESTTYPE= ${filepath})" =~ "$testtype" ]]; then
+           return 0
+       fi
+    done
+    # no test type to skip found if test types of the given kickstart test
+    return 1
 }
 
 # Find all tests in the . folder. These tests will be filtered by TESTTYPE parameter
@@ -446,7 +446,7 @@ sudo find /var/tmp/kstest-* -type d -exec chmod 755 {} +
 
 # Return exit code from above.  This is structure for future improvement,
 # you can do a cleaning here.
-echo "test fisnihed"
+echo "test finished"
 date
 
 exit ${rc}

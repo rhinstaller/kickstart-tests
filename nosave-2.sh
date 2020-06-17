@@ -39,19 +39,7 @@ validate() {
     disksdir=$1
     args=$(for d in ${disksdir}/disk-*img; do echo -a ${d}; done)
 
-    # Grab files out of the installed system while it still exists.
-    # Grab these files:
-    #
-    # logs from Anaconda - whole /var/log/anaconda/ directory is copied out,
-    #                      this can be used for saving specific test output
-    # anaconda.coverage
-    # RESULT file from the test
-    for item in /root/anaconda.coverage \
-                /var/log/anaconda/      \
-                /root/RESULT
-    do
-        run_with_timeout 1000s "virt-copy-out ${args} ${item} ${disksdir}" 2>/dev/null
-    done
+    copy_interesting_files_from_system "${args}" "${disksdir}"
 
     # The /root/RESULT file was saved from the VM.  Check its contents
     # and decide whether the test finally succeeded or not.

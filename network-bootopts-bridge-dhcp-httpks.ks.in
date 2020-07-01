@@ -1,0 +1,46 @@
+#test name: network-bootopts-bond-dhcp-httpks
+# Test bridge configured via boot options
+
+%ksappend repos/default.ks
+
+install
+shutdown
+# network
+# no network configuration
+# storage & bootloader
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+# l10n
+keyboard us
+lang en
+timezone America/New_York
+# user confguration
+rootpw testcase
+
+%ksappend payload/default_packages.ks
+
+%post --nochroot
+
+check_bridge_has_slave_nochroot bridge0 @KSTEST_NETDEV2@ yes
+@KSINCLUDE@ post-nochroot-lib-network.sh
+
+check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ bridge0
+
+%end
+
+%post
+
+@KSINCLUDE@ post-lib-network.sh
+
+check_device_connected bridge0 yes
+check_device_ifcfg_value bridge0 ONBOOT yes
+check_device_ifcfg_value @KSTEST_NETDEV2@ ONBOOT yes
+check_device_ifcfg_value @KSTEST_NETDEV2@ BRIDGE bridge0
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+   echo SUCCESS > /root/RESULT
+fi
+%end

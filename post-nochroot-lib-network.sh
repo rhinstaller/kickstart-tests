@@ -110,10 +110,12 @@ function check_gui_configurations() {
                     #else
                     #    echo "*** Failed check: ${ifcfg_file} for ${devname}:${con} added in GUI exists" >> $SYSROOT/root/RESULT
                     fi
-                else
-                    if [[ -e ${ifcfg_file} ]]; then
-                        echo "*** Failed check: ${ifcfg_file} for ${devname}:${con} added in GUI does not exist" >> $SYSROOT/root/RESULT
-                    fi
+                # Do not require ifcfg even when there is no connection, eg in case of
+                # bond configuration from boot options
+                #else
+                #    if [[ -e ${ifcfg_file} ]]; then
+                #        echo "*** Failed check: ${ifcfg_file} for ${devname}:${con} added in GUI does not exist" >> $SYSROOT/root/RESULT
+                #    fi
                 fi
                 break
             fi

@@ -1,0 +1,49 @@
+#test name: network-bootopts-vlan-static-httpks
+# Test team configured via boot options
+
+%ksappend repos/default.ks
+
+install
+shutdown
+# network
+# no network configuration
+# storage & bootloader
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+# l10n
+keyboard us
+lang en
+timezone America/New_York
+# user confguration
+rootpw testcase
+
+%ksappend payload/default_packages.ks
+
+%post --nochroot
+
+@KSINCLUDE@ post-nochroot-lib-network.sh
+
+check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV2@.111
+
+%end
+
+%post
+
+@KSINCLUDE@ post-lib-network.sh
+
+check_device_ifcfg_value @KSTEST_NETDEV2@.111 ONBOOT yes
+check_device_ifcfg_value @KSTEST_NETDEV2@.111 TYPE Vlan
+check_device_ifcfg_value @KSTEST_NETDEV2@.111 VLAN yes
+check_device_ifcfg_value @KSTEST_NETDEV2@.111 VLAN_ID 111
+check_device_ifcfg_value @KSTEST_NETDEV2@.111 PHYSDEV @KSTEST_NETDEV2@
+# Different from vlans defined via ks:
+check_device_ifcfg_value @KSTEST_NETDEV2@.111 DEVICE @KSTEST_NETDEV2@.111
+
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+   echo SUCCESS > /root/RESULT
+fi
+%end

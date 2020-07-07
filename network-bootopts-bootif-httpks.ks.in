@@ -1,0 +1,36 @@
+#test name: network-bootopts-bootif-httpks
+# Test that only device specified by BOOTIF is activated in initramfs
+
+%ksappend repos/default.ks
+
+install
+shutdown
+# network
+# no network configuration
+# storage & bootloader
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+# l10n
+keyboard us
+lang en
+timezone America/New_York
+# user confguration
+rootpw testcase
+
+%ksappend payload/default_packages.ks
+%post
+
+@KSINCLUDE@ post-lib-network.sh
+
+check_device_connected @KSTEST_NETDEV1@ yes
+check_device_connected @KSTEST_NETDEV2@ no
+check_device_ifcfg_value @KSTEST_NETDEV1@ ONBOOT yes
+check_device_ifcfg_value @KSTEST_NETDEV2@ ONBOOT no
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+   echo SUCCESS > /root/RESULT
+fi
+%end

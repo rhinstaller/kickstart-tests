@@ -33,12 +33,6 @@ if ! rpm -q langpacks-cs langpacks-ru ; then
     echo '*** langpacks packages were not installed' >> /root/RESULT
 fi
 
-# there is one langonly group for ru, which contains one non-optional package.
-# check that it got installed
-if ! rpm -q paratype-pt-sans-fonts ; then
-    echo '*** langonly group for ru not installed' >> /root/RESULT
-fi
-
 if [[ ! -e /root/RESULT ]]; then
     echo SUCCESS > /root/RESULT
 fi

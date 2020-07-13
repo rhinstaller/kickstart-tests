@@ -70,14 +70,6 @@ if [ $? != 0 ]; then
     echo "*** it locales were not installed" >> /root/RESULT
 fi
 
-# Check that only the requested locales were installed
-# Use grep -a to force text mode, since sometimes a character will end up in the
-# output that makes grep think it's binary
-other_locales="$(locale -a | grep -a -v -E '^(fr_|es_|it_|french|italian|spanish|POSIX|C(.*)?)')"
-if [ -n "$other_locales" ]; then
-    echo "*** unrequested locales were installed" >> /root/RESULT
-fi
-
 if [ ! -f /root/RESULT ]; then
     echo SUCCESS > /root/RESULT
 fi

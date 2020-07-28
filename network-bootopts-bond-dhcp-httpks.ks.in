@@ -1,0 +1,50 @@
+#test name: network-bootopts-bond-dhcp-httpks
+# Test bond configured via boot options
+
+%ksappend repos/default.ks
+
+install
+shutdown
+# network
+# no network configuration
+# storage & bootloader
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+# l10n
+keyboard us
+lang en
+timezone America/New_York
+# user confguration
+rootpw testcase
+
+%ksappend payload/default_packages.ks
+
+%post --nochroot
+
+@KSINCLUDE@ post-nochroot-lib-network.sh
+
+check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@ bond0
+
+%end
+
+%post
+
+@KSINCLUDE@ post-lib-network.sh
+
+check_device_ifcfg_value bond0 ONBOOT yes
+# ifcfg files are not named bond0_slave_1 as opposed to kickstart config
+check_device_ifcfg_value @KSTEST_NETDEV2@ ONBOOT yes
+check_device_ifcfg_value @KSTEST_NETDEV2@ SLAVE yes
+check_device_ifcfg_value @KSTEST_NETDEV3@ ONBOOT yes
+check_device_ifcfg_value @KSTEST_NETDEV3@ SLAVE yes
+check_device_connected bond0 yes
+check_bond_has_slave bond0 @KSTEST_NETDEV2@ yes
+check_bond_has_slave bond0 @KSTEST_NETDEV3@ yes
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+   echo SUCCESS > /root/RESULT
+fi
+%end

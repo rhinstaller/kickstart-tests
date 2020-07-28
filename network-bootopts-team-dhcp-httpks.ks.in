@@ -1,0 +1,48 @@
+#test name: network-bootopts-team-dhcp-httpks
+# Test team configured via boot options
+
+%ksappend repos/default.ks
+
+install
+shutdown
+# network
+# no network configuration
+# storage & bootloader
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+# l10n
+keyboard us
+lang en
+timezone America/New_York
+# user confguration
+rootpw testcase
+
+%ksappend payload/default_packages.ks
+
+%post --nochroot
+
+@KSINCLUDE@ post-nochroot-lib-network.sh
+
+check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@ team0
+
+%end
+
+%post
+
+@KSINCLUDE@ post-lib-network.sh
+
+check_device_ifcfg_value team0 ONBOOT yes
+check_device_ifcfg_value @KSTEST_NETDEV2@ ONBOOT yes
+check_device_ifcfg_value @KSTEST_NETDEV3@ ONBOOT yes
+check_device_ifcfg_value @KSTEST_NETDEV2@ TEAM_MASTER team0
+check_device_ifcfg_value @KSTEST_NETDEV3@ TEAM_MASTER team0
+check_device_connected team0 yes
+
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+   echo SUCCESS > /root/RESULT
+fi
+%end

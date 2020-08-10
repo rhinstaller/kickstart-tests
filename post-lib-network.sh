@@ -19,6 +19,42 @@ function check_device_ifcfg_value() {
     fi
 }
 
+
+# check_device_config_value NIC IFCFG-KEY IFCFG-VALUE KEYFILE-SECTION KEYFILE-KEY KEYFILE-VALUE
+# Check in ifcfg file or keyfile (any that is available) of NIC that the value of KEY (of a SECTION) is VALUE.
+# Special values of IFCFG_VALUE and KEYFILE_VALUE:
+# __NONE - the key is not in config
+# __ANY  - the key has any value
+function check_device_config_value() {
+    local nic="$1"
+    local ifcfg_key="$2"
+    local ifcfg_value="$3"
+    local keyfile_section="$4"
+    local keyfile_key="$5"
+    local keyfile_value="$6"
+    local ifcfg_file="/etc/sysconfig/network-scripts/ifcfg-${nic}"
+    local keyfile_file="/etc/NetworkManager/system-connections/${nic}.nmconnection"
+    local ifcfg_result=2
+    local keyfile_result=2
+
+    if [[ -e ${ifcfg_file} ]]; then
+        egrep -q '^'${ifcfg_key}'="?'${ifcfg_value}'"?$' ${ifcfg_file}
+        ifcfg_result=$?
+    fi
+    if [[ -e ${keyfile_file} ]]; then
+        value_found=$(python3 -c "import configparser; c = configparser.ConfigParser(); c.read('${keyfile_file}'); print(c['${keyfile_section}']['${keyfile_key}'])")
+        if [[ "${value_found}" == "${keyfile_value}" ]]; then
+            keyfile_result=0
+        else
+            keyfile_result=1
+        fi
+    fi
+    if [[ ${ifcfg_result} != 0 && ${keyfile_result} != 0 ]]; then
+        echo "*** Failed check: ${ifcfg_key}=${ifcfg_value} in ${ifcfg_file} or ${keyfile_section}.${keyfile_key}=${keyfile_value} in ${keyfile_file}" >> /root/RESULT
+    fi
+}
+
+
 # check_device_connected NIC "yes"|"no"
 # Check that the device NIC is connected ("yes") or not ("no")
 function check_device_connected() {

@@ -24,7 +24,7 @@ shutdown
 
 check_device_connected @KSTEST_NETDEV1@ yes
 check_device_connected @KSTEST_NETDEV2@ yes
-check_device_ifcfg_value @KSTEST_NETDEV2@ IPV6ADDR 2001:cafe:cafe::1/64
+check_device_config_value @KSTEST_NETDEV2@ IPV6ADDR 2001:cafe:cafe::1/64 ipv6 address1 2001:cafe:cafe::1/64
 
 # No error was written to /root/RESULT file, everything is OK
 if [[ ! -e /root/RESULT ]]; then

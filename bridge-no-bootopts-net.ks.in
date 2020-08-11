@@ -37,7 +37,8 @@ check_gui_configurations @KSTEST_NETDEV1@ bridge0
 
 check_device_connected bridge0 yes
 check_device_connected @KSTEST_NETDEV1@ yes
-check_device_ifcfg_value bridge0_slave_1 BRIDGE bridge0
+check_device_config_value bridge0_slave_1 BRIDGE bridge0 connection master bridge0
+check_device_config_value bridge0_slave_1 BRIDGE bridge0 connection slave-type bridge
 check_device_has_ipv4_address bridge0 yes
 check_device_has_ipv4_address @KSTEST_NETDEV1@ no
 

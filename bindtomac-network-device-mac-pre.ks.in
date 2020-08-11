@@ -26,12 +26,12 @@ shutdown
 
 @KSINCLUDE@ post-lib-network.sh
 
-check_ifcfg_key_exists @KSTEST_NETDEV1@ HWADDR yes
-check_ifcfg_exists @KSTEST_NETDEV1@-1 no
+check_config_key_exists @KSTEST_NETDEV1@ HWADDR __ANY ethernet mac-address __ANY
+check_config_exists @KSTEST_NETDEV1@-1 no
 check_device_connected @KSTEST_NETDEV1@ yes
 
-check_ifcfg_key_exists @KSTEST_NETDEV2@ HWADDR yes
-check_ifcfg_exists @KSTEST_NETDEV2@-1 no
+check_config_key_exists @KSTEST_NETDEV2@ HWADDR __ANY ethernet mac-address __ANY
+check_config_exists @KSTEST_NETDEV2@-1 no
 check_device_connected @KSTEST_NETDEV2@ yes
 
 # No error was written to /root/RESULT file, everything is OK

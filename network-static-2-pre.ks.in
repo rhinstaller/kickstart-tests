@@ -64,8 +64,8 @@ if [[ $nm_has_autoconnections_off -eq 0 ]]; then
     check_device_connected @KSTEST_NETDEV5@ no
 else
     # Fedora autoactivates default connections (Wired Connection 2)
-    # if it doesn't find ifcfg for the device, which is the case for
-    # kickstart in %pre (unlike normal kickstart where the ifcfg file
+    # if it doesn't find config for the device, which is the case for
+    # kickstart in %pre (unlike normal kickstart where the config file
     # is created in initramfs).
     check_device_connected @KSTEST_NETDEV5@ yes
 fi

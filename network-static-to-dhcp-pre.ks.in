@@ -36,12 +36,12 @@ check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@
 @KSINCLUDE@ post-lib-network.sh
 
 check_device_connected @KSTEST_NETDEV1@ yes
-check_ifcfg_exists @KSTEST_NETDEV2@-1 no
-check_ifcfg_key_exists @KSTEST_NETDEV2@ IPADDR no
-check_ifcfg_key_exists @KSTEST_NETDEV2@ PREFIX no
-check_ifcfg_key_exists @KSTEST_NETDEV2@ NETMASK no
-check_ifcfg_key_exists @KSTEST_NETDEV2@ GATEWAY no
-check_device_ifcfg_value @KSTEST_NETDEV2@ ONBOOT no
+check_config_exists @KSTEST_NETDEV2@-1 no
+check_config_key_exists @KSTEST_NETDEV2@ IPADDR no ipv4 method auto
+check_config_key_exists @KSTEST_NETDEV2@ PREFIX no ipv4 method auto
+check_config_key_exists @KSTEST_NETDEV2@ NETMASK no ipv4 method auto
+check_config_key_exists @KSTEST_NETDEV2@ GATEWAY no ipv4 method auto
+check_device_config_value @KSTEST_NETDEV2@ ONBOOT no connection autoconnect false
 check_device_connected @KSTEST_NETDEV2@ yes
 check_number_of_device_ipv4_addresses @KSTEST_NETDEV2@ 1
 

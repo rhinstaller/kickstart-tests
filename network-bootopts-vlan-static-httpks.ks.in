@@ -33,13 +33,15 @@ check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV2@.111
 
 @KSINCLUDE@ post-lib-network.sh
 
-check_device_ifcfg_value @KSTEST_NETDEV2@.111 ONBOOT yes
-check_device_ifcfg_value @KSTEST_NETDEV2@.111 TYPE Vlan
-check_device_ifcfg_value @KSTEST_NETDEV2@.111 VLAN yes
-check_device_ifcfg_value @KSTEST_NETDEV2@.111 VLAN_ID 111
-check_device_ifcfg_value @KSTEST_NETDEV2@.111 PHYSDEV @KSTEST_NETDEV2@
+check_device_config_value @KSTEST_NETDEV2@.111 ONBOOT yes connection autoconnect __NONE
+check_device_config_value @KSTEST_NETDEV2@.111 TYPE Vlan connection type vlan
+check_device_config_value @KSTEST_NETDEV2@.111 VLAN yes connection type vlan
+check_device_config_value @KSTEST_NETDEV2@.111 VLAN_ID 111 vlan id 111
+check_device_config_value @KSTEST_NETDEV2@.111 PHYSDEV @KSTEST_NETDEV2@ vlan parent @KSTEST_NETDEV2@
+
 # Different from vlans defined via ks:
-check_device_ifcfg_value @KSTEST_NETDEV2@.111 DEVICE @KSTEST_NETDEV2@.111
+check_device_config_value @KSTEST_NETDEV2@.111 DEVICE @KSTEST_NETDEV2@.111 connection interface-name @KSTEST_NETDEV2@.111
+
 
 
 # No error was written to /root/RESULT file, everything is OK

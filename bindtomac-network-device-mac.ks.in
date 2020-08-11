@@ -22,7 +22,7 @@ shutdown
 
 @KSINCLUDE@ post-lib-network.sh
 
-check_device_ifcfg_value ksdev0 HWADDR 52:54:00:12:34:50
+check_device_config_value ksdev0 HWADDR 52:54:00:12:34:50 ethernet mac-address 52:54:00:12:34:50
 check_device_connected ksdev0 yes
 
 # No error was written to /root/RESULT file, everything is OK

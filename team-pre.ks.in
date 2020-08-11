@@ -35,12 +35,14 @@ check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@ @KST
 
 @KSINCLUDE@ post-lib-network.sh
 
-check_device_ifcfg_value team0 ONBOOT no
+check_device_config_value team0 ONBOOT no connection autoconnect false
 
-check_device_ifcfg_value team0_slave_1 ONBOOT no
-check_device_ifcfg_value team0_slave_2 ONBOOT no
-check_device_ifcfg_value team0_slave_1 TEAM_MASTER team0
-check_device_ifcfg_value team0_slave_2 TEAM_MASTER team0
+check_device_config_value team0_slave_1 ONBOOT no connection autoconnect false
+check_device_config_value team0_slave_2 ONBOOT no connection autoconnect false
+check_device_config_value team0_slave_1 TEAM_MASTER team0 connection master team0
+check_device_config_value team0_slave_1 TEAM_MASTER team0 connection slave-type team
+check_device_config_value team0_slave_2 TEAM_MASTER team0 connection master team0
+check_device_config_value team0_slave_2 TEAM_MASTER team0 connection slave-type team
 
 check_device_connected team0 yes
 check_team_has_slave team0 @KSTEST_NETDEV1@ no
@@ -52,12 +54,14 @@ check_team_option team0 "mode activebackup"
 check_team_option team0 "priority \(port:@KSTEST_NETDEV2@\) -10"
 check_team_option team0 "priority \(port:@KSTEST_NETDEV3@\) 100"
 
-check_device_ifcfg_value team1 ONBOOT yes
+check_device_config_value team1 ONBOOT yes connection autoconnect __NONE
 
-check_device_ifcfg_value team1_slave_1 ONBOOT yes
-check_device_ifcfg_value team1_slave_2 ONBOOT yes
-check_device_ifcfg_value team1_slave_1 TEAM_MASTER team1
-check_device_ifcfg_value team1_slave_2 TEAM_MASTER team1
+check_device_config_value team1_slave_1 ONBOOT yes connection autoconnect __NONE
+check_device_config_value team1_slave_2 ONBOOT yes connection autoconnect __NONE
+check_device_config_value team1_slave_1 TEAM_MASTER team1 connection master team1
+check_device_config_value team1_slave_1 TEAM_MASTER team1 connection slave-type team
+check_device_config_value team1_slave_2 TEAM_MASTER team1 connection master team1
+check_device_config_value team1_slave_2 TEAM_MASTER team1 connection slave-type team
 
 check_device_connected team1 no
 

@@ -28,12 +28,12 @@ shutdown
 
 # --device=<MAC> is used to specify the interface, not to bind the
 # connection to the MAC address
-check_ifcfg_key_exists @KSTEST_NETDEV1@ HWADDR no
-check_ifcfg_exists @KSTEST_NETDEV1@-1 no
+check_device_config_value @KSTEST_NETDEV1@ HWADDR __NONE ethernet mac-address __NONE
+check_config_exists @KSTEST_NETDEV1@-1 no
 check_device_connected @KSTEST_NETDEV1@ yes
 
-check_ifcfg_key_exists @KSTEST_NETDEV2@ HWADDR no
-check_ifcfg_exists @KSTEST_NETDEV2@-1 no
+check_device_config_value @KSTEST_NETDEV2@ HWADDR __NONE ethernet mac-address __NONE
+check_config_exists @KSTEST_NETDEV2@-1 no
 check_device_connected @KSTEST_NETDEV2@ yes
 
 # No error was written to /root/RESULT file, everything is OK

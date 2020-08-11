@@ -35,10 +35,10 @@ check_gui_configurations @KSTEST_NETDEV1@
 @KSINCLUDE@ post-lib-network.sh
 
 check_device_connected @KSTEST_NETDEV1@ yes
-check_ifcfg_key_exists @KSTEST_NETDEV1@ IPADDR no
-check_ifcfg_key_exists @KSTEST_NETDEV1@ PREFIX no
-check_ifcfg_key_exists @KSTEST_NETDEV1@ NETMASK no
-check_ifcfg_key_exists @KSTEST_NETDEV1@ GATEWAY no
+check_device_config_value @KSTEST_NETDEV1@ IPADDR __NONE ipv4 method auto
+check_device_config_value @KSTEST_NETDEV1@ PREFIX __NONE ipv4 method auto
+check_device_config_value @KSTEST_NETDEV1@ NETMASK __NONE ipv4 method auto
+check_device_config_value @KSTEST_NETDEV1@ GATEWAY __NONE ipv4 method auto
 check_device_connected @KSTEST_NETDEV1@ yes
 check_number_of_device_ipv4_addresses @KSTEST_NETDEV1@ 1
 check_device_config_bound_to_mac @KSTEST_NETDEV1@

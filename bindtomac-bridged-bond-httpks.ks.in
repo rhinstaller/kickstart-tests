@@ -36,9 +36,10 @@ check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@ bond
 @KSINCLUDE@ post-lib-network.sh
 
 check_device_connected bridge0 yes
-check_device_ifcfg_value bond0 BRIDGE bridge0
-check_device_ifcfg_value bond0 BONDING_OPTS mode=balance-tlb
-check_ifcfg_exists bridge0_slave_1 no
+check_device_config_value bond0 BRIDGE bridge0 connection master bridge0
+check_device_config_value bond0 BRIDGE bridge0 connection slave-type bridge
+check_device_config_value bond0 BONDING_OPTS mode=balance-tlb bond mode balance-tlb
+check_config_exists bridge0_slave_1 no
 check_bond_has_slave bond0 @KSTEST_NETDEV2@ yes
 check_bond_has_slave bond0 @KSTEST_NETDEV3@ yes
 check_bond_has_slave bond0 @KSTEST_NETDEV1@ no

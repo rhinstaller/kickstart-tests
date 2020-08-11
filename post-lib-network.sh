@@ -218,6 +218,23 @@ function check_team_option() {
     fi
 }
 
+# check_config_exists NIC "yes"|"no"
+# Check that the config file for device NIC exists ("yes") or not ("no")
+function check_config_exists() {
+    local nic="$1"
+    local expected_result="$2"
+    local exists="no"
+
+    local ifcfg_file="/etc/sysconfig/network-scripts/ifcfg-${nic}"
+    local keyfile_file="/etc/NetworkManager/system-connections/${nic}.nmconnection"
+    if [[ -e ${ifcfg_file} || -e ${keyfile_file} ]]; then
+        exists="yes"
+    fi
+    if [[ ${exists} != ${expected_result} ]]; then
+        echo "*** Failed check: ${ifcfg_file} or ${keyfile_file} exists ${expected_result}" >> /root/RESULT
+    fi
+}
+
 # check_ifcfg_exists NIC "yes"|"no"
 # Check that the ifcfg file for device NIC exists ("yes") or not ("no")
 function check_ifcfg_exists() {

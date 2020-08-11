@@ -39,23 +39,23 @@ check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@ @KST
 
 check_device_connected @KSTEST_NETDEV1@ yes
 
-check_device_ifcfg_value @KSTEST_NETDEV2@ IPADDR @KSTEST_STATIC_IP1@
+check_device_config_value @KSTEST_NETDEV2@ IPADDR @KSTEST_STATIC_IP1@ ipv4 method manual
 check_device_connected @KSTEST_NETDEV2@ yes
 check_device_ipv4_address @KSTEST_NETDEV2@ @KSTEST_STATIC_IP1@
-check_device_ifcfg_bound_to_mac @KSTEST_NETDEV2@
+check_device_config_bound_to_mac @KSTEST_NETDEV2@
 
-check_device_ifcfg_value @KSTEST_NETDEV3@ IPADDR @KSTEST_STATIC_IP2@
+check_device_config_value @KSTEST_NETDEV3@ IPADDR @KSTEST_STATIC_IP2@ ipv4 method manual
 check_device_connected @KSTEST_NETDEV3@ yes
-check_device_ifcfg_bound_to_mac @KSTEST_NETDEV3@
+check_device_config_bound_to_mac @KSTEST_NETDEV3@
 
-check_device_ifcfg_value @KSTEST_NETDEV4@ IPADDR @KSTEST_STATIC_IP3@
+check_device_config_value @KSTEST_NETDEV4@ IPADDR @KSTEST_STATIC_IP3@ ipv4 method manual
 check_device_connected @KSTEST_NETDEV4@ yes
 check_device_ipv4_address @KSTEST_NETDEV4@ @KSTEST_STATIC_IP3@
-check_device_ifcfg_bound_to_mac @KSTEST_NETDEV4@
+check_device_config_bound_to_mac @KSTEST_NETDEV4@
 
-check_device_ifcfg_value @KSTEST_NETDEV5@ IPADDR @KSTEST_STATIC_IP4@
+check_device_config_value @KSTEST_NETDEV5@ IPADDR @KSTEST_STATIC_IP4@ ipv4 method manual
 check_device_connected @KSTEST_NETDEV5@ no
-check_device_ifcfg_bound_to_mac @KSTEST_NETDEV5@
+check_device_config_bound_to_mac @KSTEST_NETDEV5@
 
 # No error was written to /root/RESULT file, everything is OK
 if [[ ! -e /root/RESULT ]]; then

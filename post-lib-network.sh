@@ -38,15 +38,37 @@ function check_device_config_value() {
     local keyfile_result=2
 
     if [[ -e ${ifcfg_file} ]]; then
-        egrep -q '^'${ifcfg_key}'="?'${ifcfg_value}'"?$' ${ifcfg_file}
-        ifcfg_result=$?
+        if [[ "${ifcfg_value}" == "__NONE" ]]; then
+            ! egrep -q '^'${ifcfg_key}'=' ${ifcfg_file}
+            ifcfg_result=$?
+        elif [[ "${ifcfg_value}" == "__ANY" ]]; then
+            egrep -q '^'${ifcfg_key}'=' ${ifcfg_file}
+            ifcfg_result=$?
+        else
+            egrep -q '^'${ifcfg_key}'="?'${ifcfg_value}'"?$' ${ifcfg_file}
+            ifcfg_result=$?
+        fi
     fi
     if [[ -e ${keyfile_file} ]]; then
-        value_found=$(python3 -c "import configparser; c = configparser.ConfigParser(); c.read('${keyfile_file}'); print(c['${keyfile_section}']['${keyfile_key}'])")
-        if [[ "${value_found}" == "${keyfile_value}" ]]; then
-            keyfile_result=0
+        value_found=$(python3 -c "import configparser; c = configparser.ConfigParser(); c.read('${keyfile_file}'); print(c['${keyfile_section}']['${keyfile_key}'] if '${keyfile_section}' in c and '${keyfile_key}' in c['$keyfile_section'] else '__NONE' ); ")
+        if [[ "${keyfile_value}" == "__NONE" ]]; then
+            if [[ "${value_found}" == "__NONE" ]]; then
+                keyfile_result=0
+            else
+                keyfile_result=1
+            fi
+        elif [[ "${keyfile_value}" == "__ANY" ]]; then
+            if [[ "${value_found}" != "__NONE" ]]; then
+                keyfile_result=0
+            else
+                keyfile_result=1
+            fi
         else
-            keyfile_result=1
+            if [[ "${value_found}" == "${keyfile_value}" ]]; then
+                keyfile_result=0
+            else
+                keyfile_result=1
+            fi
         fi
     fi
     if [[ ${ifcfg_result} != 0 && ${keyfile_result} != 0 ]]; then
@@ -92,6 +114,14 @@ function check_ifcfg_key_exists() {
     else
        echo "*** Failed check: ifcfg file ${ifcfg_file} exists" >> /root/RESULT
     fi
+}
+
+# check_device_config_bound_to_mac NIC
+# Check that the configuration file of device NIC is bound to MAC address
+function check_device_config_bound_to_mac() {
+    local nic="$1"
+    check_device_config_value $nic DEVICE __NONE connection interface-name __NONE
+    check_device_config_value $nic HWADDR __ANY ethernet mac-address __ANY
 }
 
 # check_device_ifcfg_bound_to_mac NIC

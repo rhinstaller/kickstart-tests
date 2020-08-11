@@ -46,7 +46,7 @@ check_device_ifcfg_value bridge0 ONBOOT no
 # TODO: failing, file a bug
 #check_device_ifcfg_value bridge0_slave_1 ONBOOT no
 
-check_device_ifcfg_bound_to_mac bridge0_slave_1
+check_device_config_bound_to_mac bridge0_slave_1
 
 # WARNING: this depends on assumption of running %post scripts in order they
 # are defined here

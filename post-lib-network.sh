@@ -124,14 +124,6 @@ function check_device_config_bound_to_mac() {
     check_device_config_value $nic HWADDR __ANY ethernet mac-address __ANY
 }
 
-# check_device_ifcfg_bound_to_mac NIC
-# Check that the ifcfg file of device NIC is bound to MAC address
-function check_device_ifcfg_bound_to_mac() {
-    local nic="$1"
-    check_ifcfg_key_exists $nic DEVICE no
-    check_ifcfg_key_exists $nic HWADDR yes
-}
-
 # check_bond_has_slave BOND SLAVE "yes"|"no"
 # Check that the bond device BOND has ("yes") or has not ("no") a slave device SLAVE
 function check_bond_has_slave() {

@@ -61,10 +61,10 @@ check_device_ifcfg_value team1_slave_2 TEAM_MASTER team1
 
 check_device_connected team1 no
 
-check_device_ifcfg_bound_to_mac team0_slave_1
-check_device_ifcfg_bound_to_mac team0_slave_2
-check_device_ifcfg_bound_to_mac team1_slave_1
-check_device_ifcfg_bound_to_mac team1_slave_2
+check_device_config_bound_to_mac team0_slave_1
+check_device_config_bound_to_mac team0_slave_2
+check_device_config_bound_to_mac team1_slave_1
+check_device_config_bound_to_mac team1_slave_2
 
 # No error was written to /root/RESULT file, everything is OK
 if [[ ! -e /root/RESULT ]]; then

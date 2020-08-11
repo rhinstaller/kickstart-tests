@@ -42,8 +42,8 @@ check_bond_has_slave bond0 @KSTEST_NETDEV1@ no
 check_device_ipv4_address bond0.222 @KSTEST_STATIC_IP@
 check_device_has_ipv4_address bond0 no
 
-check_device_ifcfg_bound_to_mac bond0_slave_1
-check_device_ifcfg_bound_to_mac bond0_slave_2
+check_device_config_bound_to_mac bond0_slave_1
+check_device_config_bound_to_mac bond0_slave_2
 
 # No error was written to /root/RESULT file, everything is OK
 if [[ ! -e /root/RESULT ]]; then

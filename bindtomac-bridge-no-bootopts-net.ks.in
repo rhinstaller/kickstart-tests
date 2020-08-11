@@ -41,7 +41,7 @@ check_device_ifcfg_value bridge0_slave_1 BRIDGE bridge0
 check_device_has_ipv4_address bridge0 yes
 check_device_has_ipv4_address @KSTEST_NETDEV1@ no
 
-check_device_ifcfg_bound_to_mac bridge0_slave_1
+check_device_config_bound_to_mac bridge0_slave_1
 
 # WARNING: this depends on assumption of running %post scripts in order they
 # are defined here

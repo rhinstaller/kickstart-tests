@@ -1,25 +1,6 @@
 # Common functions for %post (chrooted) kickstart section
 # network tests
 
-# check_device_ifcfg_value NIC KEY VALUE
-# Check that the value of KEY in ifcfg file of device NIC is VALUE
-function check_device_ifcfg_value() {
-    local nic="$1"
-    local key="$2"
-    local value="$3"
-    local ifcfg_file="/etc/sysconfig/network-scripts/ifcfg-${nic}"
-
-    if [[ -e ${ifcfg_file} ]]; then
-        egrep -q '^'${key}'="?'${value}'"?$' ${ifcfg_file}
-        if [[ $? -ne 0 ]]; then
-           echo "*** Failed check: ${key}=${value} in ${ifcfg_file}" >> /root/RESULT
-        fi
-    else
-       echo "*** Failed check: ifcfg file ${ifcfg_file} exists" >> /root/RESULT
-    fi
-}
-
-
 # check_device_config_value NIC IFCFG-KEY IFCFG-VALUE KEYFILE-SECTION KEYFILE-KEY KEYFILE-VALUE
 # Check in ifcfg file or keyfile (any that is available) of NIC that the value of KEY (of a SECTION) is VALUE.
 # Special values of IFCFG_VALUE and KEYFILE_VALUE:
@@ -90,29 +71,6 @@ function check_device_connected() {
     nmcli -t -f DEVICE,STATE dev | grep "${nic}:connected"
     if [[ $? -ne ${exit_code} ]]; then
         echo "*** Failed check: device ${nic} connected: ${expected_result}" >> /root/RESULT
-    fi
-}
-
-# check_ifcfg_key_exists NIC KEY "yes"|"no"
-# Check that value of KEY is ("yes") or is not ("no") defined in ifcfg file of the device NIC
-function check_ifcfg_key_exists() {
-    local nic="$1"
-    local key="$2"
-    local expected_result="$3"
-
-    local ifcfg_file="/etc/sysconfig/network-scripts/ifcfg-${nic}"
-    local exit_code=0
-    if [[ ${expected_result} == "no" ]]; then
-        exit_code=1
-    fi
-
-    if [[ -e ${ifcfg_file} ]]; then
-        egrep -q '^'${key}'=' ${ifcfg_file}
-        if [[ $? -ne ${exit_code} ]]; then
-            echo "*** Failed check: ${key} exists in ${ifcfg_file}: ${expected_result}" >> /root/RESULT
-        fi
-    else
-       echo "*** Failed check: ifcfg file ${ifcfg_file} exists" >> /root/RESULT
     fi
 }
 
@@ -224,23 +182,6 @@ function check_config_exists() {
     fi
     if [[ ${exists} != ${expected_result} ]]; then
         echo "*** Failed check: ${ifcfg_file} or ${keyfile_file} exists ${expected_result}" >> /root/RESULT
-    fi
-}
-
-# check_ifcfg_exists NIC "yes"|"no"
-# Check that the ifcfg file for device NIC exists ("yes") or not ("no")
-function check_ifcfg_exists() {
-    local nic="$1"
-    local expected_result="$2"
-    local exit_code=0
-    if [[ ${expected_result} == "no" ]]; then
-        exit_code=1
-    fi
-
-    local ifcfg_file="/etc/sysconfig/network-scripts/ifcfg-${nic}"
-    test -e ${ifcfg_file}
-    if [[ $? -ne ${exit_code} ]]; then
-        echo "*** Failed check: ${ifcfg_file} exists ${expected_result}" >> /root/RESULT
     fi
 }
 

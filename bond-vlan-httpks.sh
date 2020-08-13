@@ -51,7 +51,7 @@ prepare() {
     local gateway="$(echo "$ips" | cut -d ' ' -f 3)"
 
     # Substitute IP ranges of created network in kickstart
-    sed -i -e s#@KSTEST_STATIC_IP@#${ip}# -e s#@KSTEST_STATIC_NETMASK@#${netmask}# -e s#@KSTEST_STATIC_GATEWAY@#${gateway}# ${ks}
+    sed -i -e s#@KSTEST_STATIC_IP@#${ip}#g -e s#@KSTEST_STATIC_NETMASK@#${netmask}#g -e s#@KSTEST_STATIC_GATEWAY@#${gateway}#g ${ks}
 
     ### Run http server serving kickstart
 

@@ -25,12 +25,12 @@ shutdown
 
 # --device=<MAC> is used to specify the interface, not to bind the
 # connection to the MAC address
-check_device_ifcfg_bound_to_mac @KSTEST_NETDEV1@
-check_ifcfg_exists @KSTEST_NETDEV1@-1 no
+check_device_config_bound_to_mac @KSTEST_NETDEV1@
+check_config_exists @KSTEST_NETDEV1@-1 no
 check_device_connected @KSTEST_NETDEV1@ yes
 
-check_device_ifcfg_bound_to_mac @KSTEST_NETDEV2@
-check_ifcfg_exists @KSTEST_NETDEV2@-1 no
+check_device_config_bound_to_mac @KSTEST_NETDEV2@
+check_config_exists @KSTEST_NETDEV2@-1 no
 check_device_connected @KSTEST_NETDEV2@ yes
 
 # No error was written to /root/RESULT file, everything is OK

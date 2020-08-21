@@ -46,26 +46,26 @@ check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@ @KST
 
 check_device_connected @KSTEST_NETDEV1@ yes
 
-check_device_ifcfg_value @KSTEST_NETDEV2@ IPADDR @KSTEST_STATIC_IP1@
+check_device_config_value @KSTEST_NETDEV2@ IPADDR @KSTEST_STATIC_IP1@ ipv4 method manual
 check_device_connected @KSTEST_NETDEV2@ yes
 check_device_ipv4_address @KSTEST_NETDEV2@ @KSTEST_STATIC_IP1@
 
-check_device_ifcfg_value @KSTEST_NETDEV3@ IPADDR @KSTEST_STATIC_IP2@
+check_device_config_value @KSTEST_NETDEV3@ IPADDR @KSTEST_STATIC_IP2@ ipv4 method manual
 check_device_connected @KSTEST_NETDEV3@ yes
 
-check_device_ifcfg_value @KSTEST_NETDEV4@ IPADDR @KSTEST_STATIC_IP3@
+check_device_config_value @KSTEST_NETDEV4@ IPADDR @KSTEST_STATIC_IP3@ ipv4 method manual
 check_device_connected @KSTEST_NETDEV4@ yes
 check_device_ipv4_address @KSTEST_NETDEV4@ @KSTEST_STATIC_IP3@
 
-check_device_ifcfg_value @KSTEST_NETDEV5@ IPADDR @KSTEST_STATIC_IP4@
+check_device_config_value @KSTEST_NETDEV5@ IPADDR @KSTEST_STATIC_IP4@ ipv4 method manual
 detect_nm_has_autoconnections_off
 nm_has_autoconnections_off=$?
 if [[ $nm_has_autoconnections_off -eq 0 ]]; then
     check_device_connected @KSTEST_NETDEV5@ no
 else
     # Fedora autoactivates default connections (Wired Connection 2)
-    # if it doesn't find ifcfg for the device, which is the case for
-    # kickstart in %pre (unlike normal kickstart where the ifcfg file
+    # if it doesn't find config for the device, which is the case for
+    # kickstart in %pre (unlike normal kickstart where the config file
     # is created in initramfs).
     check_device_connected @KSTEST_NETDEV5@ yes
 fi

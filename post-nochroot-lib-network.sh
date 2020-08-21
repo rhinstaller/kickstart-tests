@@ -25,7 +25,7 @@ function check_bridge_has_slave_nochroot() {
 
 # check_gui_configurations
 # Works only for gui installations.
-# Checks that the connections configurable in Network Spoke are those corresponding to ifcfg files of devices
+# Checks that the connections configurable in Network Spoke are those corresponding to configuration files of devices
 function check_gui_configurations() {
     # parse added devices and connections from anaconda.log into eg
     # " bond0.222:1484c12b-0f40-445b-93b4-10bef8ec6ce3 bond0:8df1c4f6-76aa-42e3-9fa9-aa1f00c155b4 ${KSTEST_NETDEV3}:None ${KSTEST_NETDEV2}:None ${KSTEST_NETDEV1}:d3b58e36-68cb-4de1-b1fc-98707045274f "
@@ -88,7 +88,7 @@ function check_gui_configurations() {
     fi
 
     # check that all requested devices supplied as arguments were added to GUI
-    # and if ifcfg file exists it corresponds to the connection added
+    # and if configuration file exists it corresponds to the connection added
     for devname in "$@"
     do
         local found="no"
@@ -97,25 +97,24 @@ function check_gui_configurations() {
         for dev_con in ${dev_cons}; do
             local con=${dev_con##${devname}:}
             if [[ ${con} != ${dev_con} ]]; then
+                # Do not require ifcfg when there is no connection, eg bond configuration from boot options.
+                # Do not require ifcfg when there is a connection, eg for default connections created by NM upon start
+                # (they are disabled by no-auto-default=* in RHEL installer and NetworkManager-config-server package)
                 found="yes"
-                local ifcfg_file="$SYSROOT/etc/sysconfig/network-scripts/ifcfg-${devname}"
                 if [[ ${con} != "" && ${con} != "None" ]]; then
+                    local ifcfg_file="$SYSROOT/etc/sysconfig/network-scripts/ifcfg-${devname}"
                     if [[ -e ${ifcfg_file} ]]; then
                         egrep -q '^UUID="?'${con}'"?$' ${ifcfg_file}
-                        if [[ $? -ne 0 ]]; then
-                           echo "*** Failed check: ${devname}:${con} added in GUI corresponds to ${ifcfg_file}" >> $SYSROOT/root/RESULT
-                        fi
-                    #Do not strictly require ifcfg when there is a connection, eg for default connections created by NM upon start
-                    #(they are disabled by no-auto-default=* in RHEL installer and NetworkManager-config-server package)
-                    #else
-                    #    echo "*** Failed check: ${ifcfg_file} for ${devname}:${con} added in GUI exists" >> $SYSROOT/root/RESULT
+                        ifcfg_result=$?
                     fi
-                # Do not require ifcfg even when there is no connection, eg in case of
-                # bond configuration from boot options
-                #else
-                #    if [[ -e ${ifcfg_file} ]]; then
-                #        echo "*** Failed check: ${ifcfg_file} for ${devname}:${con} added in GUI does not exist" >> $SYSROOT/root/RESULT
-                #    fi
+                    local keyfile_file="$SYSROOT/etc/NetworkManager/system-connections/${devname}.nmconnection"
+                    if [[ -e ${keyfile_file} ]]; then
+                        egrep -q '^uuid="?'${con}'"?$' ${keyfile_file}
+                        keyfile_result=$?
+                    fi
+                    if [[ ${ifcfg_result} != 0 && ${keyfile_result} != 0 ]]; then
+                        echo "*** Failed check: ${devname}:${con} added in GUI corresponds to ${ifcfg_file} or ${keyfile_file}" >> $SYSROOT/root/RESULT
+                    fi
                 fi
                 break
             fi
@@ -129,6 +128,16 @@ function check_gui_configurations() {
             if [[ -e ${ifcfg_file} ]]; then
                 for con in ${cons_without_devs}; do
                     egrep -q '^UUID="?'${con}'"?$' ${ifcfg_file}
+                    if [[ $? -eq 0 ]]; then
+                        found="yes"
+                        break
+                    fi
+                done
+            fi
+            local keyfile_file="$SYSROOT/etc/NetworkManager/system-connections/${devname}.nmconnection"
+            if [[ -e ${keyfile_file} ]]; then
+                for con in ${cons_without_devs}; do
+                    egrep -q '^uuid="?'${con}'"?$' ${keyfile_file}
                     if [[ $? -eq 0 ]]; then
                         found="yes"
                         break

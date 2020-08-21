@@ -35,12 +35,12 @@ check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@ @KST
 
 @KSINCLUDE@ post-lib-network.sh
 
-check_device_ifcfg_value bond0 ONBOOT no
+check_device_config_value bond0 ONBOOT no connection autoconnect false
 
-check_device_ifcfg_value bond0_slave_1 ONBOOT no
-check_device_ifcfg_value bond0_slave_2 ONBOOT no
-check_device_ifcfg_value bond0_slave_1 MASTER bond0
-check_device_ifcfg_value bond0_slave_2 MASTER bond0
+check_device_config_value bond0_slave_1 ONBOOT no connection autoconnect false
+check_device_config_value bond0_slave_2 ONBOOT no connection autoconnect false
+check_device_config_value bond0_slave_1 MASTER bond0 connection master bond0
+check_device_config_value bond0_slave_2 MASTER bond0 connection master bond0
 
 check_device_connected bond0 yes
 check_bond_has_slave bond0 @KSTEST_NETDEV2@ yes
@@ -49,17 +49,17 @@ check_bond_has_slave bond0 @KSTEST_NETDEV1@ no
 check_bond_has_slave bond0 @KSTEST_NETDEV4@ no
 check_bond_has_slave bond0 @KSTEST_NETDEV5@ no
 
-check_device_ifcfg_value bond1 ONBOOT yes
+check_device_config_value bond1 ONBOOT yes connection autoconnect __NONE
 
-check_device_ifcfg_value bond1_slave_1 ONBOOT yes
-check_device_ifcfg_value bond1_slave_2 ONBOOT yes
-check_device_ifcfg_value bond1_slave_1 MASTER bond1
-check_device_ifcfg_value bond1_slave_2 MASTER bond1
+check_device_config_value bond1_slave_1 ONBOOT yes connection autoconnect __NONE
+check_device_config_value bond1_slave_2 ONBOOT yes connection autoconnect __NONE
+check_device_config_value bond1_slave_1 MASTER bond1 connection master bond1
+check_device_config_value bond1_slave_2 MASTER bond1 connection master bond1
 
-check_device_ifcfg_bound_to_mac bond0_slave_1
-check_device_ifcfg_bound_to_mac bond0_slave_2
-check_device_ifcfg_bound_to_mac bond1_slave_1
-check_device_ifcfg_bound_to_mac bond1_slave_2
+check_device_config_bound_to_mac bond0_slave_1
+check_device_config_bound_to_mac bond0_slave_2
+check_device_config_bound_to_mac bond1_slave_1
+check_device_config_bound_to_mac bond1_slave_2
 
 # FIXME this doesn't seem to hold for RHEL
 check_device_connected bond1 no

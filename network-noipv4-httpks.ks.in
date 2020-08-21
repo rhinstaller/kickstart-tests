@@ -31,8 +31,8 @@ check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@
 
 @KSINCLUDE@ post-lib-network.sh
 
-check_ifcfg_key_exists @KSTEST_NETDEV2@ BOOTPROTO no
-check_ifcfg_key_exists @KSTEST_NETDEV3@ BOOTPROTO no
+check_config_key_exists @KSTEST_NETDEV2@ BOOTPROTO no ipv4 method disabled
+check_config_key_exists @KSTEST_NETDEV3@ BOOTPROTO no ipv4 method disabled
 
 # TODO create test with virtual network having ipv6 enabled (ipv6 only connection)
 #      libvirt default net does not have ipv6 enabled

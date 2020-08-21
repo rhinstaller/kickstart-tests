@@ -47,7 +47,7 @@ prepare() {
     local ip4="${oct123}.$((oct4+3))"
 
     # Substitute IP ranges of created network in kickstart
-    sed -i -e s#@KSTEST_STATIC_IP1@#${ip1}# -e s#@KSTEST_STATIC_IP2@#${ip2}# -e s#@KSTEST_STATIC_IP3@#${ip3}# -e s#@KSTEST_STATIC_IP4@#${ip4}# -e s#@KSTEST_STATIC_NETMASK@#${netmask}# -e s#@KSTEST_STATIC_GATEWAY@#${gateway}# ${ks}
+    sed -i -e s#@KSTEST_STATIC_IP1@#${ip1}#g -e s#@KSTEST_STATIC_IP2@#${ip2}#g -e s#@KSTEST_STATIC_IP3@#${ip3}#g -e s#@KSTEST_STATIC_IP4@#${ip4}#g -e s#@KSTEST_STATIC_NETMASK@#${netmask}#g -e s#@KSTEST_STATIC_GATEWAY@#${gateway}#g ${ks}
 
     echo ${ks}
 }

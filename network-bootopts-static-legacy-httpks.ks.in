@@ -32,7 +32,7 @@ check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@
 @KSINCLUDE@ post-lib-network.sh
 
 check_device_connected @KSTEST_NETDEV1@ yes
-check_device_ifcfg_value @KSTEST_NETDEV1@ IPADDR @KSTEST_STATIC_IP@
+check_device_config_value @KSTEST_NETDEV1@ IPADDR @KSTEST_STATIC_IP@ ipv4 address1 @KSTEST_STATIC_IP@/24,@KSTEST_STATIC_GATEWAY@
 check_device_ipv4_address @KSTEST_NETDEV1@ @KSTEST_STATIC_IP@
 check_device_connected @KSTEST_NETDEV2@ yes
 

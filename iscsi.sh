@@ -57,7 +57,7 @@ prepare() {
     local initiator=iqn.2009-02.com.example:${lc_test_id}
 
     # Substitute values of created target in kickstart
-    sed -i -e s#@KSTEST_ISCSI_IP@#${target_ip}# -e s#@KSTEST_ISCSI_PORT@#${target_port}# -e s#@KSTEST_ISCSI_TARGET@#${wwn}# -e s#@KSTEST_ISCSINAME@#${initiator}# ${ks}
+    sed -i -e s#@KSTEST_ISCSI_IP@#${target_ip}#g -e s#@KSTEST_ISCSI_PORT@#${target_port}#g -e s#@KSTEST_ISCSI_TARGET@#${wwn}#g -e s#@KSTEST_ISCSINAME@#${initiator}#g ${ks}
 
     echo ${ks}
 }

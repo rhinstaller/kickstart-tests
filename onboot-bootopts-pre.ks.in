@@ -33,8 +33,8 @@ check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@
 
 @KSINCLUDE@ post-lib-network.sh
 
-check_device_ifcfg_value @KSTEST_NETDEV1@ ONBOOT yes
-check_device_ifcfg_value @KSTEST_NETDEV2@ ONBOOT no
+check_device_config_value @KSTEST_NETDEV1@ ONBOOT yes connection autoconnect __NONE
+check_device_config_value @KSTEST_NETDEV2@ ONBOOT no connection autoconnect false
 check_device_connected @KSTEST_NETDEV1@ yes
 check_device_connected @KSTEST_NETDEV2@ yes
 

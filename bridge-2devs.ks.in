@@ -39,17 +39,18 @@ check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ bridge0 bridge1
 
 check_device_connected bridge0 yes
 check_device_connected @KSTEST_NETDEV1@ yes
-check_device_ifcfg_value bridge0_slave_1 BRIDGE bridge0
+check_device_config_value bridge0_slave_1 BRIDGE bridge0 connection master bridge0
+check_device_config_value bridge0_slave_1 BRIDGE bridge0 connection slave-type bridge
 
 check_device_has_ipv4_address bridge0 yes
 check_device_has_ipv4_address @KSTEST_NETDEV1@ no
 
 # This check is removed because since NM in initramfs the slave's (non-bridge)
-# configuration from initramfs does not produce corresponding ifcfg file
-# check_device_ifcfg_value @KSTEST_NETDEV1@ ONBOOT yes
+# configuration from initramfs does not produce corresponding config file
+# check_device_config_value @KSTEST_NETDEV1@ ONBOOT yes connection autoconnect __NONE
 
-check_device_ifcfg_value bridge0 ONBOOT no
-check_device_ifcfg_value bridge0_slave_1 ONBOOT no
+check_device_config_value bridge0 ONBOOT no connection autoconnect false
+check_device_config_value bridge0_slave_1 ONBOOT no connection autoconnect false
 
 # bridge1
 
@@ -57,14 +58,15 @@ check_device_connected bridge1 no
 
 check_device_connected @KSTEST_NETDEV2@ no
 
-check_device_ifcfg_value bridge1_slave_1 BRIDGE bridge1
+check_device_config_value bridge1_slave_1 BRIDGE bridge1 connection master bridge1
+check_device_config_value bridge1_slave_1 BRIDGE bridge1 connection slave-type bridge
 check_device_has_ipv4_address @KSTEST_NETDEV2@ no
-check_device_ifcfg_value bridge1 ONBOOT yes
+check_device_config_value bridge1 ONBOOT yes connection autoconnect __NONE
 
-check_device_ifcfg_value bridge1_slave_1 ONBOOT yes
+check_device_config_value bridge1_slave_1 ONBOOT yes connection autoconnect __NONE
 
-# anaconda does not create default ifcfg file for enslaved device
-check_ifcfg_exists @KSTEST_NETDEV2@ no
+# anaconda does create default config file for enslaved device
+check_config_exists @KSTEST_NETDEV2@ yes
 
 # WARNING: this depends on assumption of running %post scripts in order they
 # are defined here

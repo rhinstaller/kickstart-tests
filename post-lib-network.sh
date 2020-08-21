@@ -1,23 +1,62 @@
 # Common functions for %post (chrooted) kickstart section
 # network tests
 
-# check_device_ifcfg_value NIC KEY VALUE
-# Check that the value of KEY in ifcfg file of device NIC is VALUE
-function check_device_ifcfg_value() {
+# check_device_config_value NIC IFCFG-KEY IFCFG-VALUE KEYFILE-SECTION KEYFILE-KEY KEYFILE-VALUE
+# Check in ifcfg file or keyfile (any that is available) of NIC that the value of KEY (of a SECTION) is VALUE.
+# Special values of IFCFG_VALUE and KEYFILE_VALUE:
+# __NONE - the key is not in config
+# __ANY  - the key has any value
+function check_device_config_value() {
     local nic="$1"
-    local key="$2"
-    local value="$3"
+    local ifcfg_key="$2"
+    local ifcfg_value="$3"
+    local keyfile_section="$4"
+    local keyfile_key="$5"
+    local keyfile_value="$6"
     local ifcfg_file="/etc/sysconfig/network-scripts/ifcfg-${nic}"
+    local keyfile_file="/etc/NetworkManager/system-connections/${nic}.nmconnection"
+    local ifcfg_result=2
+    local keyfile_result=2
 
     if [[ -e ${ifcfg_file} ]]; then
-        egrep -q '^'${key}'="?'${value}'"?$' ${ifcfg_file}
-        if [[ $? -ne 0 ]]; then
-           echo "*** Failed check: ${key}=${value} in ${ifcfg_file}" >> /root/RESULT
+        if [[ "${ifcfg_value}" == "__NONE" ]]; then
+            ! egrep -q '^'${ifcfg_key}'=' ${ifcfg_file}
+            ifcfg_result=$?
+        elif [[ "${ifcfg_value}" == "__ANY" ]]; then
+            egrep -q '^'${ifcfg_key}'=' ${ifcfg_file}
+            ifcfg_result=$?
+        else
+            egrep -q '^'${ifcfg_key}'="?'${ifcfg_value}'"?$' ${ifcfg_file}
+            ifcfg_result=$?
         fi
-    else
-       echo "*** Failed check: ifcfg file ${ifcfg_file} exists" >> /root/RESULT
+    fi
+    if [[ -e ${keyfile_file} ]]; then
+        value_found=$(python3 -c "import configparser; c = configparser.ConfigParser(); c.read('${keyfile_file}'); print(c['${keyfile_section}']['${keyfile_key}'] if '${keyfile_section}' in c and '${keyfile_key}' in c['$keyfile_section'] else '__NONE' ); ")
+        if [[ "${keyfile_value}" == "__NONE" ]]; then
+            if [[ "${value_found}" == "__NONE" ]]; then
+                keyfile_result=0
+            else
+                keyfile_result=1
+            fi
+        elif [[ "${keyfile_value}" == "__ANY" ]]; then
+            if [[ "${value_found}" != "__NONE" ]]; then
+                keyfile_result=0
+            else
+                keyfile_result=1
+            fi
+        else
+            if [[ "${value_found}" == "${keyfile_value}" ]]; then
+                keyfile_result=0
+            else
+                keyfile_result=1
+            fi
+        fi
+    fi
+    if [[ ${ifcfg_result} != 0 && ${keyfile_result} != 0 ]]; then
+        echo "*** Failed check: ${ifcfg_key}=${ifcfg_value} in ${ifcfg_file} or ${keyfile_section}.${keyfile_key}=${keyfile_value} in ${keyfile_file}" >> /root/RESULT
     fi
 }
+
 
 # check_device_connected NIC "yes"|"no"
 # Check that the device NIC is connected ("yes") or not ("no")
@@ -35,35 +74,12 @@ function check_device_connected() {
     fi
 }
 
-# check_ifcfg_key_exists NIC KEY "yes"|"no"
-# Check that value of KEY is ("yes") or is not ("no") defined in ifcfg file of the device NIC
-function check_ifcfg_key_exists() {
+# check_device_config_bound_to_mac NIC
+# Check that the configuration file of device NIC is bound to MAC address
+function check_device_config_bound_to_mac() {
     local nic="$1"
-    local key="$2"
-    local expected_result="$3"
-
-    local ifcfg_file="/etc/sysconfig/network-scripts/ifcfg-${nic}"
-    local exit_code=0
-    if [[ ${expected_result} == "no" ]]; then
-        exit_code=1
-    fi
-
-    if [[ -e ${ifcfg_file} ]]; then
-        egrep -q '^'${key}'=' ${ifcfg_file}
-        if [[ $? -ne ${exit_code} ]]; then
-            echo "*** Failed check: ${key} exists in ${ifcfg_file}: ${expected_result}" >> /root/RESULT
-        fi
-    else
-       echo "*** Failed check: ifcfg file ${ifcfg_file} exists" >> /root/RESULT
-    fi
-}
-
-# check_device_ifcfg_bound_to_mac NIC
-# Check that the ifcfg file of device NIC is bound to MAC address
-function check_device_ifcfg_bound_to_mac() {
-    local nic="$1"
-    check_ifcfg_key_exists $nic DEVICE no
-    check_ifcfg_key_exists $nic HWADDR yes
+    check_device_config_value $nic DEVICE __NONE connection interface-name __NONE
+    check_device_config_value $nic HWADDR __ANY ethernet mac-address __ANY
 }
 
 # check_bond_has_slave BOND SLAVE "yes"|"no"
@@ -152,20 +168,20 @@ function check_team_option() {
     fi
 }
 
-# check_ifcfg_exists NIC "yes"|"no"
-# Check that the ifcfg file for device NIC exists ("yes") or not ("no")
-function check_ifcfg_exists() {
+# check_config_exists NIC "yes"|"no"
+# Check that the config file for device NIC exists ("yes") or not ("no")
+function check_config_exists() {
     local nic="$1"
     local expected_result="$2"
-    local exit_code=0
-    if [[ ${expected_result} == "no" ]]; then
-        exit_code=1
-    fi
+    local exists="no"
 
     local ifcfg_file="/etc/sysconfig/network-scripts/ifcfg-${nic}"
-    test -e ${ifcfg_file}
-    if [[ $? -ne ${exit_code} ]]; then
-        echo "*** Failed check: ${ifcfg_file} exists ${expected_result}" >> /root/RESULT
+    local keyfile_file="/etc/NetworkManager/system-connections/${nic}.nmconnection"
+    if [[ -e ${ifcfg_file} || -e ${keyfile_file} ]]; then
+        exists="yes"
+    fi
+    if [[ ${exists} != ${expected_result} ]]; then
+        echo "*** Failed check: ${ifcfg_file} or ${keyfile_file} exists ${expected_result}" >> /root/RESULT
     fi
 }
 

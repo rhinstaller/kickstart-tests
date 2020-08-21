@@ -54,7 +54,7 @@ prepare() {
     local gateway="$(echo "$ips" | cut -d ' ' -f 3)"
 
     # Substitute IP ranges of created network in kickstart
-    sed -i -e s#@KSTEST_STATIC_IP@#${ip}# -e s#@KSTEST_STATIC_NETMASK@#${netmask}# -e s#@KSTEST_STATIC_GATEWAY@#${gateway}# ${ks}
+    sed -i -e s#@KSTEST_STATIC_IP@#${ip}#g -e s#@KSTEST_STATIC_NETMASK@#${netmask}#g -e s#@KSTEST_STATIC_GATEWAY@#${gateway}#g ${ks}
     #ip=10.34.102.233::10.34.102.254:255.255.255.0::ens9:none
     echo "ip_static_boot_config=\"ip=${ip} gateway=${gateway} netmask=${netmask} ksdevice=${KSTEST_NETDEV1}\"" > ${tmpdir}/ip_static_boot_config
 

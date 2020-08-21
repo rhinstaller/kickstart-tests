@@ -38,7 +38,7 @@ check_gui_configurations @KSTEST_NETDEV1@
 
 @KSINCLUDE@ post-lib-network.sh
 
-check_device_ifcfg_value @KSTEST_NETDEV1@ IPV6_AUTOCONF no
+check_device_config_value @KSTEST_NETDEV1@ IPV6_AUTOCONF no ipv6 method manual
 
 # No error was written to /root/RESULT file, everything is OK
 if [[ ! -e /root/RESULT ]]; then

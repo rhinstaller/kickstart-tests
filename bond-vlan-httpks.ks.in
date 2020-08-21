@@ -30,10 +30,10 @@ check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@ bond
 
 @KSINCLUDE@ post-lib-network.sh
 
-check_device_ifcfg_value bond0.222 ONBOOT no
-check_device_ifcfg_value bond0 ONBOOT no
-check_device_ifcfg_value bond0_slave_1 ONBOOT no
-check_device_ifcfg_value bond0_slave_2 ONBOOT no
+check_device_config_value bond0.222 ONBOOT no connection autoconnect false
+check_device_config_value bond0 ONBOOT no connection autoconnect false
+check_device_config_value bond0_slave_1 ONBOOT no connection autoconnect false
+check_device_config_value bond0_slave_2 ONBOOT no connection autoconnect false
 check_device_connected bond0 yes
 check_device_connected bond0.222 yes
 check_bond_has_slave bond0 @KSTEST_NETDEV2@ yes

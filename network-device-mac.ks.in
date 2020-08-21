@@ -24,7 +24,7 @@ shutdown
 
 # --device=<MAC> is used to specify the interface, not to bind the
 # connection to the MAC address
-check_ifcfg_key_exists ksdev0 HWADDR no
+check_device_config_value ksdev0 HWADDR __NONE ethernet mac-address __NONE
 check_device_connected ksdev0 yes
 
 # No error was written to /root/RESULT file, everything is OK

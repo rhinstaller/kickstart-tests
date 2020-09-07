@@ -6,7 +6,7 @@ network --bootproto=dhcp
 
 bootloader --timeout=1
 clearpart --none --initlabel
-autopart
+autopart --type lvm
 
 keyboard us
 lang en_US.UTF-8

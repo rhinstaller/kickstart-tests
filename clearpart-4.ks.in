@@ -6,7 +6,7 @@ network --bootproto=dhcp
 
 bootloader --timeout=1 --boot-drive=sda
 clearpart --linux --initlabel
-autopart
+autopart --type lvm
 
 keyboard us
 lang en_US.UTF-8

@@ -28,17 +28,16 @@ shutdown
 @KSINCLUDE@ post-lib-network.sh
 
 check_config_exists @KSTEST_NETDEV1@ no
-check_config_exists @KSTEST_NETDEV2@ yes
+check_config_exists @KSTEST_NETDEV2@ no
 check_config_exists @KSTEST_NETDEV3@ no
 check_device_connected @KSTEST_NETDEV1@ yes
 check_device_connected @KSTEST_NETDEV2@ yes
 check_device_connected @KSTEST_NETDEV3@ yes
 
-check_number_of_connections 2
+check_number_of_connections 1
 
 check_connection_device "Wired Connection" @KSTEST_NETDEV1@
 check_connection_device "Wired Connection" @KSTEST_NETDEV2@
-check_connection_device "System @KSTEST_NETDEV2@"
 check_connection_device "Wired Connection" @KSTEST_NETDEV3@
 check_connection_setting "Wired Connection" ipv4.method auto
 check_connection_setting "Wired Connection" ipv6.method auto
@@ -75,7 +74,7 @@ check_device_connected @KSTEST_NETDEV2@ yes
 check_device_connected @KSTEST_NETDEV3@ yes
 
 check_connection_device "Wired Connection" @KSTEST_NETDEV2@
-check_connection_device "System @KSTEST_NETDEV2@"
+check_connection_device @KSTEST_NETDEV2@
 
 check_number_of_connections 4
 check_connection_device "Wired Connection" @KSTEST_NETDEV1@

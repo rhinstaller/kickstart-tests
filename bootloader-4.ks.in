@@ -4,7 +4,7 @@ network --bootproto=dhcp
 
 bootloader --timeout=1 --boot-drive=sdb --driveorder=sda,sdb,sdx
 
-autopart
+autopart --type lvm
 clearpart --all --initlabel
 zerombr
 

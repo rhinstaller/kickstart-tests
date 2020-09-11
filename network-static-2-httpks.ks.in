@@ -29,6 +29,8 @@ shutdown
 
 @KSINCLUDE@ post-nochroot-lib-network.sh
 
+pass_autoconnections_info_to_chroot
+
 check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@ @KSTEST_NETDEV4@ @KSTEST_NETDEV5@
 
 %end
@@ -51,7 +53,14 @@ check_device_connected @KSTEST_NETDEV4@ yes
 check_device_ipv4_address @KSTEST_NETDEV4@ @KSTEST_STATIC_IP3@
 
 check_device_config_value @KSTEST_NETDEV5@ IPADDR @KSTEST_STATIC_IP4@ ipv4 method manual
-check_device_connected @KSTEST_NETDEV5@ no
+detect_nm_has_autoconnections_off
+nm_has_autoconnections_off=$?
+if [[ $nm_has_autoconnections_off -eq 0 ]]; then
+    check_device_connected @KSTEST_NETDEV5@ no
+else
+    # Ifcfg from initramfs is no longer blocking default autoconnection
+    check_device_connected @KSTEST_NETDEV5@ yes
+fi
 
 # No error was written to /root/RESULT file, everything is OK
 if [[ ! -e /root/RESULT ]]; then

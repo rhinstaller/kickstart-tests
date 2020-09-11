@@ -23,6 +23,8 @@ shutdown
 
 @KSINCLUDE@ post-nochroot-lib-network.sh
 
+pass_autoconnections_info_to_chroot
+
 check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@
 
 %end
@@ -34,7 +36,15 @@ check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@
 check_device_config_value @KSTEST_NETDEV1@ ONBOOT no connection autoconnect false
 check_device_config_value @KSTEST_NETDEV2@ ONBOOT yes connection autoconnect __NONE
 check_device_config_value @KSTEST_NETDEV3@ ONBOOT no connection autoconnect false
-check_device_connected @KSTEST_NETDEV2@ no
+
+detect_nm_has_autoconnections_off
+nm_has_autoconnections_off=$?
+if [[ $nm_has_autoconnections_off -eq 0 ]]; then
+    check_device_connected @KSTEST_NETDEV2@ no
+else
+    # Ifcfg from initramfs is no longer blocking default autoconnection
+    check_device_connected @KSTEST_NETDEV2@ yes
+fi
 check_device_connected @KSTEST_NETDEV3@ yes
 
 # No error was written to /root/RESULT file, everything is OK

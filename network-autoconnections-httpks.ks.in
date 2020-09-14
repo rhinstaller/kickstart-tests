@@ -80,7 +80,7 @@ check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@
 
 check_device_config_value @KSTEST_NETDEV1@ ONBOOT yes connection autoconnect __NONE
 check_device_config_value @KSTEST_NETDEV2@ ONBOOT yes connection autoconnect __NONE
-check_device_config_value @KSTEST_NETDEV2@ DNS1 10.43.26.2 ipv4 dns 10.43.26.2;
+check_device_config_value @KSTEST_NETDEV2@ DNS1 10.43.26.2 ipv4 dns "10.43.26.2;"
 
 detect_nm_has_autoconnections_off
 nm_has_autoconnections_off=$?

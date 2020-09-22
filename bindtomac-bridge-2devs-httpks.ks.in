@@ -24,9 +24,9 @@ shutdown
 
 %post --nochroot
 
-pass_autoconnections_info_to_chroot
-
 @KSINCLUDE@ post-nochroot-lib-network.sh
+
+pass_autoconnections_info_to_chroot
 
 check_bridge_has_slave_nochroot bridge0 @KSTEST_NETDEV1@ yes
 check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ bridge0 bridge1

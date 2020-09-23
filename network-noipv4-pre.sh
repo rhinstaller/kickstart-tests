@@ -31,5 +31,6 @@ prepare_network() {
     echo "network:default"
     echo "network:default"
     echo "network:default"
+    echo "network:default"
 }
 

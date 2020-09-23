@@ -31,7 +31,8 @@ class VirtualLogRequestHandler(LogRequestHandler):
         "CRIT mdadm:DegradedArray event detected",
 
         # Ignore a call trace during debugging.
-        # "Call Trace:"
+        # Enabled tempoarily for rhbz#1885978, rhbz#1893950
+        "Call Trace:"
     ]
 
     # Specify error lines you want to add on top

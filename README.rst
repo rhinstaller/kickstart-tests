@@ -47,7 +47,7 @@ Then clone the kickstart-tests repository::
 
 And you also need a rawhide boot.iso (provided you want to run the kickstart tests on Rawhide)::
 
-  wget http://download.eng.brq.redhat.com/pub/fedora/linux/development/latest-rawhide/Server/x86_64/os/images/boot.iso
+  wget https://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Server/x86_64/os/images/boot.iso
 
 Please note that due to the dynamic nature of Rawhide the boot.iso might not always work.
 

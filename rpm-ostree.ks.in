@@ -1,0 +1,30 @@
+#test name: rpm-ostree
+
+# Use the default settings.
+%ksappend common/common_no_payload.ks
+
+# Set up the RPM OSTree source.
+ostreesetup --nogpg --osname=fedora-iot --remote=fedora-iot --url=https://kojipkgs.fedoraproject.org/compose/iot/repo/ --ref=fedora/rawhide/${basearch}/iot
+
+%post
+# Check the name of the remote.
+name="$(ostree remote list)"
+
+if [ "${name}" != "fedora-iot" ]; then
+    echo "Unexpected name: ${name}" >> /root/RESULT
+fi
+
+# Check the url of the remote.
+url="$(ostree remote show-url fedora-iot)"
+
+if [ "${url}" != "https://kojipkgs.fedoraproject.org/compose/iot/repo/" ]; then
+    echo "Unexpected URL: ${url}" >> /root/RESULT
+fi
+
+if [ ! -e /root/RESULT ]; then
+    echo SUCCESS > /root/RESULT
+fi
+
+# Write the result into logs.
+cat /root/RESULT
+%end

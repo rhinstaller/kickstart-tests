@@ -425,7 +425,7 @@ if [[ "$TEST_REMOTES" != "" ]]; then
             ssh kstest@${remote} sudo chmod -R a+r /var/tmp/kstest-\*
             # Fix permissions of log folders gathered via libguestfs
             ssh kstest@${remote} sudo find /var/tmp/kstest-\* -type d -exec chmod 755 {} +
-            scp -r kstest@${remote}:/var/tmp/kstest-\* /var/tmp/
+            scp -C -r kstest@${remote}:/var/tmp/kstest-\* /var/tmp/
         fi
 
         ssh kstest@${remote} sudo rm -rf /var/tmp/kstest-\*

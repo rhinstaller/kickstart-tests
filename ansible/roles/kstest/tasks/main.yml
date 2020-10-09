@@ -29,6 +29,9 @@
       - libguestfs-tools # kstests
       - vim
       - rsync
+      # the two are required by mkdud.py and make-addon-pkgs.py
+      - createrepo
+      - python3-rpmfluff
     state: latest
 
 - name: Install kernel-modules (reboot if updated)

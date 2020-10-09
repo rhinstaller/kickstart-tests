@@ -25,10 +25,12 @@ First you need to install the needed dependencies:
 - libguestfs-tools
 - virt-install
 - parallel
+- createrepo
+- python3-rpmfluff
 
 On Fedora the dependencies can be installed with dnf like this::
 
-  sudo dnf install lorax-lmc-virt libguestfs-tools python3-libvirt virt-install parallel
+  sudo dnf install lorax-lmc-virt libguestfs-tools python3-libvirt virt-install parallel createrepo python3-rpmfluff
 
 Or with the install_dependencies_fedora.sh script:
 

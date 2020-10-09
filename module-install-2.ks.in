@@ -24,7 +24,6 @@ shutdown
 module --name=django --stream=1.6
 
 %packages
-@^Fedora Server Edition
 @nodejs:10/default
 kernel
 vim

@@ -9,7 +9,6 @@
 %ksappend common/common_no_payload.ks
 
 %packages
-@^Fedora Server Edition
 # lets use a no-default profile to see if it is correctly set afterwards
 @cri-o:2018.0/default
 @cri-o:1.11/default

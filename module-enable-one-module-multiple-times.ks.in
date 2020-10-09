@@ -11,7 +11,6 @@ module --name=nodejs --stream=10
 module --name=nodejs --stream=10
 
 %packages
-@^Fedora Server Edition
 # lets use a no-default profile to see if it is correctly set afterwards
 kernel
 vim

@@ -47,9 +47,10 @@ check_device_has_ipv4_address bridge0 yes
 check_device_has_ipv4_address @KSTEST_NETDEV1@ no
 
 # The bridge is created in initramfs so the slave connection is named @KSTEST_NETDEV1@
-# This is failing because kickstart is actually applied in initramfs by NM via dracut
-# boot options which don't have notion of --bindto=mac. The fix would be updating the
-# connection in stage2 or adding support to nm-initrd-generator.
+# KNOWNFAILURE: This is failing because kickstart is actually applied in
+# initramfs by NM via dracut boot options which don't have notion of
+# --bindto=mac. The fix would be updating the connection in stage2 or adding
+# support to nm-initrd-generator.
 check_device_config_bound_to_mac @KSTEST_NETDEV1@
 
 # WARNING: this depends on assumption of running %post scripts in order they

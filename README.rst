@@ -27,10 +27,11 @@ First you need to install the needed dependencies:
 - parallel
 - createrepo
 - python3-rpmfluff
+- squid
 
 On Fedora the dependencies can be installed with dnf like this::
 
-  sudo dnf install lorax-lmc-virt libguestfs-tools python3-libvirt virt-install parallel createrepo python3-rpmfluff
+  sudo dnf install lorax-lmc-virt libguestfs-tools python3-libvirt virt-install parallel createrepo python3-rpmfluff squid
 
 Or with the install_dependencies_fedora.sh script:
 

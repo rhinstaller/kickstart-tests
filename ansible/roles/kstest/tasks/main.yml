@@ -32,6 +32,8 @@
       # the two are required by mkdud.py and make-addon-pkgs.py
       - createrepo
       - python3-rpmfluff
+      # required by launch_proxy.sh (proxy-* tests)
+      - squid
     state: latest
 
 - name: Install kernel-modules (reboot if updated)

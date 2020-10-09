@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
-TESTTYPE="knownfailure network"
+TESTTYPE="network"
 # This is not implemented yet for %pre (ie in anaconda, just in parse-kickstart)
 
 . ${KSTESTDIR}/functions.sh

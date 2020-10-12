@@ -16,7 +16,6 @@
 module --name=postgresql --stream=9.6
 
 %packages
-@^Fedora Server Edition
 @postgresql:10/server
 kernel
 vim

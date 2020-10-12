@@ -8,7 +8,6 @@
 %ksappend common/common_no_payload.ks
 
 %packages
-@^Fedora Server Edition
 kernel
 vim
 @nodejs

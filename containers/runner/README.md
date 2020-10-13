@@ -13,7 +13,7 @@ Host requirements
 
 Dependencies needed to be installed are defined in `host_packages` variable of [vars.yml](vars.yml).
 ```
-sudo dnf install git policycoreutils-python-utils podman
+sudo dnf install git podman
 ```
 
 The `squashfs` kernel module needs to be running on the host. To check run:
@@ -57,10 +57,6 @@ Create subdirs for test inputs (installation image) and outputs (logs):
 mkdir -p ${VOLUME_DIR}/images
 mkdir -p ${VOLUME_DIR}/logs
 ```
-Set the proper selinux context for the volume directory:
-```
-./set-volume-dir-permissions.sh ${VOLUME_DIR}
-```
 
 Download the test subject (installer boot iso):
 ```
@@ -69,7 +65,7 @@ curl -L https://download.fedoraproject.org/pub/fedora/linux/development/rawhide/
 
 Run the test:
 ```
-sudo podman run --env KSTESTS_TEST=keyboard -v ${VOLUME_DIR}:/opt/kstest/data --name last-kstest --privileged=true --device=/dev/kvm kstest-runner
+sudo podman run --env KSTESTS_TEST=keyboard -v ${VOLUME_DIR}:/opt/kstest/data:z --name last-kstest --privileged=true --device=/dev/kvm kstest-runner
 ```
 Instead of keeping named container you can remove it after the test by replacing `--name last-kstest` option with `--rm`.
 

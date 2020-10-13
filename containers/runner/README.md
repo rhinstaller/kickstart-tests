@@ -72,7 +72,7 @@ Instead of keeping named container you can remove it after the test by replacing
 See the results:
 ```
 tree -L 3 ${VOLUME_DIR}/logs
-cat ${VOLUME_DIR}/logs/kstest-*/anaconda/anaconda.log
+cat ${VOLUME_DIR}/logs/kstest-*/anaconda/virt-install.log
 ```
 
 This will check out and use kickstart-tests master from GitHub. To run against

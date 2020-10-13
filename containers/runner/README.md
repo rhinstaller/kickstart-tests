@@ -64,7 +64,7 @@ Set the proper selinux context for the volume directory:
 
 Download the test subject (installer boot iso):
 ```
-curl http://mirror.karneval.cz/pub/linux/fedora/linux/releases/32/Everything/x86_64/os/images/boot.iso --output ${VOLUME_DIR}/images/boot.iso
+curl -L https://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Server/x86_64/os/images/boot.iso --output ${VOLUME_DIR}/images/boot.iso
 ```
 
 Run the test:

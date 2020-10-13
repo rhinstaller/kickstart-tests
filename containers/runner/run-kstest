@@ -14,9 +14,11 @@ LOGS_DIR=${APP_DATA}/logs
 
 runlibvirt
 
-git clone ${KSTESTS_REPOSITORY} ${KSTESTS_DIR}
-git -C ${KSTESTS_DIR} checkout ${KSTESTS_BRANCH}
-git -C ${KSTESTS_DIR} remote -v
+if ! [ -d "${KSTESTS_DIR}" ]; then
+    git clone ${KSTESTS_REPOSITORY} ${KSTESTS_DIR}
+    git -C ${KSTESTS_DIR} checkout ${KSTESTS_BRANCH}
+    git -C ${KSTESTS_DIR} remote -v
+fi
 
 # Prepare the configuration
 UPDATES_IMAGE_ARG=""

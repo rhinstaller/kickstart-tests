@@ -75,6 +75,10 @@ tree -L 3 ${VOLUME_DIR}/logs
 cat ${VOLUME_DIR}/logs/kstest-*/anaconda/anaconda.log
 ```
 
+This will check out and use kickstart-tests master from GitHub. To run against
+your local development branch instead, pass `-v .:/opt/kstest/kickstart-tests`
+to `podman run`.
+
 Configuration of the test
 -------------------------
 

@@ -9,4 +9,4 @@
 source network-device-names.cfg
 export KSTEST_URL='--url=https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/$basearch/os/'
 export KSTEST_MODULAR_URL='https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Modular/$basearch/os/'
-export KSTEST_FTP_URL='ftp://mirror.utexas.edu/pub/fedora/linux/development/rawhide/Everything/$basearch/os/'
+export KSTEST_FTP_URL='ftp://ftp.tu-chemnitz.de/pub/linux/fedora/linux/development/rawhide/Everything/$basearch/os/'

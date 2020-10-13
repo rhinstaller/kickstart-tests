@@ -30,6 +30,7 @@ First you need to install the needed dependencies:
 - squid
 - scp
 - genisoimage
+- make
 
 On Fedora the dependencies can be installed with::
 

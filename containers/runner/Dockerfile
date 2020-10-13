@@ -16,6 +16,7 @@ RUN dnf -y update && \
     createrepo \
     python3-rpmfluff \
     squid \
+    make \
     openssh-clients && \
     dnf -y clean all
 

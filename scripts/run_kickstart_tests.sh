@@ -153,7 +153,7 @@ if [[ -e $HOME/.kstests.defaults.sh ]]; then
 fi
 
 # Grab useful data from boot.iso
-output="$(sudo ./scripts/probe_boot_iso.sh $IMAGE)"
+output="$(./scripts/probe_boot_iso.sh $IMAGE)"
 if [[ $? -ne 0 ]]; then
     echo "Can't run probe_boot_iso" >&2
     exit 3

@@ -1,4 +1,0 @@
-#!/bin/sh
-
-sudo libvirtd &
-sudo virtlogd &

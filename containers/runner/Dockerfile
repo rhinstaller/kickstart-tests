@@ -27,17 +27,14 @@ ENV PATH=${APP_ROOT}/bin:${PATH} \
 
 RUN groupadd -g 1001 -r ${KSTEST_USER} -f && \
     useradd -u 1001 -r -g ${KSTEST_USER} -m -c "Kickstart test user" ${KSTEST_USER} && \
-    mkdir -p ${APP_DATA} && \
-    # Add kstest to sudoers which is required by run_kickstart_tests.sh script
-    echo "kstest ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/${KSTEST_USER} && \
-    chmod 0440 /etc/sudoers.d/${KSTEST_USER}
+    mkdir -p ${APP_DATA}
 
 # This is what OpenShift does with random user he is using
 # BUT it does not seem to work, kstest user is not in the root group
 # so it can't for example create dirs in APP_ROOT
 #RUN usermod -a -G root ${KSTEST_USER}
 
-COPY run-kstest runlibvirt ${APP_ROOT}/bin/
+COPY run-kstest ${APP_ROOT}/bin/
 
 # OpenShift
 RUN  chgrp -R 0 ${APP_ROOT} && \

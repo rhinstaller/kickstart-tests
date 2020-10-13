@@ -8,11 +8,10 @@
 %ksappend repos/default.ks
 %ksappend common/common_no_payload.ks
 
-module --name=cri-o --stream=1.11
+module --name=avocado --stream=latest
 
 %packages
-@^Fedora Server Edition
-@cri-o:1.11/default
+@avocado:latest/default
 kernel
 vim
 %end
@@ -34,25 +33,22 @@ if [[ $? != 0 ]]; then
     echo '*** kernel package not installed' >> /root/RESULT
 fi
 
-rpm -q cri-o
+rpm -q python3-avocado
 if [[ $? != 0 ]]; then
-    echo '*** cri-o package for cri-o module not installed' >> /root/RESULT
+    echo '*** python3-avocado package for avocado module not installed' >> /root/RESULT
 fi
 
-rpm -q cri-tools
+rpm -q python3-avocado-plugins-output-html
 if [[ $? != 0 ]]; then
-    echo '*** cri-tools package for cri-o module not installed' >> /root/RESULT
+    echo '*** python3-avocado-plugins-output-html package for avocado module not installed' >> /root/RESULT
 fi
 
 # next we will check if the module is seen as enabled/installed from the
 # metadata/DNF point of view
-dnf module list --enabled cri-o | grep cri-o || echo "*** cri-o module not marked as enabled" >> /root/RESULT
-dnf module list --installed cri-o | grep cri-o || echo "*** cri-o module not marked as installed" >> /root/RESULT
+dnf module list --enabled avocado | grep avocado || echo "*** avocado module not marked as enabled" >> /root/RESULT
+dnf module list --installed avocado | grep avocado || echo "*** avocado module not marked as installed" >> /root/RESULT
 
-# check the stream and profile as well
-# - commented out due to DNF output breakage, see:
-#   https://bugzilla.redhat.com/show_bug.cgi?id=1602028#c1
-#dnf module list --installed cri-o | grep "default \[i\]" || echo "*** cri-o module default profile not marked as installed" >> /root/RESULT
+dnf module list --installed avocado | grep "default \[d\] \[i\]" || echo "*** avocado module default profile not marked as installed" >> /root/RESULT
 
 %ksappend validation/success_if_result_empty.ks
 

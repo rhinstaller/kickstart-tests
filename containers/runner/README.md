@@ -93,25 +93,5 @@ Environment variables for the container (`--env` option):
 Troubleshooting
 ---------------
 
-### Host and container base image version
-Fedora 30 seems to be the container base image version with the highest chances of being able to run the tests (with regard to the libvirt version). It was run successfuly on Fedora 30 Cloud Base image deployed with the [playbook](runner-host.yml). On Fedora 30 Workstation on bare metal also Fedora 31 container worked.
-
-Other combinations failed with errors:
-* F32 host, F30 container image:
-```
-2020-05-12 12:36:28.714+0000: 16: error : virCgroupSetValueStr:477 : Unable to write to '/sys/fs/cgroup//cgroup.subtree_control': Operation not supported
-```
-* F32 container image:
-```
-2020-05-12 12:51:32,856 INFO: ERROR    Requested operation is not valid: network 'default' is not active
-```
-* F31 host, F31 container image:
-```
-2020-05-12 12:54:53.713+0000: 14: error : virCgroupV2ParseControllersFile:281 : Unable to read from '/sys/fs/cgroup/machine/cgroup.controllers': No such file or directory
-```
-Some likely related BZs:
-* [https://bugzilla.redhat.com/show_bug.cgi?id=1751120](https://bugzilla.redhat.com/show_bug.cgi?id=1751120)
-* [https://bugzilla.redhat.com/show_bug.cgi?id=1760233](https://bugzilla.redhat.com/show_bug.cgi?id=1760233)
-
 ### Tests runnable in container
 Some tests require services, resources, or configration in VM hypervisor that might not be working in container. Checking the tests and trying to resolve the issues is TBD.

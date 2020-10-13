@@ -39,8 +39,7 @@
 # Finally, you can run tests across multiple computers at the same time by
 # putting all the hostnames into TEST_REMOTES= as a space separated list.
 # Do not add localhost manually, as it will always be added for you.  You
-# must create a user named kstest on each remote system, allow that user to
-# sudo to root for purposes of running livemedia-creator, and have ssh keys
+# must create a user named kstest on each remote system, and have ssh keys
 # set up so that the user running this script can login to the remote systems
 # as kstest without a password.  TEST_JOBS= applies on a per-system basis.
 # KEEPIT= controls how much will be kept on the master system (where "make
@@ -401,7 +400,7 @@ if [[ "$TEST_REMOTES" != "" ]]; then
     export LANG=en_US.UTF-8
 
     parallel --no-notice ${remote_args} --wd kickstart-tests --jobs ${TEST_JOBS:-4} \
-             sudo PYTHONPATH=$PYTHONPATH scripts/launcher/run_one_test.py \
+             PYTHONPATH=$PYTHONPATH scripts/launcher/run_one_test.py \
                                                                -i ../install_images/${_IMAGE} \
                                                                -k ${KEEPIT} \
                                                                --append-host-id \
@@ -421,18 +420,19 @@ if [[ "$TEST_REMOTES" != "" ]]; then
     for remote in ${TEST_REMOTES}; do
         echo "gathering results from remote ${remote}"
         if [[ ${KEEPIT} > 0 ]]; then
-            ssh kstest@${remote} sudo chown -R kstest:kstest /var/tmp/kstest-\*
-            ssh kstest@${remote} sudo chmod -R a+r /var/tmp/kstest-\*
-            # Fix permissions of log folders gathered via libguestfs
-            ssh kstest@${remote} sudo find /var/tmp/kstest-\* -type d -exec chmod 755 {} +
+            ssh kstest@${remote} chmod -R a+r /var/tmp/kstest-\*
+            # Fix permissions of log folders gathered via libguestfs (they lack the x bit)
+            # need to run it twice so that find can look into the previously broken directories
+            ssh kstest@${remote} "find /var/tmp/kstest-* -type d -print -exec chmod 755 {} + 2>/dev/null ||
+                                  find /var/tmp/kstest-* -type d -print -exec chmod 755 {} +"
             scp -r kstest@${remote}:/var/tmp/kstest-\* /var/tmp/
         fi
 
-        ssh kstest@${remote} sudo rm -rf /var/tmp/kstest-\*
+        ssh kstest@${remote} rm -rf /var/tmp/kstest-\*
     done
 else
     parallel --no-notice --jobs ${TEST_JOBS:-4} \
-        sudo PYTHONPATH=$PYTHONPATH scripts/launcher/run_one_test.py \
+        PYTHONPATH=$PYTHONPATH scripts/launcher/run_one_test.py \
                                                       -i ${IMAGE} \
                                                       -k ${KEEPIT} \
                                                       --append-host-id \
@@ -440,9 +440,11 @@ else
     rc=$?
 fi
 
-# Fix permissions of log folders gathered via libguestfs
+# Fix permissions of log folders gathered via libguestfs (they lack the x bit)
 # We need to do this also on results created on local host.
-sudo find /var/tmp/kstest-* -type d -exec chmod 755 {} +
+# need to run it twice so that find can look into the previously broken directories
+find /var/tmp/kstest-* -type d -print -exec chmod 755 {} + 2>/dev/null || \
+    find /var/tmp/kstest-* -type d -print -exec chmod 755 {} +
 
 # Return exit code from above.  This is structure for future improvement,
 # you can do a cleaning here.

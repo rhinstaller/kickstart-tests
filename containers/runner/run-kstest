@@ -12,8 +12,6 @@ BOOT_ISO=${BOOT_ISO:-boot.iso}
 ISO_DIR=${APP_DATA}/images
 LOGS_DIR=${APP_DATA}/logs
 
-runlibvirt
-
 if ! [ -d "${KSTESTS_DIR}" ]; then
     git clone ${KSTESTS_REPOSITORY} ${KSTESTS_DIR}
     git -C ${KSTESTS_DIR} checkout ${KSTESTS_BRANCH}
@@ -33,10 +31,9 @@ popd
 
 # Copy logs to a volume
 # Fixup permissions
-sudo chown -R ${KSTEST_USER}:${KSTEST_USER} /var/tmp/kstest-*
-sudo chmod -R a+r /var/tmp/kstest-*
+chmod -R a+r /var/tmp/kstest-*
 # Clean up (artifacts from broken test)
 find /var/tmp/kstest-${KSTESTS_TEST}* -name "*.iso" -delete
 find /var/tmp/kstest-${KSTESTS_TEST}* -name "*.img" -delete
 # Move to target logs directory
-sudo cp -r /var/tmp/kstest-${KSTESTS_TEST}* ${LOGS_DIR}
+cp -r /var/tmp/kstest-${KSTESTS_TEST}* ${LOGS_DIR}

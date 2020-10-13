@@ -23,9 +23,8 @@ Run a test in a container
 
 Build the container:
 ```
-sudo podman build -t kstest-runner .
+podman build -t kstest-runner .
 ```
-Note: we can't use rootless containers because of mounting of images in the contaier.
 
 Define the directory for passing of data between the container and the system (via volume):
 ```
@@ -35,7 +34,7 @@ export VOLUME_DIR=${PWD}/data
 Create subdirs for test inputs (installation image) and outputs (logs):
 ```
 mkdir -p ${VOLUME_DIR}/images
-mkdir -p ${VOLUME_DIR}/logs
+mkdir -p -m 777 ${VOLUME_DIR}/logs
 ```
 
 Download the test subject (installer boot iso):
@@ -45,7 +44,7 @@ curl -L https://download.fedoraproject.org/pub/fedora/linux/development/rawhide/
 
 Run the test:
 ```
-sudo podman run --env KSTESTS_TEST=keyboard -v ${VOLUME_DIR}:/opt/kstest/data:z --name last-kstest --privileged=true --device=/dev/kvm kstest-runner
+podman run --env KSTESTS_TEST=keyboard -v ${VOLUME_DIR}:/opt/kstest/data:z --name last-kstest --device=/dev/kvm kstest-runner
 ```
 Instead of keeping named container you can remove it after the test by replacing `--name last-kstest` option with `--rm`.
 

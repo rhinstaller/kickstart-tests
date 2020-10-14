@@ -54,8 +54,8 @@ inject_ks_to_initrd() {
 
 # Arguments for virt-install --network options
 prepare_network() {
-    echo "network:default"
-    echo "network:default"
+    echo "user"
+    echo "user"
 }
 
 cleanup() {

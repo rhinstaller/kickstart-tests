@@ -277,12 +277,7 @@ Allocating device MAC addresses
 
 For tests requiring definition of MAC address assigned to the device the
 address is statically assigned in prepare_network() function.  For kvm/qemu
-virtual machines it must start with 52:54:00. These addresses must be unique
-among are tests which are supposed to be run in parallel.  There is currently
-no mechanism to ensure this automatically. When adding a new test it is
-possible to look for already assigned addresses by running this command:
-
-  find *.sh -executable | xargs grep "network=default,mac=52:54:00:" | sort -k3
+virtual machines it must start with 52:54:00.
 
 httpks tests
 ------------

@@ -4,7 +4,7 @@ TESTTYPE="network"
 
 ### Multiple network devices:
 
-To define multiple network devices use prepare_network() function in .sh file. See onboot-activate.sh which defines 3 NICs. The values are passed to virt-install --network option. "network:default" means that the NIC will be connected to "default" virtual network.
+To define multiple network devices use prepare_network() function in .sh file. See onboot-activate.sh which defines 3 NICs. The values are passed to virt-install --network option. Tests usually use one or more `user` networks, so that they can run without privileges and are isolated from one another (for parallel test runs).
 
 It is sometimes useful to control the devices that would be activated in initramfs stage, which can be done by overriding kernel_args() function in .sh file.
 

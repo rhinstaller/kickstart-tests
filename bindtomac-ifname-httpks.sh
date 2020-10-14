@@ -28,8 +28,8 @@ kernel_args() {
 
 # Arguments for virt-install --network options
 prepare_network() {
-    echo "network=default,mac=52:54:00:12:34:40"
-    echo "network=default,mac=52:54:00:12:34:41"
+    echo "user,mac=52:54:00:12:34:40"
+    echo "user,mac=52:54:00:12:34:41"
 }
 
 prepare() {

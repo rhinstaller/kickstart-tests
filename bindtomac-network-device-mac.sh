@@ -23,5 +23,5 @@ TESTTYPE="network"
 
 # Arguments for virt-install --network options
 prepare_network() {
-    echo "network=default,mac=52:54:00:12:34:50"
+    echo "user,mac=52:54:00:12:34:50"
 }

@@ -109,23 +109,6 @@ class KickstartValidator(Validator):
 
 class LogValidator(Validator):
 
-    def check_install_errors(self, install_log):
-        ret_code = 0
-
-        with open(install_log, 'rt') as log_f:
-            for line in log_f:
-
-                # non critical error blocking the installation
-                if "CRIT systemd-coredump:" in line:
-                    log.info("Non critical error: {}".format(replace_new_lines(line)))
-                    continue
-                elif "CRIT" in line:
-                    self._result_msg = replace_new_lines(line)
-                    self._return_code = 1
-                    break
-
-        return ret_code
-
     def check_virt_errors(self, virt_log_path):
         with open(virt_log_path, 'rt') as virt_log:
             for line in virt_log:

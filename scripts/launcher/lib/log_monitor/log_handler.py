@@ -24,12 +24,20 @@ class VirtualLogRequestHandler(LogRequestHandler):
 
     # Specify the error lines you want to ignore.
     ignored_simple_tests = [
+        # Non critical error blocking the installation.
+        "CRIT systemd-coredump:",
+
+        # Based on the bug #1886809, it is a non critical error.
+        "CRIT mdadm:DegradedArray event detected",
+
+        # Ignore a call trace during debugging.
         # "Call Trace:"
     ]
 
     # Specify error lines you want to add on top
     # of the default ones contained in Lorax
     simple_tests = LogRequestHandler.simple_tests + [
+        "CRIT",
         "Payload setup error:",
         "Out of memory:",
         "Would you like to ignore this and continue with installation?",

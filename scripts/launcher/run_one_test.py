@@ -170,11 +170,7 @@ class Runner(object):
 
     def _validate_logs(self, virt_configuration):
         validator = LogValidator(self._conf.ks_test_name)
-        validator.check_install_errors(virt_configuration.install_logpath)
-
-        if validator.result:
-            validator.check_virt_errors(virt_configuration.log_path)
-
+        validator.check_virt_errors(virt_configuration.log_path)
         return validator
 
     def _validate_result(self):

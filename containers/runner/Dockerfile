@@ -9,9 +9,14 @@ RUN dnf -y update && \
     git \
     virt-install \
     libguestfs-tools \
+    genisoimage \
     lorax-lmc-virt \
     parallel \
-    python3-libvirt && \
+    python3-libvirt \
+    createrepo \
+    python3-rpmfluff \
+    squid \
+    openssh-clients && \
     dnf -y clean all
 
 ENV APP_ROOT=/opt/kstest

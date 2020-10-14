@@ -29,6 +29,7 @@ First you need to install the needed dependencies:
 - python3-rpmfluff
 - squid
 - scp
+- genisoimage
 
 On Fedora the dependencies can be installed with::
 

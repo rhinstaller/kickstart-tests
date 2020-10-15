@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -x
+set -ex
 
 KSTESTS_REPOSITORY=${KSTESTS_REPOSITORY:-https://github.com/rhinstaller/kickstart-tests}
 KSTESTS_BRANCH=${KSTESTS_BRANCH:-master}
@@ -20,13 +20,14 @@ fi
 
 # Prepare the configuration
 UPDATES_IMAGE_ARG=""
-if [[ -n "${UPDATES_IMAGE}" ]]; then
+if [ -n "${UPDATES_IMAGE}" ]; then
   UPDATES_IMAGE_ARG="-u ${UPDATES_IMAGE}"
 fi
 
 # Run the test
 pushd ${KSTESTS_DIR}
-scripts/run_kickstart_tests.sh -k 2 -i ${ISO_DIR}/${BOOT_ISO} ${UPDATES_IMAGE_ARG} ${KSTESTS_TEST}
+RC=0
+scripts/run_kickstart_tests.sh -k 2 -i ${ISO_DIR}/${BOOT_ISO} ${UPDATES_IMAGE_ARG} ${KSTESTS_TEST} || RC=$?
 popd
 
 # Copy logs to a volume
@@ -35,5 +36,7 @@ chmod -R a+r /var/tmp/kstest-*
 # Clean up (artifacts from broken test)
 find /var/tmp/kstest-${KSTESTS_TEST}* -name "*.iso" -delete
 find /var/tmp/kstest-${KSTESTS_TEST}* -name "*.img" -delete
-# Move to target logs directory
-cp -r /var/tmp/kstest-${KSTESTS_TEST}* ${LOGS_DIR}
+# Move to target logs directory; this sometimes fails on nested directory permission/ownership
+cp -r /var/tmp/kstest-${KSTESTS_TEST}* ${LOGS_DIR} || true
+
+exit $RC

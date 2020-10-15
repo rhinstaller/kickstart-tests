@@ -38,6 +38,20 @@ fi
 
 IMAGE="$1"
 
+# Fast path if ./discinfo is present (for Fedora); if it exists, it looks like this:
+#    1587584254.021611
+#    32
+#    x86_64
+DISCINFO_VER=$(isoinfo -R -x /.discinfo -i "$IMAGE" | sed -n '2 p')
+if [ -n "$DISCINFO_VER" ]; then
+    # make sure it looks like a Fedora version name/number
+    if [ "$DISCINFO_VER" = "Rawhide" ] || [ "$DISCINFO_VER" -gt 30 ]; then
+        echo "NAME=Fedora"
+        echo "VERSION=$DISCINFO_VER"
+        exit 0
+    fi
+fi
+
 # Probe boot.iso → install.img → stage 2 and dig out useful information from it.
 ISO_TMP=$(mktemp -d /tmp/kstest-iso.XXXXXXX)
 trap "rm -rf '$ISO_TMP'" EXIT INT QUIT PIPE

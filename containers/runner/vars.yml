@@ -3,5 +3,4 @@
 # Package dependencies
 host_packages:
   - git
-  - policycoreutils-python-utils
   - podman

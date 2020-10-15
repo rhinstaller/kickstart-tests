@@ -13,7 +13,7 @@ Host requirements
 
 Dependencies needed to be installed are defined in `host_packages` variable of [vars.yml](vars.yml).
 ```
-sudo dnf install git policycoreutils-python-utils podman
+sudo dnf install git podman
 ```
 
 The `squashfs` kernel module needs to be running on the host. To check run:
@@ -57,27 +57,27 @@ Create subdirs for test inputs (installation image) and outputs (logs):
 mkdir -p ${VOLUME_DIR}/images
 mkdir -p ${VOLUME_DIR}/logs
 ```
-Set the proper selinux context for the volume directory:
-```
-./set-volume-dir-permissions.sh ${VOLUME_DIR}
-```
 
 Download the test subject (installer boot iso):
 ```
-curl http://mirror.karneval.cz/pub/linux/fedora/linux/releases/32/Everything/x86_64/os/images/boot.iso --output ${VOLUME_DIR}/images/boot.iso
+curl -L https://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Server/x86_64/os/images/boot.iso --output ${VOLUME_DIR}/images/boot.iso
 ```
 
 Run the test:
 ```
-sudo podman run --env KSTESTS_TEST=keyboard -v ${VOLUME_DIR}:/opt/kstest/data --name last-kstest --privileged=true --device=/dev/kvm kstest-runner
+sudo podman run --env KSTESTS_TEST=keyboard -v ${VOLUME_DIR}:/opt/kstest/data:z --name last-kstest --privileged=true --device=/dev/kvm kstest-runner
 ```
 Instead of keeping named container you can remove it after the test by replacing `--name last-kstest` option with `--rm`.
 
 See the results:
 ```
 tree -L 3 ${VOLUME_DIR}/logs
-cat ${VOLUME_DIR}/logs/kstest-*/anaconda/anaconda.log
+cat ${VOLUME_DIR}/logs/kstest-*/anaconda/virt-install.log
 ```
+
+This will check out and use kickstart-tests master from GitHub. To run against
+your local development branch instead, pass `-v .:/opt/kstest/kickstart-tests`
+to `podman run`.
 
 Configuration of the test
 -------------------------
@@ -92,26 +92,6 @@ Environment variables for the container (`--env` option):
 
 Troubleshooting
 ---------------
-
-### Host and container base image version
-Fedora 30 seems to be the container base image version with the highest chances of being able to run the tests (with regard to the libvirt version). It was run successfuly on Fedora 30 Cloud Base image deployed with the [playbook](runner-host.yml). On Fedora 30 Workstation on bare metal also Fedora 31 container worked.
-
-Other combinations failed with errors:
-* F32 host, F30 container image:
-```
-2020-05-12 12:36:28.714+0000: 16: error : virCgroupSetValueStr:477 : Unable to write to '/sys/fs/cgroup//cgroup.subtree_control': Operation not supported
-```
-* F32 container image:
-```
-2020-05-12 12:51:32,856 INFO: ERROR    Requested operation is not valid: network 'default' is not active
-```
-* F31 host, F31 container image:
-```
-2020-05-12 12:54:53.713+0000: 14: error : virCgroupV2ParseControllersFile:281 : Unable to read from '/sys/fs/cgroup/machine/cgroup.controllers': No such file or directory
-```
-Some likely related BZs:
-* [https://bugzilla.redhat.com/show_bug.cgi?id=1751120](https://bugzilla.redhat.com/show_bug.cgi?id=1751120)
-* [https://bugzilla.redhat.com/show_bug.cgi?id=1760233](https://bugzilla.redhat.com/show_bug.cgi?id=1760233)
 
 ### Tests runnable in container
 Some tests require services, resources, or configration in VM hypervisor that might not be working in container. Checking the tests and trying to resolve the issues is TBD.

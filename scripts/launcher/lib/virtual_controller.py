@@ -139,7 +139,7 @@ class VirtualInstall(object):
         args.append(disk_opts)
 
         if self._ks_paths:
-            extra_args = "ks=file:/{0}".format(os.path.basename(self._ks_paths[0]))
+            extra_args = "inst.ks=file:/{0}".format(os.path.basename(self._ks_paths[0]))
         else:
             extra_args = ""
         if not self._vnc:
@@ -147,7 +147,7 @@ class VirtualInstall(object):
         if self._kernel_args:
             extra_args += " " + self._kernel_args
 
-        extra_args += " stage2=hd:CDLABEL={0}".format(udev_escape(self._label))
+        extra_args += " inst.stage2=hd:CDLABEL={0}".format(udev_escape(self._label))
 
         if self._boot:
             # eg booting from ipxe to emulate ibft firmware

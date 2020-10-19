@@ -2,7 +2,7 @@
 %ksappend repos/default.ks
 install
 
-network --bootproto=dhcp --device=52:54:00:12:34:56
+network --bootproto=dhcp --device=52:54:00:12:34:56 --ipv6=2001:cafe:cafe::1/64
 
 bootloader --timeout=1
 zerombr
@@ -24,8 +24,16 @@ shutdown
 
 # --device=<MAC> is used to specify the interface, not to bind the
 # connection to the MAC address
-check_device_config_value ksdev0 HWADDR __NONE ethernet mac-address __NONE
+#check_device_config_value ksdev0 HWADDR __NONE ethernet mac-address __NONE
+# Nevertheless in the ks injected in virt-install (unlike in the -httpks
+# versions), the parse-kickstart is processed too early, device name is not
+# discoverable in sysfs yet so it picks its own name ksdevX and uses infname= to
+# name the device which results in binding also to HWADDR (because of ifname=
+# being used).
+check_device_config_value ksdev0 HWADDR __ANY ethernet mac-address __ANY
+
 check_device_connected ksdev0 yes
+check_device_config_value ksdev0 IPV6ADDR 2001:cafe:cafe::1/64 ipv6 address1 2001:cafe:cafe::1/64
 
 # No error was written to /root/RESULT file, everything is OK
 if [[ ! -e /root/RESULT ]]; then

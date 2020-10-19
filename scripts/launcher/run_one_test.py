@@ -33,6 +33,7 @@
 # 99 - Test preparation failed
 
 import os
+import shutil
 import subprocess
 import socket
 
@@ -74,7 +75,7 @@ class Runner(object):
 
     def _prepare_test(self):
         log.debug("Preparing test")
-        self._link_image_to_tmp()
+        self._copy_image_to_tmp()
 
         try:
             self._ks_file = self._shell.prepare()
@@ -92,9 +93,9 @@ class Runner(object):
 
         return True
 
-    def _link_image_to_tmp(self):
-        log.info("Linking image to temp directory {}".format(self._tmp_dir))
-        os.symlink(os.path.abspath(self._conf.boot_image_path), os.path.join(self._tmp_dir, "boot.iso"))
+    def _copy_image_to_tmp(self):
+        log.info("Copying image to temp directory {}".format(self._tmp_dir))
+        shutil.copy2(self._conf.boot_image_path, self._tmp_dir)
 
     def run_test(self):
         if not self._prepare_test():

@@ -30,16 +30,14 @@ shutdown
 # Note: up to RHEL8.2 the file was created by dracut network module
 # check_config_exists @KSTEST_NETDEV1@ yes
 check_config_exists @KSTEST_NETDEV1@ no
-check_config_exists @KSTEST_NETDEV2@ yes
+check_config_exists @KSTEST_NETDEV2@ no
 check_config_exists @KSTEST_NETDEV3@ no
 
 check_device_connected @KSTEST_NETDEV1@ yes
-check_device_connected @KSTEST_NETDEV2@ no
 check_connection_device @KSTEST_NETDEV1@ @KSTEST_NETDEV1@
-check_connection_device "System @KSTEST_NETDEV2@"
 
 check_connection_setting "@KSTEST_NETDEV1@" ipv4.method auto
- check_connection_setting "@KSTEST_NETDEV1@" ipv6.method auto
+check_connection_setting "@KSTEST_NETDEV1@" ipv6.method auto
 check_connection_setting "@KSTEST_NETDEV1@" connection.interface-name @KSTEST_NETDEV1@
 check_connection_setting "@KSTEST_NETDEV1@" connection.autoconnect yes
 check_connection_setting "@KSTEST_NETDEV1@" 802-3-ethernet.mac-address --
@@ -47,17 +45,21 @@ check_connection_setting "@KSTEST_NETDEV1@" 802-3-ethernet.mac-address --
 detect_nm_has_autoconnections_off
 nm_has_autoconnections_off=$?
 if [[ $nm_has_autoconnections_off -eq 0 ]]; then
-    check_number_of_connections 2
+    check_number_of_connections 1
     check_device_connected @KSTEST_NETDEV3@ no
+    check_device_connected @KSTEST_NETDEV2@ no
 else
     check_number_of_connections 3
     check_device_connected @KSTEST_NETDEV3@ yes
-    check_connection_device "Wired connection 1" @KSTEST_NETDEV3@
+    # This is no more prevented by ifcfg file created in initramfs
+    check_device_connected @KSTEST_NETDEV2@ yes
+    check_connection_device "Wired connection 1" @KSTEST_NETDEV2@
     check_connection_setting "Wired connection 1" ipv4.method auto
     check_connection_setting "Wired connection 1" ipv6.method auto
-    check_connection_setting "Wired connection 1" connection.interface-name @KSTEST_NETDEV3@
+    check_connection_setting "Wired connection 1" connection.interface-name @KSTEST_NETDEV2@
     check_connection_setting "Wired connection 1" connection.autoconnect yes
     check_connection_setting "Wired connection 1" 802-3-ethernet.mac-address --
+    check_connection_device "Wired connection 2" @KSTEST_NETDEV3@
 fi
 
 %end
@@ -92,15 +94,16 @@ if [[ $nm_has_autoconnections_off -eq 0 ]]; then
     check_device_connected @KSTEST_NETDEV3@ no
     check_connection_device @KSTEST_NETDEV1@ @KSTEST_NETDEV1@
     check_connection_device @KSTEST_NETDEV3@
-    check_connection_device "System @KSTEST_NETDEV2@"
+    check_connection_device @KSTEST_NETDEV2@
 else
     check_device_config_value @KSTEST_NETDEV3@ ONBOOT yes connection autoconnect __NONE
-    check_number_of_connections 3
+    check_number_of_connections 4
     check_device_connected @KSTEST_NETDEV1@ yes
-    check_device_connected @KSTEST_NETDEV2@ no
+    # This is no more prevented by ifcfg file created in initramfs
+    check_device_connected @KSTEST_NETDEV2@ yes
     check_device_connected @KSTEST_NETDEV3@ yes
     check_connection_device @KSTEST_NETDEV1@ @KSTEST_NETDEV1@
-    check_connection_device "System @KSTEST_NETDEV2@"
+    check_connection_device "Wired connection 1" @KSTEST_NETDEV2@
     check_connection_device @KSTEST_NETDEV3@ @KSTEST_NETDEV3@
 fi
 

@@ -48,6 +48,8 @@ podman run --env KSTESTS_TEST=keyboard -v ${VOLUME_DIR}:/opt/kstest/data:z --nam
 ```
 Instead of keeping named container you can remove it after the test by replacing `--name last-kstest` option with `--rm`.
 
+If you have enough RAM, you can run the entire test VM in RAM with `--tmpfs /var/tmp/`, so that it will run faster. This is particularly helpful when running tests in parallel.
+
 See the results:
 ```
 tree -L 3 ${VOLUME_DIR}/logs

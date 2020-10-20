@@ -67,7 +67,7 @@ Environment variables for the container (`--env` option):
 * UPDATES_IMAGE - HTTP URL of updates image to be used
 * KSTESTS_REPOSITORY - kickstart-tests git repository to be used
 * KSTESTS_BRANCH - kickstart-tests git branch to be used
-* BOOT_ISO - name of the installer boot iso from ${VOLUME_DIR}/images to be tested (default is "boot.iso")
+* BOOT_ISO - name of the installer boot iso from `${VOLUME_DIR}/images` to be tested (default is "boot.iso")
 
 
 Troubleshooting

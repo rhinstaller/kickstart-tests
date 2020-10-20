@@ -16,11 +16,6 @@ Dependencies needed to be installed are defined in `host_packages` variable of [
 sudo dnf install git podman
 ```
 
-The `squashfs` kernel module needs to be running on the host. To check run:
-```
-lsmod | grep squashfs
-```
-
 The host needs to have enough available loop device nodes created to be able to mount various images.
 To check existing nodes run:
 ```

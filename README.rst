@@ -217,8 +217,9 @@ The following environment variables are currently supported:
   contains a name of the OS. Possible names can be "fedora", "rhel".
 
 - KSTEST_OS_VERSION - This variable is read from the input boot.iso and it
-  contains version of the OS. For example Fedora 26 have
-  KSTEST_OS_VERSION = 26 and RHEL 7.3 have KSTEST_OS_VERSION = 7.3 .
+  contains version of the OS. For example Fedora 26 has
+  KSTEST_OS_VERSION = 26, Fedora rawhide has "Rawhide", and RHEL 7.3 has
+  KSTEST_OS_VERSION = 7.3 .
 
 Chapter 3. Sharing common code in kickstart (.ks.in) files
 ==========================================================

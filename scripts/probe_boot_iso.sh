@@ -69,7 +69,7 @@ if [ ! -s "$ISO_TMP/install.img" ]; then
 fi
 
 # Extract stage2
-unsquashfs -no-xattrs -quiet -no-progress -d "$ISO_TMP/stage2" "$ISO_TMP/install.img"
+unsquashfs -no-xattrs -no-progress -d "$ISO_TMP/stage2" "$ISO_TMP/install.img"
 rm "$ISO_TMP/install.img"
 
 # Extract required information from stage2

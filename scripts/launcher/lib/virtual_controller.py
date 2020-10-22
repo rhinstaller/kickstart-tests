@@ -40,7 +40,6 @@ from pylorax import setup_logging
 
 from lib.conf.configuration import VirtualConfiguration
 from lib.utils import disable_on_dry_run
-from lib.utils.iso_dev import IsoDev
 from .validator import replace_new_lines
 from .shell_launcher import ProcessLauncher
 from .test_logging import get_logger
@@ -68,8 +67,7 @@ class VirtualInstall(object):
         """
         Start the installation
 
-        :param iso: Information about the iso to use for the installation
-        :type iso: IsoDev
+        :param str iso: Path to the iso to use for the installation
         :param list ks_paths: Paths to kickstart files. All are injected, the
            first one is the one executed.
         :param log_check: Method that returns True if the installation fails
@@ -99,6 +97,10 @@ class VirtualInstall(object):
         self._virtio_port = virtio_port
         self._nics = nics
         self._boot = boot
+
+        self._label = subprocess.check_output(
+                ["blkid", "-p", "--output=value", "--match-tag=LABEL", self._iso],
+                universal_newlines=True).strip()
 
     def _prepare_args(self):
         # add --graphics none later
@@ -132,21 +134,20 @@ class VirtualInstall(object):
             args.append("--network")
             args.append(nic)
 
-        if self._iso.stage2:
-            disk_opts = "path={0},device=cdrom,readonly=on,shareable=on".format(self._iso.iso_path)
-            args.append("--disk")
-            args.append(disk_opts)
+        disk_opts = "path={0},device=cdrom,readonly=on,shareable=on".format(self._iso)
+        args.append("--disk")
+        args.append(disk_opts)
 
         if self._ks_paths:
-            extra_args = "ks=file:/{0}".format(os.path.basename(self._ks_paths[0]))
+            extra_args = "inst.ks=file:/{0}".format(os.path.basename(self._ks_paths[0]))
         else:
             extra_args = ""
         if not self._vnc:
             extra_args += " inst.cmdline"
         if self._kernel_args:
             extra_args += " " + self._kernel_args
-        if self._iso.stage2:
-            extra_args += " stage2=hd:CDLABEL={0}".format(udev_escape(self._iso.label))
+
+        extra_args += " inst.stage2=hd:CDLABEL={0}".format(udev_escape(self._label))
 
         if self._boot:
             # eg booting from ipxe to emulate ibft firmware
@@ -157,7 +158,7 @@ class VirtualInstall(object):
             args.append(extra_args)
 
             args.append("--location")
-            args.append(self._iso.iso_path + ",kernel=isolinux/vmlinuz,initrd=isolinux/initrd.img")
+            args.append(self._iso + ",kernel=isolinux/vmlinuz,initrd=isolinux/initrd.img")
 
         channel_args = "tcp,host={0}:{1},mode=connect,target_type=virtio" \
                        ",name=org.fedoraproject.anaconda.log.0".format(
@@ -227,8 +228,6 @@ class VirtualManager(object):
         This uses virt-install with a boot.iso and a kickstart to create a disk
         image.
         """
-        iso_dev = IsoDev(self._conf.iso_path)
-
         log_monitor = LogMonitor(install_log, timeout=self._conf.timeout)
 
         kernel_args = ""
@@ -237,12 +236,10 @@ class VirtualManager(object):
         if self._conf.proxy:
             kernel_args += " proxy=" + self._conf.proxy
 
-        iso_dev.mount()
-
         try:
             log.info("Starting virtual machine")
             virt = VirtualInstall(self._conf.test_name,
-                                  iso_dev, self._conf.ks_paths,
+                                  self._conf.iso_path, self._conf.ks_paths,
                                   disk_paths=self._conf.disk_paths,
                                   kernel_args=kernel_args,
                                   vcpu_count=self._conf.vcpu_count,
@@ -260,9 +257,6 @@ class VirtualManager(object):
         except InstallError as e:
             log.error("VirtualInstall failed: %s", e)
             raise
-        finally:
-            log.info("unmounting the iso")
-            iso_dev.unmount()
 
         if log_monitor.log_check():
             if not log_monitor.error_line and self._conf.timeout:
@@ -357,8 +351,5 @@ class VirtualManager(object):
 
         if not os.path.exists("/usr/bin/virt-install"):
             errors.append("virt-install needs to be installed.")
-
-        if os.getuid() != 0:
-            errors.append("You need to run this as root")
 
         return errors

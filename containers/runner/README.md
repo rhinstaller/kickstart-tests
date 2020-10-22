@@ -16,21 +16,6 @@ Dependencies needed to be installed are defined in `host_packages` variable of [
 sudo dnf install git podman
 ```
 
-The host needs to have enough available loop device nodes created to be able to mount various images.
-To check existing nodes run:
-```
-ls /dev/loop[0-9]*
-```
-To check used nodes run:
-```
-losetup
-```
-There should be at least three available nodes.
-To create a new node on the host run mknod, for example to create /dev/loop<NUM> run:
-```
-sudo mknod /dev/loop<NUM> b 7 <NUM>
-```
-
 There is a [playbook](runner-host.yml) for deployment of the host on Fedora Cloud Base Image. See [Troubleshooting] for preferred version to be used.
 
 Run a test in a container

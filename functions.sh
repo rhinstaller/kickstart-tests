@@ -37,6 +37,9 @@ DEFAULT_DRACUT_BOOTOPTS="rd.shell=0 rd.emergency=poweroff"
 
 DEFAULT_BOOTOPTS="${DEFAULT_BASIC_BOOTOPTS} ${DEFAULT_DRACUT_BOOTOPTS}"
 
+# host IP with QEMU user mode network
+USER_NET_HOST_IP=10.0.2.2
+
 kernel_args() {
     echo $DEFAULT_BOOTOPTS
 }
@@ -178,7 +181,7 @@ start_httpd() {
     echo "${httpd_pid}" > ${tmpdir}/httpd-pid
 
     # Construct a URL
-    httpd_url="http://$(${scriptdir}/find-ip):${httpd_port}/"
+    httpd_url="http://${USER_NET_HOST_IP}:${httpd_port}/"
 
     # Save the URL
     echo "${httpd_url}" > ${tmpdir}/httpd_url
@@ -211,7 +214,7 @@ start_proxy() {
     local proxy_port="$(echo "$proxy_info" | cut -d ' ' -f 2)"
 
     # Construct a URL
-    proxy_url="http://$(${scriptdir}/find-ip):${proxy_port}/"
+    proxy_url="http://${USER_NET_HOST_IP}:${proxy_port}/"
 }
 
 stop_proxy() {
@@ -242,7 +245,7 @@ create_iscsi_target() {
     targetcli /iscsi/${wwn}/tpg1/ set attribute authentication=0 demo_mode_write_protect=0 generate_node_acls=1 cache_dynamic_acls=1 &>> ${logfile}
 
     local scriptdir=${PWD}/scripts
-    local target_ip=$(${scriptdir}/find-ip)
+    local target_ip=${USER_NET_HOST_IP}
     echo ${target_ip}
 }
 

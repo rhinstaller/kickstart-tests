@@ -78,7 +78,7 @@ inject_ks_to_initrd() {
 prepare_network() {
     local tmpdir=$1
     local network=$(basename ${tmpdir})
-    echo "network:default"
+    echo "user"
     echo "network:${network}"
     echo "network:${network}"
     echo "network:${network}"

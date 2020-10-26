@@ -27,7 +27,3 @@ These are variants of tests checking defining network in %pre section which mean
 Look into onboot-activate.ks.sh for %post bash functions that can be commonly used to test results of installation wrt network device activation and content of created ifcfg files.
 
 We could think about mechanism for sharing %post script bash snippets/functions via additional test files (ks.in) preprocessing.
-
-### Static IP configuration:
-
-To prevent IP address collisions for parallel tests running on the same hypervisor we create dedicated NATed libvirt network for a test and substitute KSTEST macros in network command of the kickstart with proper IP addresses/ranges. See scripts/create-network.py and its callers for details. We might want to use bigger network prefixes in future if the number of parallel tests running on one hypervisor using this feature exceeds 100.

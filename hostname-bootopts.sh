@@ -36,36 +36,15 @@ kernel_args() {
 
 prepare() {
     local ks=$1
-    local tmpdir=$2
-
-    ### Create dedicated network to prevent IP address conflicts for parallel tests
-
-    local network=$(basename ${tmpdir})
-
-    local scriptdir=${PWD}/scripts
-    local ips="$(${scriptdir}/create-network.py "${network}")"
-    local ip="$(echo "$ips" | cut -d ' ' -f 1)"
-    local netmask="$(echo "$ips" | cut -d ' ' -f 2)"
-    local gateway="$(echo "$ips" | cut -d ' ' -f 3)"
     local hostname=testhostname.example.com
 
-    echo "ip_static_boot_config=ip=${ip}::${gateway}:${netmask}:${hostname}:${KSTEST_NETDEV2}:none" > ${tmpdir}/ip_static_boot_config
+    echo "ip_static_boot_config=ip=192.168.100.5::192.168.100.1:255.255.255.0:${hostname}:${KSTEST_NETDEV2}:none" > ${tmpdir}/ip_static_boot_config
 
     echo ${ks}
 }
 
 # Arguments for virt-install --network options
 prepare_network() {
-    local tmpdir=$1
-    local network=$(basename ${tmpdir})
     echo "user"
-    echo "network:${network}"
-}
-
-cleanup() {
-    local tmpdir=$1
-
-    ### Destroy dedicated network
-    local network=$(basename ${tmpdir})
-    virsh net-destroy ${network}
+    echo "user"
 }

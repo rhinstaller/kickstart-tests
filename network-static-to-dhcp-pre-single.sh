@@ -38,37 +38,14 @@ kernel_args() {
 
 prepare() {
     local ks=$1
-    local tmpdir=$2
-
-    ### Create dedicated network to prevent IP address conflicts for parallel tests
-
-    local network=$(basename ${tmpdir})
-
-    local scriptdir=${PWD}/scripts
-    local ips="$(${scriptdir}/create-network.py "${network}")"
-    local ip="$(echo "$ips" | cut -d ' ' -f 1)"
-    local netmask="$(echo "$ips" | cut -d ' ' -f 2)"
-    local gateway="$(echo "$ips" | cut -d ' ' -f 3)"
-
-    # Substitute IP ranges of created network in kickstart
-    sed -i -e s#@KSTEST_STATIC_IP@#${ip}#g -e s#@KSTEST_STATIC_NETMASK@#${netmask}#g -e s#@KSTEST_STATIC_GATEWAY@#${gateway}#g ${ks}
-    #ip=10.34.102.233::10.34.102.254:255.255.255.0::ens9:none
-    echo "ip_static_boot_config=ip=${ip}::${gateway}:${netmask}::${KSTEST_NETDEV1}:none nameserver=${gateway}" > ${tmpdir}/ip_static_boot_config
+    # This is a private slirp network, so we can pick any config we like
+    sed -i -e 's#@KSTEST_STATIC_IP@#192.168.100.5#g' -e 's#@KSTEST_STATIC_NETMASK@#255.255.255.0#g' -e 's#@KSTEST_STATIC_GATEWAY@#192.168.100.1#g' ${ks}
+    echo "ip_static_boot_config=ip=192.168.100.5::192.168.100.1:255.255.255.0::${KSTEST_NETDEV1}:none nameserver=${gateway}" > ${tmpdir}/ip_static_boot_config
 
     echo ${ks}
 }
 
 # Arguments for virt-install --network options
 prepare_network() {
-    local tmpdir=$1
-    local network=$(basename ${tmpdir})
-    echo "network:${network}"
-}
-
-cleanup() {
-    local tmpdir=$1
-
-    ### Destroy dedicated network
-    local network=$(basename ${tmpdir})
-    virsh net-destroy ${network}
+    echo "user"
 }

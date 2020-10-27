@@ -31,27 +31,16 @@ kernel_args() {
 
 # Arguments for virt-install --network options
 prepare_network() {
-    local tmpdir=$1
-    local network=$(basename ${tmpdir})
-    echo "network:${network}"
-    echo "network:${network}"
+    echo "user"
+    echo "user"
 }
 
 prepare() {
     local ks=$1
     local tmpdir=$2
 
-    ### Create dedicated network to prevent IP address conflicts for parallel tests
-
-    local network=$(basename ${tmpdir})
-
-    local scriptdir=${PWD}/scripts
-    local ips="$(${scriptdir}/create-network.py "${network}")"
-    local ip="$(echo "$ips" | cut -d ' ' -f 1)"
-    local netmask="$(echo "$ips" | cut -d ' ' -f 2)"
-    local gateway="$(echo "$ips" | cut -d ' ' -f 3)"
-
-    echo "ip_static_vlan_config=\"ip=${ip}::$gateway}:${netmask}::${KSTEST_NETDEV2}.111:none:\"" > ${tmpdir}/ip_static_vlan_config
+    # This is a private slirp network, so we can pick any config we like
+    echo "ip_static_vlan_config=\"ip=192.168.100.5::192.168.100.1:255.255.255.0::${KSTEST_NETDEV2}.111:none:\"" > ${tmpdir}/ip_static_vlan_config
 
     ### Run http server serving kickstart
 
@@ -70,20 +59,8 @@ inject_ks_to_initrd() {
     echo "false"
 }
 
-# Arguments for virt-install --network options
-prepare_network() {
-    local tmpdir=$1
-    local network=$(basename ${tmpdir})
-    echo "network:${network}"
-    echo "user"
-}
-
 cleanup() {
     local tmpdir=$1
-
-    ### Destroy dedicated network
-    local network=$(basename ${tmpdir})
-    virsh net-destroy ${network}
 
     ### Kill the http server
     if [ -f ${tmpdir}/httpd-pid ]; then

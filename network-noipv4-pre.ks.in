@@ -44,19 +44,16 @@ check_config_key_exists @KSTEST_NETDEV4@ BOOTPROTO no ipv4 method disabled
 check_device_connected @KSTEST_NETDEV3@ yes
 check_device_has_ipv4_address @KSTEST_NETDEV3@ no
 
-# TODO create test with virtual network having ipv6 enabled (ipv6 only connection)
-#      libvirt default net does not have ipv6 enabled
+# TODO create test with virtual network having ipv6-only connection
 detect_nm_has_autoconnections_off
 nm_has_autoconnections_off=$?
+check_device_has_ipv4_address @KSTEST_NETDEV4@ no
 if [[ $nm_has_autoconnections_off -eq 0 ]]; then
     check_device_connected @KSTEST_NETDEV4@ no
-    check_device_has_ipv4_address @KSTEST_NETDEV4@ no
 else
-    # connection fails to activate (RA timeout, no ip config)
-    # and default con. created by NM (Wired connection 2) is autoactivated again
     check_device_connected @KSTEST_NETDEV4@ yes
-    check_device_has_ipv4_address @KSTEST_NETDEV4@ yes
-    check_connection_device "Wired connection 2" @KSTEST_NETDEV4@
+    # NM created default connection has same name as the interface
+    check_connection_device @KSTEST_NETDEV4@ @KSTEST_NETDEV4@
 fi
 
 # No error was written to /root/RESULT file, everything is OK

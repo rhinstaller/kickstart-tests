@@ -35,9 +35,11 @@ popd
 # Fixup permissions
 chmod -R a+r /var/tmp/kstest-*
 # Clean up (artifacts from broken test)
-find /var/tmp/kstest-${KSTESTS_TEST}* -name "*.iso" -delete
-find /var/tmp/kstest-${KSTESTS_TEST}* -name "*.img" -delete
-# Move to target logs directory; this sometimes fails on nested directory permission/ownership
-cp -r /var/tmp/kstest-${KSTESTS_TEST}* ${LOGS_DIR} || true
+for t in ${KSTESTS_TEST}; do
+    find /var/tmp/kstest-${t}* -name "*.iso" -delete
+    find /var/tmp/kstest-${t}* -name "*.img" -delete
+    # Move to target logs directory; this sometimes fails on nested directory permission/ownership
+    cp -r /var/tmp/kstest-${t}* ${LOGS_DIR} || true
+done
 
 exit $RC

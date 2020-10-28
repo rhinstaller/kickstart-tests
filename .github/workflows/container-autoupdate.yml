@@ -1,0 +1,29 @@
+# We cannot fully self-validate the new container, as running all kickstart tests just takes too long.
+# So tag the containers by build date, so that in the worst case we can always reset :latest to the previously working tag.
+name: Build and push containers
+on:
+  schedule:
+    - cron: 0 18 * * 6
+  # be able to start this action manually from a actions tab when needed
+  workflow_dispatch:
+
+jobs:
+  runner:
+    name: Build kstest-runner container
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Login to container registry
+        run: docker login -u ${{ secrets.QUAY_USERNAME }} -p ${{ secrets.QUAY_PASSWORD }} quay.io
+
+      - name: Build and push container
+        run: |
+          TAG=$(date --iso-8601)
+          NAME=quay.io/${{ secrets.QUAY_USERNAME }}/kstest-runner
+          docker build -t $NAME:$TAG containers/runner
+          docker tag $NAME:$TAG $NAME:latest
+
+          docker push $NAME:$TAG
+          docker push $NAME:latest

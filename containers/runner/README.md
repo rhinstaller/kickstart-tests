@@ -21,9 +21,14 @@ There is a [playbook](runner-host.yml) for deployment of the host on Fedora Clou
 Run a test in a container
 -------------------------
 
-Build the container:
+Download the [automatically built](.github/workflows/container-autoupdate.yml) official container image:
 ```
-podman build -t kstest-runner .
+podman pull quay.io/rhinstaller/kstest-runner
+```
+
+Or build the container yourself:
+```
+podman build -t rhinstaller/kstest-runner .
 ```
 
 Define the directory for passing of data between the container and the system (via volume):
@@ -44,7 +49,7 @@ curl -L https://download.fedoraproject.org/pub/fedora/linux/development/rawhide/
 
 Run the test:
 ```
-podman run --env KSTESTS_TEST=keyboard -v ${VOLUME_DIR}:/opt/kstest/data:z --name last-kstest --device=/dev/kvm kstest-runner
+podman run --env KSTESTS_TEST=keyboard -v ${VOLUME_DIR}:/opt/kstest/data:z --name last-kstest --device=/dev/kvm rhinstaller/kstest-runner
 ```
 Instead of keeping named container you can remove it after the test by replacing `--name last-kstest` option with `--rm`.
 

@@ -13,7 +13,12 @@ BOOT_ISO=${BOOT_ISO:-boot.iso}
 ISO_DIR=${APP_DATA}/images
 LOGS_DIR=${APP_DATA}/logs
 
-if ! [ -d "${KSTESTS_DIR}" ]; then
+# user can bind-mount a local kickstart-tests dir to test that
+if [ -d /kickstart-tests ]; then
+    # copy it so that we can write our *.ks files, fragments/, and so on
+    cp -r /kickstart-tests ${KSTESTS_DIR}
+else
+    # if not given, check out current git
     git clone ${KSTESTS_REPOSITORY} ${KSTESTS_DIR}
     git -C ${KSTESTS_DIR} checkout ${KSTESTS_BRANCH}
     git -C ${KSTESTS_DIR} remote -v

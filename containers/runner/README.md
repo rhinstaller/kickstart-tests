@@ -62,7 +62,7 @@ cat ${VOLUME_DIR}/logs/kstest-*/anaconda/virt-install.log
 ```
 
 This will check out and use kickstart-tests master from GitHub. To run against
-your local development branch instead, pass `-v .:/opt/kstest/kickstart-tests`
+your local development branch instead, pass `-v .:/kickstart-tests:ro`
 to `podman run`.
 
 Configuration of the test

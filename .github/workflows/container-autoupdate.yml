@@ -21,7 +21,7 @@ jobs:
       - name: Build and push container
         run: |
           TAG=$(date --iso-8601)
-          NAME=quay.io/${{ secrets.QUAY_USERNAME }}/kstest-runner
+          NAME=quay.io/rhinstaller/kstest-runner
           docker build -t $NAME:$TAG containers/runner
           docker tag $NAME:$TAG $NAME:latest
 

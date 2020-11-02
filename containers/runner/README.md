@@ -20,61 +20,43 @@ There is a [playbook](runner-host.yml) for deployment of the host on Fedora Clou
 
 Run a test in a container
 -------------------------
-
-Download the [automatically built](.github/workflows/container-autoupdate.yml) official container image:
+Use the [launch](./launch) script to run a set of tests from the current kickstart-tests directory in the runner container:
 ```
-podman pull quay.io/rhinstaller/kstest-runner
+containers/runner/launch keyboard [test2 test3 ...]
 ```
 
-Or build the container yourself:
+This will download the [automatically built](.github/workflows/container-autoupdate.yml) [official container image](https://quay.io/repository/rhinstaller/kstest-runner).
+
+You can also build the container yourself to test modifications to it:
 ```
 podman build -t rhinstaller/kstest-runner .
 ```
 
-Define the directory for passing of data between the container and the system (via volume):
-```
-export VOLUME_DIR=${PWD}/data
-```
+The `launch` script creates a `./data/` directory for passing of data between the container and the system (via volume). By default it downloads the current Fedora Rawhide boot.iso, but to test some other image you can put it into `data/images/boot.iso` before running `launch`.
 
-Create subdirs for test inputs (installation image) and outputs (logs):
+The result logs get written into `./data/logs/`:
 ```
-mkdir -p ${VOLUME_DIR}/images
-mkdir -p -m 777 ${VOLUME_DIR}/logs
+tree -L 3 data/logs
+cat data/logs/kstest-*/anaconda/virt-install.log
 ```
-
-Download the test subject (installer boot iso):
-```
-curl -L https://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Server/x86_64/os/images/boot.iso --output ${VOLUME_DIR}/images/boot.iso
-```
-
-Run the test:
-```
-podman run --env KSTESTS_TEST=keyboard -v ${VOLUME_DIR}:/opt/kstest/data:z --name last-kstest --device=/dev/kvm rhinstaller/kstest-runner
-```
-Instead of keeping named container you can remove it after the test by replacing `--name last-kstest` option with `--rm`.
-
-If you have enough RAM, you can run the entire test VM in RAM with `--tmpfs /var/tmp/`, so that it will run faster. This is particularly helpful when running tests in parallel.
-
-See the results:
-```
-tree -L 3 ${VOLUME_DIR}/logs
-cat ${VOLUME_DIR}/logs/kstest-*/anaconda/virt-install.log
-```
-
-This will check out and use kickstart-tests master from GitHub. To run against
-your local development branch instead, pass `-v .:/kickstart-tests:ro`
-to `podman run`.
 
 Configuration of the test
 -------------------------
+For more control, you can run the container manually:
+```
+podman run -it --name last-kstest --env KSTESTS_TEST=keyboard -v ./data:/opt/kstest/data:z -v .:/kickstart-tests:ro --device=/dev/kvm rhinstaller/kstest-runner
+```
+
+Instead of keeping named container you can remove it after the test by replacing `--name last-kstest` option with `--rm`.
 
 Environment variables for the container (`--env` option):
 * KSTESTS_TEST - name of the test to be run
 * UPDATES_IMAGE - HTTP URL of updates image to be used
 * KSTESTS_REPOSITORY - kickstart-tests git repository to be used
 * KSTESTS_BRANCH - kickstart-tests git branch to be used
-* BOOT_ISO - name of the installer boot iso from `${VOLUME_DIR}/images` to be tested (default is "boot.iso")
+* BOOT_ISO - name of the installer boot iso from `data/images` to be tested (default is "boot.iso")
 
+By default, the container runs the [run-kstest](./run-kstest) script. To get an interactive shell, append `bash` to the command line.
 
 Troubleshooting
 ---------------

@@ -1,0 +1,4 @@
+dist: focal
+sudo: true
+language: minimal
+script: scripts/run_travis.sh

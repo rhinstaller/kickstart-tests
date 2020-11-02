@@ -25,6 +25,8 @@ Use the [launch](./launch) script to run a set of tests from the current kicksta
 containers/runner/launch keyboard [test2 test3 ...]
 ```
 
+Call `launch all` to run all tests. This can be controlled further through `$TESTTYPE` or `$SKIP_TESTTYPES`.
+
 This will download the [automatically built](.github/workflows/container-autoupdate.yml) [official container image](https://quay.io/repository/rhinstaller/kstest-runner).
 
 You can also build the container yourself to test modifications to it:

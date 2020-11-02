@@ -39,5 +39,6 @@ EXTRA_OPTS=""
 
 # Run container against the local repository, to test changes easily
 set -x
-$CRUN run -it --rm --device=/dev/kvm --env KSTESTS_TEST="$*" --env TEST_JOBS="$TEST_JOBS" $EXTRA_OPTS \
-    -v "$PWD/data:/opt/kstest/data:z" -v "$BASEDIR:/kickstart-tests:ro,z" $CONTAINER /kickstart-tests/containers/runner/run-kstest
+$CRUN run -it --rm --device=/dev/kvm --env KSTESTS_TEST="$*" --env TESTTYPE="${TESTTYPE:-}" --env SKIP_TESTTYPES="${SKIP_TESTTYPES:-}" \
+    --env TEST_JOBS="$TEST_JOBS" $EXTRA_OPTS -v "$PWD/data:/opt/kstest/data:z" -v "$BASEDIR:/kickstart-tests:ro,z" \
+    $CONTAINER /kickstart-tests/containers/runner/run-kstest

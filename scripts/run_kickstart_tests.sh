@@ -85,9 +85,10 @@ while getopts ":i:k:t:s:u:b:p:o:" opt; do
            ;;
        s)
            # Exclude tests of the given test types. Multiple test types can be specified
-           # as a white space delimited string in quotes:
+           # as a white space or comma delimited string in quotes:
            #
            # -s "rhel-only knownfailure"
+           # -s "rhel-only,knownfailure"
            SKIP_TESTTYPES=$OPTARG
            ;;
        u)
@@ -177,7 +178,7 @@ sed_args+=$(printenv | while read line; do
 # Check if the given test should be skipped based on "test type blacklist" or not.
 function should_skip_test() {
     filepath=$1
-    for testtype in ${SKIP_TESTTYPES}; do
+    for testtype in $(echo "${SKIP_TESTTYPES}" | tr ',' ' '); do
        if [[ "$(grep TESTTYPE= ${filepath})" =~ "$testtype" ]]; then
            return 0
        fi

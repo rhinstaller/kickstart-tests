@@ -189,7 +189,7 @@ function should_skip_test() {
 # Find all tests in the . folder. These tests will be filtered by TESTTYPE parameter
 # if specified.
 function find_tests() {
-    local tests=$(find . -maxdepth 1 -name '*sh' -a -perm -o+x)
+    local tests=$(find . -maxdepth 1 -name '*.sh' -a -perm -o+x)
 
     local newtests=""
     local skipped_tests=""

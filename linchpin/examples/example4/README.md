@@ -25,7 +25,7 @@ contains modifications to the [default configuration](../../../ansible/roles/kst
 
 1) Schedule the test on *target*.
 ```
-./kstests-in-cloud.sh schedule nightly1 --pinfile examples/example4/PinFile --test-configuration linchpin/examples/example4/test-configuration.yml --results /tmp/kstest-results-nightly --virtualenv /home/rvykydal/work/linchpin/linchpin-latest --logfile /tmp/kstest-results-nightly/sheduled_runs.log --when "Mon-Fri *-*-* 00:00:05"
+scripts/kstests-in-cloud.sh schedule nightly1 --pinfile examples/example4/PinFile --test-configuration linchpin/examples/example4/test-configuration.yml --results /tmp/kstest-results-nightly --virtualenv /home/rvykydal/work/linchpin/linchpin-latest --logfile /tmp/kstest-results-nightly/sheduled_runs.log --when "Mon-Fri *-*-* 00:00:05"
 ```
 
 The results will be pulled to local host to `--results` directory.
@@ -54,7 +54,7 @@ The script can be passed `-s NUMBER_OF_RUNS` option that would mark tests with i
 5) Remove the *test run* scheduling.
 
 ```
-./kstests-in-cloud.sh schedule nightly1 --remove
+scripts/kstests-in-cloud.sh schedule nightly1 --remove
 ```
 
 #### Syncing results by pushing to remote host:
@@ -68,7 +68,7 @@ The [test configuration](test-configuration.push.yml) is updated with location o
 The command to schedule the test is modified by removing `--results` option (we don't want to pull the results to the local host) and using specific ssh key:
 
 ```
-./kstests-in-cloud.sh schedule nightly1 --pinfile examples/example4/PinFile --test-configuration linchpin/examples/example4/test-configuration.yml --virtualenv /home/rvykydal/work/linchpin/linchpin-latest --logfile /tmp/kstest-results-nightly/sheduled_runs.log --when "Mon-Fri *-*-* 00:00:05" --key-name kstests --key-use-existing --key-use-for-master
+scripts/kstests-in-cloud.sh schedule nightly1 --pinfile examples/example4/PinFile --test-configuration linchpin/examples/example4/test-configuration.yml --virtualenv /home/rvykydal/work/linchpin/linchpin-latest --logfile /tmp/kstest-results-nightly/sheduled_runs.log --when "Mon-Fri *-*-* 00:00:05" --key-name kstests --key-use-existing --key-use-for-master
 ```
 
 

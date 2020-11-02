@@ -7,4 +7,4 @@ mkdir -p ${RESULT_DIR}
 # Activate virtualenv with linchpin
 source /home/kstest/virtualenv-linchpin/bin/activate
 
-./kstests-in-cloud.sh test quick-start --pinfile PinFile.quick-start --test-configuration linchpin/examples/quick-start-with-controller/quick-start.test-configuration.yml --results ${RESULT_DIR} --ansible-python-interpreter /usr/bin/python3
+scripts/kstests-in-cloud.sh test quick-start --pinfile PinFile.quick-start --test-configuration linchpin/examples/quick-start-with-controller/quick-start.test-configuration.yml --results ${RESULT_DIR} --ansible-python-interpreter /usr/bin/python3

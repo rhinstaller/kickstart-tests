@@ -33,18 +33,18 @@ The script needs to be run from `kickstart-tests` repository.
 
 Run `network-tests` target:
 ```
-./kstests-in-cloud.sh test network-tests --pinfile examples/example3/PinFile --test-configuration linchpin/examples/example3/test-configuration.yml --results /tmp/kstest-results-network-patch
+scripts/kstests-in-cloud.sh test network-tests --pinfile examples/example3/PinFile --test-configuration linchpin/examples/example3/test-configuration.yml --results /tmp/kstest-results-network-patch
 ```
 Switch to another terminal and run `network-tests-patched` *target*:
 
 ```
-./kstests-in-cloud.sh test network-tests-patched --pinfile examples/example3/PinFile --test-configuration linchpin/examples/example3/test-configuration.patched.yml --results /tmp/kstest-results-network-patch
+scripts/kstests-in-cloud.sh test network-tests-patched --pinfile examples/example3/PinFile --test-configuration linchpin/examples/example3/test-configuration.patched.yml --results /tmp/kstest-results-network-patch
 ```
 
 After the tests start running (provisioning of the resources and deployment takes a while) you can check the status of the tests in yet another terminal:
 ```
-./kstests-in-cloud.sh status network-tests
-./kstests-in-cloud.sh status network-tests-patched
+scripts/kstests-in-cloud.sh status network-tests
+scripts/kstests-in-cloud.sh status network-tests-patched
 
 ```
 

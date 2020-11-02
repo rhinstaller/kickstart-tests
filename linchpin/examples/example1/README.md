@@ -31,7 +31,7 @@ contains modifications to the [default configuration](../../../ansible/roles/kst
 
 From `kistart-tests` repository root run:
 ```
-./kstests-in-cloud.sh test example1 --pinfile examples/example1/PinFile --test-configuration linchpin/examples/example1/test-configuration.yml --results /tmp/kstest-results-example1
+scripts/kstests-in-cloud.sh test example1 --pinfile examples/example1/PinFile --test-configuration linchpin/examples/example1/test-configuration.yml --results /tmp/kstest-results-example1
 ```
 The results are stored in `/tmp/kstest-results-example1` as configured with `--results` option.
 

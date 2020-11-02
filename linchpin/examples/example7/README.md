@@ -35,7 +35,7 @@ The script needs to be run from `kickstart-tests` repository.
 1) Provision the *target*.
 
 ```
-./kstests-in-cloud.sh provision example7 --pinfile examples/example7/PinFile
+scripts/kstests-in-cloud.sh provision example7 --pinfile examples/example7/PinFile
 ```
 
 2) Create and add the `new-test` test to the remote kickstart-test repository
@@ -55,7 +55,7 @@ git push myrepo new-test
 3) Run the test.
 
 ```
-./kstests-in-cloud.sh run example7 --test-configuration linchpin/examples/example7/test-configuration.yml --results /tmp/kstest-results-example7
+scripts/kstests-in-cloud.sh run example7 --test-configuration linchpin/examples/example7/test-configuration.yml --results /tmp/kstest-results-example7
 ```
 
 The results of the run are stored in a subdirectory of `/tmp/kstest-results-example7`
@@ -79,7 +79,7 @@ git push myrepo new-test
 
 Test the test:
 ```
-./kstests-in-cloud.sh run example7 --test-configuration linchpin/examples/example7/test-configuration.yml --results /tmp/kstest-results-example7
+scripts/kstests-in-cloud.sh run example7 --test-configuration linchpin/examples/example7/test-configuration.yml --results /tmp/kstest-results-example7
 ```
 
 Subdirectory with the results of the new *test run* was added (results were synced from *master*):
@@ -95,5 +95,5 @@ $ tree -L 2 /tmp/kstest-results-example7/
 5) Destroy the *target*.
 
 ```
-./kstests-in-cloud.sh destroy example7 --pinfile examples/example7/PinFile
+scripts/kstests-in-cloud.sh destroy example7 --pinfile examples/example7/PinFile
 ```

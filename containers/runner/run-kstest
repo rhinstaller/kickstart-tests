@@ -5,7 +5,7 @@ set -ex
 KSTESTS_REPOSITORY=${KSTESTS_REPOSITORY:-https://github.com/rhinstaller/kickstart-tests}
 KSTESTS_BRANCH=${KSTESTS_BRANCH:-master}
 KSTESTS_DIR=${APP_ROOT}/kickstart-tests
-KSTESTS_TEST=${KSTESTS_TEST:-team}
+KSTESTS_TEST=${KSTESTS_TEST:-}
 KSTESTS_KEEP=${KSTESTS_KEEP:-1}
 
 UPDATES_IMAGE=${UPDATES_IMAGE:-""}
@@ -40,11 +40,9 @@ popd
 # Fixup permissions
 chmod -R a+r /var/tmp/kstest-*
 # Clean up (artifacts from broken test)
-for t in ${KSTESTS_TEST}; do
-    find /var/tmp/kstest-${t}* -name "*.iso" -delete
-    find /var/tmp/kstest-${t}* -name "*.img" -delete
-    # Move to target logs directory; this sometimes fails on nested directory permission/ownership
-    cp -r /var/tmp/kstest-${t}* ${LOGS_DIR} || true
-done
+find /var/tmp/kstest-* -name "*.iso" -delete
+find /var/tmp/kstest-* -name "*.img" -delete
+# Move to target logs directory; this sometimes fails on nested directory permission/ownership
+cp -r /var/tmp/kstest-* ${LOGS_DIR} || true
 
 exit $RC

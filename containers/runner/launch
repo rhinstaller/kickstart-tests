@@ -42,11 +42,13 @@ fi
 
 EXTRA_OPTS=""
 
-# if there is enough RAM (1 GB per test with 2x safety margin), and we don't keep VM images, put the VMs on tmpfs for faster tests
-# FIXME: This runs ENOSPC after a while, as .qcow and .iso images pile up; clean them up properly
-#if awk "/MemAvailable:/ { exit (\$2 > 2000000*${TEST_JOBS}) ? 0 : 1  }" /proc/meminfo; then
-#    EXTRA_OPTS="--tmpfs /var/tmp/"
-#fi
+# if there is enough RAM (2 GB per test with 2x safety margin), and we don't keep VM images, put the VMs on tmpfs for faster tests
+if awk "/MemAvailable:/ { exit (\$2 > 4000000*${TEST_JOBS}) ? 0 : 1  }" /proc/meminfo; then
+    EXTRA_OPTS="--tmpfs /var/tmp/"
+# for many parallel jobs, use a anonymous volume, so that the container does not go ENOSPC
+elif [ ${TEST_JOBS} -gt 4 ]; then
+    EXTRA_OPTS="-v /var/tmp"
+fi
 
 # Run container against the local repository, to test changes easily
 set -x

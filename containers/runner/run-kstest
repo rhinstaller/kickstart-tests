@@ -30,10 +30,20 @@ if [ -n "${UPDATES_IMAGE}" ]; then
   UPDATES_IMAGE_ARG="-u ${UPDATES_IMAGE}"
 fi
 
+TESTTYPE_ARG=""
+if [ -n "${TESTTYPE}" ]; then
+    TESTTYPE_ARG="-t ${TESTTYPE}"
+fi
+
+SKIP_TESTTYPES_ARG=""
+if [ -n "${SKIP_TESTTYPES}" ]; then
+    SKIP_TESTTYPES_ARG="-s ${SKIP_TESTTYPES}"
+fi
+
 # Run the test
 pushd ${KSTESTS_DIR}
 RC=0
-scripts/run_kickstart_tests.sh -k ${KSTESTS_KEEP} -i ${ISO_DIR}/${BOOT_ISO} ${UPDATES_IMAGE_ARG} ${KSTESTS_TEST} || RC=$?
+scripts/run_kickstart_tests.sh -k ${KSTESTS_KEEP} -i ${ISO_DIR}/${BOOT_ISO} ${UPDATES_IMAGE_ARG} ${TESTTYPE_ARG} ${SKIP_TESTTYPES_ARG} ${KSTESTS_TEST} || RC=$?
 popd
 
 # Copy logs to a volume

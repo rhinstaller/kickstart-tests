@@ -3,7 +3,7 @@ Playbooks for running kickstart tests on remote hosts
 
 The playbooks allow to deploy remote hosts for running kickstart tests (the *runners*). The tests can be run either from local host (using [run_kickstart_tests.sh](../scripts/run_kickstart_tests.sh)) or from one of the *runners* deployed further as the *master*. On the *master* the tests can be also configured and scheduled for periodical runs. The *master* can store and forward the results of the executed *test runs*.
 
-The hosts used for deployment of *runner*s and *master* can be provisioned for example in cloud using [linchpin tooling](../linchpin). There is a [script](../kstests-in-cloud.sh) leveraging the playbooks for complete provisioning, deployment and running of a kickstart test, taking care of creating the inventory for the playbooks.
+The hosts used for deployment of *runner*s and *master* can be provisioned for example in cloud using [linchpin tooling](../linchpin). There is a [script](../scripts/kstests-in-cloud.sh) leveraging the playbooks for complete provisioning, deployment and running of a kickstart test, taking care of creating the inventory for the playbooks.
 
 Using the playbooks for deployment of the *runners* independently of the linchpin script may require some [deployment configuration](#deployment-configuration) depending on how the hosts to be used for *runners* have been provisioned with regard to access to the hosts.
 

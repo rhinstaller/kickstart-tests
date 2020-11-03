@@ -5,7 +5,7 @@ There is a suite of [ansible playbooks](../ansible) for running kickstart tests 
 
 Using `linchpin`, the *runners* can be provisioned in cloud while creating respective inventory for the playbooks.
 
-To pull *runners* provisioning (linchpin) and deployment (ansible), *test run* configuration (ansible), *test run* execution (ansible), results gathering (ansible), and *runners* teardown (linchpin) together there is a [kstests-in-cloud.sh](../kstests-in-cloud.sh) script available. 
+To pull *runners* provisioning (linchpin) and deployment (ansible), *test run* configuration (ansible), *test run* execution (ansible), results gathering (ansible), and *runners* teardown (linchpin) together there is a [kstests-in-cloud.sh](../scripts/kstests-in-cloud.sh) script available.
 
 Requirements
 -----------
@@ -32,12 +32,12 @@ Linchpin target
 
 Linchpin *target* is the reference to the group of cloud resources (hosts) used for *test runs*. It is possible to work with multiple *targets* from  a single `kickstart-tests` repository in parallel, but only a single *target* of a given name should be used from a single local host at the same time.
 
-The resources to be provisioned for a *target* are defined in a linchpin *pinfile*. By default the template [PinFile](PinFile) would be used. The file contains one template *target* `kstests`. Custom *targets* can be either added to the file or defined in a separate file which is passed to the [script](../kstests-in-cloud.sh) with `--pinfile` option.
+The resources to be provisioned for a *target* are defined in a linchpin *pinfile*. By default the template [PinFile](PinFile) would be used. The file contains one template *target* `kstests`. Custom *targets* can be either added to the file or defined in a separate file which is passed to the [script](../scripts/kstests-in-cloud.sh) with `--pinfile` option.
 
 Cloud credentials
 -----------------
 
-The cloud credentials need to be provided in the file and profile referred by `credentials` variable of the *target's* *pinfile*. Example [PinFile](PinFile) names the file `clouds.yml`. The default value of the `cloud_profile` variable is defined in the [script](../kstests-in-cloud.sh) as `kstest` (can be configured by `--cloud` option). By default the file will be looked up in `~/.config/linchpin`. The example of credentials configuration for `kstests` profile:
+The cloud credentials need to be provided in the file and profile referred by `credentials` variable of the *target's* *pinfile*. Example [PinFile](PinFile) names the file `clouds.yml`. The default value of the `cloud_profile` variable is defined in the [script](../scripts/kstests-in-cloud.sh) as `kstest` (can be configured by `--cloud` option). By default the file will be looked up in `~/.config/linchpin`. The example of credentials configuration for `kstests` profile:
 
 ```
 $ cat ~/.config/linchpin/clouds.yml
@@ -66,7 +66,7 @@ For more details see [ansible playbooks](../ansible/README.md) for deployment an
 
 To show the inventory generated for *target* `TARGET` (for example to run the playbooks individually on provisioned *target*), use `status` command:
 ```
-kstest-in-cloud.sh status <TARGET> --show-inventory
+scripts/kstest-in-cloud.sh status <TARGET> --show-inventory
 ```
 
 #### Resoruces configuration
@@ -112,7 +112,7 @@ The results and logs are stored in directory passed by `--results` option. For t
 
 To show the status and temporary results of a *test run* currently running on a *target* run the script with `status` command.
 ```
-kstest-in-cloud.sh status <TARGET>
+scripts/kstest-in-cloud.sh status <TARGET>
 ```
 
 Scheduling a *test run*
@@ -121,7 +121,7 @@ Scheduling a *test run*
 To schedule a *test run* on a temporarily provisioned *target* just replace the `test` command with `schedule` and add scheduling related options eventually (as in this [example](examples/example4)):
 
 ```
-./kstests-in-cloud.sh schedule nightly1 --pinfile examples/example4/PinFile --test-configuration linchpin/examples/example4/test-configuration.yml --results /tmp/kstest-results-nightly --virtualenv /home/rvykydal/work/linchpin/linchpin-latest --logfile /tmp/kstest-results-nightly/sheduled_runs.log --when "Mon-Fri *-*-* 00:00:05"
+scripts/kstests-in-cloud.sh schedule nightly1 --pinfile examples/example4/PinFile --test-configuration linchpin/examples/example4/test-configuration.yml --results /tmp/kstest-results-nightly --virtualenv /home/rvykydal/work/linchpin/linchpin-latest --logfile /tmp/kstest-results-nightly/sheduled_runs.log --when "Mon-Fri *-*-* 00:00:05"
 ```
 
 * `--when` - systemd's timer specification
@@ -130,7 +130,7 @@ To schedule a *test run* on a temporarily provisioned *target* just replace the 
 
 To remove a schedule for the *target* run:
 ```
-kstest-in-cloud.sh schedule <TARGET> --remove
+scripts/kstest-in-cloud.sh schedule <TARGET> --remove
 ```
 As can be seen in the example the results can be configured to be either pulled from local host or to be pushed from the *master* to a remote *results host*.
 

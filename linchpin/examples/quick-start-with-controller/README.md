@@ -125,7 +125,7 @@ vim ansible/roles/kstest-master/vars/main/schedule.yml
 Get the path of the inventory generated during provisioning:
 
 ```
-./kstests-in-cloud.sh status quick-start --show-inventory
+scripts/kstests-in-cloud.sh status quick-start --show-inventory
 ```
 
 Apply the scheduling by the playbook using inventory generated during provisioning:
@@ -214,7 +214,7 @@ openstack --os-cloud kstests quota show
 To see the status of a test run in progress on `quick-start` target run:
 
 ```
-./kstests-in-cloud.sh status quick-start
+scripts/kstests-in-cloud.sh status quick-start
 ```
 
 ##### Watch the progress of scheduled deployment.
@@ -304,7 +304,7 @@ Only the playbook tasks tagged "ssh-keys" are run to be faster.
 
 To see the IP addresses of runners for adding connections to virt-manager run:
 ```
-./kstests-in-cloud.sh status quick-start --show-inventory
+scripts/kstests-in-cloud.sh status quick-start --show-inventory
 ```
 
 ##### Use different cloud profile.
@@ -340,7 +340,7 @@ openstack --os-cloud kstests server list
 There is a playbook [kstest-master-stop-tests.yml](../../../ansible/kstest-master-stop-tests.yml) for master that would stop the *test run*, waiting for currently running tests to finish and fetching the incomplete results.
 
 ```
-./kstests-in-cloud.sh stop quick-start
+scripts/kstests-in-cloud.sh stop quick-start
 ```
 
 It works only when the tests are actually running (ie not during provisioning, downloading boot.iso etc...).

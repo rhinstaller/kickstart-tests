@@ -33,13 +33,13 @@ The script needs to be run from `kickstart-tests` repository.
 1) Provision the *target*.
 
 ```
-./kstests-in-cloud.sh provision example2 --pinfile examples/example2/PinFile
+scripts/kstests-in-cloud.sh provision example2 --pinfile examples/example2/PinFile
 ```
 
 2) Run the test.
 
 ```
-./kstests-in-cloud.sh run example2 --test-configuration linchpin/examples/example2/test-configuration.yml --results /tmp/kstest-results-example2
+scripts/kstests-in-cloud.sh run example2 --test-configuration linchpin/examples/example2/test-configuration.yml --results /tmp/kstest-results-example2
 ```
 
 The results of the run are stored in a subdirectory of `/tmp/kstest-results-example2`
@@ -61,7 +61,7 @@ There is no need to change the test configuration as the updates image of the sa
 runnig the same `run` command again:
 
 ```
-./kstests-in-cloud.sh run example2 --test-configuration linchpin/examples/example2/test-configuration.yml --results /tmp/kstest-results-example2
+scripts/kstests-in-cloud.sh run example2 --test-configuration linchpin/examples/example2/test-configuration.yml --results /tmp/kstest-results-example2
 ```
 
 Subdirectory with the results of the new *test run* was added (results were synced from *master*):
@@ -77,5 +77,5 @@ $ tree -L 2 /tmp/kstest-results-example2/
 5) Destroy the *target*.
 
 ```
-./kstests-in-cloud.sh destroy example2 --pinfile examples/example2/PinFile
+scripts/kstests-in-cloud.sh destroy example2 --pinfile examples/example2/PinFile
 ```

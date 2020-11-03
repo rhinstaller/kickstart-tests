@@ -34,7 +34,7 @@ Unlike when [using temporary *target*](../example4), we will use the local `kick
 We are using existing [ssh key](../../README.md#ssh-keys) (`--key-use-existing`) that will need to be added to authorized keys of *restults host* in the next step. The path to the private key (`--ansible-private-key`) that will be used also as *master* key (`--key-use-for-master`) needs to be supplied so it can be added to the *master* during its deployment.
 
 ```
-./kstests-in-cloud.sh provision nightly-permanent --pinfile examples/example5/PinFile --key-name kstests --key-use-existing --ansible-private-key ~/.ssh/kstests.pem --key-use-for-master
+scripts/kstests-in-cloud.sh provision nightly-permanent --pinfile examples/example5/PinFile --key-name kstests --key-use-existing --ansible-private-key ~/.ssh/kstests.pem --key-use-for-master
 ```
 
 2) Add ssh key to *results host*
@@ -65,7 +65,7 @@ When applying the configuration for the first time it can be useful to set up th
 To get the path of the `nightly-parmanent` *target*'s inventory run:
 
 ```
-./kstests-in-cloud.sh status --show-inventory nightly-permanent
+scripts/kstests-in-cloud.sh status --show-inventory nightly-permanent
 ```
 showing:
 ```
@@ -171,7 +171,7 @@ The script can be passed `-s NUMBER_OF_RUNS` option that would mark tests with i
 99) Destroy the *target*
 
 ```
-./kstests-in-cloud.sh destroy nightly-permanent --pinfile examples/example5/PinFile
+scripts/kstests-in-cloud.sh destroy nightly-permanent --pinfile examples/example5/PinFile
 ```
 
 

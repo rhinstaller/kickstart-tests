@@ -8,12 +8,11 @@
 module --name=nodejs --stream=10
 module --name=django --stream=1.6
 module --name=postgresql --stream=9.6
-module --name=mysql --stream=5.6
-module --name=meson --stream=latest
-module --name=gimp --stream=2.10
+module --name=mysql --stream=8.0
+module --name=perl --stream=5.32
+module --name=ruby --stream=master
 
 %packages
-@^Fedora Server Edition
 kernel
 vim
 %end
@@ -65,14 +64,14 @@ if [[ $? == 0 ]]; then
     echo '*** community-mysql-server for the only enabled mysql module installed' >> /root/RESULT
 fi
 
-rpm -q meson
+rpm -q perl
 if [[ $? == 0 ]]; then
-    echo '*** meson for the only enabled meson module installed' >> /root/RESULT
+    echo '*** perl for the only enabled perl module installed' >> /root/RESULT
 fi
 
-rpm -q gimp
+rpm -q ruby
 if [[ $? == 0 ]]; then
-    echo '*** gimp for the only enabled gimp module installed' >> /root/RESULT
+    echo '*** ruby for the only enabled ruby module installed' >> /root/RESULT
 fi
 
 # next we will check if the module is seen as enabled/installed from the
@@ -86,16 +85,16 @@ dnf module list --enabled django | grep django || echo "django module not marked
 dnf module list --enabled nodejs | grep nodejs || echo "nodejs module not marked as enabled" >> /root/RESULT
 dnf module list --enabled postgresql | grep postgresql  || echo "postgresql module not marked as enabled" >> /root/RESULT
 dnf module list --enabled mysql | grep mysql || echo "mysql module not marked as enabled" >> /root/RESULT
-dnf module list --enabled meson | grep meson || echo "meson module not marked as enabled" >> /root/RESULT
-dnf module list --enabled gimp | grep gimp || echo "gimp module not marked as enabled" >> /root/RESULT
+dnf module list --enabled perl | grep perl || echo "perl module not marked as enabled" >> /root/RESULT
+dnf module list --enabled ruby | grep ruby || echo "ruby module not marked as enabled" >> /root/RESULT
 
 # check all modules are also marked as installed
 dnf module list --installed django | grep django && echo "django module marked as installed" >> /root/RESULT
 dnf module list --installed nodejs | grep nodejs && echo "nodejs module marked as installed" >> /root/RESULT
 dnf module list --installed postgresql | grep ostgresql && echo "postgresql module marked as installed" >> /root/RESULT
 dnf module list --installed mysql | grep mysql && echo "mysql module marked as installed" >> /root/RESULT
-dnf module list --installed meson | grep meson && echo "meson module marked as installed" >> /root/RESULT
-dnf module list --installed gimp | grep gimp && echo "gimp module marked as installed" >> /root/RESULT
+dnf module list --installed perl | grep perl && echo "perl module marked as installed" >> /root/RESULT
+dnf module list --installed ruby | grep ruby && echo "ruby module marked as installed" >> /root/RESULT
 
 %ksappend validation/success_if_result_empty.ks
 %end

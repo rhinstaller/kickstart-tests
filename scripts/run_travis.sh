@@ -29,6 +29,8 @@ echo "Running tests: $TESTS"
 # HACK: /dev/kvm is root:kvm 0660 in Travis by default
 sudo -n chmod 666 /dev/kvm
 
+sudo -n containers/squid.sh start
+
 # With parallel jobs, each test takes a little longer than 10 minutes, which makes Travis abort
 # <https://docs.travis-ci.com/user/common-build-problems/#build-times-out-because-no-output-was-received>
 # Avoid this by printing a keep-alive '.' line every minute

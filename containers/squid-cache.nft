@@ -1,0 +1,6 @@
+table ip squid-cache {
+    chain prerouting {
+        type nat hook prerouting priority dstnat; policy accept;
+        tcp dport 80 redirect to :3129
+    }
+}

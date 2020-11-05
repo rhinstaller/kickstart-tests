@@ -1,4 +1,8 @@
 dist: focal
 sudo: true
 language: minimal
+addons:
+  apt:
+    packages:
+      - nftables
 script: scripts/run_travis.sh

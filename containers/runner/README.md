@@ -60,6 +60,25 @@ Environment variables for the container (`--env` option):
 
 By default, the container runs the [run-kstest](./run-kstest) script. To get an interactive shell, append `bash` to the command line.
 
+Running tests with cached package downloads
+-------------------------------------------
+
+Depending on parallelism and availabe network bandwidth, downloading the RPMs
+and package indexes takes a significant amount of time for every test. This can
+be sped up greatly with a transparent HTTP proxy. This requires root privileges
+(to configure IP routing through the proxy) and only works with system podman
+containers (which use a real bridge), not user podman containers (which use
+SLIRP networking).
+
+To use this, run
+
+    sudo containers/squid.sh start
+
+and build/run the `runner` container from above through `sudo containers/runner/launch` or `sudo podman`.
+
+This starts a container named `squid` and uses a persistent podman volume
+`ks-squid-cache`.
+
 Troubleshooting
 ---------------
 

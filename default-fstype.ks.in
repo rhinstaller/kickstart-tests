@@ -22,10 +22,14 @@ shutdown
 %packages
 %end
 
+%post --nochroot
+cp /.buildstamp /mnt/sysroot
+%end
+
 %post
 
 expected_fstype="ext4"
-if [ "@KSTEST_OS_NAME@" == "rhel" ]; then
+if [ "@KSTEST_OS_NAME@" == "rhel" ] || grep -qi '^variant=server' /.buildstamp; then
     expected_fstype="xfs"
 fi
 

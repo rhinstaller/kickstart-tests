@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2020  Red Hat, Inc.
+# Copyright (C) 2015  Red Hat, Inc.
 #
 # This copyrighted material is made available to anyone wishing to use,
 # modify, copy, or redistribute it subject to the terms and conditions of
@@ -15,10 +15,8 @@
 # License and may only be used or replicated with the express permission of
 # Red Hat, Inc.
 #
-TESTTYPE="storage fedora-only"
+# Red Hat Author(s): Chris Lumens <clumens@redhat.com>
+
+TESTTYPE="storage"
 
 . ${KSTESTDIR}/functions.sh
-
-kernel_args() {
-    echo ${DEFAULT_BOOTOPTS} inst.product=Fedora inst.variant=Workstation
-}

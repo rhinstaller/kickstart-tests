@@ -36,6 +36,12 @@ podman build -t rhinstaller/kstest-runner .
 
 The `launch` script creates a `./data/` directory for passing of data between the container and the system (via volume). By default it downloads the current Fedora Rawhide boot.iso, but to test some other image you can put it into `data/images/boot.iso` before running `launch`.
 
+There is also a [daily boot.iso](.github/workflows/daily-boot-iso.yml) built
+from Rawhide and various COPRs (e.g. Anaconda and DNF) for regression testing,
+which you can test against with the `--daily-iso` option. When given, `launch`
+downloads/unpacks that instead of the the official Rawhide boot.iso. This
+requires authentication, so the option expects a GitHub token file as value.
+
 The result logs get written into `./data/logs/`:
 ```
 tree -L 3 data/logs

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -ex
+set -o pipefail -ex
 
 KSTESTS_REPOSITORY=${KSTESTS_REPOSITORY:-https://github.com/rhinstaller/kickstart-tests}
 KSTESTS_BRANCH=${KSTESTS_BRANCH:-master}
@@ -43,10 +43,13 @@ fi
 # work around virt-install TOCTOU race <https://github.com/virt-manager/virt-manager/pull/175>
 mkdir -p ~/.cache/virt-manager/boot
 
-# Run the test
+# Run the test, capture the output for run_report.sh
+TEST_LOG=/var/tmp/kstest.log
 pushd ${KSTESTS_DIR}
-RC=0
-scripts/run_kickstart_tests.sh -k ${KSTESTS_KEEP} -i ${ISO_DIR}/${BOOT_ISO} ${UPDATES_IMAGE_ARG} ${TESTTYPE_ARG} ${SKIP_TESTTYPES_ARG} ${KSTESTS_TEST} || RC=$?
+set +e
+scripts/run_kickstart_tests.sh -k ${KSTESTS_KEEP} -i ${ISO_DIR}/${BOOT_ISO} ${UPDATES_IMAGE_ARG} ${TESTTYPE_ARG} ${SKIP_TESTTYPES_ARG} ${KSTESTS_TEST} 2>&1 | tee $TEST_LOG
+RC=$?
+set -e
 popd
 
 # Copy logs to a volume
@@ -57,5 +60,8 @@ find /var/tmp/kstest-* -name "*.iso" -delete
 find /var/tmp/kstest-* -name "*.img" -delete
 # Move to target logs directory; this sometimes fails on nested directory permission/ownership
 cp -r /var/tmp/kstest-* ${LOGS_DIR} || true
+
+# Show summary report
+${KSTESTS_DIR}/scripts/run_report.sh < $TEST_LOG
 
 exit $RC

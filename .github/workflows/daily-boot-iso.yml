@@ -33,4 +33,4 @@ jobs:
         with:
           name: images
           path: |
-            /tmp/results/**
+            /tmp/results/images/boot.iso

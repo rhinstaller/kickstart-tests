@@ -9,34 +9,28 @@ jobs:
   boot_iso:
     name: Build boot.iso
     runs-on: ubuntu-latest
-    steps:
-      # lorax and its dependencies do not exist in Ubuntu, and we want to test the latest Fedora version anyway
+    container:
+      image: fedora:latest
       # lorax does mounts and uses loop devices, thus needs to be privileged
-      - name: Start fedora container
-        run: |
-          mkdir data
-          docker run --name fedora -d --privileged --network host -v $PWD/data:/data fedora:latest sleep infinity
-
+      options: --privileged
+    steps:
       - name: Install lorax
-        run: docker exec fedora dnf install -y lorax
+        run: dnf install -y lorax
 
       - name: Run lorax
-        run: docker exec -w /data fedora lorax -p Fedora -v 34 -r 34 -s http://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/x86_64/os/ -s https://download.copr.fedorainfracloud.org/results/rpmsoftwaremanagement/dnf-nightly/fedora-rawhide-x86_64/ -s https://download.copr.fedorainfracloud.org/results/@rhinstaller/Anaconda/fedora-rawhide-x86_64/ -s https://copr-be.cloud.fedoraproject.org/results/@storage/blivet-daily/fedora-rawhide-x86_64/ /data/results
-
-      - name: Make generated files accessible
-        run: docker exec fedora chmod -R a+rX /data/
+        run: lorax -p Fedora -v 34 -r 34 -s http://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/x86_64/os/ -s https://download.copr.fedorainfracloud.org/results/rpmsoftwaremanagement/dnf-nightly/fedora-rawhide-x86_64/ -s https://download.copr.fedorainfracloud.org/results/@rhinstaller/Anaconda/fedora-rawhide-x86_64/ -s https://copr-be.cloud.fedoraproject.org/results/@storage/blivet-daily/fedora-rawhide-x86_64/ /tmp/results
 
       - name: Upload log artifacts
         uses: actions/upload-artifact@v2
         with:
           name: logs
           path: |
-            data/*.log
-            data/*.txt
+            *.log
+            *.txt
 
       - name: Upload image artifacts
         uses: actions/upload-artifact@v2
         with:
           name: images
           path: |
-            data/results/**
+            /tmp/results/**

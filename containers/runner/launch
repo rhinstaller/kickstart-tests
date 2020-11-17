@@ -29,18 +29,22 @@ Options:
  -j, --jobs N                         Run N jobs in parallel (default: $(nproc))
  -t, --testtype TYPE                  Only run TYPE tests
  -s, --skip-testtypes TYPE[,TYPE..]   Don't run tests with given types
+ --daily-iso TOKEN_FILE               Download and use daily boot.iso instead of rawhide's
+                                      (This requires a GitHub token that can read
+                                       rhinstaller/kickstart-tests workflow artifacts.)
  -h, --help                           Show this help
 EOF
 }
 
 # parse options
-eval set -- "$(getopt -o j:t:s:h --long jobs:,testtype:,skip-testtypes:,help -- "$@")"
+eval set -- "$(getopt -o j:t:s:h --long jobs:,testtype:,skip-testtypes:,daily-iso:,help -- "$@")"
 
 while true; do
     case "${1:-}" in
         -j|--jobs) shift; TEST_JOBS=$1 ;;
         -t|--testtype) shift; TESTTYPE=$1 ;;
         -s|--skip-testtypes) shift; SKIP_TESTTYPES=$1 ;;
+        --daily-iso) shift; DAILY_ISO_TOKEN="$1" ;;
         -h|--help) usage; exit 0 ;;
         --) shift; break ;;
     esac
@@ -61,8 +65,19 @@ fi
 mkdir -p data/images
 mkdir -p -m 777 data/logs
 if ! [ -e data/images/boot.iso ]; then
-    echo "INFO: data/images/boot.iso does not exist, downloading current Fedora Rawhide Server image..."
-    curl -L https://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Server/x86_64/os/images/boot.iso --output data/images/boot.iso
+    if [ -n "${DAILY_ISO_TOKEN:-}" ]; then
+        echo "INFO: data/images/boot.iso does not exist, downloading daily iso..."
+        CURL="curl -u token:$(cat $DAILY_ISO_TOKEN) --show-error --fail"
+        RESPONSE=$($CURL --silent https://api.github.com/repos/rhinstaller/kickstart-tests/actions/artifacts)
+        ZIP=$(echo "$RESPONSE" | jq --raw-output '.artifacts | map(select(.name == "images"))[0].archive_download_url')
+        echo "INFO: Downloading $ZIP ..."
+        $CURL -L -o data/images.zip "$ZIP"
+        # there is on unzip on RHEL 7, so fall back to 7za (p7zip package)
+        (cd data && if type unzip >/dev/null 2>&1; then unzip images.zip images/boot.iso; else 7za x images.zip images/boot.iso; fi)
+    else
+        echo "INFO: data/images/boot.iso does not exist, downloading current Fedora Rawhide Server image..."
+        curl -L https://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Server/x86_64/os/images/boot.iso --output data/images/boot.iso
+    fi
 fi
 
 VAR_TMP=""

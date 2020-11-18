@@ -14,18 +14,24 @@ CRUN=${CRUN:-$(which podman docker 2>/dev/null | head -n1)}
 if [ "${1:-}" = start ]; then
     # This image is well-maintained (auto-built) and really small
     $CRUN run --net host --name squid --detach \
-        --volume "$MYDIR"/squid-cache.conf:/etc/squid/conf.d.tail/cache.conf:ro \
+        --volume "$MYDIR"/squid-cache.conf:/etc/squid/conf.d.tail/cache.conf:ro,z \
         --volume ks-squid-cache:/var/cache/squid docker.io/b4tman/squid
 
     # Redirect all traffic from external interfaces (like container bridges) through our local proxy
     # This does NOT re-route localhost traffic, as that does not go through PREROUTING.
     nft -f "$MYDIR"/squid-cache.nft
 
+    if firewall-cmd --state; then
+        firewall-cmd --add-port=3129/tcp
+    fi
 elif [ "${1:-}" = stop ]; then
     nft delete table squid-cache
 
     $CRUN rm -f squid
 
+    if firewall-cmd --state; then
+        firewall-cmd --remove-port=3129/tcp
+    fi
 else
     echo "Usage: $0 start|stop" >&2
     exit 1

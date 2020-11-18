@@ -29,6 +29,7 @@ Options:
  -j, --jobs N                         Run N jobs in parallel (default: $(nproc))
  -t, --testtype TYPE                  Only run TYPE tests
  -s, --skip-testtypes TYPE[,TYPE..]   Don't run tests with given types
+ -u, --updates URL                    Set updates.img URL
  --daily-iso TOKEN_FILE               Download and use daily boot.iso instead of rawhide's
                                       (This requires a GitHub token that can read
                                        rhinstaller/kickstart-tests workflow artifacts.)
@@ -37,13 +38,14 @@ EOF
 }
 
 # parse options
-eval set -- "$(getopt -o j:t:s:h --long jobs:,testtype:,skip-testtypes:,daily-iso:,help -- "$@")"
+eval set -- "$(getopt -o j:t:s:u:h --long jobs:,testtype:,skip-testtypes:,updates:,daily-iso:,help -- "$@")"
 
 while true; do
     case "${1:-}" in
         -j|--jobs) shift; TEST_JOBS=$1 ;;
-        -t|--testtype) shift; TESTTYPE=$1 ;;
-        -s|--skip-testtypes) shift; SKIP_TESTTYPES=$1 ;;
+        -t|--testtype) shift; TESTTYPE="$1" ;;
+        -s|--skip-testtypes) shift; SKIP_TESTTYPES="$1" ;;
+        -u|--updates) shift; UPDATES_IMAGE="$1" ;;
         --daily-iso) shift; DAILY_ISO_TOKEN="$1" ;;
         -h|--help) usage; exit 0 ;;
         --) shift; break ;;
@@ -92,6 +94,8 @@ fi
 
 # Run container against the local repository, to test changes easily
 set -x
-$CRUN run -it --rm --device=/dev/kvm --env KSTESTS_TEST="$KSTESTS_TEST" --env TESTTYPE="${TESTTYPE:-}" --env SKIP_TESTTYPES="${SKIP_TESTTYPES:-}" \
-    --env TEST_JOBS="$TEST_JOBS" $VAR_TMP -v "$PWD/data:/opt/kstest/data:z" -v "$BASEDIR:/kickstart-tests:ro,z" \
+$CRUN run -it --rm --device=/dev/kvm \
+    --env KSTESTS_TEST="$KSTESTS_TEST" --env TESTTYPE="${TESTTYPE:-}" --env SKIP_TESTTYPES="${SKIP_TESTTYPES:-}" \
+    --env UPDATES_IMAGE="${UPDATES_IMAGE:-}" --env TEST_JOBS="$TEST_JOBS" \
+    $VAR_TMP -v "$PWD/data:/opt/kstest/data:z" -v "$BASEDIR:/kickstart-tests:ro,z" \
     $CONTAINER /kickstart-tests/containers/runner/run-kstest

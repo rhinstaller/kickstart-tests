@@ -18,7 +18,8 @@ jobs:
         run: dnf install -y lorax
 
       - name: Run lorax
-        run: lorax -p Fedora -v 34 -r 34 -s http://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/x86_64/os/ -s https://download.copr.fedorainfracloud.org/results/rpmsoftwaremanagement/dnf-nightly/fedora-rawhide-x86_64/ -s https://download.copr.fedorainfracloud.org/results/@rhinstaller/Anaconda/fedora-rawhide-x86_64/ -s https://copr-be.cloud.fedoraproject.org/results/@storage/blivet-daily/fedora-rawhide-x86_64/ /tmp/results
+        # The download.fedoraproject.org automatic redirector often selects download-ib01.f.o. for GitHub's cloud, which is too unreliable; manually select a good one that is nearby
+        run: lorax -p Fedora -v 34 -r 34 -s http://pubmirror2.math.uh.edu/fedora-buffet/fedora/linux/development/rawhide/Everything/x86_64/os/ -s https://download.copr.fedorainfracloud.org/results/rpmsoftwaremanagement/dnf-nightly/fedora-rawhide-x86_64/ -s https://download.copr.fedorainfracloud.org/results/@rhinstaller/Anaconda/fedora-rawhide-x86_64/ -s https://copr-be.cloud.fedoraproject.org/results/@storage/blivet-daily/fedora-rawhide-x86_64/ /tmp/results
 
       - name: Upload log artifacts
         uses: actions/upload-artifact@v2

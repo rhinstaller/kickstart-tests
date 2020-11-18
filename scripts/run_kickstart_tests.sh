@@ -57,7 +57,7 @@ IMAGE="${TEST_BOOT_ISO}"
 # 2 - Keep log files and disk images (will take up a lot of space)
 KEEPIT=${KEEPIT:-0}
 
-# Link to a server where an updates image is stored. Use on your own
+# Link to a file or server where an updates image is stored. Use on your own
 # responsibility, this can break tests.
 UPDATES_IMG=""
 
@@ -92,8 +92,8 @@ while getopts ":i:k:t:s:u:b:p:o:" opt; do
            SKIP_TESTTYPES=$OPTARG
            ;;
        u)
-           # Link to an updates image on a server. This will be added as a kernel
-           # parameter inst.updates=<server> to the VM boot options.
+           # Link to an updates image on a server or a local file. This will be added as
+           # a kernel parameter inst.updates=<server> to the VM boot options.
            # This may not be compatible with all the tests.
            UPDATES_IMG=$OPTARG
            ;;
@@ -337,6 +337,15 @@ fi
 # set updates image argument for parallel
 UPDATES_ARG=""
 if [[ -n "$UPDATES_IMG" ]]; then
+    # if it is a local file, set up a local web server for it
+    if [ -e "$UPDATES_IMG" ]; then
+        python3 -m http.server --directory "$(dirname "$UPDATES_IMG")" 8888 &
+        # stop it when this script exits
+        trap "kill $!" EXIT INT QUIT PIPE
+        # SLIRP networking address as seem from QEMU guests
+        UPDATES_IMG="http://10.0.2.2:8888/$(basename "$UPDATES_IMG")"
+    fi
+
     UPDATES_ARG="-u ${UPDATES_IMG}"
 fi
 

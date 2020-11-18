@@ -59,7 +59,7 @@ Instead of keeping named container you can remove it after the test by replacing
 
 Environment variables for the container (`--env` option):
 * KSTESTS_TEST - name of the test to be run
-* UPDATES_IMAGE - HTTP URL of updates image to be used
+* UPDATES_IMAGE - HTTP URL or path (inside the container) of updates image to be used
 * KSTESTS_REPOSITORY - kickstart-tests git repository to be used
 * KSTESTS_BRANCH - kickstart-tests git branch to be used
 * BOOT_ISO - name of the installer boot iso from `data/images` to be tested (default is "boot.iso")

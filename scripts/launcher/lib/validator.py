@@ -27,11 +27,6 @@ from .test_logging import get_logger
 log = get_logger()
 
 
-def replace_new_lines(line):
-        line.replace("#012", "\n")
-        return line
-
-
 class ResultFormatter(object):
 
     def __init__(self, test_name, host_id=""):

@@ -12,6 +12,8 @@ MYDIR=$(dirname $(realpath "$0"))
 CRUN=${CRUN:-$(which podman docker 2>/dev/null | head -n1)}
 
 if [ "${1:-}" = start ]; then
+    # clean up stopped container from previous boot (usually one does not remember to call "squid.sh stop")
+    $CRUN rm squid || true
     # This image is well-maintained (auto-built) and really small
     $CRUN run --net host --name squid --detach \
         --volume "$MYDIR"/squid-cache.conf:/etc/squid/conf.d.tail/cache.conf:ro,z \

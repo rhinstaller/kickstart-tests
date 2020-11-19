@@ -1,0 +1,49 @@
+Patch from https://github.com/virt-manager/virt-manager/pull/179
+https://github.com/virt-manager/virt-manager/commit/49a01b5482ee5009f4a59953d21eb8741670f813.patch
+
+The upstream patch is for virt-manager-common 3.1.x. This is a backport for
+version 2.2.1 in Fedora 32 (no real code difference, just some fuzz).
+
+--- /usr/share/virt-manager/virtinst/connection.py
++++ /usr/share/virt-manager/virtinst/connection.py
+@@ -220,7 +220,16 @@
+     def _fetch_all_pools_raw(self):
+         ignore, ignore, ret = pollhelpers.fetch_pools(
+             self, {}, lambda obj, ignore: obj)
+-        return [self._build_pool_raw(poolobj) for poolobj in ret]
++        pools = []
++        for poolobj in ret:
++            # TOCTOU race: a pool may go away in between enumeration and inspection
++            try:
++                pool = self._build_pool_raw(poolobj)
++            except libvirt.libvirtError as e:  # pragma: no cover
++                log.debug("Fetching pool XML failed: %s", e)
++                continue
++            pools.append(pool)
++        return pools
+ 
+     def fetch_all_pools(self):
+         """
+@@ -236,7 +245,12 @@
+ 
+     def _fetch_vols_raw(self, poolxmlobj):
+         ret = []
+-        pool = self._libvirtconn.storagePoolLookupByName(poolxmlobj.name)
++        # TOCTOU race: a volume may go away in between enumeration and inspection
++        try:
++            pool = self._libvirtconn.storagePoolLookupByName(poolxmlobj.name)
++        except libvirt.libvirtError as e:  # pragma: no cover
++            return ret
++
+         if pool.info()[0] != libvirt.VIR_STORAGE_POOL_RUNNING:
+             return ret
+ 
+@@ -247,7 +261,7 @@
+             try:
+                 xml = vol.XMLDesc(0)
+                 ret.append(StorageVolume(weakref.proxy(self), parsexml=xml))
+-            except Exception as e:
++            except libvirt.libvirtError as e:  # pragma: no cover
+                 log.debug("Fetching volume XML failed: %s", e)
+         return ret
+ 

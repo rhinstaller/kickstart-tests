@@ -70,7 +70,7 @@ About the parameters:
  - 1 = keep log files
  - 2 = keep log files and disk images (will take up a lot of space)
 
-  -u   use updates image given by URL
+  -u   use updates image given by URL or local file path
   -b   use additional installer boot options
 
 And at the end name of the kickstart test script to run.

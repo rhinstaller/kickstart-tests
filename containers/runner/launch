@@ -75,7 +75,7 @@ if ! [ -e data/images/boot.iso ]; then
         echo "INFO: Downloading $ZIP ..."
         $CURL -L -o data/images.zip "$ZIP"
         # there is on unzip on RHEL 7, so fall back to 7za (p7zip package)
-        (cd data && if type unzip >/dev/null 2>&1; then unzip images.zip images/boot.iso; else 7za x images.zip images/boot.iso; fi)
+        (cd data/images && if type unzip >/dev/null 2>&1; then unzip ../images.zip; else 7za x ../images.zip; fi)
     else
         echo "INFO: data/images/boot.iso does not exist, downloading current Fedora Rawhide Server image..."
         curl -L https://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Server/x86_64/os/images/boot.iso --output data/images/boot.iso

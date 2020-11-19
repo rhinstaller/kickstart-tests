@@ -21,7 +21,7 @@ if [ "${1:-}" = start ]; then
     # This does NOT re-route localhost traffic, as that does not go through PREROUTING.
     nft -f "$MYDIR"/squid-cache.nft
 
-    if firewall-cmd --state; then
+    if firewall-cmd --state >/dev/null 2>&1; then
         firewall-cmd --add-port=3129/tcp
     fi
 elif [ "${1:-}" = stop ]; then
@@ -29,7 +29,7 @@ elif [ "${1:-}" = stop ]; then
 
     $CRUN rm -f squid
 
-    if firewall-cmd --state; then
+    if firewall-cmd --state >/dev/null 2>&1; then
         firewall-cmd --remove-port=3129/tcp
     fi
 else

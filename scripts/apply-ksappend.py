@@ -1,10 +1,9 @@
 #!/usr/bin/python3
 
-import sys
 import os
 import argparse
 import shutil
-import glob
+import logging
 from pykickstart import parser as kickstart_parser
 
 FRAGMENTS_FOLDER = "fragments"
@@ -12,53 +11,20 @@ SHARED_FRAGMENTS_FOLDER = os.path.join(FRAGMENTS_FOLDER, "shared")
 RUNTIME_FOLDER = os.path.join(FRAGMENTS_FOLDER, "runtime")
 TOPLEVEL_PLATFORM_FOLDER = os.path.join(FRAGMENTS_FOLDER, "platform")
 
-class ArgumentParser(object):
+def parse_args():
+    _parser = argparse.ArgumentParser(description="Include fragments linked by %ksappend in tests.")
+    _parser.add_argument("test_file_path", metavar="TEST.ks.in",
+                         help="kickstart test file to process")
+    _parser.add_argument("--platform-name", "-p", type=str, required=True,
+                         metavar="PLATFORM_NAME",
+                         help="Name of the platform folder for platform specific ksappend fragments.")
+    _parser.add_argument("--override-folders", "-o", type=str, metavar='OVERRIDE_FOLDERS', default=[], nargs="*",
+                         help='Add contents of one or more override folders on top of shared and platform specific fragments.')
 
-    def __init__(self):
-        super().__init__()
-        self._parser = argparse.ArgumentParser(description="""
-        Include fragments linked by %ksappend in tests.
-        """)
+    args = _parser.parse_args()
+    args.platform_dir_path = os.path.join(TOPLEVEL_PLATFORM_FOLDER, args.platform_name)
+    return args
 
-        self._test_file_paths = ""
-        self._platform_name = ""
-
-        self._configure_parser()
-
-    @property
-    def test_file_paths(self):
-        return self._test_file_paths
-
-    @property
-    def platform_name(self):
-        return self._platform_name
-
-    @property
-    def override_folders(self):
-        return self._override_folders
-
-    @property
-    def platform_dir_path(self):
-        return os.path.join(TOPLEVEL_PLATFORM_FOLDER, self._platform_name)
-
-    def _configure_parser(self):
-        self._parser.add_argument("--test-file-paths", "-t", required=True, type=str, nargs="+",
-                                  metavar="TEST_FILE_PATHS",
-                                  help="Space delimited kickstart test files to process.")
-        self._parser.add_argument("--platform-name", "-p", type=str, required=True,
-                                  metavar="PLATFORM_NAME",
-                                  help="Name of the platform folder for platform specific ksappend fragments.")
-        self._parser.add_argument("--override-folders", "-o", type=str, metavar='OVERRIDE_FOLDERS', default=[], nargs="*",
-                                  help='Add contents of one or more override folders on top of shared and platform specific fragments.')
-
-    def parse(self):
-        print("ARGV")
-        print(sys.argv)
-        ns = self._parser.parse_args()
-
-        self._test_file_paths = ns.test_file_paths
-        self._platform_name = ns.platform_name
-        self._override_folders = ns.override_folders
 
 def merge_directories(source_dir, dest_dir):
     """Copy content of source directory to target directory.
@@ -97,8 +63,8 @@ def apply_overrides(override_folders, runtime_folder):
     This takes a list of folders holding the overrides and copies the *content* of the override
     folders on top of what's currently in the given runtime folder.
 
-    If a path to an override_folder is not valid the folder is skipped and a warning is printed
-    to stdout.
+    If a path to an override_folder is not valid the folder is skipped and a warning is logged
+    to stderr.
 
     :param override_folders: a list of paths to override folders
     :type override_folders: list of str
@@ -106,31 +72,12 @@ def apply_overrides(override_folders, runtime_folder):
     """
     for override_folder in parser.override_folders:
         if os.path.exists(override_folder):
-            print("adding ksappend override folder {}".format(override_folder))
+            logging.info("adding ksappend override folder %s", override_folder)
             merge_directories(override_folder, runtime_folder)
         else:
-            print("requested ksappend override folder {} not found".format(override_folder))
+            logging.warning("requested ksappend override folder %s not found", override_folder)
 
-def get_available_kickstart_tests(kstests):
-    """Check which kickstart test files from a list are available.
-
-    Return a list of test files that actually exist and print any files we can't
-    find to stdout.
-
-    :param kstests: a list of kickstart test file paths
-    :type kstests: list of str
-    :returns: a list of kickstart test file paths that exist
-    :rtype: list of str
-    """
-    available_test_files = []
-    for test_path in kstests:
-        if os.path.exists(test_path) and os.path.isfile(test_path):
-            available_test_files.append(test_path)
-        else:
-            print("test file requested for ksappend substitution is missing: %s", test_path)
-    return available_test_files
-
-def do_ksappend_substitution(runtime_folder):
+def do_ksappend_substitution(runtime_folder, test_file):
     """Do the ksappend substitution.
 
     This is done by changing PWD to the runtime folder,
@@ -138,69 +85,42 @@ def do_ksappend_substitution(runtime_folder):
     running Pykickstart to do the substitution and then
     reverting PWD back.
 
-    Individual substitution runs are printed to stdout as are
+    Individual substitution runs are logged as are
     failed substitution attempts.
 
-    We keep all the input files and rename them to <name>.ks.input
-    and rename all files that failed the substitution to <name>.ks.input.FAILED.
+    The result of the substitution is printed to stdout.
 
     :param str runtime_folder: path to the ksappend runtime folder
-    :returns: list of successfully processed kickstart test files
-    :rtype: list of str
+    :param str test_file: path to the kickstart .ks.in file
     """
 
-    # save current PWD
-    pwd = os.path.abspath(".")
+    abs_test_file = os.path.abspath(test_file)
 
     # change working directory to the runtime folder or else
     # Pykickstart will not find the fragments
     os.chdir(runtime_folder)
 
     # do the substitution
-    resolved_ks_files = []
-    for test_file in glob.glob("*.ks"):
-        test_base_name = os.path.split(test_file)[1].rsplit(".ks")[0]
-        print("running ksappend substitution on: {}".format(test_file))
-        # the result should be a temp file
-        result_path = kickstart_parser.preprocessKickstart(test_file)
-        if result_path:
-            # rename the input file and keep it for reference
-            input_file = "{}.ks.input".format(test_base_name)
-            shutil.move(test_file, input_file)
-            # move the result file in place of the original ks file
-            shutil.move(result_path, test_file)
-            # register the successfully resolved file
-            resolved_ks_files.append(test_file)
-        else:
-            print("ksappend substitution failed for: {}".format(test_file))
-            # rename the input file to mark it as failed
-            failed_input_file = "{}.ks.input.FAILED".format(test_base_name)
-            shutil.move(test_file, failed_input_file)
+    logging.info("running ksappend substitution on: %s", test_file)
+    # the result should be a temp file
+    result_path = kickstart_parser.preprocessKickstart(abs_test_file)
+    if result_path:
+        # print result to stdout and clean up the temp file
+        with open(result_path) as f:
+            print(f.read())
+        os.remove(result_path)
+    else:
+        logging.error("ksappend substitution failed for: %s", test_file)
+        exit(1)
 
-    # restore working directory back
-    os.chdir(pwd)
-
-    # return a list of all successfully processed file names & paths in runtime folder
-    # in the [(<file name>, <path to file in runtime folder>),] format
-    return resolved_ks_files
-
-def move_results_in_place(resolved_test_files, runtime_folder):
-    """Move resolved kickstart test files from the ksappend runtime folder.
-
-    :param resolved_ks_files: list of names of all successfully resolved kickstart test files
-    :type: resolved_ks_files: list of str
-    :param str runtime_folder: path to the ksappend runtime folder
-    """
-    for file_name in resolved_test_files:
-        shutil.copyfile(os.path.join(runtime_folder, file_name), file_name)
 
 if __name__ == "__main__":
-    parser = ArgumentParser()
-    parser.parse()
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s:apply-ksappend.py: %(message)s")
+    parser = parse_args()
 
     # check the requested platform folder exists:
     if not os.path.exists(parser.platform_dir_path):
-        print("platform folder path not found: {}".format(parser.platform_dir_path))
+        logging.error("platform folder path not found: %s", parser.platform_dir_path)
         exit(1)
 
     # make sure the runtime folder exists and is empty
@@ -220,20 +140,5 @@ if __name__ == "__main__":
     # copy any overrides
     apply_overrides(parser.override_folders, RUNTIME_FOLDER)
 
-    # copy all the test files that actually exist to runtime folder
-    available_test_files = get_available_kickstart_tests(parser.test_file_paths)
-
-    for test_path in available_test_files:
-        shutil.copy(test_path, RUNTIME_FOLDER)
-
     # do the actual ksappend substitution
-    resolved_test_files = do_ksappend_substitution(RUNTIME_FOLDER)
-
-    # move the results in place
-    move_results_in_place(resolved_test_files, RUNTIME_FOLDER)
-
-    print("ksappend with platform name {} resolved {}/{} test files".format(parser.platform_name,
-                                                                            len(parser.test_file_paths),
-                                                                            len(resolved_test_files)))
-    # and we are done
-    exit(0)
+    do_ksappend_substitution(RUNTIME_FOLDER, parser.test_file_path)

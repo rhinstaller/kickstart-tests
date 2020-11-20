@@ -4,7 +4,7 @@
 ### The subject to be tested.
 
 # Installer boot iso url.
-kstest_boot_iso_url: "https://download.fedoraproject.org/pub/fedora/linux/releases/29/Everything/x86_64/os/images/boot.iso"
+kstest_boot_iso_url: "https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/x86_64/os/images/boot.iso"
 
 # Url of updates image to be used.
 kstest_updates_img: ""
@@ -47,10 +47,10 @@ kstest_override_repos: "yes"
 # Base repository url
 # In the form of kickstart url command option.
 #kstest_url: "--mirror=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-rawhide\\&arch=$basearch"
-kstest_url: "--url=https://download.fedoraproject.org/pub/fedora/linux/releases/29/Everything/x86_64/os"
+kstest_url: "--url=https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/x86_64/os/"
 
 # Software ftp repository for tests.
-kstest_ftp_url: "ftp://mirror.utexas.edu/pub/fedora/linux/releases/29/Everything/x86_64/os/"
+kstest_ftp_url: "ftp://ftp.tu-chemnitz.de/pub/linux/fedora/linux/development/rawhide/Everything/x86_64/os/"
 
 # Unified repository url
 kstest_unified_url: "--url=http://example.com"
@@ -60,7 +60,7 @@ kstest_unified_url: "--url=http://example.com"
 # Set to [] for no additional repositories.
 kstest_repos: []
 #kstest_repos:
-#  - "repo --name=modular --baseurl=https://download.eng.brq.redhat.com/pub/fedora/linux/releases/29/Modular/x86_64/os/"
+#  - "repo --name=modular --baseurl=https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Modular/x86_64/os/"
 
 ### The tests to be run.
 

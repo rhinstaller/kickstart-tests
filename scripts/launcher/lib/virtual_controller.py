@@ -40,7 +40,6 @@ from pylorax import setup_logging
 
 from lib.conf.configuration import VirtualConfiguration
 from lib.utils import disable_on_dry_run
-from .validator import replace_new_lines
 from .shell_launcher import ProcessLauncher
 from .test_logging import get_logger
 from .log_monitor import LogMonitor
@@ -310,7 +309,6 @@ class VirtualManager(object):
             log.error("ERROR: Image creation failed: %s", e)
             raise e
 
-        self._create_human_log()
         self._report_result()
 
         return True
@@ -323,18 +321,6 @@ class VirtualManager(object):
         msg += "Results are in {}\n".format(self._conf.temp_dir)
 
         log.info(msg)
-
-    def _create_human_log(self):
-        output_log = os.path.join(self._conf.temp_dir, "virt-install-human.log")
-        if not os.path.exists(self._conf.install_logpath):
-            log.debug("Can't create virt-install-human.log")
-            return
-
-        with open(self._conf.install_logpath, 'rt') as in_file:
-            with open(output_log, 'wt') as out_file:
-                for line in in_file:
-                    line = replace_new_lines(line)
-                    out_file.write(line)
 
     @disable_on_dry_run(returns=[])
     def _check_setup(self):

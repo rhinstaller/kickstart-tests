@@ -286,7 +286,6 @@ export KSTESTDIR=$(pwd)
 # The name of input kickstart (ks.in) file is
 # 1) either defined in the test (.sh) file by KICKSTART_NAME variable
 # 2) or the same as the test (.sh) file name .sh if the variable is not found
-tests_ks=""
 for t in ${tests}; do
     ksname_line=$(grep KICKSTART_NAME= ${t})
     if [[ -n "$ksname_line" ]]; then
@@ -295,12 +294,10 @@ for t in ${tests}; do
     else
         ks=${t/.sh/.ks.in}
     fi
-    tests_ks+="${ks/.ks.in/.ks} "
-    sed ${sed_args} ${ks} > ${t/.sh/.ks}
-done
 
-# do %ksappend substition on all the files as well
-./scripts/apply-ksappend.py -p ${PLATFORM_NAME} -o ${KSAPPEND_OVERRIDES} -t ${tests_ks}
+    # do %ksappend substition on all the files as well
+    ./scripts/apply-ksappend.py -o ${KSAPPEND_OVERRIDES} -p ${PLATFORM_NAME} ${ks} | sed ${sed_args} > ${t/.sh/.ks}
+done
 
 # And now, include common stuff with @KSINCLUDE@ <FILE>
 # For example libraries for post scripts gathering the result

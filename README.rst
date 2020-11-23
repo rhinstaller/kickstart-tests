@@ -221,6 +221,10 @@ The following environment variables are currently supported:
   KSTEST_OS_VERSION = 26, Fedora rawhide has "Rawhide", and RHEL 7.3 has
   KSTEST_OS_VERSION = 7.3 .
 
+- KSTEST_EXTRA_BOOTOPTS - This variable is used in functions.sh to pass
+  additional kernel command line options. For example, setting this to `inst.text`
+  enables Anaconda's text mode (instead of the default GUI).
+
 Chapter 3. Sharing common code in kickstart (.ks.in) files
 ==========================================================
 

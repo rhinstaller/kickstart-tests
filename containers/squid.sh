@@ -17,7 +17,7 @@ if [ "${1:-}" = start ]; then
     # This image is well-maintained (auto-built) and really small
     $CRUN run --net host --name squid --detach \
         --volume "$MYDIR"/squid-cache.conf:/etc/squid/conf.d.tail/cache.conf:ro,z \
-        --volume ks-squid-cache:/var/cache/squid docker.io/b4tman/squid
+        --volume ks-squid-cache:/var/cache/squid quay.io/rhinstaller/squid
 
     # Redirect all traffic from external interfaces (like container bridges) through our local proxy
     # This does NOT re-route localhost traffic, as that does not go through PREROUTING.

@@ -6,8 +6,8 @@ git remote get-url upstream >/dev/null 2>&1 || git remote add upstream https://g
 git fetch upstream
 git rebase upstream/master
 
-# list of tests that are changed by the current PR
-TESTS=$(git diff --name-only upstream/master..HEAD -- *.ks.in *.sh | sed 's/\.ks\.in$//; s/\.sh$//' | sort -u)
+# list of tests that are changed by the current PR; ignore non-executable *.sh as these are helpers, not tests
+TESTS=$(git diff --name-only upstream/master..HEAD -- *.ks.in $(find -name '*.sh' -perm -u+x) | sed 's/\.ks\.in$//; s/\.sh$//' | sort -u)
 
 # if the PR changes anything in the test runner, or does not touch any tests, pick a few representative tests
 # FIXME: Once the runner container can run groups properly, replace with a TESTTYPE="travis" group

@@ -17,7 +17,8 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="lvm storage"
+# blivet crashes with BlockDev.LVMError: https://bugzilla.redhat.com/show_bug.cgi?id=1886767
+TESTTYPE="lvm storage knownfailure"
 
 . ${KSTESTDIR}/functions.sh
 

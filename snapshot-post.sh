@@ -17,6 +17,7 @@
 #
 # Red Hat Author(s): Jiri Konecny <jkonecny@redhat.com>
 
-TESTTYPE="snapshot lvm storage coverage"
+# FIXME: Anaconda crashes with "Logical volume testvg/testLV contains a filesystem in use"
+TESTTYPE="snapshot lvm storage coverage knownfailure"
 
 . ${KSTESTDIR}/functions.sh

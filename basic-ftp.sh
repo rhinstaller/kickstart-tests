@@ -18,6 +18,7 @@
 #
 # Red Hat Author(s): David Shea <dshea@redhat.com>
 
-TESTTYPE="method"
+# dnf crashes with zchunk errors on ftp:// repos: https://bugzilla.redhat.com/show_bug.cgi?id=1886706
+TESTTYPE="method knownfailure"
 
 . ${KSTESTDIR}/functions.sh

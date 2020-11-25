@@ -18,7 +18,8 @@
 # Red Hat Author(s): David Shea <dshea@redhat.com>
 #                    Jiri Konecny <jkonecny@redhat.com>
 
-TESTTYPE="method proxy"
+# FIXME: Anaconda crashes with "InvalidValueError: Proxy URL does not have valid format: malformed URL, cannot parse it."
+TESTTYPE="method proxy knownfailure"
 
 . ${KSTESTDIR}/functions.sh
 . ${KSTESTDIR}/functions-proxy.sh

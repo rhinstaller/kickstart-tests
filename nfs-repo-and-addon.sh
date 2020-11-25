@@ -17,7 +17,8 @@
 #
 # Red Hat Author(s): David Shea <dshea@redhat.com>
 
-TESTTYPE="method packaging"
+# requires special setup (NFS server) which we don't have in our test environments
+TESTTYPE="method packaging knownfailure"
 
 . ${KSTESTDIR}/functions.sh
 

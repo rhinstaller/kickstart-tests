@@ -20,10 +20,13 @@ RUN dnf -y update && \
     openssh-clients && \
     dnf -y clean all
 
-# HACK: Pull in the libvirt fix from https://github.com/virt-manager/virt-manager/pull/179 to fix parallel runs
+# HACK: Pull in the libvirt fixes from
+# https://github.com/virt-manager/virt-manager/pull/179 and
+# https://github.com/virt-manager/virt-manager/pull/194 to fix parallel runs
 # This will fail once a fixed libvirt lands, remove this when that happens
-COPY libvirt-pool-toctou.patch /tmp
-RUN patch --batch /usr/share/virt-manager/virtinst/connection.py /tmp/libvirt-pool-toctou.patch
+COPY ["libvirt-pool-toctou.patch", "libvirt-domain-toctou.patch", "/tmp"]
+RUN patch --batch /usr/share/virt-manager/virtinst/connection.py /tmp/libvirt-pool-toctou.patch && \
+    patch --batch /usr/share/virt-manager/virtinst/connection.py /tmp/libvirt-domain-toctou.patch
 
 ENV APP_ROOT=/opt/kstest
 ENV PATH=${APP_ROOT}/bin:${PATH} \

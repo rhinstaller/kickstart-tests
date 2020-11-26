@@ -17,6 +17,7 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="packaging"
+# FIXME: times out on rhel8
+TESTTYPE="packaging fedora-only"
 
 . ${KSTESTDIR}/functions.sh

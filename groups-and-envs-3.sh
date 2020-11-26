@@ -17,6 +17,8 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="packaging"
+# FIXME: Fails on RHEL due to nonexisting @domain-client; when dropped, fails validation on
+# "Fedora Server default environment was not installed"
+TESTTYPE="packaging fedora-only"
 
 . ${KSTESTDIR}/functions.sh

@@ -27,6 +27,7 @@ Usage:
 
 Options:
  -j, --jobs N                         Run N jobs in parallel (default: $(nproc))
+ -p, --platform NAME                  See fragments/platform/ (default: fedora_rawhide)
  -t, --testtype TYPE                  Only run TYPE tests
  -s, --skip-testtypes TYPE[,TYPE..]   Don't run tests with given types
  -u, --updates PATH|URL               Set updates.img path or URL
@@ -40,11 +41,12 @@ EOF
 }
 
 # parse options
-eval set -- "$(getopt -o j:t:s:u:h --long jobs:,testtype:,skip-testtypes:,updates:,daily-iso:,defaults:,run-args:,help -- "$@")"
+eval set -- "$(getopt -o j:p:t:s:u:h --long jobs:,platform:,testtype:,skip-testtypes:,updates:,daily-iso:,defaults:,run-args:,help -- "$@")"
 
 while true; do
     case "${1:-}" in
         -j|--jobs) shift; TEST_JOBS=$1 ;;
+        -p|--platform) shift; PLATFORM=$1 ;;
         -t|--testtype) shift; TESTTYPE="$1" ;;
         -s|--skip-testtypes) shift; SKIP_TESTTYPES="$1" ;;
         -u|--updates) shift; UPDATES_IMAGE="$1" ;;
@@ -113,6 +115,6 @@ fi
 set -x
 $CRUN run -it --rm --device=/dev/kvm --publish 127.0.0.1::16509 \
     --env KSTESTS_TEST="$KSTESTS_TEST" --env TESTTYPE="${TESTTYPE:-}" --env SKIP_TESTTYPES="${SKIP_TESTTYPES:-}" \
-    --env TEST_JOBS="$TEST_JOBS" ${UPDATES_IMG_ARGS:-} ${CONTAINER_RUN_ARGS:-} \
+    --env TEST_JOBS="$TEST_JOBS" --env PLATFORM="${PLATFORM:-}" ${UPDATES_IMG_ARGS:-} ${CONTAINER_RUN_ARGS:-} \
     ${VAR_TMP:-} -v "$PWD/data:/opt/kstest/data:z" -v "$BASEDIR:/kickstart-tests:ro,z" ${DEFAULTS_SH_ARGS:-} \
     $CONTAINER /kickstart-tests/containers/runner/run-kstest

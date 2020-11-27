@@ -17,6 +17,8 @@
 #
 # Red Hat Author(s): Martin Pitt <mpitt@redhat.com>
 
-TESTTYPE="method"
+# FIXME: https://download.devel.redhat.com does not have a recognized certificate
+# once there is a solution, create fragments/platform/rhel8/repos/https.ks
+TESTTYPE="method fedora-only"
 
 . ${KSTESTDIR}/functions.sh

@@ -20,7 +20,7 @@ rootpw testcase
 shutdown
 
 %packages
-python
+python3
 %end
 
 %post
@@ -28,8 +28,8 @@ python
 vg_size=$(vgs --noheadings -o size --unit=m --nosuffix fedora)
 root_lv_size=$(lvs --noheadings -o size --unit=m --nosuffix fedora/root)
 swap_lv_size=$(lvs --noheadings -o size --unit=m --nosuffix fedora/swap)
-root_percentage=$(python -c "print int(round(($root_lv_size*100)/$vg_size))")
-swap_percentage=$(python -c "print int(round(($swap_lv_size*100)/$vg_size))")
+root_percentage=$(python3 -c "print(int(round(($root_lv_size*100)/$vg_size)))")
+swap_percentage=$(python3 -c "print(int(round(($swap_lv_size*100)/$vg_size)))")
 if [ $swap_percentage != "10" ]; then
     echo "*** swap lv size is incorrect ($swap_lv_size MiB, or ${swap_percentage}%)" >> /root/RESULT
 fi

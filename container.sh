@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="bootloader packaging coverage"
+TESTTYPE="bootloader packaging coverage fedora-only"
 
 . ${KSTESTDIR}/functions.sh

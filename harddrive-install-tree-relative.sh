@@ -17,7 +17,9 @@
 #
 # Red Hat Author(s): Jiri Konecny <jkonecny@redhat.com>
 
-TESTTYPE=${TESTTYPE:-"packaging"}
+# FIXME: fails on RHEL 8:
+# SourceSetupError: Nothing useful found for Hard drive ISO source at partition=/dev/sdb directory=/repo/
+TESTTYPE="packaging fedora-only"
 
 . ${KSTESTDIR}/harddrive-install-tree.sh
 

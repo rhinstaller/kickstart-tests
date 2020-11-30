@@ -19,7 +19,7 @@ case "$SCENARIO" in
             mkdir -p data/images
             curl -L http://download.devel.redhat.com/rhel-8/nightly/RHEL-8/latest-RHEL-8/compose/BaseOS/x86_64/os/images/boot.iso --output data/images/boot.iso
         fi
-        $LAUNCH --skip-testtypes fedora-only,knownfailure --testtype packaging --defaults "$ROOTDIR/scripts/defaults-rhel8.sh"
+        $LAUNCH --skip-testtypes fedora-only,knownfailure --platform rhel8 --defaults "$ROOTDIR/scripts/defaults-rhel8.sh" all
         ;;
 
     # just run a single test on standard Rawhide; mostly for testing infrastructure

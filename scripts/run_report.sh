@@ -1,8 +1,8 @@
 #!/bin/gawk -f
 
 BEGIN {
-    printf("\n\n\n%-55s | %-15s | %-10s | %s\n", "TEST", "HOST", "RESULT", "EXPLANATION");
-    printf("--------------------------------------------------------+-----------------+------------+-------------------------------------------\n");
+    printf("\n\n\n%-55s | %-10s | %s\n", "TEST", "RESULT", "EXPLANATION");
+    printf("--------------------------------------------------------+------------+-------------------------------------------\n");
     FS=":";
     count=0;
     failed=0;
@@ -33,7 +33,7 @@ BEGIN {
                  failed++;
              }
 
-             printf("%-55s | %-15s | %-10s | %s\n", $5, $6, result, explanation);
+             printf("%-55s | %-10s | %s\n", $5, result, explanation);
              count++
            }
 END {

@@ -94,7 +94,7 @@ class Runner(object):
         return True
 
     def _copy_image_to_tmp(self):
-        log.info("Copying image to temp directory {}".format(self._tmp_dir))
+        log.debug("Copying image to temp directory {}".format(self._tmp_dir))
         shutil.copy2(self._conf.boot_image_path, self._tmp_dir)
 
     def run_test(self):

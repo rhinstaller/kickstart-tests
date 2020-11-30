@@ -36,8 +36,6 @@ from time import sleep
 from pylorax.treebuilder import udev_escape
 from pylorax.executils import execWithRedirect
 
-from pylorax import setup_logging
-
 from lib.conf.configuration import VirtualConfiguration
 from lib.utils import disable_on_dry_run
 from .shell_launcher import ProcessLauncher
@@ -289,8 +287,6 @@ class VirtualManager(object):
         log.info("Disk Image install successful")
 
     def run(self):
-        setup_logging(self._conf.log_path, log)
-
         log.debug(self._conf)
 
         # Check for invalid combinations of options, print all the errors and exit.

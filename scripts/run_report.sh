@@ -8,13 +8,13 @@ BEGIN {
     failed=0;
     timed_out=0;
 }
-/: RESULT:/ { if ($8 == "Test timed out") {
+/: RESULT:/ { if ($6 == "Test timed out") {
                  result = "TIMED OUT";
                  explanation = "";
                  timed_out++;
              } else if (match($0, "Traceback")) {
                  result = "FAILED";
-                 explanation = "Traceback: " $11;
+                 explanation = "Traceback: " $9;
                  failed++;
              } else if (match($0, "traceback")) {
                  result = "FAILED";
@@ -22,18 +22,18 @@ BEGIN {
                  failed++;
              } else if (match($0, "failed on line")) {
                  result = "FAILED";
-                 explanation = "error in log: "$12 ":" $13 ":" $14
+                 explanation = "error in log: "$10 ":" $11 ":" $12
                  failed++;
              } else if (match($0, "SUCCESS")) {
-                 result = $7;
+                 result = $5;
                  explanation = "";
              } else {
-                 result = $7;
-                 explanation = $8
+                 result = $5;
+                 explanation = $6
                  failed++;
              }
 
-             printf("%-55s | %-10s | %s\n", $5, result, explanation);
+             printf("%-55s | %-10s | %s\n", $3, result, explanation);
              count++
            }
 END {

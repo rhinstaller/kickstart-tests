@@ -215,7 +215,10 @@ function check_connection_device() {
     local con=$1
     local dev=$2
 
-    nmcli -t -f NAME,DEVICE con | egrep -q ^${con}:${dev}$
+    # show this in the logs for easier debugging
+    nmcli con
+
+    nmcli -t -f NAME,DEVICE con | egrep -q '^(System )?'"${con}:${dev}$"
     if [[ $? -ne 0 ]]; then
         echo "*** Failed check: connection ${con} exists and is active on ${dev}" >> /root/RESULT
     fi

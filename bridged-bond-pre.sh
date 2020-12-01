@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
-TESTTYPE="network"
+TESTTYPE="network rhbz1903061"
 # This is not implemented yet for %pre (ie in anaconda, just in parse-kickstart)
 
 . ${KSTESTDIR}/functions.sh

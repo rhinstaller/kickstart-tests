@@ -1,7 +1,8 @@
 name: Daily run
 on:
   schedule:
-    - cron: 0 22 * * *
+    # run after daily-boot-iso.yml
+    - cron: 0 23 * * *
   # be able to start this action manually from a actions tab when needed
   workflow_dispatch:
 

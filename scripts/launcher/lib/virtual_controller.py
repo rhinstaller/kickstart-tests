@@ -36,8 +36,6 @@ from time import sleep
 from pylorax.treebuilder import udev_escape
 from pylorax.executils import execWithRedirect
 
-from pylorax import setup_logging
-
 from lib.conf.configuration import VirtualConfiguration
 from lib.utils import disable_on_dry_run
 from .shell_launcher import ProcessLauncher
@@ -169,7 +167,6 @@ class VirtualInstall(object):
     def run(self):
         args = self._prepare_args()
 
-        log.info("Running virt-install.")
         log.info("virt-install %s", args)
 
         self._start_vm(args)
@@ -204,7 +201,7 @@ class VirtualInstall(object):
 
         Could use libvirt for this instead.
         """
-        log.info("shutting down %s", self._virt_name)
+        log.debug("shutting down %s", self._virt_name)
         launcher = ProcessLauncher(False)
         launcher.run_process(["virsh", "destroy", self._virt_name])
         launcher.run_process(["virsh", "undefine", self._virt_name])
@@ -236,7 +233,7 @@ class VirtualManager(object):
             kernel_args += " proxy=" + self._conf.proxy
 
         try:
-            log.info("Starting virtual machine")
+            log.debug("Starting virtual machine")
             virt = VirtualInstall(self._conf.test_name,
                                   self._conf.iso_path, self._conf.ks_paths,
                                   disk_paths=self._conf.disk_paths,
@@ -290,8 +287,6 @@ class VirtualManager(object):
         log.info("Disk Image install successful")
 
     def run(self):
-        setup_logging(self._conf.log_path, log)
-
         log.debug(self._conf)
 
         # Check for invalid combinations of options, print all the errors and exit.

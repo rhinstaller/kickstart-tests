@@ -43,7 +43,7 @@ from lib.conf.runner_parser import RunnerParser
 from lib.shell_launcher import ShellLauncher
 from lib.virtual_controller import VirtualManager, InstallError
 from lib.validator import KickstartValidator, LogValidator, ResultFormatter, Validator
-from lib.test_logging import setup_logger, get_logger
+from lib.test_logging import setup_logger, close_logger, get_logger
 
 log = get_logger()
 
@@ -94,33 +94,39 @@ class Runner(object):
         return True
 
     def _copy_image_to_tmp(self):
-        log.info("Copying image to temp directory {}".format(self._tmp_dir))
+        log.debug("Copying image to temp directory {}".format(self._tmp_dir))
         shutil.copy2(self._conf.boot_image_path, self._tmp_dir)
 
     def run_test(self):
-        if not self._prepare_test():
-            return 99
-
-        v_conf = self._create_virtual_conf()
-
-        virt_manager = VirtualManager(v_conf)
+        log_path = os.path.join(self._tmp_dir, "kstest.log")
+        setup_logger(log_path)
 
         try:
-            virt_manager.run()
-        except InstallError as e:
-            self._result_formatter.report_result(False, str(e))
-            return 1
+            if not self._prepare_test():
+                return 99
 
-        ret = self._validate_all(v_conf)
+            v_conf = self._create_virtual_conf(log_path)
 
-        self._cleanup()
-        return ret.return_code
+            virt_manager = VirtualManager(v_conf)
+
+            try:
+                virt_manager.run()
+            except InstallError as e:
+                self._result_formatter.report_result(False, str(e))
+                return 1
+
+            ret = self._validate_all(v_conf)
+
+            self._cleanup()
+            return ret.return_code
+        finally:
+            close_logger()
 
     @disable_on_dry_run
     def _cleanup(self):
         self._shell.cleanup()
 
-    def _create_virtual_conf(self) -> VirtualConfiguration:
+    def _create_virtual_conf(self, log_path) -> VirtualConfiguration:
         kernel_args = self._shell.kernel_args()
 
         if self._conf.updates_img_path:
@@ -145,7 +151,7 @@ class Runner(object):
         v_conf.kernel_args = kernel_args
         v_conf.test_name = self._conf.ks_test_name
         v_conf.temp_dir = self._tmp_dir
-        v_conf.log_path = os.path.join(self._tmp_dir, "livemedia.log")
+        v_conf.log_path = log_path
         v_conf.vnc = "vnc,listen=0.0.0.0"
         v_conf.boot_image = boot_args
         v_conf.timeout = 60
@@ -185,7 +191,6 @@ class Runner(object):
 
 def run_test_in_temp(config):
     with TempManager(config.keep_level, config.ks_test_name) as temp_dir:
-        setup_logger(temp_dir)
         runner = Runner(config, temp_dir)
         rc = runner.run_test()
 

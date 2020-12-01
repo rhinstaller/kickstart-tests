@@ -174,7 +174,7 @@ class VirtualConfiguration(BaseConfiguration):
         self._proxy = None
         self._location = None
         self._boot = None
-        self._logfile = "./livemedia.log"
+        self._logfile = None
         self._tmp = "/var/tmp"
         self._keep_image = True
         self._vcpu_count = 1

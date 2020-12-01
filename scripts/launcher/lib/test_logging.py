@@ -22,13 +22,30 @@
 
 import logging
 import os
+import sys
 
 
-def setup_logger(tmp_dir):
+def setup_logger(log_path):
     log = get_logger()
-    log_file = os.path.join(tmp_dir, "kstest-logger.log")
-    handler = logging.FileHandler(log_file)
-    log.addHandler(handler)
+    log.setLevel(logging.DEBUG)
+
+    # verbose output to file
+    h_file = logging.FileHandler(log_path)
+    h_file.setFormatter(logging.Formatter("%(asctime)s %(levelname)s: %(message)s"))
+    log.addHandler(h_file)
+
+    # output without debugging to console
+    h_console = logging.StreamHandler(sys.stdout)
+    h_console.setLevel(logging.INFO)
+    h_console.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
+    log.addHandler(h_console)
+
+
+def close_logger():
+    log = get_logger()
+    for h in log.handlers.copy():
+        h.close()
+        log.removeHandler(h)
 
 
 def get_logger():

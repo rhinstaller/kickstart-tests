@@ -14,7 +14,8 @@ for t in $CHANGED_TESTS; do
     if grep -q 'TESTTYPE.*knownfailure' ${t}.sh; then
         echo "Not running $t as it is a known failure"
     else
-        TESTS="$TESTS $t"
+        TESTS="$TESTS
+$t"
     fi
 done
 

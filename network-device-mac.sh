@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Vendula Poncova <vponcova@redhat.com>
 
-TESTTYPE="network"
+TESTTYPE="network rhbz1903061"
 
 . ${KSTESTDIR}/functions.sh
 

@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
-TESTTYPE="network"
+TESTTYPE="network rhbz1903061"
 
 . ${KSTESTDIR}/bridge-2devs-httpks.sh

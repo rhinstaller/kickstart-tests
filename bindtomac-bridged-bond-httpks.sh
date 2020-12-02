@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
-TESTTYPE="network"
+TESTTYPE="network rhbz1903061"
 
 . ${KSTESTDIR}/bridged-bond-httpks.sh
 

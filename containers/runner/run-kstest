@@ -44,6 +44,11 @@ if [ -n "${SKIP_TESTTYPES}" ]; then
     SKIP_TESTTYPES_ARG="-s ${SKIP_TESTTYPES}"
 fi
 
+RETRY_ARG=""
+if [ -n "${TEST_RETRY}" ]; then
+    RETRY_ARG="-r"
+fi
+
 # work around virt-install TOCTOU race <https://github.com/virt-manager/virt-manager/pull/175>
 mkdir -p ~/.cache/virt-manager/boot
 
@@ -69,7 +74,7 @@ fi
 TEST_LOG=/var/tmp/kstest.log
 pushd ${KSTESTS_DIR}
 set +e
-scripts/run_kickstart_tests.sh -k ${KSTESTS_KEEP} -i ${ISO_DIR}/${BOOT_ISO} ${UPDATES_IMAGE_ARG} ${PLATFORM_ARG} ${TESTTYPE_ARG} ${SKIP_TESTTYPES_ARG} ${KSTESTS_TEST} 2>&1 | tee $TEST_LOG
+scripts/run_kickstart_tests.sh -k ${KSTESTS_KEEP} -i ${ISO_DIR}/${BOOT_ISO} ${UPDATES_IMAGE_ARG} ${PLATFORM_ARG} ${TESTTYPE_ARG} ${SKIP_TESTTYPES_ARG} ${RETRY_ARG} ${KSTESTS_TEST} 2>&1 | tee $TEST_LOG
 RC=$?
 set -e
 popd

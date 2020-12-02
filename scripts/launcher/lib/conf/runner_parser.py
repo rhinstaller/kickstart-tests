@@ -88,6 +88,8 @@ class RunnerParser(BaseParser):
         self._parser.add_argument("--append-host-id", default=False, action="store_true",
                                   dest="append_host_id",
                                   help="append an id of the host running the test to the result")
+        self._parser.add_argument("--retry", default=False, action="store_true",
+                                  help="retry a failed test once, to guard against random infrastructure failures")
 
     def get_configuration(self):
         """Parse arguments and return configuration object.
@@ -115,6 +117,8 @@ class RunnerParser(BaseParser):
 
         if ns.append_host_id:
             conf.append_host_id = ns.append_host_id
+
+        conf.retry = ns.retry
 
         self._check_arguments(conf)
 

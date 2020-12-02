@@ -3,7 +3,8 @@
 set -eux
 
 MYDIR=$(dirname $(realpath "$0"))
-LAUNCH="$MYDIR/launch"
+# tests often fail due to random infrastructure flakes; enable auto-retry
+LAUNCH="$MYDIR/launch --retry"
 ROOTDIR=$(dirname $(dirname "$MYDIR"))
 SCENARIO="$1"
 shift

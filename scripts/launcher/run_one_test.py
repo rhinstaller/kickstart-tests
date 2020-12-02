@@ -47,6 +47,9 @@ from lib.test_logging import setup_logger, close_logger, get_logger
 
 log = get_logger()
 
+# return values for which a test gets retried with --retry
+# don't retry skips, panics, etc., just the unspecific failures
+RETRY_CODES = [1]
 
 class Runner(object):
 
@@ -203,5 +206,9 @@ if __name__ == '__main__':
 
     print("================================================================")
     ret_code = run_test_in_temp(config)
+
+    if config.retry and ret_code in RETRY_CODES:
+        print("\nRetrying failed test once")
+        ret_code = run_test_in_temp(config)
 
     exit(ret_code)

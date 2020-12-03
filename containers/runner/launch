@@ -10,6 +10,9 @@ BASEDIR=$(dirname $(dirname $(dirname $(realpath $0))))
 TEST_JOBS=${TEST_JOBS:-$(nproc)}
 CRUN=${CRUN:-$(which podman docker 2>/dev/null | head -n1)}
 CONTAINER=quay.io/rhinstaller/kstest-runner
+# Podman in rootless mode does not have access to /dev/kvm socket https://bugzilla.redhat.com/show_bug.cgi?id=1901462
+# disable selinux container separation when podman is executed as user
+PODMAN_SELINUX_FIX=
 
 if ! test -w /dev/kvm; then
     echo "FATAL: /dev/kvm not accessible" >&2
@@ -112,11 +115,16 @@ elif [ ${TEST_JOBS} -gt 4 ]; then
     VAR_TMP="-v /var/tmp"
 fi
 
+if [ "${CRUN%podman*}" != "$CRUN" ] && [ $(id -u) -ne 0 ]; then
+    echo "Disabling SELinux container separation to enable /dev/kvm socket access."
+    PODMAN_SELINUX_FIX="--security-opt label=disable"
+fi
+
 # Run container against the local repository, to test changes easily
 # Expose the container's libvirt to the host; check "podman ps" for the port, and use e.g.:
 # virsh -c qemu+tcp://localhost:<port>/session list
 set -x
-$CRUN run -it --rm --device=/dev/kvm --publish 127.0.0.1::16509 \
+$CRUN run -it --rm --device=/dev/kvm --publish 127.0.0.1::16509 $PODMAN_SELINUX_FIX \
     --env KSTESTS_TEST="$KSTESTS_TEST" --env TESTTYPE="${TESTTYPE:-}" --env SKIP_TESTTYPES="${SKIP_TESTTYPES:-}" \
     --env TEST_JOBS="$TEST_JOBS" --env PLATFORM="${PLATFORM:-}" --env TEST_RETRY="${TEST_RETRY:-}" ${UPDATES_IMG_ARGS:-} ${CONTAINER_RUN_ARGS:-} \
     ${VAR_TMP:-} -v "$PWD/data:/opt/kstest/data:z" -v "$BASEDIR:/kickstart-tests:ro,z" ${DEFAULTS_SH_ARGS:-} \

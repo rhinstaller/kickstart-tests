@@ -52,7 +52,7 @@ Configuration of the test
 -------------------------
 For more control, you can run the container manually:
 ```
-podman run -it --name last-kstest --env KSTESTS_TEST=keyboard -v ./data:/opt/kstest/data:z -v .:/kickstart-tests:ro --device=/dev/kvm rhinstaller/kstest-runner
+podman run -it --name last-kstest [--security-opt label=disable] --env KSTESTS_TEST=keyboard -v ./data:/opt/kstest/data:z -v .:/kickstart-tests:ro --device=/dev/kvm rhinstaller/kstest-runner
 ```
 
 Instead of keeping named container you can remove it after the test by replacing `--name last-kstest` option with `--rm`.
@@ -65,6 +65,10 @@ Environment variables for the container (`--env` option):
 * BOOT_ISO - name of the installer boot iso from `data/images` to be tested (default is "boot.iso")
 
 By default, the container runs the [run-kstest](./run-kstest) script. To get an interactive shell, append `bash` to the command line.
+
+**Beware** of the [issue](https://bugzilla.redhat.com/show_bug.cgi?id=1901462#c12) that podman
+is not able to get access to kvm socket in rootless mode. This issue will result in awfully
+slow execution of the tests. In that case please add `--security-opt label=disable`.
 
 Running tests with cached package downloads
 -------------------------------------------

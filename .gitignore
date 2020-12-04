@@ -3,3 +3,6 @@ fragments/runtime
 *.log
 *.retry
 __pycache__
+
+# these are temp directories for downloaded images and logs
+data/

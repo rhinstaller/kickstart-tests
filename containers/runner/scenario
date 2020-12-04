@@ -18,7 +18,7 @@ case "$SCENARIO" in
         if [ ! -e data/images/boot.iso ]; then
             echo "INFO: data/images/boot.iso does not exist, downloading current RHEL 8 boot iso..."
             mkdir -p data/images
-            curl -L http://download.devel.redhat.com/rhel-8/nightly/RHEL-8/latest-RHEL-8/compose/BaseOS/x86_64/os/images/boot.iso --output data/images/boot.iso
+            curl -L http://download.devel.redhat.com/nightly/rhel-8/RHEL-8/latest-RHEL-8/compose/BaseOS/x86_64/os/images/boot.iso --output data/images/boot.iso
         fi
         $LAUNCH --skip-testtypes fedora-only,knownfailure,rhbz1903061 --platform rhel8 --defaults "$ROOTDIR/scripts/defaults-rhel8.sh" all
         ;;

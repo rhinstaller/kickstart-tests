@@ -1,22 +1,42 @@
 Kickstart Test Documentation
 ****************************
 
+Kickstart tests are one way of testing the Anaconda Installer, by running an automated installation based on a kickstart file and checking the results.
+
 :Authors:
    Chris Lumens <clumens@redhat.com>
    Martin Kolman <mkolman@redhat.com>
 
-Chapter 0. How to run a single kickstart test manually
-======================================================
+Chapter 1. How to run kickstart tests in a container
+====================================================
 
-What are kickstart tests ?
---------------------------
+This is the canonical way to run tests, as it requires very little setup, does
+not do any permanent changes to your system, and exactly reproduces results
+from CI runs.
 
-Kickstart tests are one way of testing the Anaconda Installer, by running an automated installation based on a kickstart file and checking the results.
+Clone the kickstart-tests repository and enter its directory::
+
+  git clone https://github.com/rhinstaller/kickstart-tests
+  cd kickstart-tests
+
+The launch script downloads a current Fedora Rawhide boot.iso, downloads and
+starts the runner container, and runs a set of tests in it:
+
+  containers/runner/launch keyboard [test2 test3 ...]
+
+Please see the `runner documentation`_ for further details, like how to run all
+tests or some test types, running the container manually, using a different
+boot.iso, enabling caching, and more.
+
+Chapter 2. How to run kickstart tests manually on the host
+==========================================================
+
+*Warning*: This is deprecated now.
 
 Setting up
 ----------
 
-Tooling for running tests on remote hosts is in linchpin_ and ansible_. For running tests in a container, see containers_. Here we describe how to run the tests on local host.
+Tooling for running tests on remote hosts is in linchpin_ and ansible_.
 
 First you need to install the needed dependencies:
 
@@ -31,10 +51,6 @@ First you need to install the needed dependencies:
 - scp
 - genisoimage
 - make
-
-On Fedora the dependencies can be installed with::
-
-  ./scripts/install_dependencies_fedora.sh
 
 You also need to start libvirt service to be able to use virt-install::
 
@@ -112,7 +128,7 @@ If everything worked out, you should be greeted by a successful test result simi
     2017-06-06 16:55:06,813: Disk image(s) at /var/tmp/kstest-tmpfs-fixed_size.RI8HWHMF/disk-a.img,cache=unsafe
     2017-06-06 16:55:06,813: Results are in /var/tmp/kstest-tmpfs-fixed_size.RI8HWHMF
 
-Chapter 1. A test definition
+Chapter 3. A test definition
 ============================
 
 A kickstart test consists of two files:
@@ -142,7 +158,7 @@ A kickstart test consists of two files:
   NOTE: The fragments (%ksappend) mechanism does not work together with
   KICKSTART_NAME setting (%ksappend is not applied).
 
-Chapter 2. Environment Variables
+Chapter 4. Environment Variables
 ================================
 
 A lot of tests need configuration.  This is information that is required by
@@ -225,7 +241,7 @@ The following environment variables are currently supported:
   additional kernel command line options. For example, setting this to `inst.text`
   enables Anaconda's text mode (instead of the default GUI).
 
-Chapter 3. Sharing common code in kickstart (.ks.in) files
+Chapter 5. Sharing common code in kickstart (.ks.in) files
 ==========================================================
 
 To include kickstart or code snippets into test kickstart file during its
@@ -248,7 +264,7 @@ for checking test results of network tests, include it in ks.in test file:
 The including is flat, only one level is supported. Do not use @KSINCLUDE@ in
 included files, the results could be unexpected.
 
-Chapter 4. Networking tests
+Chapter 6. Networking tests
 ===========================
 
 This section contains tips for creating kicstart tests for network
@@ -293,6 +309,7 @@ reason is that using the inject method the network devices are not initialized
 in time of parsing kickstart and obtaining information from sysfs (mostly
 getting hw address) fails which results in incomplete ifcfg file generated.
 
+.. _runner documentation: ./containers/runner/README.md
 .. _linchpin: ./linchpin
 .. _ansible: ./ansible
 .. _containers: ./containers

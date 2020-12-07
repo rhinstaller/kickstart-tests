@@ -1,26 +1,16 @@
-Running kickstart tests in containers
--------------------------------------
+Running kickstart tests in container
+------------------------------------
 
-Tooling for running tests in VMs in cloud (OpenStack) is in [../../linchpin](../../linchpin).
+The runner container provides a well-defined and reproducible environment with
+all the dependencies necessary to run the tests. It makes it easy for developers
+to run the tests locally without permanent change to their system, as well as
+running them in CI in _exactly_ the same way.
 
-The motivation for moving from VMs to containers to run kickstart tests is:
-* To be able to use containers tooling for deployment, scheduling and scaling of resources for batches of kickstart tests.
-* To allow the user to run a kickstart test manually in an easy way.
+The container can be run with podman or docker.
 
+Use the [launch](./launch) script to run a set of tests from the current
+kickstart-tests directory in the runner container:
 
-Host requirements
------------------
-
-Dependencies needed to be installed are defined in `host_packages` variable of [vars.yml](vars.yml).
-```
-sudo dnf install git podman
-```
-
-There is a [playbook](runner-host.yml) for deployment of the host on Fedora Cloud Base Image. See [Troubleshooting] for preferred version to be used.
-
-Run a test in a container
--------------------------
-Use the [launch](./launch) script to run a set of tests from the current kickstart-tests directory in the runner container:
 ```
 containers/runner/launch keyboard [test2 test3 ...]
 ```
@@ -34,7 +24,10 @@ You can also build the container yourself to test modifications to it:
 podman build -t rhinstaller/kstest-runner .
 ```
 
-The `launch` script creates a `./data/` directory for passing of data between the container and the system (via volume). By default it downloads the current Fedora Rawhide boot.iso, but to test some other image you can put it into `data/images/boot.iso` before running `launch`.
+The `launch` script creates a `./data/` directory for passing of data between
+the container and the system (via volume).  By default it downloads the current
+Fedora Rawhide boot.iso, but to test some other image you can put it into
+`data/images/boot.iso` before running `launch`.
 
 There is also a [daily boot.iso](.github/workflows/daily-boot-iso.yml) built
 from Rawhide and various COPRs (e.g. Anaconda and DNF) for regression testing,
@@ -64,7 +57,8 @@ Environment variables for the container (`--env` option):
 * KSTESTS_BRANCH - kickstart-tests git branch to be used
 * BOOT_ISO - name of the installer boot iso from `data/images` to be tested (default is "boot.iso")
 
-By default, the container runs the [run-kstest](./run-kstest) script. To get an interactive shell, append `bash` to the command line.
+By default, the container runs the [run-kstest](./run-kstest) script. To get an
+interactive shell, append `bash` to the command line.
 
 **Beware** of the [issue](https://bugzilla.redhat.com/show_bug.cgi?id=1901462#c12) that podman
 is not able to get access to kvm socket in rootless mode. This issue will result in awfully
@@ -89,8 +83,8 @@ and build/run the `runner` container from above through `sudo containers/runner/
 This starts a container named `squid` and uses a persistent podman volume
 `ks-squid-cache`.
 
-Troubleshooting
----------------
+To stop the proxy, call
 
-### Tests runnable in container
-Some tests require services, resources, or configration in VM hypervisor that might not be working in container. Checking the tests and trying to resolve the issues is TBD.
+    sudo containers/squid.sh stop
+
+again.

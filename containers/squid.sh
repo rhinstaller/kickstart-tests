@@ -11,9 +11,18 @@ set -eu
 MYDIR=$(dirname $(realpath "$0"))
 CRUN=${CRUN:-$(which podman docker 2>/dev/null | head -n1)}
 
-if [ "${1:-}" = start ]; then
+is_running() {
+    [ -n "$($CRUN ps -q -f 'name=^squid$')" ]
+}
+
+start() {
+    if is_running; then
+        echo "Already running"
+        return 0
+    fi
+
     # clean up stopped container from previous boot (usually one does not remember to call "squid.sh stop")
-    $CRUN rm squid || true
+    $CRUN rm squid 2>/dev/null || true
     # This image is well-maintained (auto-built) and really small
     $CRUN run --net host --name squid --detach \
         --volume "$MYDIR"/squid-cache.conf:/etc/squid/conf.d.tail/cache.conf:ro,z \
@@ -26,7 +35,14 @@ if [ "${1:-}" = start ]; then
     if firewall-cmd --state >/dev/null 2>&1; then
         firewall-cmd --add-port=3129/tcp
     fi
-elif [ "${1:-}" = stop ]; then
+}
+
+stop() {
+    if ! is_running; then
+        echo "Already stopped"
+        return 0
+    fi
+
     nft delete table squid-cache
 
     $CRUN rm -f squid
@@ -34,7 +50,10 @@ elif [ "${1:-}" = stop ]; then
     if firewall-cmd --state >/dev/null 2>&1; then
         firewall-cmd --remove-port=3129/tcp
     fi
-else
-    echo "Usage: $0 start|stop" >&2
-    exit 1
-fi
+}
+
+case "${1:-}" in
+    start) start ;;
+    stop) stop ;;
+    *) echo "Usage: $0 start|stop" >&2; exit 1 ;;
+esac

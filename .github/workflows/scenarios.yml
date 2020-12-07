@@ -34,8 +34,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Ensure http proxy is running
-        run: |
-          [ -n "$(sudo podman ps -q -f 'name=^squid$')" ] || sudo containers/squid.sh start
+        run: sudo containers/squid.sh start
 
       - name: Run scenario ${{ matrix.scenario }} in container
         run: sudo --preserve-env=TEST_JOBS,GITHUB_TOKEN containers/runner/scenario ${{ matrix.scenario }} --defaults .github/defaults.sh

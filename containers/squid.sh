@@ -5,6 +5,8 @@
 #
 # This does NOT work with user podman containers, as they don't use a bridge, but slirp.
 # Transparent content caching does NOT work with https in principle.
+#
+# Call this with "clean" to  drop the persistent squid cache.
 
 set -eu
 
@@ -52,8 +54,16 @@ stop() {
     fi
 }
 
+clean() {
+    stop
+    if $CRUN volume inspect ks-squid-cache >/dev/null 2>&1; then
+        $CRUN volume rm ks-squid-cache
+    fi
+}
+
 case "${1:-}" in
     start) start ;;
     stop) stop ;;
-    *) echo "Usage: $0 start|stop" >&2; exit 1 ;;
+    clean) clean ;;
+    *) echo "Usage: $0 start|stop|clean" >&2; exit 1 ;;
 esac

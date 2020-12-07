@@ -204,7 +204,7 @@ function check_number_of_connections() {
     local ncons=$(nmcli -t -f NAME con | wc -l)
 
     if [[ ${ncons} -ne ${number} ]]; then
-        echo "*** Failed check: number of connections upon start: ${number}" >> /root/RESULT
+        echo "*** Failed check: number of connections: ${number}" >> /root/RESULT
     fi
 }
 

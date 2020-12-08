@@ -20,7 +20,7 @@ Clone the kickstart-tests repository and enter its directory::
   cd kickstart-tests
 
 The launch script downloads a current Fedora Rawhide boot.iso, downloads and
-starts the runner container, and runs a set of tests in it:
+starts the runner container, and runs a set of tests in it::
 
   containers/runner/launch keyboard [test2 test3 ...]
 

@@ -1,6 +1,0 @@
-# Variables for container host
-
-# Package dependencies
-host_packages:
-  - git
-  - podman

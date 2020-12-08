@@ -30,12 +30,15 @@ jobs:
           sudo podman volume rm --all || true
           sudo rm -rf *
 
+      # use the latest official packages for the nightly runs
+      - name: Clean up squid cache
+        run: sudo containers/squid.sh clean
+
       - name: Clone repository
         uses: actions/checkout@v2
 
       - name: Ensure http proxy is running
-        run: |
-          [ -n "$(sudo podman ps -q -f 'name=^squid$')" ] || sudo containers/squid.sh start
+        run: sudo containers/squid.sh start
 
       - name: Run scenario ${{ matrix.scenario }} in container
         run: sudo --preserve-env=TEST_JOBS,GITHUB_TOKEN containers/runner/scenario ${{ matrix.scenario }} --defaults .github/defaults.sh

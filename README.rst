@@ -309,7 +309,86 @@ reason is that using the inject method the network devices are not initialized
 in time of parsing kickstart and obtaining information from sysfs (mostly
 getting hw address) fails which results in incomplete ifcfg file generated.
 
+Chapter 7. Continuous Integration structure
+===========================================
+
+Regular test runs
+-----------------
+Every night, the `scenarios workflow`_ runs all tests on all our supported
+operating systems/repositories, like "Fedora Rawhide" or "RHEL 8". These are
+defined in the `containers/runner/scenario`_ script, which essentially calls
+the runner container's ``launch`` script documented above with the desired
+parameters.
+
+The ``rawhide`` and ``daily-iso`` scenarios can in principle run on any host
+that has enough resources. The ``rhel8`` test however needs to run on RHEL
+internal infrastructure.
+
+Currently all scenarios run on `self-hosted GitHub action runners`_, which are
+running in our upshift cluster. See our internal ``builders.git`` repository
+for details and the launch/setup playbooks. These have little magic, though,
+they mostly just create an OpenStack instance and install/configure the action
+runner binary as a service. All the actual test logic is contained in the
+workflow files and the runner container.
+
+The results can be viewed on the `GitHub Daily run workflows page`_. Each run
+has an artifact attached with the detailed log files. This is currently not
+very comfortable, and we are actively looking for a better solution how to
+publish the test result history.
+
+These tests are expected to succeed normally. On failures, rhinstaller
+maintainers get a "failed workflow" notification email and should investigate
+the cause.
+
+Sometimes tests fail due to networking/infrastructure flakes. To avoid this
+kind of noise, the nightly runs use the ``--retry`` option to re-run a test
+which failed due to an unspecific reason (i.e. not due to a skip or a syntax
+error in the kickstart file, etc.). The test log will still show both results
+right after each other, so that the original failure can be examined; but if
+the retry works, the test as a whole counts as success.
+
+Pull requests
+-------------
+PRs are gated to avoid introducing broken or unstable tests, and to validate
+changes to existing tests. To keep PRs open to the whole community, we want to
+avoid running them in self-hosted internal infrastructure (if we did, we'd need
+to restrict running the tests to avoid exfiltrating secrets from the internal
+Red Hat network).
+
+Thus PR tests run on Travis_, which is one of the few public CI providers who
+offer ``/dev/kvm``. The entry point is `.travis.yml`_. The ``run_travis.sh``
+script checks which tests are affected by the PR, and runs the first six in
+the runner container's launch script. Travis jobs are limited to 50 minutes, so
+we cannot currently run more; but that should suffice in most cases.
+
+PR runs do *not* auto-retry test failures. This avoids introducing unstable
+tests, and PRs usually just run a few tests so that flakes are much less likely
+to ruin the result.
+
+Service jobs
+------------
+* The `container-autoupdate`_ workflow refreshes the runner container
+  every week, and pushes it to `quay.io/rhinstaller/kstest-runner`_.
+  Developers, CI, and the ``launch`` script usually download it from there.
+
+* The `daily-boot-iso`_ workflow creates a ``boot.iso`` out of current Fedora
+  Rawhide and various COPRs every night, so that we can test updates to
+  anaconda, dnf, or blivet before they get released. This is consumed by the
+  ``daily-iso`` scenario.
+
+These jobs don't have any particular infrastructure requirements. They run on
+GitHub's infrastructure and can be run manually by a developer.
+
 .. _runner documentation: ./containers/runner/README.md
 .. _linchpin: ./linchpin
 .. _ansible: ./ansible
 .. _containers: ./containers
+.. _self-hosted GitHub action runners: https://docs.github.com/en/free-pro-team@latest/actions/hosting-your-own-runners
+.. _scenarios workflow: .github/workflows/scenarios.yml
+.. _containers/runner/scenario: ./containers/runner/scenario
+.. _GitHub Daily run workflows page: https://github.com/rhinstaller/kickstart-tests/actions?query=workflow%3A%22Daily+run%22
+.. _Travis: https://travis-ci.com/
+.. _.travis.yml: ./.travis.yml
+.. _container-autoupdate: ./.github/workflows/container-autoupdate.yml
+.. _quay.io/rhinstaller/kstest-runner: https://quay.io/repository/rhinstaller/kstest-runner
+.. _daily-boot-iso: ./.github/workflows/daily-boot-iso.yml

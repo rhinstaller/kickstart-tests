@@ -17,6 +17,7 @@
 #
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
-TESTTYPE="network rhbz1903061"
+# Upstream support was added in https://bugzilla.redhat.com/show_bug.cgi?id=1879480
+TESTTYPE="network fedora-only"
 
 . ${KSTESTDIR}/bond-vlan-httpks.sh

@@ -17,8 +17,8 @@
 #
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
-TESTTYPE="network rhbz1903061"
-# This is not implemented yet for %pre (ie in anaconda, just in parse-kickstart)
+# Upstream support was added in https://github.com/rhinstaller/anaconda/pull/2861
+TESTTYPE="network fedora-only"
 
 . ${KSTESTDIR}/functions.sh
 

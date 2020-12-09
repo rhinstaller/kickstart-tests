@@ -28,16 +28,27 @@ shutdown
 @KSINCLUDE@ post-lib-network.sh
 
 check_config_exists @KSTEST_NETDEV1@ no
-check_config_exists @KSTEST_NETDEV2@ no
+if [ "@KSTEST_OS_NAME@" == "rhel" ] ; then
+    check_config_exists @KSTEST_NETDEV2@ yes
+else
+    check_config_exists @KSTEST_NETDEV2@ no
+fi
 check_config_exists @KSTEST_NETDEV3@ no
 check_device_connected @KSTEST_NETDEV1@ yes
 check_device_connected @KSTEST_NETDEV2@ yes
 check_device_connected @KSTEST_NETDEV3@ yes
 
-check_number_of_connections 1
+if [ "@KSTEST_OS_NAME@" == "rhel" ] ; then
+    check_number_of_connections 2
+else
+    check_number_of_connections 1
+fi
 
 check_connection_device "Wired Connection" @KSTEST_NETDEV1@
 check_connection_device "Wired Connection" @KSTEST_NETDEV2@
+if [ "@KSTEST_OS_NAME@" == "rhel" ] ; then
+    check_connection_device "System @KSTEST_NETDEV2@"
+fi
 check_connection_device "Wired Connection" @KSTEST_NETDEV3@
 check_connection_setting "Wired Connection" ipv4.method auto
 check_connection_setting "Wired Connection" ipv6.method auto

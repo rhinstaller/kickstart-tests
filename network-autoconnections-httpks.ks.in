@@ -30,11 +30,19 @@ shutdown
 # Note: up to RHEL8.2 the file was created by dracut network module
 # check_config_exists @KSTEST_NETDEV1@ yes
 check_config_exists @KSTEST_NETDEV1@ no
-check_config_exists @KSTEST_NETDEV2@ no
+# In RHEL8 ifcfg files are created from kickstart already in initramfs
+if [ "@KSTEST_OS_NAME@" == "rhel" ] ; then
+    check_config_exists @KSTEST_NETDEV2@ yes
+else
+    check_config_exists @KSTEST_NETDEV2@ no
+fi
 check_config_exists @KSTEST_NETDEV3@ no
 
 check_device_connected @KSTEST_NETDEV1@ yes
 check_connection_device @KSTEST_NETDEV1@ @KSTEST_NETDEV1@
+if [ "@KSTEST_OS_NAME@" == "rhel" ] ; then
+    check_connection_device "System @KSTEST_NETDEV2@"
+fi
 
 check_connection_setting "@KSTEST_NETDEV1@" ipv4.method auto
 check_connection_setting "@KSTEST_NETDEV1@" ipv6.method auto
@@ -45,7 +53,11 @@ check_connection_setting "@KSTEST_NETDEV1@" 802-3-ethernet.mac-address --
 detect_nm_has_autoconnections_off
 nm_has_autoconnections_off=$?
 if [[ $nm_has_autoconnections_off -eq 0 ]]; then
-    check_number_of_connections 1
+    if [ "@KSTEST_OS_NAME@" == "rhel" ] ; then
+        check_number_of_connections 2
+    else
+        check_number_of_connections 1
+    fi
     check_device_connected @KSTEST_NETDEV3@ no
     check_device_connected @KSTEST_NETDEV2@ no
 else

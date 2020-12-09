@@ -24,7 +24,14 @@ shutdown
 @KSINCLUDE@ post-nochroot-lib-network.sh
 
 check_bridge_has_slave_nochroot bridge0 @KSTEST_NETDEV1@ yes
-check_gui_configurations @KSTEST_NETDEV1@ bridge0
+if [ "@KSTEST_OS_NAME@" == "rhel" ] ; then
+    # RHEL-8-FAILURE: generic "Wired Connection" created in initramfs (ip=dhcp)
+    # would be edited for @KSTEST_NETDEV1@ in GUI which is not ideal
+    check_gui_configurations bridge0
+else
+    check_gui_configurations @KSTEST_NETDEV1@ bridge0
+fi
+
 
 %end
 

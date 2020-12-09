@@ -10,7 +10,7 @@ jobs:
     name: Build boot.iso
     runs-on: ubuntu-latest
     container:
-      image: fedora:latest
+      image: fedora:rawhide
       # lorax does mounts and uses loop devices, thus needs to be privileged
       options: --privileged
     steps:

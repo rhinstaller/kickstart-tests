@@ -98,8 +98,6 @@ function check_gui_configurations() {
             local con=${dev_con##${devname}:}
             if [[ ${con} != ${dev_con} ]]; then
                 # Do not require ifcfg when there is no connection, eg bond configuration from boot options.
-                # Do not require ifcfg when there is a connection, eg for default connections created by NM upon start
-                # (they are disabled by no-auto-default=* in RHEL installer and NetworkManager-config-server package)
                 found="yes"
                 if [[ ${con} != "" && ${con} != "None" ]]; then
                     local ifcfg_file="$SYSROOT/etc/sysconfig/network-scripts/ifcfg-${devname}"

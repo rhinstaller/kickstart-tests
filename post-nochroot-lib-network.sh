@@ -98,8 +98,6 @@ function check_gui_configurations() {
             local con=${dev_con##${devname}:}
             if [[ ${con} != ${dev_con} ]]; then
                 # Do not require ifcfg when there is no connection, eg bond configuration from boot options.
-                # Do not require ifcfg when there is a connection, eg for default connections created by NM upon start
-                # (they are disabled by no-auto-default=* in RHEL installer and NetworkManager-config-server package)
                 found="yes"
                 if [[ ${con} != "" && ${con} != "None" ]]; then
                     local ifcfg_file="$SYSROOT/etc/sysconfig/network-scripts/ifcfg-${devname}"
@@ -112,8 +110,18 @@ function check_gui_configurations() {
                         egrep -q '^uuid="?'${con}'"?$' ${keyfile_file}
                         keyfile_result=$?
                     fi
-                    if [[ ${ifcfg_result} != 0 && ${keyfile_result} != 0 ]]; then
-                        echo "*** Failed check: ${devname}:${con} added in GUI corresponds to ${ifcfg_file} or ${keyfile_file}" >> $SYSROOT/root/RESULT
+                    # Using device-specific connection created in intramfs is
+                    # acceptable as well even if there is no persistent
+                    # connection (ifcfg_file or keyfile_file above) created
+                    # from it by Anaconda for various reasons (eg for a bridge
+                    # slave device)
+                    local temporary_keyfile_file="$SYSROOT/run/NetworkManager/system-connections/${devname}.nmconnection"
+                    if [[ -e ${temporary_keyfile_file} ]]; then
+                        egrep -q '^uuid="?'${con}'"?$' ${temporary_keyfile_file}
+                        temporary_keyfile_result=$?
+                    fi
+                    if [[ ${ifcfg_result} != 0 && ${keyfile_result} != 0 && ${temporary_keyfile_result} != 0 ]]; then
+                        echo "*** Failed check: ${devname}:${con} added in GUI corresponds to ${ifcfg_file} or ${keyfile_file} or ${temporary_keyfile_file}" >> $SYSROOT/root/RESULT
                     fi
                 fi
                 break

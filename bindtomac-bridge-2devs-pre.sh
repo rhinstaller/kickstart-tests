@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
-TESTTYPE="network rhbz1903061"
+TESTTYPE="network"
 
 . ${KSTESTDIR}/bridge-2devs-pre.sh

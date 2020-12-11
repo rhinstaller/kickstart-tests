@@ -56,6 +56,8 @@ stop() {
 
 clean() {
     stop
+    # clean up in case it still exists, but is stopped
+    $CRUN rm -f squid 2>/dev/null || true
     if $CRUN volume inspect ks-squid-cache >/dev/null 2>&1; then
         $CRUN volume rm ks-squid-cache
     fi

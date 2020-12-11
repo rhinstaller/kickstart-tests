@@ -38,10 +38,17 @@ check_gui_configurations @KSTEST_NETDEV1@ bridge0
 check_device_connected bridge0 yes
 check_device_connected @KSTEST_NETDEV1@ yes
 
-# The bridge is created in initramfs so the slave connection is named @KSTEST_NETDEV1@
-# connection.master is identified by connection uuid so check __ANY
-check_device_config_value @KSTEST_NETDEV1@ BRIDGE bridge0 connection master __ANY
-check_device_config_value @KSTEST_NETDEV1@ BRIDGE bridge0 connection slave-type bridge
+if [ "@KSTEST_OS_NAME@" == "rhel" ] ; then
+    # RHEL-8-FAILURE: in rhel 8 the ifcfg is generated in initramfs by Anaconda
+    check_device_config_value bridge0_slave_1 BRIDGE bridge0 connection master bridge0
+    check_device_config_value bridge0_slave_1 BRIDGE bridge0 connection slave-type bridge
+else
+    # The bridge is created in initramfs so the slave connection is named @KSTEST_NETDEV1@
+    # connection.master is identified by connection uuid so check __ANY
+    check_device_config_value @KSTEST_NETDEV1@ BRIDGE bridge0 connection master __ANY
+    check_device_config_value @KSTEST_NETDEV1@ BRIDGE bridge0 connection slave-type bridge
+fi
+
 
 check_device_has_ipv4_address bridge0 yes
 check_device_has_ipv4_address @KSTEST_NETDEV1@ no

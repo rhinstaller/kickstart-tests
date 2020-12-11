@@ -24,8 +24,8 @@ jobs:
       - name: Build boot.iso with lorax
         run: |
           mkdir build
-          # HACK: lorax and podman overlayfs really hate each other: https://bugzilla.redhat.com/show_bug.cgi?id=1906364
-          sudo podman run --rm -i --storage-driver=vfs --root /tmp/podman-vfs --privileged --device /dev/loop0 --device /dev/loop-control --network host -v $PWD/build:/data registry.access.redhat.com/ubi8 <<EOF
+          # /var/tmp tmpfs speeds up lorax and avoids https://bugzilla.redhat.com/show_bug.cgi?id=1906364
+          sudo podman run --rm -i --privileged --device /dev/loop0 --device /dev/loop-control --tmpfs /var/tmp:rw,mode=1777 --network host -v $PWD/build:/data registry.access.redhat.com/ubi8 <<EOF
           set -eux
 
           # lorax must run on RHEL host to produce RHEL guest images :-(

@@ -30,7 +30,13 @@ shutdown
 # discoverable in sysfs yet so it picks its own name ksdevX and uses infname= to
 # name the device which results in binding also to HWADDR (because of ifname=
 # being used).
-check_device_config_value ksdev0 HWADDR __ANY ethernet mac-address __ANY
+if [ "@KSTEST_OS_NAME@" == "rhel" ] ; then
+    # RHEL-8-FAILURE mac binding for ifname= is not applied when updating connection,
+    # fixed upstream in commit a5cb6311e22587b539248bd5d2a227d08c0bb581
+    check_device_config_value ksdev0 HWADDR __NONE ethernet mac-address __NONE
+else
+    check_device_config_value ksdev0 HWADDR __ANY ethernet mac-address __ANY
+fi
 
 check_device_connected ksdev0 yes
 check_device_config_value ksdev0 IPV6ADDR 2001:cafe:cafe::1/64 ipv6 address1 2001:cafe:cafe::1/64

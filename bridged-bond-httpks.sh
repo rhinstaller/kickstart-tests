@@ -18,7 +18,7 @@
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
 # FIXME: https://github.com/rhinstaller/kickstart-tests/issues/447
-TESTTYPE="network rhel-8-failure"
+TESTTYPE=${TESTTYPE:-"network rhel-8-failure"}
 
 . ${KSTESTDIR}/functions.sh
 

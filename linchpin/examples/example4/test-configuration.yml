@@ -1,4 +1,0 @@
----
-kstest_boot_iso_url: "https://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/x86_64/os/images/boot.iso"
-kstest_url: "--url=https://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/x86_64/os"
-kstest_ftp_url: "ftp://mirror.utexas.edu/pub/fedora/linux/development/rawhide/Everything/x86_64/os/"

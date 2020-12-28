@@ -1,6 +1,5 @@
 #test name: tmpfs-fixed_size
 %ksappend repos/default.ks
-install
 network --bootproto=dhcp
 
 bootloader --timeout=1

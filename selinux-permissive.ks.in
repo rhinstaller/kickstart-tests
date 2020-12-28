@@ -1,7 +1,6 @@
 #version=DEVEL
 #test name: selinux-permissive
 %ksappend repos/default.ks
-install
 network --bootproto=dhcp
 
 bootloader --timeout=1

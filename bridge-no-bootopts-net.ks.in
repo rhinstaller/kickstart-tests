@@ -3,7 +3,6 @@
 # when parsing kickstart, ie ks=hd: or ks=file:)
 # https://bugzilla.redhat.com/show_bug.cgi?id=1373360
 %ksappend repos/default.ks
-install
 
 # --onboot=no doesn't make much sense as a use case but we want to test that it works in this test
 network --device=bridge0  --bridgeslaves=@KSTEST_NETDEV1@ --bootproto=dhcp

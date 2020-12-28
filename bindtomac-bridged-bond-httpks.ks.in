@@ -1,6 +1,5 @@
 #test name bindtomac-bridged-bond
 %ksappend repos/default.ks
-install
 
 network --device=@KSTEST_NETDEV1@ --bootproto=dhcp --onboot=yes --activate
 network --device=bond0   --bondslaves=@KSTEST_NETDEV2@,@KSTEST_NETDEV3@ --bondopts=mode=balance-tlb --noipv4 --activate --bindto=mac

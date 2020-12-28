@@ -1,6 +1,5 @@
 #test name: snapshot-pre
 %ksappend repos/default.ks
-install
 network --bootproto=dhcp
 
 bootloader --timeout=1

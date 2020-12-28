@@ -7,7 +7,6 @@
 %ksappend repos/default.ks
 %ksappend common/common_no_payload.ks
 
-install
 network --bootproto=dhcp
 
 bootloader --timeout=1

@@ -6,7 +6,6 @@
 # Also, just in case, the admin users is not the first user to be created.
 %ksappend repos/default.ks
 
-install
 
 network --bootproto=dhcp
 

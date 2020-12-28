@@ -2,7 +2,6 @@
 #
 # Check that geolocation is not done during a regular kickstart installation.
 %ksappend repos/default.ks
-install
 network --bootproto=dhcp
 
 bootloader --timeout=1

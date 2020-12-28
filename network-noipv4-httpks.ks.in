@@ -1,6 +1,5 @@
 #test name: network-noipv4-httpks
 %ksappend repos/default.ks
-install
 
 network --device=@KSTEST_NETDEV2@ --noipv4 --no-activate --onboot=yes
 network --device=@KSTEST_NETDEV3@ --noipv4 --noipv6 --activate --onboot=no

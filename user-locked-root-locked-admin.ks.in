@@ -4,7 +4,6 @@
 # and the only user admin account being locked as well.
 %ksappend repos/default.ks
 
-install
 
 network --bootproto=dhcp
 

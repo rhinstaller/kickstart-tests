@@ -2,7 +2,6 @@
 # rhbz#1433891
 # rhbz#1432886
 %ksappend repos/default.ks
-install
 %include /tmp/ksinclude
 %pre
 echo "network --device=@KSTEST_NETDEV2@ --bootproto dhcp --onboot=no --activate" >> /tmp/ksinclude

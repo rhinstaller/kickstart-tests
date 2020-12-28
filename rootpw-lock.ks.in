@@ -5,7 +5,6 @@
 
 %ksappend repos/default.ks
 
-install
 
 network --bootproto=dhcp
 

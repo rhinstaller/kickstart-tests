@@ -3,7 +3,6 @@
 # Test conversion from x layouts to vc keymap and overriding of boot option by
 # kickstart command
 %ksappend repos/default.ks
-install
 network --bootproto=dhcp
 
 bootloader --timeout=1

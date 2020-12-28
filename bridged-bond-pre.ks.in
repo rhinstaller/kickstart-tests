@@ -1,6 +1,5 @@
 # test name bridged-bond-pre
 %ksappend repos/default.ks
-install
 
 %include /tmp/ksinclude
 %pre

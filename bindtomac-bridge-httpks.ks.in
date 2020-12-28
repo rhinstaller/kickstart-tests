@@ -1,6 +1,5 @@
 #test name bindtomac-bridge
 %ksappend repos/default.ks
-install
 
 # --onboot=no doesn't make much sense as a use case but we want to test that it works in this test
 network --device=bridge0  --bridgeslaves=@KSTEST_NETDEV1@ --bootproto=dhcp --onboot=no --bindto=mac

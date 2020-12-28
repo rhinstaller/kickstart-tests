@@ -17,7 +17,6 @@ nfs --server=@KSTEST_NFS_SERVER@ --dir=@KSTEST_NFS_PATH@
 repo --name=kstest-nfs --baseurl=@KSTEST_NFS_ADDON_REPO@ --cost=50
 repo --name=kstest-http --baseurl=@KSTEST_HTTP_ADDON_REPO@ --cost=25 --excludepkgs=testpkg-share1 --install
 
-install
 network --bootproto=dhcp
 
 bootloader --timeout=1

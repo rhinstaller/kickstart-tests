@@ -5,7 +5,6 @@
 # user specifications and simply skip creation of such users.
 %ksappend repos/default.ks
 
-install
 
 network --bootproto=dhcp
 

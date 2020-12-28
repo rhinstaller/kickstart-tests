@@ -4,7 +4,6 @@
 # with admin priviledges are specified.
 %ksappend repos/default.ks
 
-install
 
 network --bootproto=dhcp
 

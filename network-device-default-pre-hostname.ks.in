@@ -1,7 +1,6 @@
 #test name: network-device-default-pre-hostname
 # rhbz#1272274
 %ksappend repos/default.ks
-install
 
 %include /tmp/ksinclude
 %pre

@@ -1,6 +1,5 @@
 #test name: network-device-mac
 %ksappend repos/default.ks
-install
 
 network --bootproto=dhcp --device=52:54:00:12:34:56 --ipv6=2001:cafe:cafe::1/64
 

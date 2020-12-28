@@ -1,7 +1,6 @@
 #version=DEVEL
 #test name: ntp-pools
 %ksappend repos/default.ks
-install
 network --bootproto=dhcp
 
 # use ntp.cesnet.cz as an NTP server and 0.pool.ntp.org as an NTP pool

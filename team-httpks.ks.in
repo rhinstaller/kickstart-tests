@@ -1,6 +1,5 @@
 #test name: team
 %ksappend repos/default.ks
-install
 
 network --device team0 --bootproto dhcp --teamslaves="@KSTEST_NETDEV2@'{\"prio\": -10, \"sticky\": true}',@KSTEST_NETDEV3@'{\"prio\": 100}'" --teamconfig="{\"runner\": {\"name\": \"activebackup\"}}" --activate --onboot=no
 network --device team1 --bootproto dhcp --teamslaves=@KSTEST_NETDEV4@,@KSTEST_NETDEV5@ --teamconfig="{\"runner\": {\"name\": \"roundrobin\"}}"

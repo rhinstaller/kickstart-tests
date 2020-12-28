@@ -1,7 +1,6 @@
 #test name: autopart-encrypted-3
 
 %ksappend repos/default.ks
-install
 network --bootproto=dhcp
 
 bootloader --timeout=1

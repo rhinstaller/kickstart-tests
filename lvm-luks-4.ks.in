@@ -1,7 +1,6 @@
 #test name: lvm-luks-4
 
 %ksappend repos/default.ks
-install
 network --bootproto=dhcp
 
 bootloader --timeout=1

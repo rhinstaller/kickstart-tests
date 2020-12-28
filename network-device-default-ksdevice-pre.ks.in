@@ -4,7 +4,6 @@
 #      ignores the command without --device specified (and no ksdevice set),
 #      but it will be applied in anaconda.
 %ksappend repos/default.ks
-install
 
 %include /tmp/ksinclude
 %pre

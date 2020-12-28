@@ -1,7 +1,6 @@
 #test name: ibft
 
 %ksappend repos/default.ks
-install
 
 bootloader --timeout=1
 zerombr

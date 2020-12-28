@@ -3,7 +3,6 @@
 
 %ksappend repos/default.ks
 
-install
 shutdown
 # network
 # no network configuration

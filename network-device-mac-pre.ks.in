@@ -1,6 +1,5 @@
 #test name: network-device-mac-pre
 %ksappend repos/default.ks
-install
 
 %include /tmp/ksinclude
 %pre

@@ -1,6 +1,5 @@
 #test name: hostname
 %ksappend repos/default.ks
-install
 network --bootproto=dhcp
 # Set hostname for testing
 network --hostname=testhostname.example.com

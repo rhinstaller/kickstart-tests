@@ -1,7 +1,6 @@
 #test name: user-single
 %ksappend repos/default.ks
 
-install
 
 network --bootproto=dhcp
 

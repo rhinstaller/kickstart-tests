@@ -4,7 +4,6 @@
 # (this should lock the root account) but with a user that is an admin.
 %ksappend repos/default.ks
 
-install
 
 network --bootproto=dhcp
 

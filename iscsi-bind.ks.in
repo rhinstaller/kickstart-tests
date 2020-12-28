@@ -1,7 +1,6 @@
 #test name: iscsi-bind
 
 %ksappend repos/default.ks
-install
 
 iscsiname @KSTEST_ISCSINAME@
 iscsi --ipaddr @KSTEST_ISCSI_IP@ --port @KSTEST_ISCSI_PORT@ --target @KSTEST_ISCSI_TARGET@ --iface=@KSTEST_NETDEV1@

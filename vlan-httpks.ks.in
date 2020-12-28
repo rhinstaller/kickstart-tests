@@ -1,6 +1,5 @@
 #test name: vlan-httpks
 %ksappend repos/default.ks
-install
 
 # Parent configured and activated in initramfs
 network --device @KSTEST_NETDEV2@ --vlanid 104 --bootproto dhcp --no-activate

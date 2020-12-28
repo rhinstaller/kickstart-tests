@@ -1,7 +1,6 @@
 #test name: hostname-bootopts
 # rhbz#1441337
 %ksappend repos/default.ks
-install
 
 bootloader --timeout=1
 zerombr

@@ -1,7 +1,6 @@
 #test name: bindtomac-network-static-2
 #various combinations of activation in initramfs and stage 2
 %ksappend repos/default.ks
-install
 # activated in initramfs with dhcp, reactivated in stage 2
 network --device=@KSTEST_NETDEV2@ --bootproto static --ip @KSTEST_STATIC_IP1@ --netmask @KSTEST_STATIC_NETMASK@ --gateway @KSTEST_STATIC_GATEWAY@ --bindto mac
 # activated in initramfs with dhcp, not reactivated in stage 2

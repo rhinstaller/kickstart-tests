@@ -1,5 +1,4 @@
 ## common commands without payload and storage configuration ##
-install
 shutdown
 # network
 network --bootproto=dhcp

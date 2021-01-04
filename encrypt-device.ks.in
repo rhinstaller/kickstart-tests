@@ -1,6 +1,5 @@
 #test name: encrypt-device
 %ksappend repos/default.ks
-install
 network --bootproto=dhcp
 
 bootloader --timeout=1

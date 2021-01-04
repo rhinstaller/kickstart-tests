@@ -1,5 +1,4 @@
 %ksappend repos/default.ks
-install
 network --bootproto=dhcp
 
 bootloader --timeout=13 --append="anaconda_testing_option=1" --password="grub.pbkdf2.12345" --iscrypted

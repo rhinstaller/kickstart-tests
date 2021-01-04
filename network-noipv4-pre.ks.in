@@ -1,6 +1,5 @@
 #test name: network-noipv4-pre
 %ksappend repos/default.ks
-install
 
 %include /tmp/ksinclude
 %pre

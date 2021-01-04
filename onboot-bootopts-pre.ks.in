@@ -1,6 +1,5 @@
 #test name: onboot-bootopts-pre
 %ksappend repos/default.ks
-install
 
 %include /tmp/ksinclude
 %pre

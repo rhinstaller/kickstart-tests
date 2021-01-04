@@ -1,7 +1,6 @@
 #test name: bond-vlan-pre
 #NOTE: this test is a variant of bond-vlan-httpks test, it is sharing its .sh file (setup of NICs and network boot configuration) so beware of changing it independently of bond-vlan-httpks test
 %ksappend repos/default.ks
-install
 
 %include /tmp/ksinclude
 %pre

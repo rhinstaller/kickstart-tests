@@ -1,5 +1,4 @@
 %ksappend repos/default.ks
-install
 network --bootproto=dhcp
 
 bootloader --timeout=1 --driveorder=sdx,sdb,sda

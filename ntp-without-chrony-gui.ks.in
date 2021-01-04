@@ -1,7 +1,6 @@
 #version=DEVEL
 #test name: ntp-without-chrony-gui
 %ksappend repos/default.ks
-install
 network --bootproto=dhcp
 
 # test timezone in GUI mode

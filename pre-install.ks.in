@@ -1,7 +1,6 @@
 #test name: pre-install
 %ksappend repos/default.ks
 
-install
 
 network --bootproto=dhcp
 

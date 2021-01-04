@@ -1,7 +1,6 @@
 #version=DEVEL
 #test name: ntp-with-nontp
 %ksappend repos/default.ks
-install
 network --bootproto=dhcp
 
 # test timezone in text mode

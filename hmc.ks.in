@@ -10,7 +10,6 @@
 # Enable hmc in a kickstart file or use inst.repo=hmc.
 hmc
 
-install
 network --bootproto=dhcp
 
 bootloader --timeout=1

@@ -1,6 +1,5 @@
 #test name: network-prefixdevname
 %ksappend repos/default.ks
-install
 
 %include /tmp/ksinclude
 %pre

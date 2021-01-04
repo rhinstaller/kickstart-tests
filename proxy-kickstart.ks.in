@@ -2,7 +2,6 @@
 url @KSTEST_URL@ --proxy=PROXY-ADDON
 repo --name=kstest-http --baseurl=HTTP-ADDON-REPO --proxy=PROXY-ADDON --install
 
-install
 network --bootproto=dhcp
 
 bootloader --timeout=1

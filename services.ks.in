@@ -1,7 +1,6 @@
 #version=DEVEL
 #test name: services
 %ksappend repos/default.ks
-install
 network --bootproto=dhcp
 
 bootloader --timeout=1

@@ -1,6 +1,5 @@
 #test name: escrow-cert
 %ksappend repos/default.ks
-install
 network --bootproto=dhcp
 
 bootloader --timeout=1

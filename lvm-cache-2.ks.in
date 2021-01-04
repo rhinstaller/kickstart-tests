@@ -1,7 +1,6 @@
 #version=DEVEL
 #test name: lvm-cache-2
 %ksappend repos/default.ks
-install
 network --bootproto=dhcp
 
 bootloader --timeout=1

@@ -1,6 +1,5 @@
 #test name: bond
 %ksappend repos/default.ks
-install
 network --device=link --bootproto=dhcp
 
 # Create testing bond interface

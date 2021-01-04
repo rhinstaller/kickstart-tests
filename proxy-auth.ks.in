@@ -1,7 +1,6 @@
 #test name: proxy-auth
 url @KSTEST_URL@ --proxy=http://anaconda:qweqwe@PROXY-ADDON
 repo --name=kstest-http --baseurl=HTTP-ADDON-REPO --proxy=http://anaconda:qweqwe@PROXY-ADDON --install
-install
 network --bootproto=dhcp
 
 bootloader --timeout=1

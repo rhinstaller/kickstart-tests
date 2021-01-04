@@ -1,7 +1,6 @@
 #version=DEVEL
 #test name: ignoredisk
 %ksappend repos/default.ks
-install
 network --bootproto=dhcp
 
 bootloader --timeout=1 --boot-drive=sda

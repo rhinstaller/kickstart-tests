@@ -26,7 +26,7 @@ ip_static_vlan_config=""
 kernel_args() {
     . ${tmpdir}/ip_static_vlan_config
     . ${tmpdir}/ks_url
-    echo ${DEFAULT_BOOTOPTS} ip=${KSTEST_NETDEV1}:dhcp ${ip_static_vlan_config} vlan=${KSTEST_NETDEV2}.111:${KSTEST_NETDEV2} ks=${ks_url}
+    echo ${DEFAULT_BOOTOPTS} ip=${KSTEST_NETDEV1}:dhcp ${ip_static_vlan_config} vlan=${KSTEST_NETDEV2}.111:${KSTEST_NETDEV2} inst.ks=${ks_url}
 }
 
 # Arguments for virt-install --network options

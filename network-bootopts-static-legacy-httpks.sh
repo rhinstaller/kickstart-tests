@@ -36,7 +36,7 @@ ip_static_boot_config=""
 kernel_args() {
     . ${tmpdir}/ip_static_boot_config
     . ${tmpdir}/ks_url
-    echo ${DEFAULT_BOOTOPTS} ${ip_static_boot_config} ks=${ks_url}
+    echo ${DEFAULT_BOOTOPTS} ${ip_static_boot_config} inst.ks=${ks_url}
 }
 
 prepare() {

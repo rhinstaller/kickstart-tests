@@ -15,6 +15,8 @@
 # License and may only be used or replicated with the express permission of
 # Red Hat, Inc.
 #
-TESTTYPE="ui"
+
+# Anaconda raises the noninteractive error for the progress spoke.
+TESTTYPE="ui knownfailure"
 
 . ${KSTESTDIR}/functions.sh

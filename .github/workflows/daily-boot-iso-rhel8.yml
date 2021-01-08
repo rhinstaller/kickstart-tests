@@ -9,6 +9,8 @@ jobs:
   build:
     name: run
     runs-on: [self-hosted, kstest]
+    env:
+       LORAX_BUILD_CONTAINER: registry.access.redhat.com/ubi8
     steps:
       # self-hosted runners don't do this automatically; also useful to keep stuff around for debugging
       # need to run sudo as the launch script and the container create root/other user owned files
@@ -17,6 +19,11 @@ jobs:
           sudo podman ps -q --all --filter='ancestor=kstest-runner' | xargs -tr sudo podman rm -f
           sudo podman volume rm --all || true
           sudo rm -rf *
+
+      - name: Update container images used here
+        run: |
+          sudo podman pull ${{ env.LORAX_BUILD_CONTAINER }}
+          sudo podman pull quay.io/rhinstaller/kstest-runner:latest
 
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -32,7 +39,7 @@ jobs:
           sudo mknod -m 0660 /dev/loop1 b 7 1  2> /dev/null || true
 
           # /var/tmp tmpfs speeds up lorax and avoids https://bugzilla.redhat.com/show_bug.cgi?id=1906364
-          sudo podman run --rm -i --privileged --tmpfs /var/tmp:rw,mode=1777 --network host -v $PWD/build:/data registry.access.redhat.com/ubi8 <<EOF
+          sudo podman run --rm -i --privileged --tmpfs /var/tmp:rw,mode=1777 --network host -v $PWD/build:/data ${{ env.LORAX_BUILD_CONTAINER }} <<EOF
           set -eux
 
           # lorax must run on RHEL host to produce RHEL guest images :-(

@@ -190,6 +190,14 @@ start_httpd() {
     echo "${httpd_url}" > ${tmpdir}/httpd_url
 }
 
+stop_httpd() {
+    local tmpdir=$1
+
+    if [ -f ${tmpdir}/httpd-pid ]; then
+        kill $(cat ${tmpdir}/httpd-pid)
+    fi
+}
+
 start_proxy() {
     local proxy_root=$1
     local config="squid.conf"

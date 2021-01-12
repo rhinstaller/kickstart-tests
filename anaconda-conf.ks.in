@@ -1,0 +1,42 @@
+#version=DEVEL
+#test name: anaconda-conf
+
+# Verify that the Anaconda configuration can be changed.
+
+# Use defaults.
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+%pre --erroronfail
+
+# Verify that the updates image is correctly applied.
+if [[ ! -f /etc/anaconda/conf.d/99-testing.conf ]]; then
+    echo "ERROR: configuration snippet doesn't exist!"
+    shutdown --now
+    exit 1
+fi
+
+%end
+
+%post --nochroot
+
+cat /tmp/anaconda.log \
+| grep "Writing a temporary configuration loaded from" \
+| grep "/etc/anaconda/conf.d/99-testing.conf"
+
+if [[ $? != 0 ]]; then
+    echo "*** the configuration file wasn't loaded:" >> /mnt/sysroot/root/RESULT
+fi
+
+cat /tmp/syslog \
+| grep "Storage check started with constraints" \
+| grep "'req_partition_sizes': {'/boot': Size (1024 MiB)}"
+
+if [[ $? != 0 ]]; then
+    echo "*** the configuration isn't correct:" >> /mnt/sysroot/root/RESULT
+fi
+
+%end
+
+%ksappend validation/success_if_result_empty_standalone.ks

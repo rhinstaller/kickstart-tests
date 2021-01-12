@@ -50,6 +50,7 @@ Environment variables for the container (`--env` option):
 * KSTESTS_REPOSITORY - kickstart-tests git repository to be used
 * KSTESTS_BRANCH - kickstart-tests git branch to be used
 * BOOT_ISO - name of the installer boot iso from `data/images` to be tested (default is "boot.iso")
+* KSTEST_EXTRA_BOOTOPTS - additional boot options applied to all tests
 
 By default, the container runs the [run-kstest](./run-kstest) script. To get an
 interactive shell, append `bash` to the command line.
@@ -81,3 +82,57 @@ To stop the proxy, call
     sudo containers/squid.sh stop
 
 again.
+
+# Hints and tips
+
+## Updates image
+
+To apply Anaconda updates image use the `-u` argument of the `containers/runner/launch`
+script. If the image is uploaded on the server use:
+
+    containers/runner/launch -u http://example.com/my_updates.img keyboard [test2 test3]
+
+Or use local updates image directly:
+
+    containers/runner/launch -u ./my_updates.img keyboard [test2 test3]
+
+## Downloading last daily build boot.iso
+
+The `containers/runner/launch` script is able to automatically download last daily boot.iso with
+our COPR daily builds in it. However, to be able to do that you need to provide your GitHub token.
+This GitHub token needs to have `public_repo` access. Please look
+[here](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/creating-a-personal-access-token)
+to find out how to generate the token.
+
+Then you can use `--daily-iso <path_to_token>` to download newest ISO. ISO will be stored to
+`./data/images/boot.iso` if not already present. If you need newer ISO please remove the locally
+stored one first!
+
+    containers/runner/launch --daily-iso ./path/to/token_file keyboard [test2 test3]
+
+## Connecting to a test run
+
+It's essential to know how to connect to the running tests to see why they are failing. For these
+situations you should follow this guide.
+
+Run tests as root to have bridging instead of using SLIRP and having IP address for the container
+so we know where to connect.
+
+    sudo containers/runner/launch keyboard
+
+
+Before the tests are started you should see something like this.
+
+    ************************************************************************
+    You can connect to this container's libvirt with this connection string:
+   
+       qemu+tcp://${MY_IP}/session
+   
+    ************************************************************************
+
+The last thing is to take the `qemu+tcp://<IP>/session` and put that to virtual
+machine manager (`virt-manager -c qemu+tcp://<IP>/session`). Then you can see and control 
+VM by the manager.
+
+If change of the boot options for the tests is required (for example to add `inst.text`) please
+use `--run-args="--env KSTEST_EXTRA_BOOTOPTS=inst.text"` parameter for the `launch` script.

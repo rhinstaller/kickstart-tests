@@ -1,5 +1,4 @@
-Running kickstart tests in container
-------------------------------------
+# Running kickstart tests in container
 
 The runner container provides a well-defined and reproducible environment with
 all the dependencies necessary to run the tests. It makes it easy for developers
@@ -11,18 +10,15 @@ The container can be run with podman or docker.
 Use the [launch](./launch) script to run a set of tests from the current
 kickstart-tests directory in the runner container:
 
-```
-containers/runner/launch keyboard [test2 test3 ...]
-```
+    containers/runner/launch keyboard [test2 test3 ...]
 
 Call `launch all` to run all tests. This can be controlled further through `--testtype` and/or `--skip-testtypes`, see `--help`.
 
 This will download the [automatically built](.github/workflows/container-autoupdate.yml) [official container image](https://quay.io/repository/rhinstaller/kstest-runner).
 
 You can also build the container yourself to test modifications to it:
-```
-podman build -t rhinstaller/kstest-runner .
-```
+
+    podman build -t rhinstaller/kstest-runner .
 
 The `launch` script creates a `./data/` directory for passing of data between
 the container and the system (via volume).  By default it downloads the current
@@ -36,17 +32,15 @@ downloads/unpacks that instead of the the official Rawhide boot.iso. This
 requires authentication, so the option expects a GitHub token file as value.
 
 The result logs get written into `./data/logs/`:
-```
-tree -L 3 data/logs
-cat data/logs/kstest-*/anaconda/virt-install.log
-```
 
-Configuration of the test
--------------------------
+    tree -L 3 data/logs
+    cat data/logs/kstest-*/anaconda/virt-install.log
+
+# Configuration of the test
+
 For more control, you can run the container manually:
-```
-podman run -it --name last-kstest [--security-opt label=disable] --env KSTESTS_TEST=keyboard -v ./data:/opt/kstest/data:z -v .:/kickstart-tests:ro --device=/dev/kvm rhinstaller/kstest-runner
-```
+
+    podman run -it --name last-kstest [--security-opt label=disable] --env KSTESTS_TEST=keyboard -v ./data:/opt/kstest/data:z -v .:/kickstart-tests:ro --device=/dev/kvm rhinstaller/kstest-runner
 
 Instead of keeping named container you can remove it after the test by replacing `--name last-kstest` option with `--rm`.
 
@@ -64,8 +58,7 @@ interactive shell, append `bash` to the command line.
 is not able to get access to kvm socket in rootless mode. This issue will result in awfully
 slow execution of the tests. In that case please add `--security-opt label=disable`.
 
-Running tests with cached package downloads
--------------------------------------------
+# Running tests with cached package downloads
 
 Depending on parallelism and availabe network bandwidth, downloading the RPMs
 and package indexes takes a significant amount of time for every test. This can

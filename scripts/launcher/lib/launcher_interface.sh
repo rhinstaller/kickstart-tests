@@ -96,6 +96,10 @@ case $1 in
         msg="$(prepare ${ks} ${tmpdir})"
         ret=$?
         ;;
+    prepare_updates)
+        msg="$(prepare_updates ${tmpdir})"
+        ret=$?
+        ;;
     prepare_disks)
         msg="$(prepare_disks ${tmpdir})"
         ret=$?

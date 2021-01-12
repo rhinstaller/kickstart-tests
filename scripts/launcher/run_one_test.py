@@ -130,6 +130,9 @@ class Runner(object):
         self._shell.cleanup()
 
     def _create_virtual_conf(self, log_path) -> VirtualConfiguration:
+        img_path = self._shell.prepare_updates()
+        self._conf.updates_img_path = img_path
+
         kernel_args = self._shell.kernel_args()
 
         if self._conf.updates_img_path:

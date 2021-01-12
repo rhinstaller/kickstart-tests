@@ -79,13 +79,20 @@ class ProcessLauncher(object):
 
     def _report_result(self, subprocess_out):
         if not subprocess_out.check_ret_code():
-            msg = self._format_result(subprocess_out)
-            log.debug(msg)
+            msg = "Failed to run subprocess: '{}'\n".format(self._cmd)
+            msg += self._format_result(subprocess_out)
+
             if self._print_errors:
                 print(msg)
 
+            log.debug(msg)
+        else:
+            msg = self._format_result(subprocess_out)
+            log.debug(msg)
+
     def _format_result(self, subprocess_out):
-        msg = "Failed to run subprocess: '{}'\n".format(self._cmd)
+        msg = ""
+
         if subprocess_out.stderr:
             msg += "stderr:\n"
             msg += subprocess_out.stderr + "\n"
@@ -119,6 +126,11 @@ class ShellLauncher(ProcessLauncher):
 
     def cleanup(self):
         return self._run_shell_func("cleanup")
+
+    def prepare_updates(self):
+        out = self._run_shell_func("prepare_updates")
+        out.check_ret_code_with_exception()
+        return out.stdout
 
     def prepare_disks(self):
         out = self._run_shell_func("prepare_disks")

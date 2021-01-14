@@ -1,3 +1,4 @@
+# Build our container for running kickstart tests and push that to our quay.io repository
 # We cannot fully self-validate the new container, as running all kickstart tests just takes too long.
 # So tag the containers by build date, so that in the worst case we can always reset :latest to the previously working tag.
 name: Build and push containers

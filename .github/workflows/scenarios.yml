@@ -1,3 +1,4 @@
+# Run all kickstart tests for all active branches
 name: Daily run
 on:
   schedule:

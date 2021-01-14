@@ -1,3 +1,4 @@
+# Build Rawhide boot.iso daily
 name: Build daily Rawhide+COPR boot.iso
 on:
   schedule:

@@ -182,6 +182,7 @@ class VirtualConfiguration(BaseConfiguration):
         self._vnc = None
         self._kernel_args = None
         self._timeout = None
+        self._runner_args = []
 
     @property
     def test_name(self):
@@ -359,3 +360,13 @@ class VirtualConfiguration(BaseConfiguration):
     def timeout(self, value: int):
         """Set cancel installer after X minutes"""
         self._timeout = value
+
+    @property
+    def runner_args(self) -> list:
+        """Additional arguments to pass to virt-install"""
+        return self._runner_args
+
+    @runner_args.setter
+    def runner_args(self, value: list):
+        """Set additional arguments to pass to virt-install"""
+        self._runner_args = value

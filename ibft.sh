@@ -60,13 +60,6 @@ prepare_disks() {
     echo ""
 }
 
-additional_runner_args() {
-#--boot 'kernel=/usr/share/ipxe/ipxe.lkrn,kernel_args=ifconf -c dhcp net0 && chain http://10.34.39.2/trees/rv/ibft-tests/test2-m2/install.ipxe
-    . ${tmpdir}/httpd_url
-    ipxe_script_url="${httpd_url}${ipxe_script}"
-    echo "--boot kernel=${ipxe_image},kernel_args='ifconf -c dhcp net0 && chain ${ipxe_script_url}'"
-}
-
 boot_args() {
     . ${tmpdir}/httpd_url
     ipxe_script_url="${httpd_url}${ipxe_script}"

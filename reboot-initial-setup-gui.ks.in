@@ -1,0 +1,49 @@
+#version=DEVEL
+#test name: reboot-initial-setup-gui
+
+# Make sure that there is nothing else to configure.
+%ksappend users/user.ks
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
+
+# Reboot the installed system.
+reboot
+
+# Enable the initial setup.
+firstboot --enable
+
+# Run in the graphical mode.
+graphical
+
+%packages
+
+# Install the initial setup.
+initial-setup-gui
+
+# Install something that provides service(graphical-login).
+gdm
+
+# Don't install the initial setup addons.
+-subscription-manager-initial-setup-addon
+
+%end
+
+# Validate on the first boot.
+%ksappend validation/success_on_first_boot.ks
+
+%post
+
+# Remove EULA if any.
+rm /usr/share/redhat-release/EULA
+
+# Create a script with the first boot test.
+# Print errors to stdout.
+cat > /usr/libexec/kickstart-test.sh << EOF
+
+journalctl -g "Starting Initial Setup GUI" >/dev/null \
+|| echo "Failed to start Initial Setup GUI."
+
+journalctl -u initial-setup -g "Traceback" --quiet
+EOF
+
+%end

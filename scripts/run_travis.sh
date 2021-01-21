@@ -31,8 +31,10 @@ network-static
 "
 fi
 
-# weed out duplicates, convert to space separated list, and limit to 6 tests (we can't run a lot of tests on Travis)
-TESTS=$(echo "$TESTS" | sort -u | head -n6 | xargs)
+# Limit to 6 tests (we can't run a lot of tests on Travis), weed out duplicates
+# and convert to space separated list. The changed tests should have precedence
+# over the representative tests.
+TESTS=$(echo "$TESTS" | head -n6 | sort -u | xargs)
 
 echo "Running tests: $TESTS"
 

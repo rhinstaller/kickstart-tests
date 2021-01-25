@@ -61,10 +61,13 @@ KEEPIT=${KEEPIT:-0}
 # responsibility, this can break tests.
 UPDATES_IMG=""
 
+# Local or remote path to an additional repo that will be added for the installation transaction.
+ADDITIONAL_REPO=""
+
 TESTTYPE=""
 SKIP_TESTTYPES=""
 
-while getopts ":i:k:t:s:u:b:p:o:r" opt; do
+while getopts ":i:k:t:s:u:a:b:p:o:r" opt; do
     case $opt in
        i)
            # If this wasn't set from the environment, set it from the command line
@@ -97,6 +100,12 @@ while getopts ":i:k:t:s:u:b:p:o:r" opt; do
            # This may not be compatible with all the tests.
            UPDATES_IMG=$OPTARG
            ;;
+       a)
+           # Path to a RPM repo on a server or in local directory. This will be added as
+           # a kernel parameter inst.addrepo=KSTEST_ADDITIONAL_REPO,<server> to the VM boot options.
+           # This may not be compatible with all the tests.
+           ADDITIONAL_REPO=$OPTARG
+           ;;
        b)
            # Use additional boot options. Will be added to kernel_args from .sh file.
            BOOT_ARGS=$OPTARG
@@ -118,7 +127,7 @@ while getopts ":i:k:t:s:u:b:p:o:r" opt; do
            RETRY=--retry
            ;;
        *)
-           echo "Usage: run_kickstart_tests.sh [-i boot.iso] [-k 0|1|2] [-t test_type_to_run] [-s test_types_to_ignore] [-u link_to_updates.img] [-b additional_boot_options] [-p platform_name] [-o ksappend_overrides] [tests]"
+           echo "Usage: run_kickstart_tests.sh [-i boot.iso] [-k 0|1|2] [-t test_type_to_run] [-s test_types_to_ignore] [-u link_to_updates.img] [-a local_or_remote_repo_path] [-b additional_boot_options] [-p platform_name] [-o ksappend_overrides] [tests]"
            exit 1
            ;;
     esac
@@ -351,6 +360,22 @@ if [[ -n "$UPDATES_IMG" ]]; then
     UPDATES_ARG="-u ${UPDATES_IMG}"
 fi
 
+# set up additional package repo
+ADDITIONAL_REPO_ARG=""
+if [[ -n "$ADDITIONAL_REPO" ]]; then
+    if [ -e "$ADDITIONAL_REPO" ]; then
+        # set up a local web server for the local runner local
+        # folder containing the repo
+        python3 -m http.server --directory ${ADDITIONAL_REPO} 9999 &
+        # stop it when this script exits
+        trap "kill $!" EXIT INT QUIT PIPE
+        # SLIRP networking address as seem from QEMU guests
+        ADDITIONAL_REPO="http://10.0.2.2:9999/${ADDITIONAL_REPO}"
+    fi
+
+    ADDITIONAL_REPO_ARG="-a ${ADDITIONAL_REPO}"
+fi
+
 BOOT_ARG=""
 if [[ -n "$BOOT_ARGS" ]]; then
     BOOT_ARG="-b \"${BOOT_ARGS}\""
@@ -416,7 +441,7 @@ if [[ "$TEST_REMOTES" != "" ]]; then
                                                                -i ../install_images/${_IMAGE} \
                                                                -k ${KEEPIT} \
                                                                --append-host-id \
-                                                               ${RETRY} ${UPDATES_ARG} ${BOOT_ARG} {} ::: ${tests}
+                                                               ${RETRY} ${UPDATES_ARG} ${ADDITIONAL_REPO_ARG} ${BOOT_ARG} {} ::: ${tests}
     rc=$?
     cd -
 
@@ -448,7 +473,7 @@ else
                                                       -i ${IMAGE} \
                                                       -k ${KEEPIT} \
                                                       --append-host-id \
-                                                      ${RETRY} ${UPDATES_ARG} ${BOOT_ARG} {} ::: ${tests}
+                                                      ${RETRY} ${UPDATES_ARG} ${ADDITIONAL_REPO_ARG} ${BOOT_ARG} {} ::: ${tests}
     rc=$?
 fi
 

@@ -85,6 +85,9 @@ class RunnerParser(BaseParser):
         self._parser.add_argument("--updates", '-u', metavar="Path",
                                   type=str, dest="updates_path",
                                   help="Updates image path used in the test")
+        self._parser.add_argument("--additional_repo", '-a', metavar="Path",
+                                  type=str, dest="additional_repo_path",
+                                  help="Additionl repo path used in the test")
         self._parser.add_argument("--append-host-id", default=False, action="store_true",
                                   dest="append_host_id",
                                   help="append an id of the host running the test to the result")
@@ -114,6 +117,9 @@ class RunnerParser(BaseParser):
 
         if ns.updates_path:
             conf.updates_img_path = ns.updates_path
+
+        if ns.additional_repo_path:
+            conf.additional_repo_path = ns.additional_repo_path
 
         if ns.append_host_id:
             conf.append_host_id = ns.append_host_id

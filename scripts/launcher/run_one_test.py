@@ -135,6 +135,9 @@ class Runner(object):
         if self._conf.updates_img_path:
             kernel_args += " inst.updates={}".format(self._conf.updates_img_path)
 
+        if self._conf.additional_repo_path:
+            kernel_args += " inst.addrepo=KSTEST_ADDITIONAL_REPO,{}".format(self._conf.additional_repo_path)
+
         if self._conf.hung_task_timeout_secs:
             kernel_args += " inst.kernel.hung_task_timeout_secs={}".format(
                 self._conf.hung_task_timeout_secs)

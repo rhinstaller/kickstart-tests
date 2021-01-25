@@ -34,6 +34,7 @@ Options:
  -t, --testtype TYPE                  Only run TYPE tests
  -s, --skip-testtypes TYPE[,TYPE..]   Don't run tests with given types
  -u, --updates PATH|URL               Set updates.img path or URL
+ -a, --additional-repo PATH|URL       Set additional repo path or URL
  -r, --retry                          Retry failed tests once, to guard against random
                                       infrastructure failures
  --daily-iso TOKEN_FILE               Download and use daily boot.iso instead of rawhide's
@@ -46,7 +47,7 @@ EOF
 }
 
 # parse options
-eval set -- "$(getopt -o j:p:t:s:u:rh --long jobs:,platform:,testtype:,skip-testtypes:,updates:,retry,daily-iso:,defaults:,run-args:,help -- "$@")"
+eval set -- "$(getopt -o j:p:t:s:u:a:rh --long jobs:,platform:,testtype:,skip-testtypes:,updates:additional-repo:,retry,daily-iso:,defaults:,run-args:,help -- "$@")"
 
 while true; do
     case "${1:-}" in
@@ -55,6 +56,7 @@ while true; do
         -t|--testtype) shift; TESTTYPE="$1" ;;
         -s|--skip-testtypes) shift; SKIP_TESTTYPES="$1" ;;
         -u|--updates) shift; UPDATES_IMAGE="$1" ;;
+        -a|--additional-repo) shift; ADDITIONAL_REPO="$1" ;;
         -r|--retry) TEST_RETRY=1 ;;
         --daily-iso) shift; DAILY_ISO_TOKEN="$1" ;;
         --defaults) shift; DEFAULTS_SH="$1" ;;
@@ -103,6 +105,15 @@ elif [ -n "${UPDATES_IMAGE:-}" ]; then
     UPDATES_IMG_ARGS="--env UPDATES_IMAGE=$UPDATES_IMAGE"
 fi
 
+# support both path and URL for additional repo
+if [ -e "${ADDITIONAL_REPO:-}" ]; then
+    # local folder; bind mount into container
+    ADDITIONAL_REPO_ARGS="-v $ADDITIONAL_REPO:/kstest_additional_repo:ro,Z --env ADDITIONAL_REPO=/kstest_additional_repo"
+elif [ -n "${ADDITIONAL_REPO:-}" ]; then
+    # URL, pass through
+    ADDITIONAL_REPO_ARGS="--env ADDITIONAL_REPO=$ADDITIONAL_REPO"
+fi
+
 if [ -n "${DEFAULTS_SH:-}" ]; then
     DEFAULTS_SH_ARGS="-v $DEFAULTS_SH:/home/kstest/.kstests.defaults.sh:ro,z"
 fi
@@ -126,6 +137,7 @@ fi
 set -x
 $CRUN run -it --rm --device=/dev/kvm --publish 127.0.0.1::16509 $PODMAN_SELINUX_FIX \
     --env KSTESTS_TEST="$KSTESTS_TEST" --env TESTTYPE="${TESTTYPE:-}" --env SKIP_TESTTYPES="${SKIP_TESTTYPES:-}" \
-    --env TEST_JOBS="$TEST_JOBS" --env PLATFORM="${PLATFORM:-}" --env TEST_RETRY="${TEST_RETRY:-}" ${UPDATES_IMG_ARGS:-} ${CONTAINER_RUN_ARGS:-} \
+    --env TEST_JOBS="$TEST_JOBS" --env PLATFORM="${PLATFORM:-}" --env TEST_RETRY="${TEST_RETRY:-}" \
+    ${UPDATES_IMG_ARGS:-} ${ADDITIONAL_REPO_ARGS:-} ${CONTAINER_RUN_ARGS:-} \
     ${VAR_TMP:-} -v "$PWD/data:/opt/kstest/data:z" -v "$BASEDIR:/kickstart-tests:ro,z" ${DEFAULTS_SH_ARGS:-} \
     $CONTAINER /kickstart-tests/containers/runner/run-kstest

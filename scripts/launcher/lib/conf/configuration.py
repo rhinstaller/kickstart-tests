@@ -83,6 +83,7 @@ class RunnerConfiguration(BaseConfiguration):
         self._image_path = ""
         self._keep_option = KeepLevel.NOTHING
         self._updates_img_path = ""
+        self._additional_repo_path = ""
         self._append_host_id = False
         self._hung_task_timeout_secs = 1200
 
@@ -137,6 +138,14 @@ class RunnerConfiguration(BaseConfiguration):
     @updates_img_path.setter
     def updates_img_path(self, val):
         self._updates_img_path = val
+
+    @property
+    def additional_repo_path(self):
+        return self._additional_repo_path
+
+    @additional_repo_path.setter
+    def additional_repo_path(self, val):
+        self._additional_repo_path = val
 
     @property
     def script_path(self):

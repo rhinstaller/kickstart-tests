@@ -30,6 +30,11 @@ if [ -n "${UPDATES_IMAGE}" ]; then
   UPDATES_IMAGE_ARG="-u ${UPDATES_IMAGE}"
 fi
 
+ADDITIONAL_REPO_ARG=""
+if [ -n "${ADDITIONAL_REPO}" ]; then
+  ADDITIONAL_REPO_ARG="-a ${ADDITIONAL_REPO}"
+fi
+
 PLATFORM_ARG=""
 if [ -n "${PLATFORM}" ]; then
     PLATFORM_ARG="-p ${PLATFORM}"
@@ -74,7 +79,7 @@ fi
 TEST_LOG=/var/tmp/kstest.log
 pushd ${KSTESTS_DIR}
 set +e
-scripts/run_kickstart_tests.sh -k ${KSTESTS_KEEP} -i ${ISO_DIR}/${BOOT_ISO} ${UPDATES_IMAGE_ARG} ${PLATFORM_ARG} ${TESTTYPE_ARG} ${SKIP_TESTTYPES_ARG} ${RETRY_ARG} ${KSTESTS_TEST} 2>&1 | tee $TEST_LOG
+scripts/run_kickstart_tests.sh -k ${KSTESTS_KEEP} -i ${ISO_DIR}/${BOOT_ISO} ${UPDATES_IMAGE_ARG} ${ADDITIONAL_REPO_ARG} ${PLATFORM_ARG} ${TESTTYPE_ARG} ${SKIP_TESTTYPES_ARG} ${RETRY_ARG} ${KSTESTS_TEST} 2>&1 | tee $TEST_LOG
 RC=$?
 set -e
 popd

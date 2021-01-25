@@ -115,8 +115,8 @@ stored one first!
 It's essential to know how to connect to the running tests to see why they are failing. For these
 situations you should follow this guide.
 
-Run tests as root to have bridging instead of using SLIRP and having IP address for the container
-so we know where to connect.
+Run tests as **root** to have bridging instead of using SLIRP and having IP address for the
+container so we know where to connect.
 
     sudo containers/runner/launch keyboard
 
@@ -126,13 +126,14 @@ Before the tests are started you should see something like this.
     ************************************************************************
     You can connect to this container's libvirt with this connection string:
    
-       qemu+tcp://${MY_IP}/session
+       qemu+tcp://<IP>/session
    
     ************************************************************************
 
-The last thing is to take the `qemu+tcp://<IP>/session` and put that to virtual
-machine manager (`virt-manager -c qemu+tcp://<IP>/session`). Then you can see and control 
-VM by the manager.
+Then you can copy the hypervisor connection URI (`qemu+tcp://<IP>/session`) and display
+the graphical console for a virtual machine with a command:
 
-If change of the boot options for the tests is required (for example to add `inst.text`) please
-use `--run-args="--env KSTEST_EXTRA_BOOTOPTS=inst.text"` parameter for the `launch` script.
+    virt-viewer -c qemu+tcp://<IP>/session
+
+To change of the boot options for the tests (for example to add `inst.text`), please use
+`--run-args="--env KSTEST_EXTRA_BOOTOPTS=inst.text"` parameter for the `launch` script.

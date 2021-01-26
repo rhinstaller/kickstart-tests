@@ -18,7 +18,7 @@ This will download the [automatically built](.github/workflows/container-autoupd
 
 You can also build the container yourself to test modifications to it:
 
-    podman build -t rhinstaller/kstest-runner .
+    podman build --no-cache -t quay.io/rhinstaller/kstest-runner containers/runner/
 
 The `launch` script creates a `./data/` directory for passing of data between
 the container and the system (via volume).  By default it downloads the current

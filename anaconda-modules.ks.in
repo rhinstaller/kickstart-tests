@@ -1,0 +1,51 @@
+#version=DEVEL
+#test name: anaconda-modules
+
+# Verify that only the enabled Anaconda DBus modules are started.
+
+# Use defaults.
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+%post --nochroot
+
+# Get the activated Anaconda DBus modules.
+cat /tmp/syslog | grep "Activating service name" | \
+grep "org.fedoraproject.Anaconda.Modules" | cut -d"'" -f2 \
+| sort > /tmp/generated.out
+
+# Generate the expected output.
+cat > /tmp/expected.out << EOF
+org.fedoraproject.Anaconda.Modules.Localization
+org.fedoraproject.Anaconda.Modules.Network
+org.fedoraproject.Anaconda.Modules.Payloads
+org.fedoraproject.Anaconda.Modules.Security
+org.fedoraproject.Anaconda.Modules.Services
+org.fedoraproject.Anaconda.Modules.Storage
+org.fedoraproject.Anaconda.Modules.Subscription
+org.fedoraproject.Anaconda.Modules.Timezone
+org.fedoraproject.Anaconda.Modules.Users
+EOF
+
+# Drop the Subscription module if this is not RHEL.
+if [[ "@KSTEST_OS_NAME@" != "rhel" ]]; then
+    sed -i '/Subscription/d' /tmp/expected.out
+fi
+
+# Check the output
+diff /tmp/expected.out /tmp/generated.out
+
+if [[ $? != 0 ]]; then
+    echo "*** List of activated modules differs!" >> /mnt/sysroot/root/RESULT
+
+    echo "*** The following modules were expected:" >> /mnt/sysroot/root/RESULT
+    cat /tmp/expected.out >> /mnt/sysroot/root/RESULT
+
+    echo "*** The following modules were generated:" >> /mnt/sysroot/root/RESULT
+    cat /tmp/generated.out >> /mnt/sysroot/root/RESULT
+fi
+
+%end
+
+%ksappend validation/success_if_result_empty_standalone.ks

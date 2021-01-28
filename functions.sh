@@ -49,6 +49,11 @@ prepare() {
     echo ${ks}
 }
 
+prepare_updates() {
+    local tmp_dir=$1
+    echo "${UPDATES}"
+}
+
 prepare_disks() {
     tmpdir=$1
 
@@ -185,6 +190,14 @@ start_httpd() {
     echo "${httpd_url}" > ${tmpdir}/httpd_url
 }
 
+stop_httpd() {
+    local tmpdir=$1
+
+    if [ -f ${tmpdir}/httpd-pid ]; then
+        kill $(cat ${tmpdir}/httpd-pid)
+    fi
+}
+
 start_proxy() {
     local proxy_root=$1
     local config="squid.conf"
@@ -259,4 +272,42 @@ remove_iscsi_target() {
     if [[ ${KEEPIT} == 1 ]]; then
         rm ${imgfile}
     fi
+}
+
+apply_updates_image() {
+    local image_url="${1}"
+    local updates_dir="${2}"
+
+    # Create the updates directory.
+    mkdir -p "${updates_dir}"
+
+    # Check the updates image.
+    if [[ -z "${image_url}" ]]; then
+        return
+    fi
+
+    # Download and extract the updates image.
+    ( cd "${updates_dir}" ; curl -f "${image_url}" | gzip -dc  | cpio -idu )
+}
+
+create_updates_image() {
+    local updates_dir="${1}"
+    local updates_img="${2}"
+
+    ( cd "${updates_dir}" ; find . | cpio -co | gzip -9 ) >"${updates_img}"
+}
+
+upload_updates_image() {
+    local tmp_dir="${1}"
+    local updates_img="${2}"
+
+    # Copy the updates image.
+    mkdir ${tmpdir}/http
+    cp "${updates_img}" ${tmpdir}/http/updates.img
+
+    # Start the http server.
+    start_httpd ${tmpdir}/http ${tmpdir}
+
+    # Provide the URL of the updates image.
+    echo "${httpd_url}updates.img"
 }

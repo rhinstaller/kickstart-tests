@@ -1,0 +1,13 @@
+#version=DEVEL
+#test name: reboot
+
+# Use defaults.
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+# Reboot the installed system.
+reboot
+
+# Validate on the first boot.
+%ksappend validation/success_on_first_boot.ks

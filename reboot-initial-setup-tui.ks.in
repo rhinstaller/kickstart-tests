@@ -1,0 +1,41 @@
+#version=DEVEL
+#test name: reboot-initial-setup-tui
+
+# Make sure that there is nothing else to configure.
+%ksappend users/user.ks
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
+
+# Reboot the installed system.
+reboot
+
+# Enable the initial setup.
+firstboot --enable
+
+%packages
+
+# Install the initial setup.
+initial-setup
+
+%end
+
+# Validate on the first boot.
+%ksappend validation/success_on_first_boot.ks
+
+%post
+
+# Remove EULA if any.
+rm /usr/share/redhat-release/EULA
+
+# Create a script with the first boot test.
+# Print errors to stdout.
+cat > /usr/libexec/kickstart-test.sh << EOF
+
+journalctl -g "Starting Initial Setup TUI" >/dev/null \
+|| echo "Failed to start Initial Setup TUI."
+
+journalctl -u initial-setup -g "Traceback" --quiet
+
+EOF
+
+%end

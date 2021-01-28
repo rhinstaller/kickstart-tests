@@ -60,7 +60,7 @@ class VirtualInstall(object):
     def __init__(self, test_name, iso, ks_paths, disk_paths, log_check,
                  kernel_args=None, vcpu_count=1, memory=1024, vnc=None,
                  virtio_host="127.0.0.1", virtio_port=6080,
-                 nics=None, boot=None):
+                 nics=None, boot=None, runner_args=None):
         """
         Start the installation
 
@@ -78,6 +78,7 @@ class VirtualInstall(object):
         :param int virtio_port: Port to connect virtio log to
         :param list nics: virt-install --network parameters
         :param str boot: virt-install --boot option (used eg for ibft)
+        :param list runner_args: extra arguments to pass to the virt-install
         """
         super().__init__()
 
@@ -94,6 +95,7 @@ class VirtualInstall(object):
         self._virtio_port = virtio_port
         self._nics = nics
         self._boot = boot
+        self._runner_args = runner_args or []
 
         self._label = subprocess.check_output(
                 ["blkid", "-p", "--output=value", "--match-tag=LABEL", self._iso],
@@ -110,10 +112,11 @@ class VirtualInstall(object):
 
         # CHECKME This seems to be necessary because of ipxe ibft chain booting,
         # otherwise the vm is created but it does not boot into installation
-        if not self._boot:
+        if not self._boot and "--wait" not in self._runner_args:
             args.append("--noreboot")
 
         args.append("--graphics")
+
         if self._vnc:
             args.append(self._vnc)
         else:
@@ -162,6 +165,10 @@ class VirtualInstall(object):
                            self._virtio_host, self._virtio_port)
         args.append("--channel")
         args.append(channel_args)
+
+        # Append the extra arguments.
+        args.extend(self._runner_args)
+
         return args
 
     def run(self):
@@ -245,7 +252,8 @@ class VirtualManager(object):
                                   virtio_host=log_monitor.host,
                                   virtio_port=log_monitor.port,
                                   nics=self._conf.networks,
-                                  boot=self._conf.boot_image)
+                                  boot=self._conf.boot_image,
+                                  runner_args=self._conf.runner_args)
 
             virt.run()
             virt.destroy(os.path.basename(self._conf.temp_dir))

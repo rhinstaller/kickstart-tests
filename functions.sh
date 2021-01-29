@@ -311,3 +311,61 @@ upload_updates_image() {
     # Provide the URL of the updates image.
     echo "${httpd_url}updates.img"
 }
+
+export_additional_repo() {
+    # Export additional RPM repository via localhost web server if found in the
+    # /opt/kstest/data/additional_repo well known path. We expect the folder
+    # to just contain a bunch of RPM files and will copy its contents to a tempdir
+    # and then run createrepo on it to make sure all necessary metadata is in place.
+    #
+    # Address of the localhost web server can be sourced from ${tmpdir}/addrepo_url
+    # for use in kernel_args(). Also as this starts a localhost web server do not
+    # forget to shut the server down in cleanup().
+    #
+    # This function expects one argument - path to the tempdir.
+    local tmpdir=$1
+
+    # check if additional repo exists on well known path
+
+    if [ -e /opt/kstest/data/additional_repo ]; then
+        # Copy the repo to the tmpdir so
+        # that the createrepo call odes not
+        # mess up the directory on the host.
+        # FIXME: /opt/kstest/data should either come from a env var or
+        #        runner script should copy the additional_repo folder to the
+        #        tempdir
+        cp -R /opt/kstest/data/additional_repo ${tmpdir}/kstest_additional_repo
+
+        # We expect just a bunch of RPMs, so create all the expected
+        # metadata for it.
+        createrepo_c -q ${tmpdir}/kstest_additional_repo
+
+        # log repo content for debugging purposes
+        ls ${tmpdir}/kstest_additional_repo > ${tmpdir}/additional_repo_content
+
+        # start a http server to serve the repo
+        start_httpd ${tmpdir}/kstest_additional_repo ${tmpdir}
+
+        # Store the server address in file so that it can be sourced later
+        # (eq. in kernel_args() and similar).
+        echo addrepo_url=${httpd_url} > ${tmpdir}/addrepo_url
+    fi
+}
+
+append_additional_repo_to_kernel_args() {
+    # Append boot options needed for using the additional RPM repository to
+    # the provided list of boot options and return the result.
+    #
+    # If no additional repo appears to be in use, just return the boot option
+    # string.
+    #
+    # This function expects one argument - boot options string.
+    local bootopts=$1
+
+    if [ -e ${tmpdir}/addrepo_url ]; then
+        . ${tmpdir}/addrepo_url
+        echo $bootopts inst.addrepo=KSTEST_ADDITIONAL_REPO,${addrepo_url}
+    else
+        echo $bootopts
+    fi
+}

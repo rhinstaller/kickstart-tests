@@ -9,7 +9,16 @@ set -eu
 BASEDIR=$(dirname $(dirname $(dirname $(realpath $0))))
 TEST_JOBS=${TEST_JOBS:-$(nproc)}
 CRUN=${CRUN:-$(which podman docker 2>/dev/null | head -n1)}
+
+# Set the container image to use.
+# If the rhinstaller/kstest-runner container image exists in the local registry, prefer it.
 CONTAINER=quay.io/rhinstaller/kstest-runner
+LOCAL_CONTAINER=localhost/rhinstaller/kstest-runner
+if $CRUN image inspect "$LOCAL_CONTAINER" &> /dev/null; then
+    CONTAINER="$LOCAL_CONTAINER"
+fi
+echo "INFO: Using container image: $CONTAINER"
+
 # Podman in rootless mode does not have access to /dev/kvm socket https://bugzilla.redhat.com/show_bug.cgi?id=1901462
 # disable selinux container separation when podman is executed as user
 PODMAN_SELINUX_FIX=

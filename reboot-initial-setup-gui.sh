@@ -22,3 +22,13 @@ TESTTYPE="reboot initial-setup"
 additional_runner_args() {
     echo "--wait"
 }
+
+kernel_args() {
+    export_additional_repo $tmpdir
+    echo $(append_additional_repo_to_kernel_args $DEFAULT_BOOTOPTS)
+}
+
+cleanup() {
+    local tmp_dir="${1}"
+    stop_httpd "${tmp_dir}"
+}

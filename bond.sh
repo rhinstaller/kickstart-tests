@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="network rhbz1918744"
+TESTTYPE="network"
 
 . ${KSTESTDIR}/functions.sh

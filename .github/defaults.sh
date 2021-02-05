@@ -1,3 +1,3 @@
-# The download.fedoraproject.org automatic redirector often selects download-ib01.f.o. for GitHub's cloud, which is too unreliable; manually select a good one that is nearby
-export KSTEST_URL='--url=http://pubmirror1.math.uh.edu/fedora-buffet/fedora/linux/development/rawhide/Everything/$basearch/os/'
-export KSTEST_MODULAR_URL='http://pubmirror1.math.uh.edu/fedora-buffet/fedora/linux/development/rawhide/Modular/$basearch/os/'
+# Use the download.fedoraproject.org automatic redirector
+export KSTEST_URL='--url=http://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/$basearch/os/'
+export KSTEST_MODULAR_URL='http://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Modular/$basearch/os/'

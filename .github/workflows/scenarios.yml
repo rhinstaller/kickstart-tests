@@ -42,7 +42,7 @@ jobs:
         run: sudo containers/squid.sh start
 
       - name: Run scenario ${{ matrix.scenario }} in container
-        run: sudo --preserve-env=TEST_JOBS,GITHUB_TOKEN containers/runner/scenario ${{ matrix.scenario }} --defaults .github/defaults.sh
+        run: sudo --preserve-env=TEST_JOBS,GITHUB_TOKEN containers/runner/scenario ${{ matrix.scenario }}
 
       - name: Collect logs
         if: always()

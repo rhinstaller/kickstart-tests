@@ -14,12 +14,6 @@ kickstart-tests directory in the runner container:
 
 Call `launch all` to run all tests. This can be controlled further through `--testtype` and/or `--skip-testtypes`, see `--help`.
 
-This will download the [automatically built](.github/workflows/container-autoupdate.yml) [official container image](https://quay.io/repository/rhinstaller/kstest-runner).
-
-You can also build the container yourself to test modifications to it:
-
-    podman build -t rhinstaller/kstest-runner .
-
 The `launch` script creates a `./data/` directory for passing of data between
 the container and the system (via volume).  By default it downloads the current
 Fedora Rawhide boot.iso, but to test some other image you can put it into
@@ -137,3 +131,16 @@ the graphical console for a virtual machine with a command:
 
 To change of the boot options for the tests (for example to add `inst.text`), please use
 `--run-args="--env KSTEST_EXTRA_BOOTOPTS=inst.text"` parameter for the `launch` script.
+
+## Building the runner container locally
+
+The `launch` script downloads the [automatically built](.github/workflows/container-autoupdate.yml) [official container image](https://quay.io/repository/rhinstaller/kstest-runner) by default.
+
+You can also build the container yourself to test modifications to it:
+
+    podman build -t rhinstaller/kstest-runner .
+
+The `launch` script prefers the locally built container image to the officially built one.
+Remove the locally built image to switch back to using the official container image:
+
+    podman image rm localhost/rhinstaller/kstest-runner

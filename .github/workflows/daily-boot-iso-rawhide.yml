@@ -22,7 +22,8 @@ jobs:
         run: |
           . /etc/os-release
           # The download.fedoraproject.org automatic redirector often selects download-ib01.f.o. for GitHub's cloud, which is too unreliable; use a mirror
-          lorax -p Fedora -v $VERSION_ID -r $VERSION_ID -s http://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/x86_64/os/ -s https://download.copr.fedorainfracloud.org/results/rpmsoftwaremanagement/dnf-nightly/fedora-rawhide-x86_64/ -s https://download.copr.fedorainfracloud.org/results/@rhinstaller/Anaconda/fedora-rawhide-x86_64/ -s https://copr-be.cloud.fedoraproject.org/results/@storage/blivet-daily/fedora-rawhide-x86_64/ /tmp/results
+          # The --volid argument can cause different network interface naming: https://github.com/rhinstaller/kickstart-tests/issues/448
+          lorax -p Fedora -v $VERSION_ID -r $VERSION_ID --volid Fedora-S-dvd-x86_64-rawh -s http://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/x86_64/os/ -s https://download.copr.fedorainfracloud.org/results/rpmsoftwaremanagement/dnf-nightly/fedora-rawhide-x86_64/ -s https://download.copr.fedorainfracloud.org/results/@rhinstaller/Anaconda/fedora-rawhide-x86_64/ -s https://copr-be.cloud.fedoraproject.org/results/@storage/blivet-daily/fedora-rawhide-x86_64/ /tmp/results
 
       - name: Upload log artifacts
         uses: actions/upload-artifact@v2

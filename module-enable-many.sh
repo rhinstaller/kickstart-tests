@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="packaging modularity fedora-only"
+TESTTYPE="packaging modularity fedora-only rhbz1928049"
 
 . ${KSTESTDIR}/functions.sh

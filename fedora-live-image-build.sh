@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Martin Kolman <mkolman@redhat.com>
 
-TESTTYPE="packaging fedora-only rhbz1926632"
+TESTTYPE="packaging fedora-only"
 
 . ${KSTESTDIR}/functions.sh

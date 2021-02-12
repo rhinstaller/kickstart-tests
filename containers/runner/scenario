@@ -10,9 +10,9 @@ SCENARIO="$1"
 shift
 
 case "$SCENARIO" in
-    rawhide) $LAUNCH --skip-testtypes rhel-only,knownfailure,rhbz1926632 "$@" all ;;
+    rawhide) $LAUNCH --skip-testtypes rhel-only,knownfailure "$@" all ;;
     rawhide-text) $LAUNCH --skip-testtypes rhel-only,knownfailure --run-args '-eKSTEST_EXTRA_BOOTOPTS=inst.text' "$@" all ;;
-    daily-iso) $LAUNCH --skip-testtypes rhel-only,knownfailure,rhbz1926632 --testtype packaging --daily-iso="$GITHUB_TOKEN" "$@" ;;
+    daily-iso) $LAUNCH --skip-testtypes rhel-only,knownfailure --testtype packaging --daily-iso="$GITHUB_TOKEN" "$@" ;;
 
     rhel8)
         if [ ! -e data/images/boot.iso ]; then

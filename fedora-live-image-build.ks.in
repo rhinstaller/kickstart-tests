@@ -1,4 +1,4 @@
-# live image build test based on F29 live image kickstart
+# live image build test based on F34 live image kickstart
 # - for now just having it run to the end with all of its
 #   complex post scripts should be enough
 
@@ -19,18 +19,12 @@ rootpw --iscrypted --lock locked
 lang en_US.UTF-8
 # Shutdown after installation
 shutdown
-# System timezone
-timezone US/Eastern
 # Network information
 network  --bootproto=dhcp --device=link --activate
-#repo --name="koji-override-0" --baseurl=http://kojipkgs.fedoraproject.org/compose/rawhide/Fedora-Rawhide-20180727.n.1/compose/Everything/$basearch/os
-#repo --name="koji-override-1" --baseurl=http://kojipkgs.fedoraproject.org/compose/rawhide/Fedora-Rawhide-20180727.n.1/compose/Workstation/$basearch/os
-# Use network installation
-#url --url="http://kojipkgs.fedoraproject.org/compose/rawhide/Fedora-Rawhide-20180727.n.1/compose/Workstation/$basearch/os"
-# System authorization information
-auth --useshadow --passalgo=sha512
 # Firewall configuration
 firewall --enabled --service=mdns
+# System timezone
+timezone US/Eastern
 # SELinux configuration
 selinux --enforcing
 
@@ -43,7 +37,7 @@ zerombr
 # Partition clearing information
 clearpart --all
 # Disk partitioning information
-part / --fstype="ext4" --grow
+part / --grow
 
 %post
 # FIXME: it'd be better to get this installed from a package
@@ -77,21 +71,14 @@ livedir="LiveOS"
 for arg in \`cat /proc/cmdline\` ; do
   if [ "\${arg##rd.live.dir=}" != "\${arg}" ]; then
     livedir=\${arg##rd.live.dir=}
-    return
+    continue
   fi
   if [ "\${arg##live_dir=}" != "\${arg}" ]; then
     livedir=\${arg##live_dir=}
-    return
   fi
 done
 
-# enable swaps unless requested otherwise
-swaps=\`blkid -t TYPE=swap -o device\`
-if ! strstr "\`cat /proc/cmdline\`" noswap && [ -n "\$swaps" ] ; then
-  for s in \$swaps ; do
-    action "Enabling swap partition \$s" swapon \$s
-  done
-fi
+# enable swapfile if it exists
 if ! strstr "\`cat /proc/cmdline\`" noswap && [ -f /run/initramfs/live/\${livedir}/swap.img ] ; then
   action "Enabling swap file" swapon /run/initramfs/live/\${livedir}/swap.img
 fi
@@ -136,7 +123,6 @@ findPersistentHome() {
   for arg in \`cat /proc/cmdline\` ; do
     if [ "\${arg##persistenthome=}" != "\${arg}" ]; then
       homedev=\${arg##persistenthome=}
-      return
     fi
   done
 }
@@ -203,7 +189,7 @@ touch /.liveimg-configured
 # https://bugzilla.redhat.com/show_bug.cgi?id=679486
 # the hostname must be something else than 'localhost'
 # https://bugzilla.redhat.com/show_bug.cgi?id=1370222
-echo "localhost-live" > /etc/hostname
+hostnamectl set-hostname "localhost-live"
 
 EOF
 
@@ -283,11 +269,8 @@ EOF
 
 # work around for poor key import UI in PackageKit
 rm -f /var/lib/rpm/__db*
-releasever=$(rpm -q --qf '%{version}\n' --whatprovides system-release)
-basearch=$(uname -i)
-rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-$releasever-$basearch
 echo "Packages within this LiveCD"
-rpm -qa
+rpm -qa --qf '%{size}\t%{name}-%{version}-%{release}.%{arch}\n' |sort -rn
 # Note that running rpm recreates the rpm db files which aren't needed or wanted
 rm -f /var/lib/rpm/__db*
 
@@ -321,12 +304,15 @@ touch /etc/machine-id
 %end
 
 %post --nochroot
-cp $INSTALL_ROOT/usr/share/licenses/*-release/* $LIVE_ROOT/
+# For livecd-creator builds only (lorax/livemedia-creator handles this directly)
+if [ -n "$LIVE_ROOT" ]; then
+    cp "$INSTALL_ROOT"/usr/share/licenses/*-release-common/* "$LIVE_ROOT/"
 
-# only works on x86, x86_64
-if [ "$(uname -i)" = "i386" -o "$(uname -i)" = "x86_64" ]; then
-  if [ ! -d $LIVE_ROOT/LiveOS ]; then mkdir -p $LIVE_ROOT/LiveOS ; fi
-  cp /usr/bin/livecd-iso-to-disk $LIVE_ROOT/LiveOS
+    # only installed on x86, x86_64
+    if [ -f /usr/bin/livecd-iso-to-disk ]; then
+        mkdir -p "$LIVE_ROOT/LiveOS"
+        cp /usr/bin/livecd-iso-to-disk "$LIVE_ROOT/LiveOS"
+    fi
 fi
 
 %end
@@ -375,7 +361,7 @@ if [ -f /usr/share/applications/liveinst.desktop ]; then
 
   cat >> /usr/share/glib-2.0/schemas/org.gnome.shell.gschema.override << FOE
 [org.gnome.shell]
-favorite-apps=['firefox.desktop', 'evolution.desktop', 'rhythmbox.desktop', 'shotwell.desktop', 'org.gnome.Nautilus.desktop', 'anaconda.desktop']
+favorite-apps=['firefox.desktop', 'org.gnome.Calendar.desktop', 'rhythmbox.desktop', 'org.gnome.Photos.desktop', 'org.gnome.Nautilus.desktop', 'anaconda.desktop']
 FOE
 
   # Make the welcome screen show up
@@ -414,7 +400,6 @@ EOF
 
 %end
 
-
 %post
 
 # if we got this far the live image build itself did not fail
@@ -425,34 +410,27 @@ echo SUCCESS > /root/RESULT
 
 %end
 
-
 %packages
+@^workstation-product-environment
 @anaconda-tools
-@base-x
-@core
-@firefox
-@fonts
-@gnome-desktop
-@guest-desktop-agents
-@hardware-support
-@libreoffice
-@multimedia
-@networkmanager-submodules
-@printing
-@workstation-product
+@x86-baremetal-tools
 aajohan-comfortaa-fonts
 anaconda
 anaconda-install-env-deps
+anaconda-live
+chkconfig
 dracut-live
 glibc-all-langpacks
+initscripts
 kernel
 kernel-modules
 kernel-modules-extra
-memtest86+
-syslinux
 -@dial-up
 -@input-methods
 -@standard
+-device-mapper-multipath
+-fcoe-utils
 -gfs2-utils
 -reiserfs-utils
+
 %end

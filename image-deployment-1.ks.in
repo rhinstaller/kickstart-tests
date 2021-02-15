@@ -1,0 +1,106 @@
+#version=DEVEL
+#test name: image-deployment-1
+
+# Compare files on the installed system with the content
+# of the deployed image and check files that were changed
+# or added by the installer. There shouldn't be files
+# related to disabled modules and installation tasks.
+
+# NOTE: This test requires a tar image!
+
+# Use defaults for network, bootloader and storage.
+%ksappend network/default.ks
+%ksappend bootloader/default.ks
+%ksappend storage/default.ks
+
+# Install the prepared tar.
+liveimg --url=http://10.43.136.2/trees/rv/bmi/BP2-0.0.4.tar.xz
+
+# Run the installation in the cmdline mode.
+cmdline
+shutdown
+
+%post --nochroot
+
+# Download the tar image.
+tar_url="http://10.43.136.2/trees/rv/bmi/BP2-0.0.4.tar.xz"
+tar_img="/tmp/img.tar.xz"
+curl -f "${tar_url}" > "${tar_img}"
+
+%end
+
+%post --nochroot
+
+# Generate a list of files to exclude.
+cat > "/tmp/excluded.in" <<EOF
+./boot/
+./dev/
+./proc/
+./tmp/
+./sys/
+./run/
+./etc/machine-id
+./usr/lib/modules/
+EOF
+
+%end
+
+%post --nochroot
+
+# Find changed files.
+tar_img="/tmp/img.tar.xz"
+
+# Get a list of changed files.
+tar --diff -f "${tar_img}" -C /mnt/sysroot | cut -d":" -f1 \
+| grep -v -f /tmp/excluded.in| sort | uniq >/tmp/generated.out
+
+# Get a list of expected changes.
+cat > "/tmp/expected.out" <<EOF
+./etc/mtab
+./usr/libexec/openssh/ssh-keysign
+./var/lib/unbound/root.key
+EOF
+
+# Check the output
+diff /tmp/expected.out /tmp/generated.out
+
+if [[ $? != 0 ]]; then
+    echo "*** unexpected files has changed:" >> /mnt/sysroot/root/RESULT
+    cat /tmp/generated.out >> /mnt/sysroot/root/RESULT
+fi
+
+%end
+
+%post --nochroot
+
+# Find missing files.
+tar_img="/tmp/img.tar.xz"
+
+# Get a list of tar files.
+tar --list -f "${tar_img}" | sed 's/\/$//' | grep -v -f /tmp/excluded.in | sort >/tmp/tar_files.out
+
+# Get a list of system files.
+(cd /mnt/sysroot ; find . | grep -v -f /tmp/excluded.in | sort ) >/tmp/sys_files.out
+
+# Compare the lists.
+diff /tmp/tar_files.out /tmp/sys_files.out | grep ">" | sed 's/^> //' >/tmp/generated.out
+
+# Get a list of expected changes.
+cat > "/tmp/expected.out" <<EOF
+./etc/crypttab
+./etc/default/grub
+./etc/fstab
+./etc/resolv.conf
+EOF
+
+# Check the output
+diff /tmp/expected.out /tmp/generated.out
+
+if [[ $? != 0 ]]; then
+    echo "*** unexpected files were added:" >> /mnt/sysroot/root/RESULT
+    cat /tmp/generated.out >> /mnt/sysroot/root/RESULT
+fi
+
+%end
+
+%ksappend validation/success_if_result_empty_standalone.ks

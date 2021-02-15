@@ -1,0 +1,58 @@
+#version=DEVEL
+#test name: image-deployment-2
+
+# Test that we can disable modules and installation tasks
+# that are not suitable for the image deployment. Use the
+# package installation in this test, because it is easier
+# to test for now.
+
+# Use defaults for network, bootloader and storage.
+%ksappend network/default.ks
+%ksappend bootloader/default.ks
+%ksappend storage/default.ks
+
+# Install RPM packages.
+%ksappend repos/default.ks
+%ksappend payload/default_packages.ks
+
+# Run the installation in the cmdline mode.
+cmdline
+shutdown
+
+%post --nochroot
+
+# Get the activated Anaconda DBus modules.
+less /tmp/syslog | grep "Activating service name" | \
+grep "org.fedoraproject.Anaconda.Modules" | cut -d"'" -f2 \
+| sort > /tmp/generated.out
+
+# Generate the expected output.
+cat > /tmp/expected.out <<EOF
+org.fedoraproject.Anaconda.Modules.Network
+org.fedoraproject.Anaconda.Modules.Payloads
+org.fedoraproject.Anaconda.Modules.Storage
+EOF
+
+# Check the output
+diff /tmp/expected.out /tmp/generated.out
+
+if [[ $? != 0 ]]; then
+    echo "*** unexpected modules were activated:" >> /mnt/sysroot/root/RESULT
+    cat /tmp/generated.out >> /mnt/sysroot/root/RESULT
+fi
+
+%end
+
+%post --nochroot
+
+# Get the network installation tasks.
+cat /tmp/anaconda.log | grep "installation: Task started:" \
+| grep -i -e "firewall" -e "network"
+
+if [[ $? == 0 ]]; then
+    echo "*** unexpected installation tasks" >> /mnt/sysroot/root/RESULT
+fi
+
+%end
+
+%ksappend validation/success_if_result_empty_standalone.ks

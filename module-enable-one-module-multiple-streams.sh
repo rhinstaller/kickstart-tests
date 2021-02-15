@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Martin Kolman <mkolman@redhat.com>
 
-TESTTYPE="knownfailure packaging modularity fedora-only rhbz1928049"
+TESTTYPE="knownfailure packaging modularity fedora-only"
 
 . ${KSTESTDIR}/functions.sh

@@ -53,3 +53,4 @@ jobs:
           path: |
             data/logs/kstest.log
             data/logs/kstest-*/*.log
+            data/logs/kstest-*/anaconda/lorax-packages.log

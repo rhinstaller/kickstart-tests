@@ -19,7 +19,7 @@
 
 # FIXME: fails on RHEL 8:
 # SourceSetupError: Nothing useful found for Hard drive ISO source at partition=/dev/sdb directory=/repo/
-TESTTYPE=${TESTTYPE:-"packaging fedora-only"}
+TESTTYPE=${TESTTYPE:-"packaging fedora-only rhbz1935004"}
 
 . ${KSTESTDIR}/functions.sh
 

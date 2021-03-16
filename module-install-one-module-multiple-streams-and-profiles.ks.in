@@ -12,26 +12,12 @@
 # lets use a no-default profile to see if it is correctly set afterwards
 @cri-o:2018.0/default
 @cri-o:1.11/default
-kernel
-vim
 %end
 
 %post
 # modules have some packages defined as their API in their profiles,
 # we can check for those to be (or not to be installed) to see if the
 # module has (or has not) been installed
-
-# the vim standalone package
-rpm -q vim-minimal
-if [[ $? != 0 ]]; then
-    echo '*** vim-minimal package requested but not installed' >> /root/RESULT
-fi
-
-# it is also nice to have kernel
-rpm -q kernel
-if [[ $? != 0 ]]; then
-    echo '*** kernel package not installed' >> /root/RESULT
-fi
 
 # the cri-o module should be just enabled, so the API package should *not*
 # be installed

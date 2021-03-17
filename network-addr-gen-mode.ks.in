@@ -1,0 +1,72 @@
+#test name: network-addr-gen-mode
+# Test ipv6.addr-gen-mode default (rhbz#1873021) for
+# - device configured by ip=<IFACE>:dhcp boot option
+# - device unconfigured
+# - device configured by kickstart
+# - device configured by kickstart via pre section
+%ksappend repos/default.ks
+
+network --device=@KSTEST_NETDEV2@ --bootproto=dhcp
+%include /tmp/ksinclude
+%pre
+echo "network --device=@KSTEST_NETDEV4@ --bootproto dhcp --onboot=no --activate" >> /tmp/ksinclude
+%end
+
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+
+%pre
+
+# We will copy /root/RESULT to /mnt/sysimage/root/RESULT at the beginning of the %post (--nochroot) checks
+@KSINCLUDE@ post-lib-network.sh
+
+check_connection_setting "@KSTEST_NETDEV1@" ipv6.addr-gen-mode eui64
+
+%end
+
+%post --nochroot
+
+@KSINCLUDE@ post-nochroot-lib-network.sh
+
+# First copy result from %pre stage to chroot
+copy_pre_stage_result
+
+check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@ @KSTEST_NETDEV4@
+
+%end
+
+%post
+
+@KSINCLUDE@ post-lib-network.sh
+
+check_device_config_value @KSTEST_NETDEV1@ IPV6_ADDR_GEN_MODE __NONE ipv6 addr-gen-mode eui64
+check_connection_setting "@KSTEST_NETDEV1@" ipv6.addr-gen-mode eui64
+check_device_config_value @KSTEST_NETDEV2@ IPV6_ADDR_GEN_MODE __NONE ipv6 addr-gen-mode eui64
+if [ "@KSTEST_OS_NAME@" == "rhel" ] ; then
+    # Remove for rhel9 (where ifcfg from kickstart not generated in initramfs)
+    check_connection_setting "System @KSTEST_NETDEV2@" ipv6.addr-gen-mode eui64
+else
+    check_connection_setting "@KSTEST_NETDEV2@" ipv6.addr-gen-mode eui64
+fi
+check_device_config_value @KSTEST_NETDEV2@ IPV6_ADDR_GEN_MODE __NONE ipv6 addr-gen-mode eui64
+check_connection_setting "@KSTEST_NETDEV3@" ipv6.addr-gen-mode eui64
+check_device_config_value @KSTEST_NETDEV2@ IPV6_ADDR_GEN_MODE __NONE ipv6 addr-gen-mode eui64
+check_connection_setting "@KSTEST_NETDEV4@" ipv6.addr-gen-mode eui64
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+   echo SUCCESS > /root/RESULT
+fi
+%end

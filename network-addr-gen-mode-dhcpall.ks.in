@@ -1,0 +1,54 @@
+#test name: network-addr-gen-mode-dhcpall
+# Test ipv6.addr-gen-mode default (rhbz#1873021) for ip=dhcp (or missing ip=) boot option
+%ksappend repos/default.ks
+
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+
+%pre
+
+# We will copy /root/RESULT to /mnt/sysimage/root/RESULT at the beginning of the %post (--nochroot) checks
+@KSINCLUDE@ post-lib-network.sh
+
+check_connection_setting "Wired Connection" ipv6.addr-gen-mode eui64
+check_connection_setting "Wired Connection" ipv6.method auto
+
+%end
+
+%post --nochroot
+
+@KSINCLUDE@ post-nochroot-lib-network.sh
+
+# First copy result from %pre stage to chroot
+copy_pre_stage_result
+
+check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@
+
+%end
+
+%post
+
+@KSINCLUDE@ post-lib-network.sh
+
+check_device_config_value @KSTEST_NETDEV1@ IPV6_ADDR_GEN_MODE __NONE ipv6 addr-gen-mode eui64
+check_connection_setting "@KSTEST_NETDEV1@" ipv6.addr-gen-mode eui64
+check_device_config_value @KSTEST_NETDEV2@ IPV6_ADDR_GEN_MODE __NONE ipv6 addr-gen-mode eui64
+check_connection_setting "@KSTEST_NETDEV2@" ipv6.addr-gen-mode eui64
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+   echo SUCCESS > /root/RESULT
+fi
+%end

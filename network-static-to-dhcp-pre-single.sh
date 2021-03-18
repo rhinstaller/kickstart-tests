@@ -39,8 +39,7 @@ kernel_args() {
 prepare() {
     local ks=$1
     # This is a private slirp network, so we can pick any config we like
-    sed -i -e 's#@KSTEST_STATIC_IP@#192.168.100.5#g' -e 's#@KSTEST_STATIC_NETMASK@#255.255.255.0#g' -e 's#@KSTEST_STATIC_GATEWAY@#192.168.100.1#g' ${ks}
-    echo "ip_static_boot_config=ip=192.168.100.5::192.168.100.1:255.255.255.0::${KSTEST_NETDEV1}:none nameserver=${gateway}" > ${tmpdir}/ip_static_boot_config
+    echo "ip_static_boot_config=ip=10.0.2.200::10.0.2.2:255.255.255.0::${KSTEST_NETDEV1}:none:10.0.2.3" > ${tmpdir}/ip_static_boot_config
 
     echo ${ks}
 }

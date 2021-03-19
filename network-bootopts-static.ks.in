@@ -1,0 +1,43 @@
+#test name: network-bootopts-static
+# Static configuration of single interface via boot options
+%ksappend repos/default.ks
+
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+%post --nochroot
+
+@KSINCLUDE@ post-nochroot-lib-network.sh
+
+check_gui_configurations @KSTEST_NETDEV1@
+
+%end
+
+%post
+
+@KSINCLUDE@ post-lib-network.sh
+
+check_device_connected @KSTEST_NETDEV1@ yes
+
+check_device_config_value @KSTEST_NETDEV1@ IPADDR @KSTEST_STATIC_IP@ ipv4 address1 @KSTEST_STATIC_IP@/@KSTEST_STATIC_PREFIX@,@KSTEST_STATIC_GATEWAY@
+check_device_config_value @KSTEST_NETDEV1@ PREFIX @KSTEST_STATIC_PREFIX@ ipv4 address1 @KSTEST_STATIC_IP@/@KSTEST_STATIC_PREFIX@,@KSTEST_STATIC_GATEWAY@
+check_device_config_value @KSTEST_NETDEV1@ GATEWAY @KSTEST_STATIC_GATEWAY@ ipv4 address1 @KSTEST_STATIC_IP@/@KSTEST_STATIC_PREFIX@,@KSTEST_STATIC_GATEWAY@
+check_device_config_value @KSTEST_NETDEV1@ DNS1 @KSTEST_STATIC_DNS1@ ipv4 dns "@KSTEST_STATIC_DNS1@;"
+check_device_ipv4_address @KSTEST_NETDEV1@ @KSTEST_STATIC_IP@
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+   echo SUCCESS > /root/RESULT
+fi
+%end

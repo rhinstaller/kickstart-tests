@@ -1,2 +1,3 @@
 # The Fedora rawhide repository with modules.
-repo --name=modular --baseurl @KSTEST_MODULAR_URL@
+# Install the repo, so DNF can use it in %post scripts.
+repo --name=modular --baseurl @KSTEST_MODULAR_URL@ --install --cost 0

@@ -11,6 +11,7 @@
 # both intended and unintended.
 
 %ksappend repos/default.ks
+%ksappend repos/modular.ks
 %ksappend common/common_no_payload.ks
 
 module --name=postgresql --stream=9.6

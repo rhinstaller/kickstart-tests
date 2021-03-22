@@ -8,6 +8,7 @@
 #
 
 %ksappend repos/default.ks
+%ksappend repos/modular.ks
 %ksappend common/common_no_payload.ks
 
 module --name=cri-o --stream=2018.0

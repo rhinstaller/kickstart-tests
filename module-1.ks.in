@@ -5,6 +5,7 @@
 # - install a second module
 
 %ksappend repos/default.ks
+%ksappend repos/modular.ks
 %ksappend common/common_no_payload.ks
 
 module --name=nodejs --stream=15

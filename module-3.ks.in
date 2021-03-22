@@ -4,6 +4,7 @@
 # but different profiles. Check both profiles are installed.
 
 %ksappend repos/default.ks
+%ksappend repos/modular.ks
 %ksappend common/common_no_payload.ks
 
 %packages

@@ -38,7 +38,7 @@ prepare() {
     local ks=$1
     local hostname=testhostname.example.com
 
-    echo "ip_static_boot_config=ip=192.168.100.5::192.168.100.1:255.255.255.0:${hostname}:${KSTEST_NETDEV2}:none" > ${tmpdir}/ip_static_boot_config
+    echo "ip_static_boot_config=ip=10.0.2.200::10.0.2.2:255.255.255.0:${hostname}:${KSTEST_NETDEV2}:none" > ${tmpdir}/ip_static_boot_config
 
     echo ${ks}
 }

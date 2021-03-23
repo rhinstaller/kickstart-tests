@@ -40,7 +40,7 @@ prepare() {
     local tmpdir=$2
 
     # This is a private slirp network, so we can pick any config we like
-    echo "ip_static_vlan_config=\"ip=192.168.100.5::192.168.100.1:255.255.255.0::${KSTEST_NETDEV2}.111:none:\"" > ${tmpdir}/ip_static_vlan_config
+    echo "ip_static_vlan_config=\"ip=10.0.2.200::10.0.2.2:255.255.255.0::${KSTEST_NETDEV2}.111:none:\"" > ${tmpdir}/ip_static_vlan_config
 
     ### Run http server serving kickstart
 

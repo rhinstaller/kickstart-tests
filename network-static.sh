@@ -37,7 +37,7 @@ prepare() {
     local ks=$1
 
     # This is a private slirp network, so we can pick any config we like
-    sed -i -e 's#@KSTEST_STATIC_IP@#192.168.100.5#g' -e 's#@KSTEST_STATIC_NETMASK@#255.255.255.0#g' -e 's#@KSTEST_STATIC_GATEWAY@#192.168.100.1#g' ${ks}
+    sed -i -e 's#@KSTEST_STATIC_IP@#10.0.2.200#g' -e 's#@KSTEST_STATIC_NETMASK@#255.255.255.0#g' -e 's#@KSTEST_STATIC_GATEWAY@#10.0.2.2#g' ${ks}
 
     echo ${ks}
 }

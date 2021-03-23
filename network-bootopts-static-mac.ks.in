@@ -1,0 +1,56 @@
+#test name: network-bootopts-static-mac
+# Static configuration of single interface via boot options using MAC address
+# https://bugzilla.redhat.com/show_bug.cgi?id=1915493#c43
+%ksappend repos/default.ks
+
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+%post --nochroot
+
+@KSINCLUDE@ post-nochroot-lib-network.sh
+
+pass_autoconnections_info_to_chroot
+
+check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@
+
+%end
+
+%post
+
+@KSINCLUDE@ post-lib-network.sh
+
+check_device_connected @KSTEST_NETDEV2@ yes
+
+detect_nm_has_autoconnections_off
+nm_has_autoconnections_off=$?
+if [[ $nm_has_autoconnections_off -eq 0 ]]; then
+    check_device_connected @KSTEST_NETDEV1@ no
+else
+    check_device_connected @KSTEST_NETDEV1@ yes
+fi
+
+
+check_device_config_value @KSTEST_NETDEV1@ IPADDR __NONE ipv4 method auto
+check_device_config_value @KSTEST_NETDEV2@ IPADDR @KSTEST_STATIC_IP@ ipv4 address1 @KSTEST_STATIC_IP@/@KSTEST_STATIC_PREFIX@,@KSTEST_STATIC_GATEWAY@
+check_device_config_value @KSTEST_NETDEV2@ PREFIX @KSTEST_STATIC_PREFIX@ ipv4 address1 @KSTEST_STATIC_IP@/@KSTEST_STATIC_PREFIX@,@KSTEST_STATIC_GATEWAY@
+check_device_config_value @KSTEST_NETDEV2@ GATEWAY @KSTEST_STATIC_GATEWAY@ ipv4 address1 @KSTEST_STATIC_IP@/@KSTEST_STATIC_PREFIX@,@KSTEST_STATIC_GATEWAY@
+check_device_config_value @KSTEST_NETDEV2@ DNS1 @KSTEST_STATIC_DNS1@ ipv4 dns "@KSTEST_STATIC_DNS1@;"
+check_device_ipv4_address @KSTEST_NETDEV2@ @KSTEST_STATIC_IP@
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+   echo SUCCESS > /root/RESULT
+fi
+%end

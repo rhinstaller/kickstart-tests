@@ -1,0 +1,40 @@
+#test name: module-2
+#
+# generic module install test:
+# - enable one module with a stream
+# - install the same module with same stream
+
+%ksappend repos/default.ks
+%ksappend repos/modular.ks
+%ksappend common/common_no_payload.ks
+
+module --name=nodejs --stream=15
+
+%packages
+@nodejs:15/development
+%end
+
+%post
+# modules have some packages defined as their API in their profiles,
+# we can check for those to be (or not to be installed) to see if the
+# module has (or has not) been installed
+
+# the nodejs module should be just enabled, so the API package should *not*
+# be installed
+
+rpm -q nodejs
+if [[ $? != 0 ]]; then
+    echo '*** nodejs package for nodejs module not installed' >> /root/RESULT
+fi
+
+# next we will check if the module is seen as enabled/installed from the
+# metadata/DNF point of view
+dnf module list --enabled nodejs || echo "*** nodejs module not marked as enabled" >> /root/RESULT
+dnf module list --installed nodejs || echo "*** nodejs module not marked as installed" >> /root/RESULT
+
+# check the stream and profile as well
+dnf module list --installed nodejs | grep "development[^,]*\[i\]" || echo "*** nodejs module development profile not marked as installed" >> /root/RESULT
+
+%ksappend validation/success_if_result_empty.ks
+
+%end

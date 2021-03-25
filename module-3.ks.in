@@ -1,0 +1,58 @@
+#test name: module-3
+#
+# Specify one module in packages section twice with same stream
+# but different profiles. Check both profiles are installed.
+
+%ksappend repos/default.ks
+%ksappend repos/modular.ks
+%ksappend common/common_no_payload.ks
+
+%packages
+# lets use a non-default profile to see if it is correctly set afterwards
+@nodejs:15/default
+@nodejs:15/development
+%end
+
+%post
+# modules have some packages defined as their API in their profiles,
+# we can check for those to be (or not to be installed) to see if the
+# module has (or has not) been installed
+
+# the nodejs module should be just enabled, so the API package should *not*
+# be installed
+
+rpm -q nodejs
+if [[ $? != 0 ]]; then
+    echo '*** nodejs package for nodejs module not installed' >> /root/RESULT
+fi
+
+rpm -q npm
+if [[ $? != 0 ]]; then
+    echo '*** npm package for nodejs module not installed' >> /root/RESULT
+fi
+
+rpm -q nodejs-devel
+if [[ $? != 0 ]]; then
+    echo '*** nodejs-devel package for nodejs module development profile not installed' >> /root/RESULT
+fi
+
+# log info about enabled and installed modules and streams
+dnf module list --enabled
+dnf module list --installed
+
+# next we will check if the module is seen as enabled/installed from the
+# metadata/DNF point of view
+dnf module list --enabled nodejs || echo "*** nodejs module not marked as enabled" >> /root/RESULT
+dnf module list --installed nodejs || echo "*** nodejs module not marked as installed" >> /root/RESULT
+
+# check the profile
+dnf module list --installed nodejs | grep "default[^,]*\[i\]" || echo "*** nodejs module default profile not marked as installed" >> /root/RESULT
+dnf module list --installed nodejs | grep "development[^,]*\[i\]" || echo "*** nodejs module development profile not marked as installed" >> /root/RESULT
+dnf module list --installed nodejs | grep "minimal[^,]*\[i\]" && echo "*** nodejs module minimal profile marked as installed" >> /root/RESULT
+
+# check the stream
+dnf module list --enabled nodejs | grep "15[^,]*\[e\]" || echo "*** nodejs stream id 15 not marked as enabled" >> /root/RESULT
+
+%ksappend validation/success_if_result_empty.ks
+
+%end

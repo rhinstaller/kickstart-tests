@@ -5,11 +5,10 @@
 #       no modules with a default stream
 
 %ksappend repos/default.ks
+%ksappend repos/modular.ks
 %ksappend common/common_no_payload.ks
 
 %packages
-kernel
-vim
 @nodejs
 @postgresql
 @meson
@@ -21,18 +20,6 @@ vim
 # modules have some packages defined as their API in their profiles,
 # we can check for those to be (or not to be installed) to see if the
 # module has (or has not) been installed
-
-# the vim standalone package
-rpm -q vim-minimal
-if [[ $? != 0 ]]; then
-    echo '*** vim-minimal package requested but not installed' >> /root/RESULT
-fi
-
-# it is also nice to have kernel
-rpm -q kernel
-if [[ $? != 0 ]]; then
-    echo '*** kernel package not installed' >> /root/RESULT
-fi
 
 rpm -q nodejs
 if [[ $? != 0 ]]; then

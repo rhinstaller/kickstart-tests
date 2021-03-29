@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Martin Kolman <mkolman@redhat.com>
 
-TESTTYPE="packaging modularity fedora-only rhbz1928049"
+TESTTYPE="packaging modularity fedora-only"
 
 . ${KSTESTDIR}/functions.sh

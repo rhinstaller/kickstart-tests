@@ -18,6 +18,6 @@
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
 # FIXME: times out on rhel8
-TESTTYPE="packaging fedora-only rhbz1928049"
+TESTTYPE="packaging fedora-only"
 
 . ${KSTESTDIR}/functions.sh

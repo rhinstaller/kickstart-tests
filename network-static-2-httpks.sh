@@ -38,7 +38,7 @@ prepare() {
     local tmpdir=$2
 
     # This is a private slirp network, so we can pick any config we like
-    sed -i -e 's#@KSTEST_STATIC_IP1@#192.168.100.10#g' -e 's#@KSTEST_STATIC_IP2@#192.168.100.11#g' -e 's#@KSTEST_STATIC_IP3@#192.168.100.12#g' -e 's#@KSTEST_STATIC_IP4@#192.168.100.13#g' -e 's#@KSTEST_STATIC_NETMASK@#255.255.255.0#g' -e 's#@KSTEST_STATIC_GATEWAY@#192.168.100.1#g' ${ks}
+    sed -i -e 's#@KSTEST_STATIC_IP1@#10.0.2.200#g' -e 's#@KSTEST_STATIC_IP2@#10.0.2.201#g' -e 's#@KSTEST_STATIC_IP3@#10.0.2.202#g' -e 's#@KSTEST_STATIC_IP4@#10.0.2.203#g' -e 's#@KSTEST_STATIC_NETMASK@#255.255.255.0#g' -e 's#@KSTEST_STATIC_GATEWAY@#10.0.2.2#g' ${ks}
 
     ### Run http server serving kickstart
 

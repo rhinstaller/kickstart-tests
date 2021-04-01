@@ -44,8 +44,8 @@ prepare() {
     local tmpdir=$2
 
     # This is a private slirp network, so we can pick any config we like
-    sed -i -e 's#@KSTEST_STATIC_IP@#192.168.100.5#g' -e 's#@KSTEST_STATIC_NETMASK@#255.255.255.0#g' -e 's#@KSTEST_STATIC_GATEWAY@#192.168.100.1#g' ${ks}
-    echo "ip_static_boot_config=\"ip=192.168.100.5 gateway=192.168.100.1 netmask=255.255.255.0 ksdevice=${KSTEST_NETDEV1}\"" > ${tmpdir}/ip_static_boot_config
+    sed -i -e 's#@KSTEST_STATIC_IP@#10.0.2.200#g' -e 's#@KSTEST_STATIC_NETMASK@#255.255.255.0#g' -e 's#@KSTEST_STATIC_GATEWAY@#10.0.2.2#g' ${ks}
+    echo "ip_static_boot_config=\"ip=10.0.2.200 gateway=10.0.2.2 netmask=255.255.255.0 ksdevice=${KSTEST_NETDEV1}\"" > ${tmpdir}/ip_static_boot_config
 
     ### Run http server serving kickstart
 

@@ -17,6 +17,7 @@
 #
 # Red Hat Author(s): Martin Kolman <mkolman@redhat.com>
 
-TESTTYPE="packaging fedora-only"
+# https://bugzilla.redhat.com/show_bug.cgi?id=1926632#c7
+TESTTYPE="packaging fedora-only knownfailure"
 
 . ${KSTESTDIR}/functions.sh

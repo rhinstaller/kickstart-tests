@@ -21,3 +21,11 @@
 TESTTYPE="packaging fedora-only knownfailure"
 
 . ${KSTESTDIR}/functions.sh
+
+# This rest effectively builds a Fedora live image, which
+# among other things installs 1600+ packages and does various
+# fairly resource intensive tasks. So bump the timeout
+# to give it more time to do what's needed.
+get_timeout() {
+    echo "120"
+}

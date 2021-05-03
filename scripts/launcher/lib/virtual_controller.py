@@ -133,9 +133,10 @@ class VirtualInstall(object):
             args.append("--disk")
             args.append("path={0},bus=sata".format(disk))
 
-        for nic in self._nics or []:
+        nics = self._nics or ["user"]
+        for nic in nics:
             args.append("--network")
-            args.append(nic)
+            args.append(nic+",model=virtio")
 
         disk_opts = "path={0},device=cdrom,readonly=on,shareable=on".format(self._iso)
         args.append("--disk")

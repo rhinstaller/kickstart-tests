@@ -23,6 +23,15 @@ case "$SCENARIO" in
         $LAUNCH --skip-testtypes fedora-only,knownfailure,rhel-8-failure --platform rhel8 --defaults "$ROOTDIR/scripts/defaults-rhel8.sh" all
         ;;
 
+    rhel9)
+        if [ ! -e data/images/boot.iso ]; then
+            echo "INFO: data/images/boot.iso does not exist, downloading current RHEL 9 boot iso..."
+            mkdir -p data/images
+            curl -L http://download.eng.bos.redhat.com/rhel-9/development/RHEL-9-Beta/latest-RHEL-9/compose/BaseOS/x86_64/os/images/boot.iso --output data/images/boot.iso
+        fi
+        $LAUNCH --skip-testtypes fedora-only,knownfailure --platform rhel9 --defaults "$ROOTDIR/scripts/defaults-rhel9.sh" all
+        ;;
+
     # just run a single test on standard Rawhide; mostly for testing infrastructure
     minimal) $LAUNCH "$@" container ;;
 

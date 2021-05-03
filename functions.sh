@@ -17,7 +17,15 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-source network-device-names.cfg
+# Network device names are defined in the defaults (KSTEST_NETDEV<X> values)
+if [[ -e scripts/defaults.sh ]]; then
+    . scripts/defaults.sh
+fi
+
+if [[ -e $HOME/.kstests.defaults.sh ]]; then
+    . $HOME/.kstests.defaults.sh
+fi
+
 
 prereqs() {
     # No prereqs by default

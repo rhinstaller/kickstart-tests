@@ -22,7 +22,7 @@ fi
 %post --nochroot
 
 cat /tmp/anaconda.log \
-| grep "Writing a temporary configuration loaded from" \
+| grep "Configuration loaded from:" \
 | grep "/etc/anaconda/conf.d/99-testing.conf"
 
 if [[ $? != 0 ]]; then

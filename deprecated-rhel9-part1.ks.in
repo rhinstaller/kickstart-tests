@@ -1,0 +1,77 @@
+#version=DEVEL
+#test name: deprecated-logging-level
+%ksappend repos/default.ks
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+clearpart --all --initlabel
+autopart
+
+keyboard us
+lang en_US.UTF-8
+timezone --nontp Europe/Prague
+rootpw testcase
+shutdown
+
+repo --ignoregroups 1 --name=epel8 --install --baseurl=https://dl.fedoraproject.org/pub/epel/8/Everything/x86_64/
+
+%packages --instLangs cs --excludeWeakdeps --timeout 42
+%end
+
+logging --level debug --host thisdoesntexist.example.com
+
+%anaconda
+pwpolicy root --minlen=6 --notempty
+%end
+
+%post --nochroot
+# Check logging --level
+if ! $(grep -q "KickstartDeprecationWarning: Ignoring deprecated option on line [0-9]*: The --level option has been deprecated" /tmp/anaconda.log); then
+    echo 'Deprecation warning is missing for logging --level' > /mnt/sysroot/root/RESULT
+fi
+if ! $(grep -q thisdoesntexist.example.com /etc/rsyslog.conf); then
+    echo 'Command logging ignored not deprecated option "host"' > /mnt/sysroot/root/RESULT
+fi
+# Check %packages --instLangs --excludeWeakdeps
+if ! $(grep -q "KickstartParseWarning: The --instLangs option on line [0-9]* will be deprecated in future releases" /tmp/anaconda.log); then
+    echo 'Deprecation warning is missing for %packages --instLangs' > /mnt/sysroot/root/RESULT
+fi
+if ! $(grep -q "KickstartParseWarning: The --excludeWeakdeps option on line [0-9]* will be deprecated in future releases" /tmp/anaconda.log); then
+    echo 'Deprecation warning is missing for %packages --excludeWeakdeps' > /mnt/sysroot/root/RESULT
+fi
+if ! $(awk '/DNF configuration:/,/^$/' /tmp/anaconda.log | grep -q "timeout = 42"); then
+    echo 'Command %packages ignored not deprecated option "timeout"' > /mnt/sysroot/root/RESULT
+fi
+# Check %anaconda pwpolicy
+if ! $(grep -q "KickstartDeprecationWarning: The %%anaconda section has been deprecated" /tmp/anaconda.log); then
+    echo 'Deprecation warning is missing for %anaconda' > /mnt/sysroot/root/RESULT
+fi
+if ! $(grep -q "KickstartDeprecationWarning: The pwpolicy command has been deprecated" /tmp/anaconda.log); then
+    echo 'Deprecation warning is missing for pwpolicy' > /mnt/sysroot/root/RESULT
+fi
+# Check repo --ignoregroups
+if ! $(grep -q "KickstartDeprecationWarning: Ignoring deprecated option on line [0-9]*: The --ignoregroups option has been deprecated" /tmp/anaconda.log); then
+    echo 'Deprecation warning is missing for repo --ignoregroups' > /mnt/sysroot/root/RESULT
+fi
+# Check timezone --nontp
+if ! $(grep -q "KickstartParseWarning: The option --nontp will be deprecated in future releases." /tmp/anaconda.log); then
+    echo 'Deprecation warning is missing for timezone --nontp' > /mnt/sysroot/root/RESULT
+fi
+%end
+
+%post
+# Check repo --ignoregroups
+if [ ! -e /etc/yum.repos.d/epel8.repo ]; then
+    echo 'Command repo ignored not deprecated options' > /root/RESULT
+fi
+# Check timezone --nontp
+if ! $(ls -l /etc/localtime | grep -q "Europe/Prague"); then
+    echo 'Command timezone ignored not deprecated options' > /root/RESULT
+fi
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+    echo SUCCESS > /root/RESULT
+fi
+%end

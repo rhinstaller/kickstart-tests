@@ -58,3 +58,8 @@ validate() {
         return 0
     fi
 }
+
+cleanup() {
+    local tmp_dir="${1}"
+    stop_proxy "${tmp_dir}/proxy"
+}

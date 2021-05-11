@@ -1,4 +1,0 @@
-# Disable the lecture message that appears on first use.  (1) It's annoying to
-# see, (2) It screws up ansible to get some unexpected message.
-Defaults    lecture = never
-

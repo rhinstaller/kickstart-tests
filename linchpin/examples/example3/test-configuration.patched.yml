@@ -1,5 +1,0 @@
----
-kstest_boot_iso_url: "https://download.fedoraproject.org/pub/fedora/linux/releases/29/Everything/x86_64/os/images/boot.iso"
-kstest_updates_img: "http://rvykydal.fedorapeople.org/updates.networking-patch.img"
-kstest_url: "--url=https://download.fedoraproject.org/pub/fedora/linux/releases/29/Everything/x86_64/os"
-kstest_test_type: "network"

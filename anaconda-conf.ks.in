@@ -21,8 +21,14 @@ fi
 
 %post --nochroot
 
+if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
+    LOG_MSG="Writing a temporary configuration loaded from"
+else
+    LOG_MSG="Configuration loaded from:"
+fi
+
 cat /tmp/anaconda.log \
-| grep "Configuration loaded from:" \
+| grep "${LOG_MSG}" \
 | grep "/etc/anaconda/conf.d/99-testing.conf"
 
 if [[ $? != 0 ]]; then

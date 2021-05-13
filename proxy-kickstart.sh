@@ -84,11 +84,7 @@ validate() {
 }
 
 cleanup() {
-    tmpdir=$1
-
-    if [ -f ${tmpdir}/httpd-pid ]; then
-        kill $(cat ${tmpdir}/httpd-pid)
-    fi
-
-    stop_proxy ${tmpdir}/proxy
+    local tmp_dir="${1}"
+    stop_httpd "${tmp_dir}"
+    stop_proxy "${tmp_dir}/proxy"
 }

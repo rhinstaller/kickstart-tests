@@ -66,7 +66,7 @@ def main(user, password, debug_fd=None):
     """ Main program loop. """
     try:
         while True:
-            r_in = raw_input()
+            r_in = input()
             write_debug("Test credentials: %s -- " % r_in.rstrip(), debug_fd=debug_fd)
             (in_user, in_password) = r_in.strip().split(' ')
             if in_user == user and in_password == password:

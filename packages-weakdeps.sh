@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): David Shea <dshea@redhat.com>
 
-TESTTYPE="packaging"
+TESTTYPE="packaging rhbz1960279"
 
 . ${KSTESTDIR}/functions.sh

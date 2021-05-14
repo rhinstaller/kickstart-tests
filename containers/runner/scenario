@@ -29,7 +29,7 @@ case "$SCENARIO" in
             mkdir -p data/images
             curl -L http://download.eng.bos.redhat.com/rhel-9/development/RHEL-9-Beta/latest-RHEL-9/compose/BaseOS/x86_64/os/images/boot.iso --output data/images/boot.iso
         fi
-        $LAUNCH --skip-testtypes fedora-only,knownfailure,rhbz1958142,rhbz1958173 --platform rhel9 --defaults "$ROOTDIR/scripts/defaults-rhel9.sh" all
+        $LAUNCH --skip-testtypes fedora-only,knownfailure,rhbz1958142,rhbz1958173,rhbz1960279 --platform rhel9 --defaults "$ROOTDIR/scripts/defaults-rhel9.sh" all
         ;;
 
     # just run a single test on standard Rawhide; mostly for testing infrastructure

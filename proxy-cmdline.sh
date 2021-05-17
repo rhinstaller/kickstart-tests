@@ -24,7 +24,8 @@ TESTTYPE="method proxy"
 . ${KSTESTDIR}/functions-proxy.sh
 
 kernel_args() {
-    echo ${DEFAULT_BOOTOPTS} inst.proxy=${proxy_url%%/*}
+    proxy_url="$(cat ${tmpdir}/proxy_url)"
+    echo ${DEFAULT_BOOTOPTS} inst.proxy=${proxy_url}
 }
 
 prepare() {

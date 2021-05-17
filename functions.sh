@@ -236,6 +236,9 @@ start_proxy() {
 
     # Construct a URL
     proxy_url="http://${USER_NET_HOST_IP}:${proxy_port}/"
+
+    # Save the URL
+    echo "${proxy_url}" > ${tmpdir}/proxy_url
 }
 
 stop_proxy() {

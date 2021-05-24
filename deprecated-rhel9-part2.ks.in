@@ -1,0 +1,35 @@
+#version=DEVEL
+#test name: deprecated-timezone-ntpservers
+%ksappend repos/default.ks
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+clearpart --all --initlabel
+autopart
+
+keyboard us
+lang en_US.UTF-8
+timezone --ntpservers ntp.example.com Europe/Prague
+rootpw testcase
+shutdown
+
+%packages
+%end
+
+%post --nochroot
+if ! $(grep -q "KickstartParseWarning: The option --ntpservers will be deprecated in future releases." /tmp/anaconda.log); then
+    echo 'Deprecation warning is missing for timezone --ntpservers' > /mnt/sysroot/root/RESULT
+fi
+%end
+
+%post
+if ! $(ls -l /etc/localtime | grep -q "Europe/Prague"); then
+    echo 'Command timezone ignored not deprecated options' > /root/RESULT
+fi
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+    echo SUCCESS > /root/RESULT
+fi
+%end

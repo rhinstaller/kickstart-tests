@@ -23,7 +23,7 @@ TESTTYPE=${TESTTYPE:-"network"}
 
 kernel_args() {
     . ${tmpdir}/ks_url
-    echo ${DEFAULT_BOOTOPTS} ip=${KSTEST_NETDEV1}:dhcp ip=bond0:dhcp bond=bond0:${KSTEST_NETDEV2},${KSTEST_NETDEV3}:mode=active-backup,primary=${KSTEST_NETDEV2} inst.ks=${ks_url}
+    echo ${DEFAULT_BOOTOPTS} ip=${KSTEST_NETDEV1}:dhcp bond=bond0:${KSTEST_NETDEV2},${KSTEST_NETDEV3}:mode=active-backup,primary=${KSTEST_NETDEV2} ip=bond0:dhcp inst.ks=${ks_url}
 }
 
 # Arguments for virt-install --network options

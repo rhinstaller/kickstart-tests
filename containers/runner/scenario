@@ -12,7 +12,7 @@ shift
 case "$SCENARIO" in
     rawhide) $LAUNCH --skip-testtypes rhel-only,knownfailure "$@" all ;;
     rawhide-text) $LAUNCH --skip-testtypes rhel-only,knownfailure --run-args '-eKSTEST_EXTRA_BOOTOPTS=inst.text' "$@" all ;;
-    daily-iso) $LAUNCH --skip-testtypes rhel-only,knownfailure --daily-iso="$GITHUB_TOKEN" "$@" all ;;
+    daily-iso) $LAUNCH --skip-testtypes rhel-only,knownfailure,rhbz1964819 --daily-iso="$GITHUB_TOKEN" "$@" all ;;
 
     rhel8)
         if [ ! -e data/images/boot.iso ]; then

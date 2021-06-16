@@ -2,17 +2,30 @@
 # Run a set of tests (positional command line arguments) in the runner container in podman or docker.
 # Tests are taken from the current kickstart-tests checkout
 # If data/images/boot.iso exists, that is tested, otherwise it downloads the current Fedora Rawhide version.
-# This runs `nproc` parallel tests by default; this can be changed by setting $TEST_JOBS.
+# Runs --recommended-jobs number of parallel tests by default, which can be changed by setting $TEST_JOBS.
 
 set -eu
 
 BASEDIR=$(dirname $(dirname $(dirname $(realpath $0))))
-TEST_JOBS=${TEST_JOBS:-$(nproc)}
 CRUN=${CRUN:-$(which podman docker 2>/dev/null | head -n1)}
 CONTAINER=quay.io/rhinstaller/kstest-runner
 # Podman in rootless mode does not have access to /dev/kvm socket https://bugzilla.redhat.com/show_bug.cgi?id=1901462
 # disable selinux container separation when podman is executed as user
 PODMAN_SELINUX_FIX=
+
+# Get number of jobs to be run in parallel based on number of CPUs and amount of RAM
+recommended_jobs() {
+    local ram_for_test=2.5
+    mem_limit=$(awk -F":" -v ram_for_test=${ram_for_test} '$1~/MemTotal/{print int($2 / 1024^2 / ram_for_test) }' /proc/meminfo )
+    cpu_limit=$(nproc)
+    if [ $mem_limit -lt $cpu_limit ]; then
+        echo ${mem_limit}
+    else
+        echo ${cpu_limit}
+    fi
+}
+
+TEST_JOBS=${TEST_JOBS:-$(recommended_jobs)}
 
 if ! test -w /dev/kvm; then
     echo "FATAL: /dev/kvm not accessible" >&2
@@ -41,12 +54,15 @@ Options:
                                        rhinstaller/kickstart-tests workflow artifacts.)
  --defaults DEFAULTS_SH_FILE          Path to file with overrides to scripts/defaults.sh
  --run-args ARGUMENTS                 Extra $CRUN options/arguments (space separated)
+ --recommended-jobs                   Print the number of jobs (--jobs option) used
+                                      by default and exit. It is calulated from the number
+                                      of CPUs and the size of RAM.
  -h, --help                           Show this help
 EOF
 }
 
 # parse options
-eval set -- "$(getopt -o j:p:t:s:u:rh --long jobs:,platform:,testtype:,skip-testtypes:,updates:,retry,daily-iso:,defaults:,run-args:,help -- "$@")"
+eval set -- "$(getopt -o j:p:t:s:u:rh --long jobs:,platform:,testtype:,skip-testtypes:,updates:,retry,daily-iso:,defaults:,run-args:,recommended-jobs,help -- "$@")"
 
 while true; do
     case "${1:-}" in
@@ -59,6 +75,7 @@ while true; do
         --daily-iso) shift; DAILY_ISO_TOKEN="$1" ;;
         --defaults) shift; DEFAULTS_SH="$1" ;;
         --run-args) shift; CONTAINER_RUN_ARGS="$1" ;;
+        --recommended-jobs) recommended_jobs; exit 0 ;;
         -h|--help) usage; exit 0 ;;
         --) shift; break ;;
     esac

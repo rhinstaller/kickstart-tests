@@ -382,3 +382,7 @@ append_additional_repo_to_kernel_args() {
         echo $bootopts
     fi
 }
+
+get_timeout() {
+    echo "60"
+}

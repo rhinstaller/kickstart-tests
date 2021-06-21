@@ -120,6 +120,10 @@ case $1 in
         msg="$(additional_runner_args)"
         ret=$?
         ;;
+    get_timeout)
+        msg="$(get_timeout)"
+        ret=$?
+        ;;
     validate)
         msg="$(validate ${tmpdir})"
         ret=$?

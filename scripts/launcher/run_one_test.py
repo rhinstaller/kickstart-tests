@@ -135,6 +135,9 @@ class Runner(object):
 
         kernel_args = self._shell.kernel_args()
 
+        timeout_string = self._shell.get_timeout()
+        timeout = int(timeout_string)
+
         if self._conf.updates_img_path:
             kernel_args += " inst.updates={}".format(self._conf.updates_img_path)
 
@@ -160,7 +163,7 @@ class Runner(object):
         v_conf.log_path = log_path
         v_conf.vnc = "vnc,listen=0.0.0.0"
         v_conf.boot_image = boot_args
-        v_conf.timeout = 60
+        v_conf.timeout = timeout
         v_conf.disk_paths = disk_args
         v_conf.networks = nics_args
         v_conf.runner_args = self._shell.additional_runner_args()

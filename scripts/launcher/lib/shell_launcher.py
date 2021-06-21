@@ -175,6 +175,18 @@ class ShellLauncher(ProcessLauncher):
         out.check_ret_code_with_exception()
         return out.stdout_as_array
 
+    def get_timeout(self):
+        """Per test timeout override.
+
+        The value returned by the get_timeout() function should be
+        a string representing an integer value that sets how long
+        should we wait for a test to finish in minutes.
+        """
+        out = self._run_shell_func("get_timeout")
+
+        out.check_ret_code_with_exception()
+        return out.stdout
+
     def validate(self):
         return self._run_shell_func("validate")
 

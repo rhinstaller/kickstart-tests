@@ -15,7 +15,7 @@
 #
 # Author: Will Woods <wwoods@redhat.com>
 
-TESTTYPE="driverdisk"
+TESTTYPE="driverdisk rhbz1973156"
 
 . ${KSTESTDIR}/functions.sh
 

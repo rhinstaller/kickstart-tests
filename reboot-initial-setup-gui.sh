@@ -15,12 +15,14 @@
 # License and may only be used or replicated with the express permission of
 # Red Hat, Inc.
 #
-TESTTYPE="reboot initial-setup gh527"
+TESTTYPE="reboot initial-setup"
 
 . ${KSTESTDIR}/functions.sh
 
 additional_runner_args() {
-    echo "--wait"
+    # Wait for reboot and shutdown of the VM,
+    # but exit after the specified timeout.
+    echo "--wait $(get_timeout)"
 }
 
 kernel_args() {

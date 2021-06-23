@@ -21,3 +21,8 @@
 TESTTYPE="packaging fedora-only"
 
 . ${KSTESTDIR}/functions.sh
+
+# The test installs ~1366 packages for which 1h timeout is sometimes not enough
+get_timeout() {
+    echo "90"
+}

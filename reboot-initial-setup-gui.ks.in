@@ -43,6 +43,12 @@ cat > /usr/libexec/kickstart-test.sh << EOF
 journalctl -g "Starting Initial Setup GUI" >/dev/null \
 || echo "Failed to start Initial Setup GUI."
 
+journalctl -g "No supported window manager found!" >/dev/null \
+&& echo "Failed to start Initial Setup GUI. No supported window manager found."
+
+journalctl -g "Initial Setup finished successfully" >/dev/null \
+|| echo "Initial Setup has failed."
+
 journalctl -u initial-setup -g "Traceback" --quiet
 EOF
 

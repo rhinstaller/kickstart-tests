@@ -30,6 +30,9 @@ class VirtualLogRequestHandler(LogRequestHandler):
         # Based on the bug #1886809, it is a non critical error.
         "CRIT mdadm:DegradedArray event detected",
 
+        # Team networking is deprecated
+        "CRIT kernel:Warning: team - this hardware",
+
         # Ignore a call trace during debugging.
         # "Call Trace:"
     ]

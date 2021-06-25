@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Martin Kolman <mkolman@redhat.com>
 
-TESTTYPE="users coverage rhbz1975786"
+TESTTYPE="users coverage"
 
 . ${KSTESTDIR}/functions.sh

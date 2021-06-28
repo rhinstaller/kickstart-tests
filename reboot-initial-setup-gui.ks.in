@@ -20,6 +20,9 @@ graphical
 # Install the initial setup.
 initial-setup-gui
 
+# See https://github.com/rhinstaller/initial-setup/issues/131.
+gnome-kiosk
+
 # Install something that provides service(graphical-login).
 gdm
 

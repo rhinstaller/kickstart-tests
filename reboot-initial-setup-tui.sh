@@ -17,12 +17,14 @@
 #
 
 # FIXME: Enable the test for RHEL.
-TESTTYPE="reboot initial-setup fedora-only gh527"
+TESTTYPE="reboot initial-setup fedora-only"
 
 . ${KSTESTDIR}/functions.sh
 
 additional_runner_args() {
-    echo "--wait"
+    # Wait for reboot and shutdown of the VM,
+    # but exit after the specified timeout.
+    echo "--wait $(get_timeout)"
 }
 
 kernel_args() {

@@ -15,7 +15,8 @@ firstboot --enable
 # Run in the graphical mode.
 graphical
 
-%packages
+# --ignoremissing: gnome-kiosk is not used on rhel 8
+%packages --ignoremissing
 
 # Install the initial setup.
 initial-setup-gui

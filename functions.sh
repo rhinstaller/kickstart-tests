@@ -102,8 +102,15 @@ copy_file() {
 }
 
 copy_interesting_files_from_system() {
-    args="$1"
-    disksdir="$2"
+    local disksdir="$1"
+
+    # Find disks.
+    local args=$(for d in ${disksdir}/disk-*img; do echo -a ${d}; done)
+
+    # Use also iscsi disk if there is any.
+    if [[ -n ${iscsi_disk_img} ]]; then
+        args="${args} -a ${disksdir}/${iscsi_disk_img}"
+    fi
 
     # Grab files out of the installed system while it still exists.
     # Grab these files:
@@ -124,20 +131,21 @@ copy_interesting_files_from_system() {
 }
 
 validate_RESULT() {
-    disksdir=$1
-    args=$(for d in ${disksdir}/disk-*img; do echo -a ${d}; done)
+    local tmp_dir="${1}"
+    copy_interesting_files_from_system "${tmp_dir}"
+    check_result_file "${tmp_dir}"
+    return $?
+}
 
-    # Use also iscsi disk if there is any
-    if [[ -n ${iscsi_disk_img} ]]; then
-        args="${args} -a ${disksdir}/${iscsi_disk_img}"
-    fi
-
-    copy_interesting_files_from_system "${args}" "${disksdir}"
+check_result_file() {
+    local tmp_dir="${1}"
+    local status=0
+    local result=""
 
     # The /root/RESULT file was saved from the VM.  Check its contents
     # and decide whether the test finally succeeded or not.
-    status=0
-    result=$(cat ${disksdir}/RESULT)
+    result=$(cat "${tmp_dir}/RESULT")
+
     if [[ $? != 0 ]]; then
         status=1
         echo '*** /root/RESULT does not exist in VM image.'

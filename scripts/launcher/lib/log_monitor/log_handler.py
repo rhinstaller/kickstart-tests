@@ -54,6 +54,7 @@ class VirtualLogRequestHandler(LogRequestHandler):
         "The following problem occurred on line",  # kickstart parsing error
         "storage configuration failed:",
         "Not enough space in file systems for the current software selection.",
+        "anabot.service: Failed with result 'exit-code'.",
     ]
 
     def iserror(self, line):

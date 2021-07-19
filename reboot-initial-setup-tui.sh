@@ -17,7 +17,7 @@
 #
 
 # FIXME: Enable the test for RHEL.
-TESTTYPE="reboot initial-setup fedora-only"
+TESTTYPE="reboot initial-setup fedora-only smoke"
 
 . ${KSTESTDIR}/functions.sh
 

@@ -14,13 +14,13 @@
 # visible to Anaconda. Fix this when this behavior is fixed in the payload.
 
 zerombr
-clearpart --all --initlabel --drives=/dev/sda
+clearpart --all --initlabel --drives=/dev/vda
 
-part / --fstype=ext4 --grow --size=4400 --ondisk=/dev/sda
-part /boot --fstype=ext4 --size=500 --ondisk=/dev/sda
-part swap --fstype=swap --size=500 --ondisk=/dev/sda
+part / --fstype=ext4 --grow --size=4400 --ondisk=/dev/vda
+part /boot --fstype=ext4 --size=500 --ondisk=/dev/vda
+part swap --fstype=swap --size=500 --ondisk=/dev/vda
 
-harddrive --partition=/dev/sdb --dir=/repo/
+harddrive --partition=/dev/vdb --dir=/repo/
 
 %ksappend payload/default_packages.ks
 
@@ -28,7 +28,7 @@ harddrive --partition=/dev/sdb --dir=/repo/
 # This will add ISO_LOCATION with link to an ISO
 %ksappend section-data/server-dvd-link.ks
 
-DISK="/dev/sdb"
+DISK="/dev/vdb"
 
 wipefs -a $DISK
 mkfs.ext4 -F $DISK

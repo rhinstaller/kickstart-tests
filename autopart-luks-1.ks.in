@@ -22,9 +22,9 @@ shutdown
 %post
 
 # Set the crypted device.
-crypted="/dev/sda2"
+crypted="/dev/vda2"
 
-# Check if the type of /dev/sda2 is crypto_LUKS.
+# Check if the type of /dev/vda2 is crypto_LUKS.
 type="$(blkid -o value -s TYPE ${crypted})"
 
 if [[ "$type" != "crypto_LUKS" ]] ; then
@@ -32,7 +32,7 @@ if [[ "$type" != "crypto_LUKS" ]] ; then
     exit 1
 fi
 
-# Check if the LUKS version of /dev/sda2 is luks1.
+# Check if the LUKS version of /dev/vda2 is luks1.
 result="$(cryptsetup luksDump ${crypted} | awk '{ if ($1 == "Version:") print $2; }' )"
 
 if [[ "$result" != "1" ]] ; then

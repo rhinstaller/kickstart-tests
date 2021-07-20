@@ -11,8 +11,8 @@ clearpart --all --initlabel
 
 part /boot --fstype="ext4" --size=1024
 part swap --fstype="swap" --size=2048
-part raid.1 --fstype="mdmember" --ondisk=sda --size=7167
-part raid.2 --fstype="mdmember" --ondisk=sdb --size=7167
+part raid.1 --fstype="mdmember" --ondisk=vda --size=7167
+part raid.2 --fstype="mdmember" --ondisk=vdb --size=7167
 
 raid / --device=root --fstype="ext4" --level=RAID1 --encrypted --passphrase="passphrase" --luks-version=luks2 raid.1 raid.2
 

@@ -1,7 +1,7 @@
 %ksappend repos/default.ks
 network --bootproto=dhcp
 
-bootloader --timeout=1 --driveorder=sdx,sdb,sda
+bootloader --timeout=1 --driveorder=sdx,vdb,vda
 
 autopart --type lvm
 clearpart --all --initlabel
@@ -19,8 +19,8 @@ shutdown
 
 %pre-install
 # Get the MBR after the partitioning.
-dd if=/dev/sda bs=512 count=1 of=/tmp/pre_install_mbr_sda.bin
-dd if=/dev/sdb bs=512 count=1 of=/tmp/pre_install_mbr_sdb.bin
+dd if=/dev/vda bs=512 count=1 of=/tmp/pre_install_mbr_vda.bin
+dd if=/dev/vdb bs=512 count=1 of=/tmp/pre_install_mbr_vdb.bin
 %end
 
 
@@ -28,18 +28,18 @@ dd if=/dev/sdb bs=512 count=1 of=/tmp/pre_install_mbr_sdb.bin
 SYSROOT=${ANA_INSTALL_PATH:-/mnt/sysimage}
 
 # Get the current MBR.
-dd if=/dev/sda bs=512 count=1 of=/tmp/current_mbr_sda.bin
-dd if=/dev/sdb bs=512 count=1 of=/tmp/current_mbr_sdb.bin
+dd if=/dev/vda bs=512 count=1 of=/tmp/current_mbr_vda.bin
+dd if=/dev/vdb bs=512 count=1 of=/tmp/current_mbr_vdb.bin
 
 # Check the MBR. The boot drive is defined by the first usable drive from --driveorder.
-cmp /tmp/pre_install_mbr_sda.bin /tmp/current_mbr_sda.bin
+cmp /tmp/pre_install_mbr_vda.bin /tmp/current_mbr_vda.bin
 if [[ $? -ne 0 ]]; then
-    echo '*** Failed check: MBR should be the same on sda' >> ${ANA_INSTALL_PATH}/root/RESULT
+    echo '*** Failed check: MBR should be the same on vda' >> ${ANA_INSTALL_PATH}/root/RESULT
 fi
 
-cmp /tmp/pre_install_mbr_sdb.bin /tmp/current_mbr_sdb.bin
+cmp /tmp/pre_install_mbr_vdb.bin /tmp/current_mbr_vdb.bin
 if [[ $? -ne 1 ]]; then
-    echo '*** Failed check: MBR should be changed on sdb' >> ${ANA_INSTALL_PATH}/root/RESULT
+    echo '*** Failed check: MBR should be changed on vdb' >> ${ANA_INSTALL_PATH}/root/RESULT
 fi
 
 # The test was successful.

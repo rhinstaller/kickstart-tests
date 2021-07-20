@@ -24,14 +24,14 @@ shutdown
 # Create vg which will be origin of the snapshot and used for the installation
 echo "Clean partition"
 vgremove -f testvg
-wipefs --all /dev/sda
+wipefs --all /dev/vda
 
 echo "Create partition"
-parted -s /dev/sda mklabel msdos
-parted -s /dev/sda mkpart primary 1M 80%
+parted -s /dev/vda mklabel msdos
+parted -s /dev/vda mkpart primary 1M 80%
 
 echo "Create pv & vg"
-vgcreate testvg /dev/sda1
+vgcreate testvg /dev/vda1
 
 echo "Create thin lvm"
 lvcreate -n ThinPool -l 70%FREE testvg

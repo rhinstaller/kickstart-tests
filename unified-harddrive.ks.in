@@ -10,15 +10,15 @@
 
 %ksappend common/common_no_payload.ks
 
-harddrive --partition=/dev/sdb1 --dir=/
+harddrive --partition=/dev/vdb1 --dir=/
 
 %ksappend payload/unified_packages.ks
 
 %pre
 # Add ISO_LOCATION with an url to the unified-iso
 %ksappend section-data/unified-iso.ks
-DISK="/dev/sdb"
-PARTITION="/dev/sdb1"
+DISK="/dev/vdb"
+PARTITION="/dev/vdb1"
 
 # Prepare partition on the new disk
 parted $DISK mklabel msdos

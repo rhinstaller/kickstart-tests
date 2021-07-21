@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="knownfailure packaging"
+TESTTYPE="packaging rhel-8-failure"
 
 . ${KSTESTDIR}/functions.sh

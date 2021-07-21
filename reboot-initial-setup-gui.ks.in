@@ -40,6 +40,13 @@ gdm
 # Remove EULA if any.
 rm /usr/share/redhat-release/EULA
 
+# Disable EULA for the initial setup.
+# FIXME: This is a temporary workaround for RHEL 9.
+cat > /etc/initial-setup/conf.d/90-no-eula.conf << EOF
+[License]
+eula =
+EOF
+
 # Create a script with the first boot test.
 # Print errors to stdout.
 cat > /usr/libexec/kickstart-test.sh << EOF

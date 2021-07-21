@@ -28,11 +28,6 @@ org.fedoraproject.Anaconda.Modules.Timezone
 org.fedoraproject.Anaconda.Modules.Users
 EOF
 
-# Drop the Subscription module if this is not RHEL.
-if [[ "@KSTEST_OS_NAME@" != "rhel" ]]; then
-    sed -i '/Subscription/d' /tmp/expected.out
-fi
-
 # Check the output
 diff /tmp/expected.out /tmp/generated.out
 

@@ -15,9 +15,8 @@
 # License and may only be used or replicated with the express permission of
 # Red Hat, Inc.
 #
-
-# FIXME: Enable the test for RHEL.
-TESTTYPE="reboot initial-setup fedora-only smoke"
+# The fix requires https://github.com/rhinstaller/anaconda/commit/6b80b7b.
+TESTTYPE="reboot initial-setup smoke rhel-8-failure"
 
 . ${KSTESTDIR}/functions.sh
 

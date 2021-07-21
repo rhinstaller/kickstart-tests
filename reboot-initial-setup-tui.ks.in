@@ -31,10 +31,10 @@ rm /usr/share/redhat-release/EULA
 # Print errors to stdout.
 cat > /usr/libexec/kickstart-test.sh << EOF
 
-journalctl -g "Starting Initial Setup TUI" >/dev/null \
+journalctl | grep -q "Starting Initial Setup TUI" \
 || echo "Failed to start Initial Setup TUI."
 
-journalctl -g "Initial Setup finished successfully" >/dev/null \
+journalctl | grep -q "Initial Setup finished successfully" \
 || echo "Initial Setup has failed."
 
 journalctl -u initial-setup -g "Traceback" --quiet

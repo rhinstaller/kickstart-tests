@@ -44,13 +44,13 @@ rm /usr/share/redhat-release/EULA
 # Print errors to stdout.
 cat > /usr/libexec/kickstart-test.sh << EOF
 
-journalctl -g "Starting Initial Setup GUI" >/dev/null \
+journalctl | grep -q "Starting Initial Setup GUI" \
 || echo "Failed to start Initial Setup GUI."
 
-journalctl -g "No supported window manager found!" >/dev/null \
+journalctl | grep -q "No supported window manager found!" \
 && echo "Failed to start Initial Setup GUI. No supported window manager found."
 
-journalctl -g "Initial Setup finished successfully" >/dev/null \
+journalctl | grep -q "Initial Setup finished successfully" \
 || echo "Initial Setup has failed."
 
 journalctl -u initial-setup -g "Traceback" --quiet

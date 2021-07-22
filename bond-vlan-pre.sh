@@ -18,6 +18,6 @@
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
 # Upstream support was added in https://bugzilla.redhat.com/show_bug.cgi?id=1879480
-TESTTYPE="network fedora-only"
+TESTTYPE="network skip-on-rhel"
 
 . ${KSTESTDIR}/bond-vlan-httpks.sh

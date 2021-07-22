@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="btrfs storage fedora-only"
+TESTTYPE="btrfs storage skip-on-rhel"
 
 . ${KSTESTDIR}/functions.sh
 

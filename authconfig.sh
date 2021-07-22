@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
-TESTTYPE="security rhel-only"
+TESTTYPE="security skip-on-fedora"
 
 . ${KSTESTDIR}/functions.sh

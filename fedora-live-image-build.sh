@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Martin Kolman <mkolman@redhat.com>
 
-TESTTYPE="packaging fedora-only"
+TESTTYPE="packaging skip-on-rhel"
 
 . ${KSTESTDIR}/functions.sh
 

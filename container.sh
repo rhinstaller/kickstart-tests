@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="bootloader packaging coverage fedora-only"
+TESTTYPE="bootloader packaging coverage skip-on-rhel"
 
 . ${KSTESTDIR}/functions.sh

@@ -6,19 +6,19 @@ network --bootproto=dhcp
 bootloader --timeout=1
 zerombr
 clearpart --all --initlabel
-part /boot --fstype=ext4 --size=500 --ondisk=sda
-part / --size=4000 --fstype=ext4 --fsoptions=loud,noatime --ondisk=sda --label=rootfs
+part /boot --fstype=ext4 --size=500 --ondisk=vda
+part / --size=4000 --fstype=ext4 --fsoptions=loud,noatime --ondisk=vda --label=rootfs
 
 # Create three encrypted swap partitions. First, a regular partition
-part swap --fstype=swap --size=500 --encrypted --passphrase=TestCase --ondisk=sda --label=part_swap
+part swap --fstype=swap --size=500 --encrypted --passphrase=TestCase --ondisk=vda --label=part_swap
 
 # LVM
-part pv.1 --fstype=lvmpv --size=500 --ondisk=sda
+part pv.1 --fstype=lvmpv --size=500 --ondisk=vda
 volgroup fedora pv.1
 logvol swap --name=swap --vgname=fedora --size=400 --grow --fstype=swap --encrypted --passphrase=TestCase
 
 # RAID
-part raid.01 --size=500 --ondisk=sdb
+part raid.01 --size=500 --ondisk=vdb
 part raid.02 --size=500 --ondisk=sdc
 raid swap --level=1 --device=0 --fstype=swap --encrypted --label=md_swap --passphrase=TestCase raid.01 raid.02
 

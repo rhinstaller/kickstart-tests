@@ -18,8 +18,8 @@ shutdown
 %end
 
 %post
-# Check if the type of /dev/sda2 is crypto_LUKS.
-crypted="/dev/sda2"
+# Check if the type of /dev/vda2 is crypto_LUKS.
+crypted="/dev/vda2"
 type="$(blkid -o value -s TYPE ${crypted})"
 
 if [[ "$type" != "crypto_LUKS" ]] ; then
@@ -28,7 +28,7 @@ if [[ "$type" != "crypto_LUKS" ]] ; then
 fi
 
 # Try to use the passphrase.
-crypted="/dev/sda2"
+crypted="/dev/vda2"
 echo "passphrase" | cryptsetup luksOpen --test-passphrase "${crypted}"
 
 if [[ $? != 0 ]] ; then

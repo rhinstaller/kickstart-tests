@@ -7,8 +7,8 @@ bootloader --timeout=1
 zerombr
 clearpart --all --initlabel
 part /boot --fstype=ext4 --size=500
-part raid.01 --size=7500 --ondisk=sda
-part raid.02 --size=7500 --ondisk=sdb
+part raid.01 --size=7500 --ondisk=vda
+part raid.02 --size=7500 --ondisk=vdb
 part raid.03 --size=7500 --ondisk=sdc
 raid pv.01 --level=RAID5 --device=pv.01 raid.01 raid.02 raid.03
 volgroup fedora pv.01

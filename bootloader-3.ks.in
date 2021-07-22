@@ -1,7 +1,7 @@
 %ksappend repos/default.ks
 network --bootproto=dhcp
 
-bootloader --timeout=1 --boot-drive=sda --nombr
+bootloader --timeout=1 --boot-drive=vda --nombr
 
 autopart
 clearpart --all
@@ -19,7 +19,7 @@ shutdown
 
 %pre-install
 # Get the MBR after the partitioning.
-dd if=/dev/sda bs=512 count=1 of=/tmp/pre_install_mbr_content.bin
+dd if=/dev/vda bs=512 count=1 of=/tmp/pre_install_mbr_content.bin
 %end
 
 
@@ -27,7 +27,7 @@ dd if=/dev/sda bs=512 count=1 of=/tmp/pre_install_mbr_content.bin
 SYSROOT=${ANA_INSTALL_PATH:-/mnt/sysimage}
 
 # Get the current MBR.
-dd if=/dev/sda bs=512 count=1 of=/tmp/current_mbr_content.bin
+dd if=/dev/vda bs=512 count=1 of=/tmp/current_mbr_content.bin
 
 # Check the MBR.
 cmp /tmp/pre_install_mbr_content.bin /tmp/current_mbr_content.bin

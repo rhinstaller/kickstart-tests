@@ -5,8 +5,8 @@ network --bootproto=dhcp
 bootloader --timeout=1
 zerombr
 clearpart --all --initlabel
-part pv.68 --asprimary --fstype="lvmpv" --ondisk=sda --size=7691
-part /boot --asprimary --fstype="ext4" --ondisk=sda --size=500
+part pv.68 --asprimary --fstype="lvmpv" --ondisk=vda --size=7691
+part /boot --asprimary --fstype="ext4" --ondisk=vda --size=500
 volgroup vg01 --pesize=4096 pv.68
 logvol /  --fstype="ext4" --size=5000 --encrypted --name=root_lv --vgname=vg01 --passphrase=OntarioIsAProvince --label=root
 logvol /var  --fstype="ext4" --size=1000 --name=var_lv --vgname=vg01

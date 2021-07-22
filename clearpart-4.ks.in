@@ -3,7 +3,7 @@
 %ksappend repos/default.ks
 network --bootproto=dhcp
 
-bootloader --timeout=1 --boot-drive=sda
+bootloader --timeout=1 --boot-drive=vda
 clearpart --linux --initlabel
 autopart --type lvm
 
@@ -19,60 +19,60 @@ shutdown
 %pre
 # Doing all this here is a lot easier than trying to make virt tools do
 # what I want on the outside.  Also this'll run before storage.
-parted /dev/sda mklabel msdos
-parted --align=none /dev/sda mkpart primary 0 1G
-mkfs.ext4 /dev/sda1
-mkdir /sda
-mount /dev/sda1 /sda
-echo TEST > /sda/sentinel
-umount /sda
-rmdir /sda
+parted /dev/vda mklabel msdos
+parted --align=none /dev/vda mkpart primary 0 1G
+mkfs.ext4 /dev/vda1
+mkdir /vda
+mount /dev/vda1 /vda
+echo TEST > /vda/sentinel
+umount /vda
+rmdir /vda
 %end
 
 %pre
 # Doing all this here is a lot easier than trying to make virt tools do
 # what I want on the outside.  Also this'll run before storage.
-parted /dev/sdb mklabel msdos
-parted --align=none /dev/sdb mkpart primary fat32 0 1G
-mkfs.vfat /dev/sdb1
-mkdir /sdb
-mount /dev/sdb1 /sdb
-echo TEST > /sdb/sentinel
-umount /sdb
-rmdir /sdb
+parted /dev/vdb mklabel msdos
+parted --align=none /dev/vdb mkpart primary fat32 0 1G
+mkfs.vfat /dev/vdb1
+mkdir /vdb
+mount /dev/vdb1 /vdb
+echo TEST > /vdb/sentinel
+umount /vdb
+rmdir /vdb
 %end
 
 %post --nochroot
 SYSROOT=${ANA_INSTALL_PATH:-/mnt/sysimage}
 
-# Check that /dev/sda1 was cleared:
+# Check that /dev/vda1 was cleared:
 
-mkdir /sda
-mount /dev/sda1 /sda
+mkdir /vda
+mount /dev/vda1 /vda
 if [[ $? == 0 ]]; then
-    if [[ -f /sda/sentinel ]]; then
-        if [[ "$(cat /sda/sentinel)" == "TEST" ]]; then
-            echo "*** /sda/sentinel exists" >> ${SYSROOT}/root/RESULT
+    if [[ -f /vda/sentinel ]]; then
+        if [[ "$(cat /vda/sentinel)" == "TEST" ]]; then
+            echo "*** /vda/sentinel exists" >> ${SYSROOT}/root/RESULT
         fi
     fi
 
-    umount /sda
+    umount /vda
 fi
 
-# Check that /dev/sdb1 wasn't cleared:
+# Check that /dev/vdb1 wasn't cleared:
 
-mkdir /sdb
-mount /dev/sdb1 /sdb
+mkdir /vdb
+mount /dev/vdb1 /vdb
 if [[ $? != 0 ]]; then
-    echo "*** could not mount /dev/sdb1" >> ${SYSROOT}/root/RESULT
+    echo "*** could not mount /dev/vdb1" >> ${SYSROOT}/root/RESULT
 else
-    if [[ ! -f /sdb/sentinel ]]; then
-        echo "*** /sdb/sentinel no longer exists" >> ${SYSROOT}/root/RESULT
-    elif [[ "$(cat /sdb/sentinel)" != "TEST" ]]; then
-        echo "*** /sdb/sentinel has changed contents" >> ${SYSROOT}/root/RESULT
+    if [[ ! -f /vdb/sentinel ]]; then
+        echo "*** /vdb/sentinel no longer exists" >> ${SYSROOT}/root/RESULT
+    elif [[ "$(cat /vdb/sentinel)" != "TEST" ]]; then
+        echo "*** /vdb/sentinel has changed contents" >> ${SYSROOT}/root/RESULT
     fi
 
-    umount /sdb
+    umount /vdb
 fi
 
 if [ ! -e /root/RESULT ]; then

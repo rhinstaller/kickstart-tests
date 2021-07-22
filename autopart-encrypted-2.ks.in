@@ -18,8 +18,8 @@ shutdown
 %end
 
 %post
-# Check the cipher name of /dev/sda2.
-crypted="/dev/sda2"
+# Check the cipher name of /dev/vda2.
+crypted="/dev/vda2"
 
 cipher="$(cryptsetup luksDump ${crypted} | awk '{ if ($1 == "Cipher:") print $2; }' )"
 

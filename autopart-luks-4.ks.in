@@ -22,16 +22,16 @@ shutdown
 %post
 
 # Set the crypted device.
-crypted="/dev/sda2"
+crypted="/dev/vda2"
 
-# Check the PBKDF of /dev/sda2.
+# Check the PBKDF of /dev/vda2.
 result="$(cryptsetup luksDump ${crypted} | awk '{ if ($1 == "PBKDF:") print $2; }' )"
 
 if [[ "$result" != "argon2i" ]] ; then
     echo "*** unexpected PBKDF for ${crypted}: ${result}" >> /root/RESULT
 fi
 
-# Check the memory of /dev/sda2.
+# Check the memory of /dev/vda2.
 result="$(cryptsetup luksDump ${crypted} | awk '{ if ($1 == "Memory:") print $2; }' )"
 
 if [[ "$result" != "64" ]] ; then

@@ -5,10 +5,10 @@
 network --bootproto=dhcp
 bootloader --timeout=1
 
-mount /dev/sda1 /boot
-mount /dev/sda2 / --reformat=ext4 --mkfsoptions="-L root-test-label"
-mount /dev/sda3 /home --mountoptions="nofail"
-mount /dev/sda4 none
+mount /dev/vda1 /boot
+mount /dev/vda2 / --reformat=ext4 --mkfsoptions="-L root-test-label"
+mount /dev/vda3 /home --mountoptions="nofail"
+mount /dev/vda4 none
 
 keyboard us
 lang en_US.UTF-8
@@ -22,24 +22,24 @@ shutdown
 %pre
 
 # Do the partitioning here.
-parted /dev/sda mklabel msdos
+parted /dev/vda mklabel msdos
 sleep 1
 
-parted --align=none /dev/sda mkpart primary 512K 1.5G
+parted --align=none /dev/vda mkpart primary 512K 1.5G
 sleep 1
-mkfs.ext2 /dev/sda1
+mkfs.ext2 /dev/vda1
 
-parted --align=none /dev/sda mkpart primary 1.5G 8G
+parted --align=none /dev/vda mkpart primary 1.5G 8G
 sleep 1
-mkfs.ext2 /dev/sda2
+mkfs.ext2 /dev/vda2
 
-parted --align=none /dev/sda mkpart primary 8G 9G
+parted --align=none /dev/vda mkpart primary 8G 9G
 sleep 1
-mkfs.ext4 /dev/sda3
+mkfs.ext4 /dev/vda3
 
-parted --align=none /dev/sda mkpart primary 9G 10G
+parted --align=none /dev/vda mkpart primary 9G 10G
 sleep 1
-mkswap /dev/sda4
+mkswap /dev/vda4
 %end
 
 %post
@@ -73,10 +73,10 @@ check_mount_point() {
 
 }
 
-check_mount_point "/dev/sda1" "/boot"  "ext2" "defaults" ""
-check_mount_point "/dev/sda2" "/"      "ext4" "defaults" "root-test-label"
-check_mount_point "/dev/sda3" "/home"  "ext4" "nofail"   ""
-check_mount_point "/dev/sda4" "[SWAP]" "swap" ""         ""
+check_mount_point "/dev/vda1" "/boot"  "ext2" "defaults" ""
+check_mount_point "/dev/vda2" "/"      "ext4" "defaults" "root-test-label"
+check_mount_point "/dev/vda3" "/home"  "ext4" "nofail"   ""
+check_mount_point "/dev/vda4" "[SWAP]" "swap" ""         ""
 
 if [ ! -e /root/RESULT ]; then
     echo SUCCESS >/root/RESULT

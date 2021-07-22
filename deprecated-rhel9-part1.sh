@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Zdenek Veleba <zveleba@redhat.com>
 
-TESTTYPE="deprecated rhel-only rhel-9-only"
+TESTTYPE="deprecated skip-on-rhel-8 skip-on-fedora"
 
 . ${KSTESTDIR}/functions.sh

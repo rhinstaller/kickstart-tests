@@ -18,7 +18,7 @@
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
 # FIXME: times out on rhel8
-TESTTYPE="packaging fedora-only"
+TESTTYPE="packaging skip-on-rhel"
 
 . ${KSTESTDIR}/functions.sh
 

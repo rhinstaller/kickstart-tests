@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="packaging fedora-only"
+TESTTYPE="packaging skip-on-rhel"
 
 . ${KSTESTDIR}/functions.sh

@@ -18,7 +18,7 @@
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
 # On RHEL, boot option is not enough for unattended installation
-TESTTYPE="keyboard i18n fedora-only"
+TESTTYPE="keyboard i18n skip-on-rhel"
 
 . ${KSTESTDIR}/functions.sh
 

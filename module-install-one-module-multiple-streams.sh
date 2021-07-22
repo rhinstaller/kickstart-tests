@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Martin Kolman <mkolman@redhat.com>
 
-TESTTYPE="knownfailure packaging modularity fedora-only"
+TESTTYPE="knownfailure packaging modularity skip-on-rhel"
 
 . ${KSTESTDIR}/functions.sh

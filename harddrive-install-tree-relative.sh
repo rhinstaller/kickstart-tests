@@ -19,7 +19,7 @@
 
 # FIXME: fails on RHEL 8:
 # SourceSetupError: Nothing useful found for Hard drive ISO source at partition=/dev/sdb directory=/repo/
-TESTTYPE="packaging fedora-only"
+TESTTYPE="packaging skip-on-rhel"
 
 . ${KSTESTDIR}/harddrive-install-tree.sh
 

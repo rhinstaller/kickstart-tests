@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Martin Kolman <mkolman@redhat.com>
 
-TESTTYPE="knownfailure packaging modularity fedora-only"
+TESTTYPE="knownfailure packaging modularity skip-on-rhel"
 # there are currently no modules with a default streams in Fedora
 
 . ${KSTESTDIR}/functions.sh

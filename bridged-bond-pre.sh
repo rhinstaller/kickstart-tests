@@ -18,7 +18,7 @@
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
 # Upstream support was added in https://github.com/rhinstaller/anaconda/pull/2861
-TESTTYPE="network fedora-only"
+TESTTYPE="network skip-on-rhel"
 
 . ${KSTESTDIR}/functions.sh
 

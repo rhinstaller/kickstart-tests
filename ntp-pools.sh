@@ -18,6 +18,6 @@
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
 # Fails in rhel8 with "Unknown command: timesource"
-TESTTYPE="time coverage fedora-only"
+TESTTYPE="time coverage fedora-only rhel-9-only"
 
 . ${KSTESTDIR}/functions.sh

@@ -27,14 +27,21 @@ initial-setup
 # Remove EULA if any.
 rm /usr/share/redhat-release/EULA
 
+# Disable EULA for the initial setup.
+# FIXME: This is a temporary workaround for RHEL 9.
+cat > /etc/initial-setup/conf.d/90-no-eula.conf << EOF
+[License]
+eula =
+EOF
+
 # Create a script with the first boot test.
 # Print errors to stdout.
 cat > /usr/libexec/kickstart-test.sh << EOF
 
-journalctl -g "Starting Initial Setup TUI" >/dev/null \
+journalctl | grep -q "Starting Initial Setup TUI" \
 || echo "Failed to start Initial Setup TUI."
 
-journalctl -g "Initial Setup finished successfully" >/dev/null \
+journalctl | grep -q "Initial Setup finished successfully" \
 || echo "Initial Setup has failed."
 
 journalctl -u initial-setup -g "Traceback" --quiet

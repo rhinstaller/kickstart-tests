@@ -19,7 +19,7 @@ logvol swap --name=swap --vgname=fedora --size=400 --grow --fstype=swap --encryp
 
 # RAID
 part raid.01 --size=500 --ondisk=vdb
-part raid.02 --size=500 --ondisk=sdc
+part raid.02 --size=500 --ondisk=vdc
 raid swap --level=1 --device=0 --fstype=swap --encrypted --label=md_swap --passphrase=TestCase raid.01 raid.02
 
 keyboard us

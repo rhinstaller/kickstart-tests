@@ -24,7 +24,7 @@
 # injected in initrd) network devices are not found in sysfs in the time of
 # parsing the kickstart.
 
-TESTTYPE=${TESTTYPE:-"network rhel-only"}
+TESTTYPE=${TESTTYPE:-"network skip-on-fedora"}
 
 . ${KSTESTDIR}/functions.sh
 

@@ -19,6 +19,6 @@
 
 # FIXME: Fails on RHEL due to nonexisting @domain-client; when dropped, fails validation on
 # "Fedora Server default environment was not installed"
-TESTTYPE="packaging fedora-only"
+TESTTYPE="packaging skip-on-rhel"
 
 . ${KSTESTDIR}/functions.sh

@@ -19,6 +19,6 @@
 
 # FIXME: https://download.devel.redhat.com does not have a recognized certificate
 # once there is a solution, create fragments/platform/rhel8/repos/https.ks
-TESTTYPE="method fedora-only"
+TESTTYPE="method skip-on-rhel"
 
 . ${KSTESTDIR}/functions.sh

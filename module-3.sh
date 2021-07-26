@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Martin Kolman <mkolman@redhat.com>
 
-TESTTYPE="packaging modularity fedora-only"
+TESTTYPE="packaging modularity skip-on-rhel"
 
 . ${KSTESTDIR}/functions.sh

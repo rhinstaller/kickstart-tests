@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Jiri Konecny <jkonecny@redhat.com>
 
-#TESTTYPE="packaging rhel-only"
+#TESTTYPE="packaging skip-on-fedora"
 
 TESTTYPE="knownfailure"
 

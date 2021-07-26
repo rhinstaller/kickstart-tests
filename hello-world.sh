@@ -18,6 +18,6 @@
 # Red Hat Author(s): Vendula Poncova <vponcova@redhat.com>
 
 # FIXME: %pre script uses python3, which does not exist in RHEL8 env; times out there
-TESTTYPE="addon coverage fedora-only"
+TESTTYPE="addon coverage skip-on-rhel"
 
 . ${KSTESTDIR}/functions.sh

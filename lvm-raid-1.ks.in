@@ -9,7 +9,7 @@ clearpart --all --initlabel
 part /boot --fstype=ext4 --size=500
 part raid.01 --size=7500 --ondisk=vda
 part raid.02 --size=7500 --ondisk=vdb
-part raid.03 --size=7500 --ondisk=sdc
+part raid.03 --size=7500 --ondisk=vdc
 raid pv.01 --level=RAID5 --device=pv.01 raid.01 raid.02 raid.03
 volgroup fedora pv.01
 logvol swap --name=swap --vgname=fedora --size=500 --fstype=swap

@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="packaging rhel-8-failure"
+TESTTYPE="packaging skip-on-rhel-8"
 
 . ${KSTESTDIR}/functions.sh

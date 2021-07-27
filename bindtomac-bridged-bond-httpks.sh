@@ -18,7 +18,7 @@
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
 # FIXME: https://github.com/rhinstaller/kickstart-tests/issues/447
-TESTTYPE="network rhel-8-failure"
+TESTTYPE="network skip-on-rhel-8"
 
 . ${KSTESTDIR}/bridged-bond-httpks.sh
 

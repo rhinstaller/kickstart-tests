@@ -16,7 +16,7 @@
 # Red Hat, Inc.
 #
 # The fix requires https://github.com/rhinstaller/anaconda/commit/6b80b7b.
-TESTTYPE="reboot initial-setup smoke rhel-8-failure"
+TESTTYPE="reboot initial-setup smoke skip-on-rhel-8"
 
 . ${KSTESTDIR}/functions.sh
 

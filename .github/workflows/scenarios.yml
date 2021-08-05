@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
 
     # these settings depend on the infrastructure; on upshift ocp-master-xxl they take about 4 hours
-    timeout-minutes: 420
+    timeout-minutes: 480
     env:
       TEST_JOBS: 16
       GITHUB_TOKEN: /home/github/github-token

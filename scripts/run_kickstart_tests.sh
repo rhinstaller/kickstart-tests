@@ -184,7 +184,8 @@ sed_args+=$(printenv | while read line; do
 function should_skip_test() {
     filepath=$1
     for testtype in $(echo "${SKIP_TESTTYPES}" | tr ',' ' '); do
-       if [[ "$(grep ^\s*TESTTYPE= ${filepath})" =~ "$testtype" ]]; then
+       # Use sentinel ',' characters to be able to match the exact tag string
+       if [[ "$(grep ^\s*TESTTYPE= ${filepath} | tr ' "=\n' ',')" =~ ",${testtype}," ]]; then
            return 0
        fi
     done

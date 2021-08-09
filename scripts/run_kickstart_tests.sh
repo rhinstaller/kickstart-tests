@@ -184,7 +184,7 @@ sed_args+=$(printenv | while read line; do
 function should_skip_test() {
     filepath=$1
     for testtype in $(echo "${SKIP_TESTTYPES}" | tr ',' ' '); do
-       if [[ "$(grep TESTTYPE= ${filepath})" =~ "$testtype" ]]; then
+       if [[ "$(grep ^\s*TESTTYPE= ${filepath})" =~ "$testtype" ]]; then
            return 0
        fi
     done

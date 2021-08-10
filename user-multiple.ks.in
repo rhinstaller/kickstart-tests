@@ -20,7 +20,7 @@ timezone America/New_York
 
 rootpw qweqwe
 
-%packages --default
+%packages
 %end
 
 # Create multiple users, including incorrect user specifications that should be skipped

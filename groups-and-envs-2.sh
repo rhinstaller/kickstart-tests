@@ -24,5 +24,5 @@ TESTTYPE="packaging skip-on-rhel"
 
 # The test installs ~1366 packages for which 1h timeout is sometimes not enough
 get_timeout() {
-    echo "90"
+    echo "120"
 }

@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="raid storage coverage rhbz1987170"
+TESTTYPE="raid storage coverage"
 
 . ${KSTESTDIR}/functions.sh
 

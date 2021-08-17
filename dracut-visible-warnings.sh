@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Jiri Konecny <jkonecny@redhat.com>
 
-TESTTYPE="dracut skip-on-rhel"
+TESTTYPE="dracut skip-on-rhel-8"
 
 . ${KSTESTDIR}/functions.sh
 

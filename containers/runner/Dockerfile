@@ -1,4 +1,4 @@
-FROM fedora:32
+FROM fedora:34
 LABEL maintainer='anaconda-devel-list@redhat.com'
 
 RUN dnf -y update && \
@@ -8,12 +8,12 @@ RUN dnf -y update && \
     rsync \
     git \
     virt-install \
-    libguestfs-tools \
+    guestfs-tools \
     genisoimage \
     lorax-lmc-virt \
     parallel \
     python3-libvirt \
-    createrepo \
+    createrepo_c \
     python3-rpmfluff \
     squid \
     make \

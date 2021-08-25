@@ -20,7 +20,7 @@ case "$SCENARIO" in
             mkdir -p data/images
             curl -L http://download.eng.bos.redhat.com/rhel-8/development/RHEL-8/latest-RHEL-8/compose/BaseOS/x86_64/os/images/boot.iso --output data/images/boot.iso
         fi
-        $LAUNCH --skip-testtypes skip-on-rhel,knownfailure,skip-on-rhel-8,rhbz1963834,rhbz1973156,rhbz1990358,gh564 --platform rhel8 --defaults "$ROOTDIR/scripts/defaults-rhel8.sh" all
+        $LAUNCH --skip-testtypes skip-on-rhel,knownfailure,skip-on-rhel-8,rhbz1963834,rhbz1973156,gh564 --platform rhel8 --defaults "$ROOTDIR/scripts/defaults-rhel8.sh" all
         ;;
 
     rhel9)

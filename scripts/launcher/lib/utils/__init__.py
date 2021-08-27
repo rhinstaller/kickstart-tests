@@ -21,6 +21,7 @@
 
 import os
 import shutil
+import datetime
 
 from functools import wraps
 from contextlib import AbstractContextManager
@@ -62,7 +63,8 @@ class TempManager(AbstractContextManager):
         self._test_name = test_name
 
     def __enter__(self):
-        prefix = "kstest-{}.".format(self._test_name)
+        time_stamp = datetime.datetime.now().strftime('%Y_%m_%d-%H_%M_%S')
+        prefix = "kstest-{}.{}.".format(self._test_name, time_stamp)
         self._tmp_dir = mkdtemp(prefix=prefix, dir="/var/tmp")
         self._change_permission()
 

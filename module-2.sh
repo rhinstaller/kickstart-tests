@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Martin Kolman <mkolman@redhat.com>
 
-TESTTYPE="packaging modularity skip-on-rhel"
+TESTTYPE="packaging modularity skip-on-rhel gh575"
 
 . ${KSTESTDIR}/functions.sh

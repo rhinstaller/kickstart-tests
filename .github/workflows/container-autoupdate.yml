@@ -12,6 +12,7 @@ jobs:
   runner:
     name: Build kstest-runner container
     runs-on: ubuntu-latest
+    environment: quay.io
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2

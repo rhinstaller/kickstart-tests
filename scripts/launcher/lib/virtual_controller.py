@@ -151,10 +151,6 @@ class VirtualInstall(object):
         if self._kernel_args:
             extra_args += " " + self._kernel_args
 
-        # work around too slow VMs failing to start Xorg
-        # TODO: Remove this again once we know how to run things normally.
-        extra_args += " inst.xtimeout=300"
-
         extra_args += " inst.stage2=hd:CDLABEL={0}".format(udev_escape(self._label))
 
         if self._boot:

@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="bootloader packaging coverage skip-on-rhel"
+TESTTYPE="bootloader packaging coverage skip-on-rhel rhbz2006694"
 
 . ${KSTESTDIR}/functions.sh

@@ -29,8 +29,7 @@ case "$SCENARIO" in
             mkdir -p data/images
             curl -L http://download.eng.bos.redhat.com/rhel-9/development/RHEL-9-Beta/latest-RHEL-9/compose/BaseOS/x86_64/os/images/boot.iso --output data/images/boot.iso
         fi
-        # FIXME: Temporarily disable the kdump addon in RHEL 9 (#1986942, #1986969).
-        $LAUNCH --skip-testtypes skip-on-rhel,skip-on-rhel-9,knownfailure,rhbz1960279,rhbz1973156 --run-args '-eKSTEST_EXTRA_BOOTOPTS=inst.kdump_addon' --platform rhel9 --defaults "$ROOTDIR/scripts/defaults-rhel9.sh" all
+        $LAUNCH --skip-testtypes skip-on-rhel,skip-on-rhel-9,knownfailure,rhbz1960279,rhbz1973156 --platform rhel9 --defaults "$ROOTDIR/scripts/defaults-rhel9.sh" all
         ;;
 
     # just run a single test on standard Rawhide; mostly for testing infrastructure

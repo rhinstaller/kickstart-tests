@@ -3,33 +3,11 @@
 #
 # Test that https:// repositories work as expected. Most tests run with http to
 # be able to squid-cache the downloads.
-# Only install a minimal system to save time, similar to the "container" test.
 
-%ksappend repos/https.ks
-%ksappend common/common.ks
-%ksappend users/default.ks
-%ksappend network/default.ks
-
-# Disable the boot loader.
-bootloader --disabled
-
-# Disable the NTP service.
-keyboard us
-lang en_US.UTF-8
-timezone Etc/UTC --utc --nontp
-
-# Create only / with the ext4 filesystem type.
-autopart --type=plain --fstype=ext4 --nohome --noboot --noswap
-zerombr
-clearpart --all
-
-# Don't install kernel and systemd.
-%packages --nocore
--kernel
--systemd
-bash
-rpm
-%end
+# Use defaults.
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
 
 %post
 # (1) No http:// Fedora repo sources

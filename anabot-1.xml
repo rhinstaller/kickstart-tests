@@ -1,0 +1,25 @@
+<installation xmlns:ez="http://fedoraproject.org/anaconda/anabot/recipe/tiny/1">
+  <welcome>
+    <language value="English" />
+    <continue />
+    <beta_dialog policy="may_fail" />
+  </welcome>
+  <hub>
+    <create_user>
+      <username value="testuser" />
+      <is_admin checked="yes" />
+      <password value="fo0m4nchU!" />
+      <confirm_password value="fo0m4nchU!" />
+      <done />
+    </create_user>
+    <partitioning>
+      <disk name="*" action="select" />
+      <done />
+    </partitioning>
+    <begin_installation />
+  </hub>
+  <configuration>
+    <wait_until_complete />
+    <reboot />
+  </configuration>
+</installation>

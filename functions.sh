@@ -123,7 +123,8 @@ copy_interesting_files_from_system() {
     # RESULT - file from the test
     for item in /root/original-ks.cfg \
                 /root/anaconda-ks.cfg \
-                /var/log/anaconda/    \
+                /root/anabot.log \
+                /var/log/anaconda/ \
                 /root/RESULT
     do
         copy_file "${args}" "${item}" "${disksdir}" 2>/dev/null

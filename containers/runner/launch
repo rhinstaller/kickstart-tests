@@ -42,7 +42,7 @@ Usage:
     $0 [options] all
 
 Options:
- -j, --jobs N                         Run N jobs in parallel (default: $(nproc))
+ -j, --jobs N                         Run N jobs in parallel (default: $(recommended_jobs))
  -p, --platform NAME                  See fragments/platform/ (default: fedora_rawhide)
  -t, --testtype TYPE                  Only run TYPE tests
  -s, --skip-testtypes TYPE[,TYPE..]   Don't run tests with given types

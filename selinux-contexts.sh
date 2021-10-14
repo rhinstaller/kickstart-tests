@@ -20,3 +20,9 @@
 TESTTYPE="security selinux gh598"
 
 . ${KSTESTDIR}/functions.sh
+
+additional_runner_args() {
+    # Wait for reboot and shutdown of the VM,
+    # but exit after the specified timeout.
+    echo "--wait $(get_timeout)"
+}

@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Vladimir Slavik <vslavik@redhat.com>
 
-TESTTYPE="security selinux"
+TESTTYPE="security selinux gh598"
 
 . ${KSTESTDIR}/functions.sh

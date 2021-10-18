@@ -4,25 +4,23 @@
 %ksappend common/common_no_payload.ks
 %ksappend payload/default_packages.ks
 
-# Check files with wrong SElinux contexts. This *must* run in %post after the
-# "stock" %post script 80-setfilecons.ks. Thus, include that file before our
-# code, to make sure it is executed in the right order.
+# Reboot the installed system.
+reboot
 
-%include /usr/share/anaconda/post-scripts/80-setfilecons.ks
+# Validate on the first boot.
+%ksappend validation/success_on_first_boot.ks
 
+# Set up the actual test.
 %post
 
-echo "Listing files with wrong SElinux contexts..."
-restorecon -rvn / -e /mnt -e /proc -e /run -e /sys > /root/RESULT
+# Make sure something doesn't fix the labels before we can check them.
+systemctl disable selinux-autorelabel.service
 
-# Report success if no errors have been reported to /root/RESULT
-if [ ! -s /root/RESULT ]
-then
-    # result file empty or none -> success
-    echo SUCCESS > /root/RESULT
-else
-    # some errors happened
-    exit 1
-fi
+# Write the code to run after reboot. It lists files with wrong SELinux contexts.
+cat > /usr/libexec/kickstart-test.sh << 'EOF'
+
+restorecon -rvn / -e /mnt -e /proc -e /run -e /sys
+
+EOF
 
 %end

@@ -1,9 +1,0 @@
-[kstest]
-
-[kstest-master]
-
-[all:vars]
-#ansible_python_interpreter=/usr/bin/python3
-#ansible_ssh_private_key_file=
-#ansible_ssh_user=fedora
-#ansible_ssh_common_args='-o StrictHostKeyChecking=no'

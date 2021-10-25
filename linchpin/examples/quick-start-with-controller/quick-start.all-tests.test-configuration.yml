@@ -1,8 +1,0 @@
----
-kstest_boot_iso_url: "https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/x86_64/os/images/boot.iso"
-kstest_url: "--url=https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/x86_64/os/"
-kstest_repos:
-    - "repo --name=modular --baseurl=https://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Modular/x86_64/os/"
-kstest_ftp_url: "ftp://ftp.fi.muni.cz/pub/linux/fedora/linux/development/rawhide/Everything/x86_64/os/"
-kstest_test_jobs: 4
-kstest_skip_test_types: "rhel-only"

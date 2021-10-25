@@ -1,6 +1,0 @@
----
-# Variables for scheduling a run of the test cofigured on master
-
-kstest_master_cron_disabled: true
-kstest_master_cron_hour: 00
-kstest_master_cron_minute: 00

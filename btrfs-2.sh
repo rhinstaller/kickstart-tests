@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="btrfs storage skip-on-rhel"
+TESTTYPE="btrfs storage skip-on-rhel gh609"
 
 . ${KSTESTDIR}/functions.sh
 

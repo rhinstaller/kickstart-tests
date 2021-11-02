@@ -19,7 +19,7 @@ systemctl disable selinux-autorelabel.service
 # Write the code to run after reboot. It lists files with wrong SELinux contexts.
 cat > /usr/libexec/kickstart-test.sh << 'EOF'
 
-restorecon -rvn / -e /mnt -e /proc -e /run -e /sys
+restorecon -rvn / -e /dev -e /mnt -e /proc -e /run -e /sys
 
 EOF
 

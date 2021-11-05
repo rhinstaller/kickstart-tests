@@ -9,8 +9,8 @@
 
 %packages
 # lets use a non-default profile to see if it is correctly set afterwards
-@nodejs:15/default
-@nodejs:15/development
+@nodejs:16/default
+@nodejs:16/development
 %end
 
 %post
@@ -51,7 +51,7 @@ dnf module list --installed nodejs | grep "development[^,]*\[i\]" || echo "*** n
 dnf module list --installed nodejs | grep "minimal[^,]*\[i\]" && echo "*** nodejs module minimal profile marked as installed" >> /root/RESULT
 
 # check the stream
-dnf module list --enabled nodejs | grep "15[^,]*\[e\]" || echo "*** nodejs stream id 15 not marked as enabled" >> /root/RESULT
+dnf module list --enabled nodejs | grep "16[^,]*\[e\]" || echo "*** nodejs stream id 16 not marked as enabled" >> /root/RESULT
 
 %ksappend validation/success_if_result_empty.ks
 

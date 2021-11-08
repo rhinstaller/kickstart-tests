@@ -6,10 +6,10 @@
 %ksappend repos/modular.ks
 %ksappend common/common_no_payload.ks
 
-module --name=nodejs --stream=15
-module --name=nodejs --stream=15 --disable
-module --name=nodejs --stream=15
-module --name=postgresql --stream=13 --disable
+module --name=nodejs --stream=16
+module --name=nodejs --stream=16 --disable
+module --name=nodejs --stream=16
+module --name=postgresql --stream=14 --disable
 module --name=perl --stream=5.32
 
 %packages

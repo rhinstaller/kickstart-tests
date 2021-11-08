@@ -8,10 +8,10 @@
 %ksappend repos/modular.ks
 %ksappend common/common_no_payload.ks
 
-module --name=nodejs --stream=15
+module --name=nodejs --stream=16
 
 %packages
-@nodejs:15/development
+@nodejs:16/development
 %end
 
 %post

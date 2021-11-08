@@ -8,10 +8,10 @@
 %ksappend repos/modular.ks
 %ksappend common/common_no_payload.ks
 
-module --name=nodejs --stream=15
+module --name=nodejs --stream=16
 
 %packages
-@postgresql:13/server
+@postgresql:14/server
 %end
 
 %post

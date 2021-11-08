@@ -32,12 +32,12 @@ if [[ $? != 0 ]]; then
     echo "*** btrfs volume 'fedora-btrfs' was not found" >> /root/RESULT
 fi
 
-btrfs fi df / | grep "Data,\sRAID0"
+btrfs fi df / | grep "Data,\sRAID\|Data,\sraid0"
 if [[ $? != 0 ]]; then
     echo "*** btrfs volume data RAID level is not RAID0" >> /root/RESULT
 fi
 
-btrfs fi df / | grep "Metadata,\sRAID1"
+btrfs fi df / | grep "Metadata,\sRAID1\|Metadata,\sraid1"
 if [[ $? != 0 ]]; then
     echo "*** btrfs volume metadata RAID level is not RAID1" >> /root/RESULT
 fi

@@ -123,7 +123,7 @@ class VirtualInstall(object):
             args.append("none")
 
         args.append("--video")
-        args.append("virtio")
+        args.append("vga")
 
         for ks in self._ks_paths:
             args.append("--initrd-inject")

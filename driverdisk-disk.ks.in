@@ -1,24 +1,11 @@
 #version=DEVEL
 #test name: driverdisk-disk
 %ksappend repos/default.ks
-network --bootproto=dhcp
 
-keyboard us
-lang en_US.UTF-8
-timezone America/New_York --utc
-rootpw testcase
-shutdown
-
-bootloader --timeout=1
-zerombr
-clearpart --all
-autopart
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
 
 driverdisk /dev/disk/by-label/TEST_DD
-
-%packages
-@core
-%end
 
 %post --nochroot
 SYSROOT=${ANA_INSTALL_PATH:-/mnt/sysimage}

@@ -15,7 +15,7 @@
 #
 # Author: Will Woods <wwoods@redhat.com>
 
-TESTTYPE="driverdisk rhbz1973156"
+TESTTYPE="driverdisk"
 
 . ${KSTESTDIR}/functions.sh
 
@@ -27,5 +27,9 @@ prepare_disks() {
 
     # driverdisk image
     ${KSTESTDIR}/lib/mkdud.py -k -b -L "TEST_DD" ${diskdir}/dd.iso >/dev/null
-    echo "${diskdir}/dd.iso,device=cdrom,readonly=on"
+    echo "path=${diskdir}/dd.iso,device=cdrom,readonly=on"
+}
+
+kernel_args() {
+   echo inst.dd=/dev/disk/by-label/TEST_DD
 }

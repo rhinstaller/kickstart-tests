@@ -18,6 +18,6 @@
 # Red Hat Author(s): Jiri Konecny <jkonecny@redhat.com>
 
 # times out
-TESTTYPE="packaging skip-on-fedora knownfailure"
+TESTTYPE="packaging skip-on-fedora manual"
 
 . ${KSTESTDIR}/functions.sh

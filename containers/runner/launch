@@ -12,6 +12,7 @@ CONTAINER=quay.io/rhinstaller/kstest-runner
 # Podman in rootless mode does not have access to /dev/kvm socket https://bugzilla.redhat.com/show_bug.cgi?id=1901462
 # disable selinux container separation when podman is executed as user
 PODMAN_SELINUX_FIX=
+RUN_COMMAND=/kickstart-tests/containers/runner/run-kstest
 
 # Get number of jobs to be run in parallel based on number of CPUs and amount of RAM
 recommended_jobs() {
@@ -49,6 +50,8 @@ Options:
  -u, --updates PATH|URL               Set updates.img path or URL
  -r, --retry                          Retry failed tests once, to guard against random
                                       infrastructure failures
+ -c, --connect-shell                  Connect to the container and do not run the tests
+                                      automatically
  --daily-iso TOKEN_FILE               Download and use daily boot.iso instead of rawhide's
                                       (This requires a GitHub token that can read
                                        rhinstaller/kickstart-tests workflow artifacts.)
@@ -62,7 +65,7 @@ EOF
 }
 
 # parse options
-eval set -- "$(getopt -o j:p:t:s:u:rh --long jobs:,platform:,testtype:,skip-testtypes:,updates:,retry,daily-iso:,defaults:,run-args:,recommended-jobs,help -- "$@")"
+eval set -- "$(getopt -o j:p:t:s:u:rch --long jobs:,platform:,testtype:,skip-testtypes:,updates:,retry,connect-shell,daily-iso:,defaults:,run-args:,recommended-jobs,help -- "$@")"
 
 while true; do
     case "${1:-}" in
@@ -72,6 +75,7 @@ while true; do
         -s|--skip-testtypes) shift; SKIP_TESTTYPES="$1" ;;
         -u|--updates) shift; UPDATES_IMAGE="$1" ;;
         -r|--retry) TEST_RETRY=1 ;;
+        -c|--connect-shell) RUN_COMMAND=/bin/bash ;;
         --daily-iso) shift; DAILY_ISO_TOKEN="$1" ;;
         --defaults) shift; DEFAULTS_SH="$1" ;;
         --run-args) shift; CONTAINER_RUN_ARGS="$1" ;;
@@ -145,4 +149,4 @@ $CRUN run -it --rm --device=/dev/kvm --publish 127.0.0.1::16509 $PODMAN_SELINUX_
     --env KSTESTS_TEST="$KSTESTS_TEST" --env TESTTYPE="${TESTTYPE:-}" --env SKIP_TESTTYPES="${SKIP_TESTTYPES:-}" \
     --env TEST_JOBS="$TEST_JOBS" --env PLATFORM="${PLATFORM:-}" --env TEST_RETRY="${TEST_RETRY:-}" ${UPDATES_IMG_ARGS:-} ${CONTAINER_RUN_ARGS:-} \
     ${VAR_TMP:-} -v "$PWD/data:/opt/kstest/data:z" -v "$BASEDIR:/kickstart-tests:ro,z" ${DEFAULTS_SH_ARGS:-} \
-    $CONTAINER /kickstart-tests/containers/runner/run-kstest
+    $CONTAINER $RUN_COMMAND

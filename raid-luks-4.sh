@@ -17,7 +17,8 @@
 #
 # Red Hat Author(s): Vendula Poncova <vponcova@redhat.com>
 
-TESTTYPE="knownfailure storage raid luks"
+# Check the results on the running VM.
+TESTTYPE="manual storage raid luks"
 
 . ${KSTESTDIR}/functions.sh
 

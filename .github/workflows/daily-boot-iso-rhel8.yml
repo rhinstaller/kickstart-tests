@@ -99,7 +99,7 @@ jobs:
           cp /home/github/rhel8-daily-boot.iso data/images/boot.iso
 
       - name: Run coverage tests
-        run: sudo TEST_JOBS=16 containers/runner/launch --retry --testtype coverage --skip-testtypes skip-on-rhel,skip-on-rhel-8,knownfailure --platform rhel8 --defaults $PWD/scripts/defaults-rhel8.sh
+        run: sudo TEST_JOBS=16 containers/runner/launch --retry --testtype coverage --skip-testtypes skip-on-rhel,skip-on-rhel-8,knownfailure,manual --platform rhel8 --defaults $PWD/scripts/defaults-rhel8.sh
 
       - name: Upload test logs
         if: always()

@@ -10,9 +10,9 @@ SCENARIO="$1"
 shift
 
 case "$SCENARIO" in
-    rawhide) $LAUNCH --skip-testtypes skip-on-fedora,knownfailure "$@" all ;;
-    rawhide-text) $LAUNCH --skip-testtypes skip-on-fedora,knownfailure --run-args '-eKSTEST_EXTRA_BOOTOPTS=inst.text' "$@" all ;;
-    daily-iso) $LAUNCH --skip-testtypes skip-on-fedora,knownfailure,rhbz1973156,gh595,gh576 --daily-iso="$GITHUB_TOKEN" "$@" all ;;
+    rawhide) $LAUNCH --skip-testtypes skip-on-fedora,knownfailure,manual "$@" all ;;
+    rawhide-text) $LAUNCH --skip-testtypes skip-on-fedora,knownfailure,manual --run-args '-eKSTEST_EXTRA_BOOTOPTS=inst.text' "$@" all ;;
+    daily-iso) $LAUNCH --skip-testtypes skip-on-fedora,knownfailure,manual,rhbz1973156,gh595,gh576 --daily-iso="$GITHUB_TOKEN" "$@" all ;;
 
     rhel8)
         if [ ! -e data/images/boot.iso ]; then
@@ -20,7 +20,7 @@ case "$SCENARIO" in
             mkdir -p data/images
             curl -L http://download.eng.bos.redhat.com/rhel-8/development/RHEL-8/latest-RHEL-8/compose/BaseOS/x86_64/os/images/boot.iso --output data/images/boot.iso
         fi
-        $LAUNCH --skip-testtypes skip-on-rhel,knownfailure,skip-on-rhel-8,rhbz1973156,gh564,gh595,gh576 --platform rhel8 --defaults "$ROOTDIR/scripts/defaults-rhel8.sh" all
+        $LAUNCH --skip-testtypes skip-on-rhel,knownfailure,manual,skip-on-rhel-8,rhbz1973156,gh564,gh595,gh576 --platform rhel8 --defaults "$ROOTDIR/scripts/defaults-rhel8.sh" all
         ;;
 
     rhel9)
@@ -29,7 +29,7 @@ case "$SCENARIO" in
             mkdir -p data/images
             curl -L http://download.eng.bos.redhat.com/rhel-9/development/RHEL-9/latest-RHEL-9.0/compose/BaseOS/x86_64/os/images/boot.iso --output data/images/boot.iso
         fi
-        $LAUNCH --skip-testtypes skip-on-rhel,skip-on-rhel-9,knownfailure,rhbz1960279,rhbz1973156,gh595,gh564,gh601,gh576 --platform rhel9 --defaults "$ROOTDIR/scripts/defaults-rhel9.sh" all
+        $LAUNCH --skip-testtypes skip-on-rhel,skip-on-rhel-9,knownfailure,manual,rhbz1960279,rhbz1973156,gh595,gh564,gh601,gh576 --platform rhel9 --defaults "$ROOTDIR/scripts/defaults-rhel9.sh" all
         ;;
 
     # just run a single test on standard Rawhide; mostly for testing infrastructure

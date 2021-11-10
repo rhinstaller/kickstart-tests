@@ -18,7 +18,6 @@
 #
 # Red Hat Author(s): David Shea <dshea@redhat.com>
 
-# dnf crashes with zchunk errors on ftp:// repos: https://bugzilla.redhat.com/show_bug.cgi?id=1886706
-TESTTYPE="method knownfailure"
+TESTTYPE="method skip-on-rhel"
 
 . ${KSTESTDIR}/functions.sh

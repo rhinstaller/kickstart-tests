@@ -65,6 +65,11 @@ prepare_updates() {
 }
 
 prepare_disks() {
+    # This function has to 'echo' one of the following.
+    #
+    # echo '<disk_path>'                                    -- ',bus=virtio' will be added automatically
+    # echo '<disk_path>,<virt_install_disk_arguments>'      -- ',bus=virtio' will be added automatically
+    # echo 'path=<disk_path>,<virt_install_disk_arguments>' -- the string is taken in this form (nothing will be added)
     tmpdir=$1
 
     qemu-img create -q -f qcow2 ${tmpdir}/disk-a.img 10G

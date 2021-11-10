@@ -5,8 +5,6 @@
 %ksappend common/common_no_payload.ks
 %ksappend payload/default_packages.ks
 
-driverdisk /dev/disk/by-label/TEST_DD
-
 %post --nochroot
 SYSROOT=${ANA_INSTALL_PATH:-/mnt/sysimage}
 RESULTFILE=$SYSROOT/root/RESULT

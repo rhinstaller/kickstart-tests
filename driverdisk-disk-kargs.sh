@@ -29,3 +29,7 @@ prepare_disks() {
     ${KSTESTDIR}/lib/mkdud.py -k -b -L "TEST_DD" ${diskdir}/dd.iso >/dev/null
     echo "path=${diskdir}/dd.iso,device=cdrom,readonly=on"
 }
+
+kernel_args() {
+   echo inst.dd=/dev/disk/by-label/TEST_DD
+}

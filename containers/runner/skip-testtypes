@@ -1,0 +1,58 @@
+# The file defines types of tests to be skipped by the --skip-testtypes option
+# of the containers/runner/launch script.
+# The file is sourced from shell scripts.
+
+# test types skipped in all scenarios
+common_skip_array=(
+  knownfailure
+  manual
+)
+
+rawhide_skip_array=(
+  skip-on-fedora
+)
+
+rawhide_text_skip_array=(
+  skip-on-fedora
+)
+
+daily_iso_skip_array=(
+  skip-on-fedora
+  gh576       # clearpart-4 test is flaky on all scenarios
+  gh595       # proxy-cmdline failing on all scenarios
+  rhbz2018913 # /etc/resolv.conf is not a symlink after kickstart
+)
+
+rhel8_skip_array=(
+  skip-on-rhel
+  skip-on-rhel-8
+  gh576       # clearpart-4 test is flaky on all scenarios
+  gh595       # proxy-cmdline failing on all scenarios
+)
+
+rhel9_skip_array=(
+  skip-on-rhel
+  skip-on-rhel-9
+  gh576       # clearpart-4 test is flaky on all scenarios
+  gh595       # proxy-cmdline failing on all scenarios
+  rhbz1960279 # packages-weakdeps: "gnupg2 --recommends has changed, test needs to be updated"
+)
+
+# used in workflows/daily-boot-iso-rhel8.yml
+rhel8_daily_skip_array=(
+  skip-on-rhel
+  skip-on-rhel-8
+)
+
+_join_args_by_comma(){
+  local IFS=","
+  echo "$*"
+}
+
+# Do not forget to add new releases below as well
+SKIP_TESTTYPES_RAWHIDE=$(_join_args_by_comma "${common_skip_array[@]}" "${rawhide_skip_array[@]}")
+SKIP_TESTTYPES_RAWHIDE_TEXT=$(_join_args_by_comma "${common_skip_array[@]}" "${rawhide_text_skip_array[@]}")
+SKIP_TESTTYPES_DAILY_ISO=$(_join_args_by_comma "${common_skip_array[@]}" "${daily_iso_skip_array[@]}")
+SKIP_TESTTYPES_RHEL8=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel8_skip_array[@]}")
+SKIP_TESTTYPES_RHEL9=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel9_skip_array[@]}")
+SKIP_TESTTYPES_RHEL8_DAILY=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel8_daily_skip_array[@]}")

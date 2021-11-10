@@ -1,11 +1,13 @@
 #test name: onboot-options-pre
 # Test network command options defined in %pre section
 # --nodefroute
+# --mtu
 %ksappend repos/default.ks
 
 %include /tmp/ksinclude
 %pre
 echo "network --device=@KSTEST_NETDEV2@ --bootproto dhcp --nodefroute" >> /tmp/ksinclude
+echo "network --device=@KSTEST_NETDEV3@ --bootproto dhcp --mtu=9000" >> /tmp/ksinclude
 %end
 
 bootloader --timeout=1
@@ -38,6 +40,7 @@ check_device_config_value @KSTEST_NETDEV1@ DEFROUTE yes ipv4 never-default __NON
 check_device_config_value @KSTEST_NETDEV2@ DEFROUTE no ipv4 never-default true
 check_device_connected @KSTEST_NETDEV1@ yes
 check_device_connected @KSTEST_NETDEV2@ yes
+check_device_config_value @KSTEST_NETDEV3@ MTU 9000 ethernet mtu 9000
 
 # No error was written to /root/RESULT file, everything is OK
 if [[ ! -e /root/RESULT ]]; then

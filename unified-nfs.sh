@@ -19,6 +19,6 @@
 
 #TESTTYPE="packaging skip-on-fedora"
 
-TESTTYPE="knownfailure"
+TESTTYPE="skip-on-fedora manual"
 
 . ${KSTESTDIR}/functions.sh

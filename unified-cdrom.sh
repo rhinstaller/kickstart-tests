@@ -25,6 +25,6 @@
 # which will be the want used for booting in our case.
 #
 
-TESTTYPE="knownfailure"
+TESTTYPE="skip-on-fedora manual"
 
 . ${KSTESTDIR}/functions.sh

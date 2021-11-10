@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Vendula Poncova <vponcova@redhat.com>
 
-TESTTYPE="knownfailure"
+TESTTYPE="manual payload"
 
 . ${KSTESTDIR}/functions.sh
 

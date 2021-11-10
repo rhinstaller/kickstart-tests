@@ -17,7 +17,8 @@
 #
 # Red Hat Author(s): Vendula Poncova <vponcova@redhat.com>
 
-TESTTYPE="knownfailure storage lvm luks"
+# Check the results on the running VM.
+TESTTYPE="manual storage lvm luks"
 
 . ${KSTESTDIR}/functions.sh
 

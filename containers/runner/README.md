@@ -137,3 +137,12 @@ the graphical console for a virtual machine with a command:
 
 To change of the boot options for the tests (for example to add `inst.text`), please use
 `--run-args="--env KSTEST_EXTRA_BOOTOPTS=inst.text"` parameter for the `launch` script.
+
+## Running test manually from the container
+
+Sometimes it could be helpful to run the test in the container manually to be able to inspect the
+container after the run. To do that:
+
+1. Run `containers/runner/launch` with `-c` argument in addition to other arguments. This will
+open shell of the container where you can do what you want to before starting the test. 
+2. Start the test(s) execution with `/kickstart-tests/containers/runner/run-kstest`.

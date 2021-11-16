@@ -16,6 +16,9 @@
       <disk name="*" action="select" />
       <done />
     </partitioning>
+    <software_selection>
+      <environment id="minimal-environment" />
+    </software_selection>
     <begin_installation />
   </hub>
   <configuration>

@@ -15,7 +15,7 @@
 # License and may only be used or replicated with the express permission of
 # Red Hat, Inc.
 #
-TESTTYPE="ui anabot skip-on-rhel-8 gh601"
+TESTTYPE="ui anabot skip-on-rhel-8 gh601 gh632 gh633"
 
 . ${KSTESTDIR}/functions.sh
 

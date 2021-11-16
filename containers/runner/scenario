@@ -12,7 +12,7 @@ shift
 case "$SCENARIO" in
     rawhide) $LAUNCH --skip-testtypes skip-on-fedora,knownfailure,manual "$@" all ;;
     rawhide-text) $LAUNCH --skip-testtypes skip-on-fedora,knownfailure,manual --run-args '-eKSTEST_EXTRA_BOOTOPTS=inst.text' "$@" all ;;
-    daily-iso) $LAUNCH --skip-testtypes skip-on-fedora,knownfailure,manual,gh595,gh576 --daily-iso="$GITHUB_TOKEN" "$@" all ;;
+    daily-iso) $LAUNCH --skip-testtypes skip-on-fedora,knownfailure,manual,gh595,gh576,gh632,gh633 --daily-iso="$GITHUB_TOKEN" "$@" all ;;
 
     rhel8)
         if [ ! -e data/images/boot.iso ]; then

@@ -1,0 +1,28 @@
+#version=DEVEL
+#test name: dns
+# Test domain name resolution.
+
+# Use defaults.
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+%post
+
+@KSINCLUDE@ post-lib-network.sh
+
+if [ "@KSTEST_OS_NAME@" == "rhel" ]; then
+    # rhbz#1989472
+    check_resolv_conf_is_by_nm
+else
+    # rhbz#2018913
+    check_resolv_conf_is_by_resolved
+fi
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+   echo SUCCESS > /root/RESULT
+fi
+
+%end
+

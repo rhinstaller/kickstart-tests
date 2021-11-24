@@ -9,10 +9,13 @@ ROOTDIR=$(dirname $(dirname "$MYDIR"))
 SCENARIO="$1"
 shift
 
+# Read the test types (SKIP_TESTTYPES_*) to be skipped by scenarios
+source "$MYDIR/skip-testtypes"
+
 case "$SCENARIO" in
-    rawhide) $LAUNCH --skip-testtypes skip-on-fedora,knownfailure,manual "$@" all ;;
-    rawhide-text) $LAUNCH --skip-testtypes skip-on-fedora,knownfailure,manual --run-args '-eKSTEST_EXTRA_BOOTOPTS=inst.text' "$@" all ;;
-    daily-iso) $LAUNCH --skip-testtypes skip-on-fedora,knownfailure,manual,gh595,gh576,rhbz2018913 --daily-iso="$GITHUB_TOKEN" "$@" all ;;
+    rawhide) $LAUNCH --skip-testtypes "$SKIP_TESTTYPES_RAWHIDE" "$@" all ;;
+    rawhide-text) $LAUNCH --skip-testtypes "$SKIP_TESTTYPES_RAWHIDE_TEXT" --run-args '-eKSTEST_EXTRA_BOOTOPTS=inst.text' "$@" all ;;
+    daily-iso) $LAUNCH --skip-testtypes "$SKIP_TESTTYPES_DAILY_ISO" --daily-iso="$GITHUB_TOKEN" "$@" all ;;
 
     rhel8)
         if [ ! -e data/images/boot.iso ]; then
@@ -20,7 +23,7 @@ case "$SCENARIO" in
             mkdir -p data/images
             curl -L http://download.eng.bos.redhat.com/rhel-8/development/RHEL-8/latest-RHEL-8.6/compose/BaseOS/x86_64/os/images/boot.iso --output data/images/boot.iso
         fi
-        $LAUNCH --skip-testtypes skip-on-rhel,knownfailure,manual,skip-on-rhel-8,gh595,gh576 --platform rhel8 --defaults "$ROOTDIR/scripts/defaults-rhel8.sh" all
+        $LAUNCH --skip-testtypes "$SKIP_TESTTYPES_RHEL8" --platform rhel8 --defaults "$ROOTDIR/scripts/defaults-rhel8.sh" all
         ;;
 
     rhel9)
@@ -29,7 +32,7 @@ case "$SCENARIO" in
             mkdir -p data/images
             curl -L http://download.eng.bos.redhat.com/rhel-9/development/RHEL-9/latest-RHEL-9.0/compose/BaseOS/x86_64/os/images/boot.iso --output data/images/boot.iso
         fi
-        $LAUNCH --skip-testtypes skip-on-rhel,skip-on-rhel-9,knownfailure,manual,rhbz1960279,gh595,gh576 --platform rhel9 --defaults "$ROOTDIR/scripts/defaults-rhel9.sh" all
+        $LAUNCH --skip-testtypes "$SKIP_TESTTYPES_RHEL9" --platform rhel9 --defaults "$ROOTDIR/scripts/defaults-rhel9.sh" all
         ;;
 
     # just run a single test on standard Rawhide; mostly for testing infrastructure

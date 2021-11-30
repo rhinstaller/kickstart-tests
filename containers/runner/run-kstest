@@ -81,13 +81,13 @@ popd
 
 # Copy logs to a volume
 # Fixup permissions
-chmod -R a+r /var/tmp/kstest-*
+chmod -R a+rw /var/tmp/kstest-*
 # Clean up (artifacts from broken test)
 find /var/tmp/kstest-* -name "*.iso" -delete
 find /var/tmp/kstest-* -name "*.img" -delete
 cp $TEST_LOG ${LOGS_DIR}
 # Move to target logs directory; this sometimes fails on nested directory permission/ownership
-cp -r /var/tmp/kstest-* ${LOGS_DIR} || true
+cp -pr /var/tmp/kstest-* ${LOGS_DIR} || true
 
 # Show summary report
 ${KSTESTS_DIR}/scripts/run_report.sh < $TEST_LOG

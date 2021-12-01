@@ -1,4 +1,4 @@
-SYSROOT=${ANA_INSTALL_PATH:-/mnt/sysimage}
+SYSROOT=/mnt/sysroot
 
 # check_bridge_has_slave_nochroot BRIDGE SLAVE "yes|no"
 # Check that the bridge device BRIDGE has ("yes") or has not ("no") a slave device SLAVE

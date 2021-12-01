@@ -1,7 +1,7 @@
 # The library for nochroot post scripts of the UI kickstart tests.
 
 # Specify the result file.
-SYSROOT=${ANA_INSTALL_PATH:-/mnt/sysimage}
+SYSROOT=/mnt/sysroot
 RESULT_FILE=${SYSROOT}/root/RESULT
 
 # Check that the current display mode is set to the expected value.

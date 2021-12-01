@@ -6,7 +6,7 @@
 %ksappend payload/default_packages.ks
 
 %post --nochroot
-SYSROOT=${ANA_INSTALL_PATH:-/mnt/sysimage}
+SYSROOT=/mnt/sysroot
 RESULTFILE=$SYSROOT/root/RESULT
 fail() { echo "*** $*" >> $RESULTFILE; }
 

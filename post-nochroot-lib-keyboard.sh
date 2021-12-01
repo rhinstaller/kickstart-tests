@@ -1,4 +1,4 @@
-SYSROOT=${ANA_INSTALL_PATH:-/mnt/sysimage}
+SYSROOT=/mnt/sysroot
 RESULT_FILE=${SYSROOT}/root/RESULT
 
 # check_current_vc_keymap VC_KEYMAP "yes"|"no"

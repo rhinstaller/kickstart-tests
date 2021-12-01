@@ -24,41 +24,41 @@ shutdown
 httpsdir=$(echo "@KSTEST_URL@" | grep -e '--url="\?https:')
 
 # Check that the addon repo file was installed
-if [[ ! -f $ANA_INSTALL_PATH/etc/yum.repos.d/kstest-http.repo ]]; then
-    echo 'kstest-http.repo does not exist' >> $ANA_INSTALL_PATH/root/RESULT
+if [[ ! -f /mnt/sysroot/etc/yum.repos.d/kstest-http.repo ]]; then
+    echo 'kstest-http.repo does not exist' >> /mnt/sysroot/root/RESULT
 fi
 
 # Check that the proxy configuration was written to the repo file
-grep -q 'proxy=PROXY-ADDON' $ANA_INSTALL_PATH/etc/yum.repos.d/kstest-http.repo
+grep -q 'proxy=PROXY-ADDON' /mnt/sysroot/etc/yum.repos.d/kstest-http.repo
 if [[ $? -ne 0 ]]; then
-    echo 'kstest-http.repo does not contain proxy information' >> $ANA_INSTALL_PATH/root/RESULT
+    echo 'kstest-http.repo does not contain proxy information' >> /mnt/sysroot/root/RESULT
 fi
 
 # Check that the installed repo file is usable
 # Find if this is using yum or dnf
-if [[ -f $ANA_INSTALL_PATH/usr/bin/dnf ]]; then
+if [[ -f /mnt/sysroot/usr/bin/dnf ]]; then
 	BIN="dnf"
 else
 	BIN="yum"
 fi
 
 # Clean packages to force package download
-chroot $ANA_INSTALL_PATH $BIN clean packages
+chroot /mnt/sysroot $BIN clean packages
 # Download package to test if the installed repository is usable
-chroot $ANA_INSTALL_PATH \
+chroot /mnt/sysroot \
     $BIN --disablerepo=\* --enablerepo=kstest-http --downloadonly --nogpgcheck -y \
          reinstall testpkg-http-core 2>/dev/null | \
         grep -q 'testpkg-http-core'
 if [[ $? -ne 0 ]]; then
-    echo 'unable to query kstest-http repo' >> $ANA_INSTALL_PATH/root/RESULT
+    echo 'unable to query kstest-http repo' >> /mnt/sysroot/root/RESULT
 fi
 
 # If nothing was written to RESULT, it worked
-if [[ ! -f $ANA_INSTALL_PATH/root/RESULT ]]; then
+if [[ ! -f /mnt/sysroot/root/RESULT ]]; then
     if [ "$httpsdir" ]; then
-        echo 'SUCCESS but limited testing for TLS repository server' > $ANA_INSTALL_PATH/root/RESULT
+        echo 'SUCCESS but limited testing for TLS repository server' > /mnt/sysroot/root/RESULT
     else
-        echo 'SUCCESS' > $ANA_INSTALL_PATH/root/RESULT
+        echo 'SUCCESS' > /mnt/sysroot/root/RESULT
     fi
 fi
 

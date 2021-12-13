@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Jiri Konecny <jkonecny@redhat.com>
 
-TESTTYPE="snapshot lvm storage"
+TESTTYPE="snapshot lvm storage rhbz2031775"
 
 . ${KSTESTDIR}/functions.sh

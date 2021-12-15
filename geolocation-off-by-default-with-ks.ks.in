@@ -20,8 +20,7 @@ shutdown
 
 %post --nochroot
 # Specify the result file.
-SYSROOT=${ANA_INSTALL_PATH:-/mnt/sysimage}
-RESULT_FILE=${SYSROOT}/root/RESULT
+RESULT_FILE=/mnt/sysroot/root/RESULT
 
 # Geolocation should be off by default during a kickstart installation.
 # This can be tested by checking if the sensitive-info log contains

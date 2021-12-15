@@ -37,8 +37,8 @@ certutil -d /tmp/escrow_test/nss -L -n escrow_cert -a -o /tmp/escrow_test/escrow
 
 %pre-install
 # Copy the escrow database to the install path so we can use it during %post
-mkdir $ANA_INSTALL_PATH/root
-cp -a /tmp/escrow_test $ANA_INSTALL_PATH/root/
+mkdir /mnt/sysroot/root
+cp -a /tmp/escrow_test /mnt/sysroot/root/
 %end
 
 %post

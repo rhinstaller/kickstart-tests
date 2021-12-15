@@ -27,7 +27,7 @@ shutdown
 
 %post --nochroot
 
-SYSROOT=${ANA_INSTALL_PATH:-/mnt/sysimage}
+SYSROOT=/mnt/sysroot
 
 function check_iscsi_session_nochroot() {
     local transport="$1"

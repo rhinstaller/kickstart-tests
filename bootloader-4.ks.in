@@ -25,8 +25,6 @@ dd if=/dev/vdb bs=512 count=1 of=/tmp/pre_install_mbr_vdb.bin
 
 
 %post --nochroot
-SYSROOT=${ANA_INSTALL_PATH:-/mnt/sysimage}
-
 # Get the current MBR.
 dd if=/dev/vda bs=512 count=1 of=/tmp/current_mbr_vda.bin
 dd if=/dev/vdb bs=512 count=1 of=/tmp/current_mbr_vdb.bin
@@ -34,16 +32,16 @@ dd if=/dev/vdb bs=512 count=1 of=/tmp/current_mbr_vdb.bin
 # Check the MBR. The boot drive is defined by --boot-drive.
 cmp /tmp/pre_install_mbr_vda.bin /tmp/current_mbr_vda.bin
 if [[ $? -ne 0 ]]; then
-    echo '*** Failed check: MBR should be the same on vda' >> ${ANA_INSTALL_PATH}/root/RESULT
+    echo '*** Failed check: MBR should be the same on vda' >> /mnt/sysroot/root/RESULT
 fi
 
 cmp /tmp/pre_install_mbr_vdb.bin /tmp/current_mbr_vdb.bin
 if [[ $? -ne 1 ]]; then
-    echo '*** Failed check: MBR should be changed on vdb' >> ${ANA_INSTALL_PATH}/root/RESULT
+    echo '*** Failed check: MBR should be changed on vdb' >> /mnt/sysroot/root/RESULT
 fi
 
 # The test was successful.
-if [ ! -e  ${ANA_INSTALL_PATH}/root/RESULT ]; then
-    echo SUCCESS >  ${ANA_INSTALL_PATH}/root/RESULT
+if [ ! -e  /mnt/sysroot/root/RESULT ]; then
+    echo SUCCESS >  /mnt/sysroot/root/RESULT
 fi
 %end

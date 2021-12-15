@@ -6,7 +6,7 @@
 %ksappend payload/default_packages.ks
 
 %post --nochroot
-SYSROOT=${ANA_INSTALL_PATH:-/mnt/sysimage}
+SYSROOT=/mnt/sysroot
 
 for name in sshd vnc; do
     ERROR_MSG="'$name' is deprecated and has been removed"

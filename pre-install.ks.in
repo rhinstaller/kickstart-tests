@@ -20,8 +20,8 @@ shutdown
 
 %pre-install
 # TEST setting up /etc/passwd before package installation
-mkdir $ANA_INSTALL_PATH/etc
-cat > $ANA_INSTALL_PATH/etc/passwd << EOF
+mkdir /mnt/sysroot/etc
+cat > /mnt/sysroot/etc/passwd << EOF
 root:x:0:0:root:/root:/bin/bash
 bin:x:1:1:bin:/bin:/sbin/nologin
 daemon:x:2:2:daemon:/sbin:/sbin/nologin

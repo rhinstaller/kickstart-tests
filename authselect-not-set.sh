@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
-TESTTYPE="security"
+TESTTYPE="security gh640"
 
 . ${KSTESTDIR}/functions.sh

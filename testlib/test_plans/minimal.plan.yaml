@@ -1,0 +1,11 @@
+name: minimal
+description: Run minimal plan with single fast test
+point_person: rvykydal@redhat.com
+artifact_type: github.scheduled.daily.kstest.minimal
+verified_by:
+  test_cases:
+    direct_list:
+      - container
+configurations:
+  - architecture: x86_64
+    platform: fedora_rawhide

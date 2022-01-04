@@ -1,0 +1,20 @@
+name: {{ kstest.name }}
+description: See the source
+author: rvykydal@redhat.com
+execution:
+  type: kickstart-test
+  automation_data:
+    test: {{ kstest.name }}
+tags:
+{% for tag in kstest.tags %}
+  - {{ tag }}
+{% endfor %}
+priority: 1
+instructions:
+  setup:
+    - Download iso
+    - Check out repo
+  steps:
+    - Run test
+  teardown:
+    - Clean up

@@ -1,0 +1,18 @@
+name: daily daily-iso
+description: Daily run on current rawhide with anaconda dnf and python-blivet daily builds
+point_person: rvykydal@redhat.com
+artifact_type: github.scheduled.daily.kstest
+execute_on:
+  - filter: event.scenario.testplan == "daily-iso"
+verified_by:
+  test_cases:
+    query: '"knownfailure" not in tc.tags and
+            "manual" not in tc.tags and
+            "skip-on-fedora" not in tc.tags and
+            "rhbz2018913" not in tc.tags and
+            "gh576" not in tc.tags and
+            "gh640" not in tc.tags and
+            "gh641" not in tc.tags and
+            "gh658" not in tc.tags and
+            "rhbz2052038" not in tc.tags and
+            "gh595" not in tc.tags'

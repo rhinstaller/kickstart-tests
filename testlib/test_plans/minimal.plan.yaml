@@ -1,0 +1,10 @@
+name: minimal
+description: Run minimal plan with single fast test
+point_person: rvykydal@redhat.com
+artifact_type: github.scheduled.daily.kstest
+execute_on:
+  - filter: event.scenario.testplan == "minimal"
+verified_by:
+  test_cases:
+    direct_list:
+      - container

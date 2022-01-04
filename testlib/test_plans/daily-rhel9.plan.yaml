@@ -1,0 +1,15 @@
+name: daily rhel9
+description: Daily run on current RHEL 9 development compose
+point_person: rvykydal@redhat.com
+artifact_type: github.scheduled.daily.kstest
+execute_on:
+  - filter: event.scenario.testplan == "rhel9"
+verified_by:
+  test_cases:
+    query: '"knownfailure" not in tc.tags and
+            "manual" not in tc.tags and
+            "skip-on-rhel" not in tc.tags and
+            "skip-on-rhel-9" not in tc.tags and
+            "rhbz1960279" not in tc.tags and
+            "gh576" not in tc.tags and
+            "gh595" not in tc.tags'

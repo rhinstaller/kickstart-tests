@@ -23,7 +23,7 @@ kernel_args() {
     local tmp_dir="${1}"
 
     # Provide an installation source.
-    local repo_url="$( echo ${KSTEST_URL} | sed -e 's/^--url=//' )"
+    local repo_url="${KSTEST_URL}"
 
     # Provide the anabot recipe.
     cp ${KSTESTDIR}/${name}.xml ${tmp_dir}/http/example.xml

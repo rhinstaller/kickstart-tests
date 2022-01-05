@@ -54,7 +54,7 @@ validate() {
     check_proxy_settings $tmpdir
 
     # HTTPS direct mirror; we don't need to capture hostname here
-    httpsdir=$(echo "$KSTEST_URL" | grep -e '--url="\?https:')
+    httpsdir=$(echo "$KSTEST_URL" | grep -e 'https:')
 
     # unless direct https URL was used, also check for:
     if [ ! "$httpsdir" ]; then

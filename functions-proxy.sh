@@ -6,13 +6,13 @@ function check_proxy_settings() {
 
     # Checks must differ depending on the form of KSTEST_URL
     # HTTP mirror list; we find the hostname with the cuts
-    httplist=$(echo "$KSTEST_URL" | grep -e '--mirrorlist="\?http:' | cut -d'=' -f2 | cut -d'/' -f3)
+    httplist=$(echo "$KSTEST_URL" | grep -e 'http:' | cut -d'/' -f3)
     # HTTPS mirror list; ditto
-    httpslist=$(echo "$KSTEST_URL" | grep -e '--mirrorlist="\?https:' | cut -d'=' -f2 | cut -d'/' -f3)
+    httpslist=$(echo "$KSTEST_URL" | grep -e 'https:' | cut -d'/' -f3)
     # HTTP direct mirror; ditto
-    httpdir=$(echo "$KSTEST_URL" | grep -e '--url="\?http:' | cut -d'=' -f2 | cut -d'/' -f3)
+    httpdir=$(echo "$KSTEST_URL" | grep -e 'http:' | cut -d'/' -f3)
     # HTTPS direct mirror; we don't need to capture hostname here
-    httpsdir=$(echo "$KSTEST_URL" | grep -e '--url="\?https:')
+    httpsdir=$(echo "$KSTEST_URL" | grep -e 'https:')
 
     if [ "$httpslist" ]; then
         # check for CONNECT request to mirrorlist host

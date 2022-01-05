@@ -1,5 +1,5 @@
 #test name: proxy-kickstart
-url @KSTEST_URL@ --proxy=PROXY-ADDON
+url --url=@KSTEST_URL@ --proxy=PROXY-ADDON
 repo --name=kstest-http --baseurl=HTTP-ADDON-REPO --proxy=PROXY-ADDON --install
 
 network --bootproto=dhcp
@@ -21,7 +21,7 @@ shutdown
 
 %post --nochroot
 # HTTPS direct mirror; we don't need to capture hostname here
-httpsdir=$(echo "@KSTEST_URL@" | grep -e '--url="\?https:')
+httpsdir=$(echo "@KSTEST_URL@" | grep -e 'https:')
 
 # Check that the addon repo file was installed
 if [[ ! -f /mnt/sysroot/etc/yum.repos.d/kstest-http.repo ]]; then

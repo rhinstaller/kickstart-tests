@@ -38,7 +38,6 @@ rhel9_skip_array=(
   gh576       # clearpart-4 test is flaky on all scenarios
   gh595       # proxy-cmdline failing on all scenarios
   rhbz1960279 # packages-weakdeps: "gnupg2 --recommends has changed, test needs to be updated"
-  rhbz2031775 # issue with lvcreate --devices option
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

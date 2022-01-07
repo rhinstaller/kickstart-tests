@@ -177,7 +177,7 @@ sed_args+=$(printenv | while read line; do
     key="$(echo $line | cut -d'=' -f1)"
     val="$(echo $line | cut -d'=' -f2-)"
 
-    [[ "${key}" =~ ^KSTEST_ ]] && echo -n " -e s#@${key}@#${val}#g"
+    [[ "${key}" =~ ^KSTEST_ ]] && echo -n " -e s#@${key}@#${val//&/\\&}#g"
  done)
 
 # Check if the given test should be skipped based on "test type blacklist" or not.

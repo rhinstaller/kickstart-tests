@@ -1,0 +1,12 @@
+#test name: url-metalink
+
+## Simple test for url --metalink.
+
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+url --metalink=@KSTEST_METALINK@
+
+%post
+%ksappend validation/success_if_result_empty.ks
+%end

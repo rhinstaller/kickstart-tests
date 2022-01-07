@@ -1,0 +1,16 @@
+#test name: repo-mirrorlist
+
+## Simple test for repo --mirrorlist.
+
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+# Specify the mandatory base repo, but keep it empty.
+url --url=EMPTY_REPO_URL
+
+# Everything should be provided by the additional repos.
+repo --name=test01 --mirrorlist=@KSTEST_MIRRORLIST@
+
+%post
+%ksappend validation/success_if_result_empty.ks
+%end

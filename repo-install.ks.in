@@ -1,0 +1,65 @@
+#test name: repo-install
+
+## Test for repo --install.
+
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+repo --name=test01 --baseurl=@KSTEST_URL@
+repo --name=test02 --baseurl=@KSTEST_URL@ --install
+repo --name=test03 --baseurl=@KSTEST_URL@ --cost=25  --install
+repo --name=test04 --baseurl=@KSTEST_URL@ --noverifyssl --install
+repo --name=test05 --baseurl=@KSTEST_URL@ --includepkgs=p1,p2 --excludepkgs=p3,p4 --install
+
+%post
+
+# Check the test01 repository.
+repo=/etc/yum.repos.d/test01.repo
+
+if [[ -e ${repo} ]]; then
+    echo "*** ${repo} shouldn't be installed" >> /root/RESULT
+fi
+
+# Check the test02 repository.
+repo=/etc/yum.repos.d/test02.repo
+
+if [[ ! -e ${repo} ]]; then
+    echo "*** ${repo} should be installed" >> /root/RESULT
+fi
+
+# Check the test03 repository.
+repo=/etc/yum.repos.d/test03.repo
+
+if [[ ! -e ${repo} ]]; then
+    echo "*** ${repo} should be installed" >> /root/RESULT
+elif ! grep -q '^cost=25$' ${repo}; then
+    echo "*** ${repo} should specify the cost option" >> /root/RESULT
+    cat ${repo} >> /root/RESULT
+fi
+
+# Check the test04 repository.
+repo=/etc/yum.repos.d/test04.repo
+
+if [[ ! -e ${repo} ]]; then
+    echo "*** ${repo} should be installed" >> /root/RESULT
+elif ! grep -q '^sslverify=0$' ${repo}; then
+    echo "*** ${repo} should specify the sslverify option" >> /root/RESULT
+    cat ${repo} >> /root/RESULT
+fi
+
+# Check the test05 repository.
+repo=/etc/yum.repos.d/test05.repo
+
+if [[ ! -e ${repo} ]]; then
+    echo "*** ${repo} should be installed" >> /root/RESULT
+elif ! grep -q '^include=p1,p2$' ${repo}; then
+    echo "*** ${repo} should specify the includepkgs option" >> /root/RESULT
+    cat ${repo} >> /root/RESULT
+elif ! grep -q '^exclude=p3,p4$' ${repo}; then
+    echo "*** ${repo} should specify the excludepkgs option" >> /root/RESULT
+    cat ${repo} >> /root/RESULT
+fi
+
+%ksappend validation/success_if_result_empty.ks
+%end

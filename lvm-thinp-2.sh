@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="lvm storage rhbz2031775"
+TESTTYPE="lvm storage"
 
 . ${KSTESTDIR}/functions.sh

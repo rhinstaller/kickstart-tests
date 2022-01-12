@@ -1,2 +1,2 @@
 # Default Fedora Rawhide repositories
-url @KSTEST_URL@
+url --url @KSTEST_URL@

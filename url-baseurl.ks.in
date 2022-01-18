@@ -1,0 +1,12 @@
+#test name: url-baseurl
+
+## Simple test for url --url.
+
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+url --url=@KSTEST_URL@
+
+%post
+%ksappend validation/success_if_result_empty.ks
+%end

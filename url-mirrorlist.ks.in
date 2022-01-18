@@ -1,0 +1,12 @@
+#test name: url-mirrorlist
+
+## Simple test for url --mirrorlist.
+
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+url --mirrorlist=@KSTEST_MIRRORLIST@
+
+%post
+%ksappend validation/success_if_result_empty.ks
+%end

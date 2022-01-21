@@ -19,3 +19,25 @@
 TESTTYPE="packaging repo"
 
 . ${KSTESTDIR}/functions.sh
+
+prepare() {
+    local ks="$1"
+    local tmp_dir="$2"
+    local httpd_url=""
+
+    # Create an empty repository.
+    mkdir -p "${tmp_dir}/http/repo"
+    createrepo_c -q "${tmp_dir}/http/repo"
+
+    # Start a http server to serve the repository.
+    start_httpd "${tmp_dir}/http" "${tmp_dir}"
+
+    # Substitute variables in the kickstart file.
+    sed -e "s|EMPTY_REPO_URL|${httpd_url}/repo|" "${ks}" > "${tmp_dir}/ks.cfg"
+    echo "${tmp_dir}/ks.cfg"
+}
+
+cleanup() {
+    local tmp_dir="${1}"
+    stop_httpd "${tmp_dir}"
+}

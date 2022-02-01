@@ -1,0 +1,20 @@
+# test name: check_for_disabled_addons
+
+# Use defaults
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+%post --nochroot
+# Check the syslog for Addons, which should have been disabled
+ 
+errors=$( grep "Anaconda.Addons*" /tmp/syslog | grep -v forbidden )
+
+if [[ -n "${errors}" ]]; then
+    echo "Addons are still enabled:" > /mnt/sysroot/root/RESULT
+    echo "${errors}" >> /mnt/sysroot/root/RESULT
+else
+    echo "SUCCESS" >> /mnt/sysroot/root/RESULT
+fi
+
+%end

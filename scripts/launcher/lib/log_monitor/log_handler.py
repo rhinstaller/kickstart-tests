@@ -31,7 +31,7 @@ class VirtualLogRequestHandler(LogRequestHandler):
         "CRIT mdadm:DegradedArray event detected",
 
         # Team networking is deprecated
-        "CRIT kernel:Warning: team - this hardware",
+        "CRIT kernel:Warning: Deprecated Driver is detected: team ",
 
         # Ignore a call trace during debugging.
         # "Call Trace:"

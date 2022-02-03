@@ -17,38 +17,33 @@
 #
 # Red Hat Author(s): Jiri Konecny <jkonecny@redhat.com>
 
-TESTTYPE="packaging"
+TESTTYPE="packaging repo"
 
 . ${KSTESTDIR}/functions.sh
 
 prepare() {
-    ks=$1
-    tmpdir=$2
+    local ks=$1
+    local tmp_dir=$2
 
-    scriptdir=$PWD/scripts
+    # Create the addon repository.
+    "${PWD}/scripts/generate-repository.py" "${tmp_dir}/addon" "addon"
 
-    # Create the test repo
-    PYTHONPATH=${KSTESTDIR}/lib:$PYTHONPATH ${scriptdir}/make-addon-pkgs.py $tmpdir
-
-    # Start a http server and proxy server to serve the repos
-    start_httpd ${tmpdir}/http $tmpdir
+    # Start a http server that will provide the repository.
+    start_httpd "${tmp_dir}/addon" "${tmp_dir}"
 
     echo "${ks}"
 }
 
 kernel_args() {
-    tmpdir="$1"
+    local tmp_dir="$1"
+    local httpd_url=""
 
-    httpd_url="$(cat ${tmpdir}/httpd_url)"
-
-    echo ${tmpdir} -- ${httpd_url} > /tmp/addrepo-test.log
-
-    echo "${DEFAULT_BOOTOPTS} inst.addrepo=LOCAL,${httpd_url}"
+    httpd_url="$(cat ${tmp_dir}/httpd_url)"
+    echo ${tmp_dir} -- ${httpd_url} > /tmp/addrepo-test.log
+    echo "${DEFAULT_BOOTOPTS} inst.addrepo=ADDON,${httpd_url}"
 }
 
 cleanup() {
-    ### Kill the http server
-    if [ -f ${tmpdir}/httpd-pid ]; then
-        kill $(cat ${tmpdir}/httpd-pid)
-    fi
+    local tmp_dir="${1}"
+    stop_httpd "${tmp_dir}"
 }

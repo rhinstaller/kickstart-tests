@@ -1,0 +1,64 @@
+#test name: repo-enable
+
+## Test for enabling repositories using repo --name.
+
+%ksappend common/common_no_payload.ks
+%ksappend repos/default.ks
+
+# Enable the repository in the installation environment.
+repo --name=addon-a
+
+%packages
+optional-package-from-addon-a
+%end
+
+%pre
+
+# Create additional repositories in the installation environment.
+
+cat > /etc/anaconda.repos.d/addon-a.repo <<EOF
+[addon-a]
+name=addon-a
+enabled=0
+baseurl=REPO_A_URL
+cost=50
+EOF
+
+cat > /etc/anaconda.repos.d/addon-b.repo <<EOF
+[addon-b]
+name=addon-b
+enabled=0
+baseurl=REPO_B_URL
+cost=25
+EOF
+
+%end
+
+%post
+
+# Check packages that should be installed.
+
+rpm -q optional-package-from-addon-a
+if [[ $? != 0 ]]; then
+    echo '*** optional-package-from-addon-a was not installed' >> /root/RESULT
+fi
+
+rpm -q mandatory-package-from-addon-a
+if [[ $? != 0 ]]; then
+    echo '*** mandatory-package-from-addon-a was not installed' >> /root/RESULT
+fi
+
+# Check packages that shouldn't be installed.
+
+rpm -q optional-package-from-addon-b
+if [[ $? == 0 ]]; then
+    echo '*** optional-package-from-addon-b was installed' >> /root/RESULT
+fi
+
+rpm -q mandatory-package-from-addon-b
+if [[ $? == 0 ]]; then
+    echo '*** mandatory-package-from-addon-b was installed' >> /root/RESULT
+fi
+
+%ksappend validation/success_if_result_empty.ks
+%end

@@ -25,23 +25,26 @@ TESTTYPE="method proxy knownfailure"
 . ${KSTESTDIR}/functions-proxy.sh
 
 prepare() {
-    ks=$1
-    tmpdir=$2
+    local ks=$1
+    local tmp_dir=$2
+    local httpd_url=""
+    local proxy_url=""
+    mkdir "${tmp_dir}/http"
 
-    scriptdir=$PWD/scripts
+    # Create the addon repository.
+    "${PWD}/scripts/generate-repository.py" "${tmp_dir}/http" "addon"
 
-    # Create the test repo
-    PYTHONPATH=${KSTESTDIR}/lib:$PYTHONPATH ${scriptdir}/make-addon-pkgs.py $tmpdir
+    # Start a http and proxy server that will provide the repository.
+    start_httpd "${tmp_dir}/http" "${tmp_dir}"
+    start_proxy "${tmp_dir}/proxy"
 
-    # Start a http and proxy server to serve the test repo
-    start_httpd ${tmpdir}/http ${tmpdir}
-    start_proxy ${tmpdir}/proxy
-
+    # Substitute variables in the kickstart file.
     sed -e  "/^repo/ s|HTTP-ADDON-REPO|${httpd_url}|" \
         -re "/^(repo|url)/ s|PROXY-ADDON|${proxy_url}|" \
         -e  "/'proxy=/ s|PROXY-ADDON|${proxy_url%%/*}|" \
-        ${ks} > ${tmpdir}/kickstart-repo.ks
-    echo ${tmpdir}/kickstart-repo.ks
+        "${ks}" > "${tmp_dir}/ks.cfg"
+
+    echo "${tmp_dir}/ks.cfg"
 }
 
 validate() {
@@ -58,8 +61,8 @@ validate() {
 
     # unless direct https URL was used, also check for:
     if [ ! "$httpsdir" ]; then
-        # testpkg-http-core from the addon repo
-        grep -q 'testpkg-http-core.*\.rpm' $tmpdir/proxy/access.log
+        # mandatory-package-from-addon from the addon repo
+        grep -q 'mandatory-package-from-addon.*\.rpm' $tmpdir/proxy/access.log
         if [[ $? -ne 0 ]]; then
             echo 'addon repo package requests were not proxied' >> $tmpdir/RESULT
         fi

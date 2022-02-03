@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015  Red Hat, Inc.
+# Copyright (C) 2022  Red Hat, Inc.
 #
 # This copyrighted material is made available to anyone wishing to use,
 # modify, copy, or redistribute it subject to the terms and conditions of
@@ -17,31 +17,33 @@
 #
 # Red Hat Author(s): David Shea <dshea@redhat.com>
 
-# requires special setup (NFS server) which we don't have in our test environments
-TESTTYPE="method packaging knownfailure"
+TESTTYPE="packaging repo"
 
 . ${KSTESTDIR}/functions.sh
 
 prepare() {
-    ks=$1
-    tmpdir=$2
+    local ks=$1
+    local tmp_dir=$2
+    local httpd_url=""
+    mkdir "${tmp_dir}/http"
 
-    scriptdir=$PWD/scripts
-
-    # Create the test repo
-    PYTHONPATH=${KSTESTDIR}/lib:$PYTHONPATH ${scriptdir}/make-addon-pkgs.py $tmpdir
+    # Create the repositories 'addon-a' and 'addon-b'.
+    "${PWD}/scripts/generate-repository.py" "${tmp_dir}/http/a" "addon-a"
+    "${PWD}/scripts/generate-repository.py" "${tmp_dir}/http/b" "addon-b"
 
     # Start a http server to serve the test repo
-    start_httpd ${tmpdir}/http ${tmpdir}
+    start_httpd "${tmp_dir}/http" "${tmp_dir}"
 
-    sed -e "s|@KSTEST_HTTP_ADDON_REPO@|${httpd_url}|" ${ks} > ${tmpdir}/kickstart.ks
-    echo ${tmpdir}/kickstart.ks
+    # Substitute variables in the kickstart file.
+    sed -e "s|REPO_A_URL|${httpd_url}/a|" \
+        -e "s|REPO_B_URL|${httpd_url}/b|" \
+        "${ks}" > "${tmp_dir}/ks.cfg"
+
+    echo "${tmp_dir}/ks.cfg"
 }
 
-cleanup() {
-    tmpdir=$1
 
-    if [ -f ${tmpdir}/httpd-pid ]; then
-        kill $(cat ${tmpdir}/httpd-pid)
-    fi
+cleanup() {
+    local tmp_dir="${1}"
+    stop_httpd "${tmp_dir}"
 }

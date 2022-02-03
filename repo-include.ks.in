@@ -1,0 +1,69 @@
+#test name: repo-include
+
+## Test for repo --cost and --includepkgs.
+
+%ksappend common/common_no_payload.ks
+%ksappend repos/default.ks
+
+# The addon repos are setup with the following packages:
+#
+# Repository 'addon-a':
+#   - mandatory-package-from-addon-a, to be installed with @core
+#   - optional-package-from-addon-a, to be installed because we ask for it
+#   - package-1, contains a file /usr/share/package-1/addon-a, to be excluded via includepkgs
+#   - package-2, contains a file /usr/share/package-2/addon-a, to be included due to cost
+#
+# Repository 'addon-b':
+#   - mandatory-package-from-addon-b, to be installed with @core
+#   - optional-package-from-addon-b, to be installed because we ask for it
+#   - package-1, contains a file /usr/share/package-1/addon-b, to be included
+#   - package-2, contains a file /usr/share/package-2/addon-b, to be excluded via cost
+#
+
+repo --name=addon-a --baseurl=REPO_A_URL --cost=25 --includepkgs=*-from-addon-a,package-2
+repo --name=addon-b --baseurl=REPO_B_URL --cost=50
+
+%packages
+package-1
+package-2
+optional-package-from-addon-a
+optional-package-from-addon-b
+%end
+
+%post
+# Check that all the packages were installed.
+pkgs=(
+    package-1
+    package-2
+    mandatory-package-from-addon-a
+    optional-package-from-addon-a
+    mandatory-package-from-addon-b
+    optional-package-from-addon-b
+)
+
+for pkg in "${pkgs[@]}" ; do
+    if ! rpm -q $pkg ; then
+        echo "*** package ${pkg} was not installed" >> /root/RESULT
+    fi
+done
+
+# Check that the right packages were installed.
+if [[ -e /usr/share/package-1/addon-a ]]; then
+    echo "*** wrong version of package-1 was installed" >> /root/RESULT
+fi
+
+if [[ -e /usr/share/package-2/addon-b ]]; then
+    echo "*** wrong version of package-2 was installed" >> /root/RESULT
+fi
+
+# Double check that the correct marker files are in place.
+if [[ ! -e /usr/share/package-1/addon-b ]]; then
+    echo "*** unable to find marker for package-1" >> /root/RESULT
+fi
+
+if [[ ! -e /usr/share/package-2/addon-a ]]; then
+    echo "*** unable to find marker for package-2" >> /root/RESULT
+fi
+
+%ksappend validation/success_if_result_empty.ks
+%end

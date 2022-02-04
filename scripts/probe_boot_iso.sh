@@ -45,7 +45,7 @@ IMAGE="$1"
 DISCINFO_VER=$(isoinfo -R -x /.discinfo -i "$IMAGE" | sed -n '2 p')
 if [ -n "$DISCINFO_VER" ]; then
     # make sure it looks like a Fedora version name/number
-    if [ "$DISCINFO_VER" = "Rawhide" ] || [ "$DISCINFO_VER" -gt 30 ]; then
+    if [ "$DISCINFO_VER" = "Rawhide" ] || [ $(echo $DISCINFO_VER | cut -d. -f1) -gt 30 ]; then
         echo "NAME=Fedora"
         echo "VERSION=$DISCINFO_VER"
         exit 0

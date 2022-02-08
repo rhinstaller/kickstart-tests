@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2019  Red Hat, Inc.
+# Copyright (C) 2022  Red Hat, Inc.
 #
 # This copyrighted material is made available to anyone wishing to use,
 # modify, copy, or redistribute it subject to the terms and conditions of
@@ -15,40 +15,34 @@
 # License and may only be used or replicated with the express permission of
 # Red Hat, Inc.
 #
-# Red Hat Author(s): Jiri Konecny <jkonecny@redhat.com>
 
-TESTTYPE="packaging"
+TESTTYPE="packaging repo"
 
 . ${KSTESTDIR}/functions.sh
 
 prepare() {
-    ks=$1
-    tmpdir=$2
+    local ks=$1
+    local tmp_dir=$2
+    local httpd_url=""
+    mkdir "${tmp_dir}/http"
 
-    scriptdir=$PWD/scripts
+    # Create the repositories 'a' and 'b'.
+    "${PWD}/scripts/generate-repository.py" "${tmp_dir}/http/a" "addon-a"
+    "${PWD}/scripts/generate-repository.py" "${tmp_dir}/http/b" "addon-b"
 
-    # Create the test repo
-    PYTHONPATH=${KSTESTDIR}/lib:$PYTHONPATH ${scriptdir}/make-addon-pkgs.py $tmpdir
+    # Start a http server to serve the test repo
+    start_httpd "${tmp_dir}/http" "${tmp_dir}"
 
-    # Start a http server and proxy server to serve the repos
-    start_httpd ${tmpdir}/http $tmpdir
+    # Substitute variables in the kickstart file.
+    sed -e "s|REPO_A_URL|${httpd_url}/a|" \
+        -e "s|REPO_B_URL|${httpd_url}/b|" \
+        "${ks}" > "${tmp_dir}/ks.cfg"
 
-    echo "${ks}"
+    echo "${tmp_dir}/ks.cfg"
 }
 
-kernel_args() {
-    tmpdir="$1"
-
-    httpd_url="$(cat ${tmpdir}/httpd_url)"
-
-    echo ${tmpdir} -- ${httpd_url} > /tmp/addrepo-test.log
-
-    echo "${DEFAULT_BOOTOPTS} inst.addrepo=LOCAL,${httpd_url}"
-}
 
 cleanup() {
-    ### Kill the http server
-    if [ -f ${tmpdir}/httpd-pid ]; then
-        kill $(cat ${tmpdir}/httpd-pid)
-    fi
+    local tmp_dir="${1}"
+    stop_httpd "${tmp_dir}"
 }

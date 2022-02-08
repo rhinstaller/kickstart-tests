@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015  Red Hat, Inc.
+# Copyright (C) 2019  Red Hat, Inc.
 #
 # This copyrighted material is made available to anyone wishing to use,
 # modify, copy, or redistribute it subject to the terms and conditions of
@@ -15,33 +15,35 @@
 # License and may only be used or replicated with the express permission of
 # Red Hat, Inc.
 #
-# Red Hat Author(s): David Shea <dshea@redhat.com>
+# Red Hat Author(s): Jiri Konecny <jkonecny@redhat.com>
 
-# requires special setup (NFS server) which we don't have in our test environments
-TESTTYPE="method packaging knownfailure"
+TESTTYPE="packaging repo"
 
 . ${KSTESTDIR}/functions.sh
 
 prepare() {
-    ks=$1
-    tmpdir=$2
+    local ks=$1
+    local tmp_dir=$2
 
-    scriptdir=$PWD/scripts
+    # Create the addon repository.
+    "${PWD}/scripts/generate-repository.py" "${tmp_dir}/addon" "addon"
 
-    # Create the test repo
-    PYTHONPATH=${KSTESTDIR}/lib:$PYTHONPATH ${scriptdir}/make-addon-pkgs.py $tmpdir
+    # Start a http server that will provide the repository.
+    start_httpd "${tmp_dir}/addon" "${tmp_dir}"
 
-    # Start a http server to serve the test repo
-    start_httpd ${tmpdir}/http ${tmpdir}
+    echo "${ks}"
+}
 
-    sed -e "s|@KSTEST_HTTP_ADDON_REPO@|${httpd_url}|" ${ks} > ${tmpdir}/kickstart.ks
-    echo ${tmpdir}/kickstart.ks
+kernel_args() {
+    local tmp_dir="$1"
+    local httpd_url=""
+
+    httpd_url="$(cat ${tmp_dir}/httpd_url)"
+    echo ${tmp_dir} -- ${httpd_url} > /tmp/addrepo-test.log
+    echo "${DEFAULT_BOOTOPTS} inst.addrepo=ADDON,${httpd_url}"
 }
 
 cleanup() {
-    tmpdir=$1
-
-    if [ -f ${tmpdir}/httpd-pid ]; then
-        kill $(cat ${tmpdir}/httpd-pid)
-    fi
+    local tmp_dir="${1}"
+    stop_httpd "${tmp_dir}"
 }

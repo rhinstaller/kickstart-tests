@@ -1,6 +1,6 @@
 #test name: proxy-auth
 url --url=@KSTEST_URL@ --proxy=http://anaconda:qweqwe@PROXY-ADDON
-repo --name=kstest-http --baseurl=HTTP-ADDON-REPO --proxy=http://anaconda:qweqwe@PROXY-ADDON --install
+repo --name=addon --baseurl=HTTP-ADDON-REPO --proxy=http://anaconda:qweqwe@PROXY-ADDON --install
 network --bootproto=dhcp
 
 bootloader --timeout=1
@@ -14,7 +14,7 @@ timezone America/New_York
 rootpw qweqwe
 shutdown
 
-# Install @core, which will also pull in testpkg-http-core from the addon repo
+# Install @core, which will also pull in mandatory-package-from-addon from the addon repo
 %packages
 %end
 
@@ -23,14 +23,14 @@ shutdown
 httpsdir=$(echo "@KSTEST_URL@" | grep -e 'https:')
 
 # Check that the addon repo file was installed
-if [[ ! -f /mnt/sysroot/etc/yum.repos.d/kstest-http.repo ]]; then
-    echo 'kstest-http.repo does not exist' >> /mnt/sysroot/root/RESULT
+if [[ ! -f /mnt/sysroot/etc/yum.repos.d/addon.repo ]]; then
+    echo 'addon.repo does not exist' >> /mnt/sysroot/root/RESULT
 fi
 
 # Check that the proxy configuration was written to the repo file
-grep -q 'proxy=http://anaconda:qweqwe@PROXY-ADDON' /mnt/sysroot/etc/yum.repos.d/kstest-http.repo
+grep -q 'proxy=http://anaconda:qweqwe@PROXY-ADDON' /mnt/sysroot/etc/yum.repos.d/addon.repo
 if [[ $? -ne 0 ]]; then
-    echo 'kstest-http.repo does not contain proxy information' >> /mnt/sysroot/root/RESULT
+    echo 'addon.repo does not contain proxy information' >> /mnt/sysroot/root/RESULT
 fi
 
 # Check that the installed repo file is usable
@@ -46,11 +46,11 @@ chroot /mnt/sysroot $BIN clean packages
 
 # Download package to test if the installed repository is usable
 chroot /mnt/sysroot \
-    $BIN --disablerepo=\* --enablerepo=kstest-http --downloadonly --nogpgcheck -y \
-         reinstall testpkg-http-core 2>/dev/null | \
-        grep -q 'testpkg-http-core'
+    $BIN --disablerepo=\* --enablerepo=addon --downloadonly --nogpgcheck -y \
+         reinstall mandatory-package-from-addon 2>/dev/null | \
+        grep -q 'mandatory-package-from-addon'
 if [[ $? -ne 0 ]]; then
-    echo 'unable to query kstest-http repo' >> /mnt/sysroot/root/RESULT
+    echo 'unable to query addon repo' >> /mnt/sysroot/root/RESULT
 fi
 
 # If nothing was written to RESULT, it worked

@@ -1,5 +1,5 @@
 #version=DEVEL
-#test name: addrepo
+#test name: repo-addrepo
 
 # This test will check the installation with addrepo kernel parameter functionality.
 # The inst.addrepo boot option will add additional software repository,
@@ -10,24 +10,24 @@
 %ksappend repos/default.ks
 
 %packages
-testpkg-http-core
-testpkg-share1
+mandatory-package-from-addon
+package-1
 %end
 
 %post
 
-rpm -q testpkg-http-core
+rpm -q mandatory-package-from-addon
 if [[ $? != 0 ]]; then
-    echo '*** testpkg-http-core was not installed' >> /root/RESULT
+    echo '*** mandatory-package-from-addon was not installed' >> /root/RESULT
 fi
 
-rpm -q testpkg-share1
+rpm -q package-1
 if [[ $? != 0 ]]; then
-    echo '*** testpkg-share1 was not installed' >> /root/RESULT
+    echo '*** package-1 was not installed' >> /root/RESULT
 fi
 
-if [[ -e /etc/LOCAL.repo ]]; then
-    echo '*** LOCAL.repo should not be installed to the system' >> /root/RESULT
+if [[ -e /etc/ADDON.repo ]]; then
+    echo '*** ADDON.repo should not be installed to the system' >> /root/RESULT
 fi
 
 %ksappend validation/success_if_result_empty.ks

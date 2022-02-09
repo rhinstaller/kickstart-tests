@@ -63,8 +63,9 @@ UPDATES_IMG=""
 
 TESTTYPE=""
 SKIP_TESTTYPES=""
+TIMEOUT=0
 
-while getopts ":i:k:t:s:u:b:p:o:r" opt; do
+while getopts ":i:k:t:s:u:b:p:o:rx:" opt; do
     case $opt in
        i)
            # If this wasn't set from the environment, set it from the command line
@@ -116,6 +117,9 @@ while getopts ":i:k:t:s:u:b:p:o:r" opt; do
            # Retry tests once which failed for an unspecific reason (code 1), to avoid random
            # infrastructure failures when running lots of tests
            RETRY=--retry
+           ;;
+       x)
+           TIMEOUT=$OPTARG
            ;;
        *)
            echo "Usage: run_kickstart_tests.sh [-i boot.iso] [-k 0|1|2] [-t test_type_to_run] [-s test_types_to_ignore] [-u link_to_updates.img] [-b additional_boot_options] [-p platform_name] [-o ksappend_overrides] [tests]"
@@ -412,7 +416,7 @@ if [[ "$TEST_REMOTES" != "" ]]; then
     # missmatch from happening.
     export LANG=en_US.UTF-8
 
-    parallel --no-notice ${remote_args} --wd kickstart-tests --jobs ${TEST_JOBS:-4} \
+    timeout ${TIMEOUT} parallel --no-notice ${remote_args} --wd kickstart-tests --jobs ${TEST_JOBS:-4} \
              PYTHONPATH=$PYTHONPATH scripts/launcher/run_one_test.py \
                                                                -i ../install_images/${_IMAGE} \
                                                                -k ${KEEPIT} \
@@ -444,7 +448,7 @@ if [[ "$TEST_REMOTES" != "" ]]; then
         ssh kstest@${remote} rm -rf /var/tmp/kstest-\*
     done
 else
-    parallel --no-notice --jobs ${TEST_JOBS:-4} \
+    timeout ${TIMEOUT} parallel --no-notice --jobs ${TEST_JOBS:-4} \
         PYTHONPATH=$PYTHONPATH scripts/launcher/run_one_test.py \
                                                       -i ${IMAGE} \
                                                       -k ${KEEPIT} \

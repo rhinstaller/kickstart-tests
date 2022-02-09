@@ -65,7 +65,7 @@ EOF
 }
 
 # parse options
-eval set -- "$(getopt -o j:p:t:s:u:rch --long jobs:,platform:,testtype:,skip-testtypes:,updates:,retry,connect-shell,daily-iso:,defaults:,run-args:,recommended-jobs,help -- "$@")"
+eval set -- "$(getopt -o j:p:t:s:u:rch --long jobs:,platform:,testtype:,skip-testtypes:,updates:,retry,connect-shell,daily-iso:,defaults:,run-args:,recommended-jobs,timeout:,help -- "$@")"
 
 while true; do
     case "${1:-}" in
@@ -80,6 +80,7 @@ while true; do
         --defaults) shift; DEFAULTS_SH="$1" ;;
         --run-args) shift; CONTAINER_RUN_ARGS="$1" ;;
         --recommended-jobs) recommended_jobs; exit 0 ;;
+        --timeout) shift; TIMEOUT="$1" ;;
         -h|--help) usage; exit 0 ;;
         --) shift; break ;;
     esac
@@ -147,6 +148,7 @@ fi
 set -x
 $CRUN run -it --rm --device=/dev/kvm --publish 127.0.0.1::16509 $PODMAN_SELINUX_FIX \
     --env KSTESTS_TEST="$KSTESTS_TEST" --env TESTTYPE="${TESTTYPE:-}" --env SKIP_TESTTYPES="${SKIP_TESTTYPES:-}" \
+    --env KSTESTS_RUN_TIMEOUT="${TIMEOUT:-}" \
     --env TEST_JOBS="$TEST_JOBS" --env PLATFORM="${PLATFORM:-}" --env TEST_RETRY="${TEST_RETRY:-}" ${UPDATES_IMG_ARGS:-} ${CONTAINER_RUN_ARGS:-} \
     ${VAR_TMP:-} -v "$PWD/data:/opt/kstest/data:z" -v "$BASEDIR:/kickstart-tests:ro,z" ${DEFAULTS_SH_ARGS:-} \
     $CONTAINER $RUN_COMMAND

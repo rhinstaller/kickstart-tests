@@ -2,9 +2,10 @@
 # Launch a scenario for the daily run.
 set -eux
 
+SCENARIO_TIMEOUT=${SCENARIO_TIMEOUT:-0}
 MYDIR=$(dirname $(realpath "$0"))
 # tests often fail due to random infrastructure flakes; enable auto-retry
-LAUNCH="$MYDIR/launch --retry"
+LAUNCH="$MYDIR/launch --retry --timeout=$SCENARIO_TIMEOUT"
 ROOTDIR=$(dirname $(dirname "$MYDIR"))
 SCENARIO="$1"
 shift

@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
-TESTTYPE="network rhbz2018913"
+TESTTYPE="network"
 
 . ${KSTESTDIR}/functions.sh

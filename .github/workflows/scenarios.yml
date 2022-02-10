@@ -21,6 +21,9 @@ jobs:
     env:
       TEST_JOBS: 16
       GITHUB_TOKEN: /home/github/github-token
+      # Should be smaller than job's timeout-minutes value so we get logs of the tests that finished
+      # by the timeout.
+      SCENARIO_TIMEOUT: 450m
 
     steps:
       # self-hosted runners don't do this automatically; also useful to keep stuff around for debugging
@@ -42,7 +45,7 @@ jobs:
         run: sudo containers/squid.sh start
 
       - name: Run scenario ${{ matrix.scenario }} in container
-        run: sudo --preserve-env=TEST_JOBS,GITHUB_TOKEN containers/runner/scenario ${{ matrix.scenario }} --defaults .github/defaults.sh
+        run: sudo --preserve-env=TEST_JOBS,GITHUB_TOKEN,SCENARIO_TIMEOUT containers/runner/scenario ${{ matrix.scenario }} --defaults .github/defaults.sh
 
       - name: Collect logs
         if: always()

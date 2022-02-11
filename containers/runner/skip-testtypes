@@ -20,7 +20,6 @@ daily_iso_skip_array=(
   skip-on-fedora
   gh576       # clearpart-4 test is flaky on all scenarios
   gh595       # proxy-cmdline failing on all scenarios
-  rhbz2018913 # /etc/resolv.conf is not a symlink after kickstart
   gh640       # authselect-not-set failing
   gh641       # packages-multilib failing on systemd conflict
   rhbz2052038 # selinux-context failing on rpm database location change

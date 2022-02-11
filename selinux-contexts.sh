@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Vladimir Slavik <vslavik@redhat.com>
 
-TESTTYPE="security selinux"
+TESTTYPE="security selinux rhbz2052038"
 
 . ${KSTESTDIR}/functions.sh
 

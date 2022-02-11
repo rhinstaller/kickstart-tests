@@ -16,7 +16,7 @@
 # Red Hat, Inc.
 #
 
-TESTTYPE="packaging repo"
+TESTTYPE="packaging repo gh660"
 
 . ${KSTESTDIR}/functions.sh
 

@@ -24,6 +24,7 @@ daily_iso_skip_array=(
   gh641       # packages-multilib failing on systemd conflict
   rhbz2052038 # selinux-context failing on rpm database location change
   gh658       # module-3 can't find 'nodejs:16' module
+  gh660       # repo-X tests can't find packages in additional repo
 )
 
 rhel8_skip_array=(
@@ -31,6 +32,7 @@ rhel8_skip_array=(
   skip-on-rhel-8
   gh576       # clearpart-4 test is flaky on all scenarios
   gh595       # proxy-cmdline failing on all scenarios
+  gh660       # repo-X tests can't find packages in additional repo
 )
 
 rhel9_skip_array=(
@@ -39,6 +41,7 @@ rhel9_skip_array=(
   gh576       # clearpart-4 test is flaky on all scenarios
   gh595       # proxy-cmdline failing on all scenarios
   rhbz1960279 # packages-weakdeps: "gnupg2 --recommends has changed, test needs to be updated"
+  gh660       # repo-X tests can't find packages in additional repo
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): David Shea <dshea@redhat.com>
 
-TESTTYPE="packaging repo"
+TESTTYPE="packaging repo gh660"
 
 . ${KSTESTDIR}/functions.sh
 

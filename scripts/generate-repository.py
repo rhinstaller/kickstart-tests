@@ -74,16 +74,18 @@ os.dup2(os.open(os.devnull, os.O_WRONLY), 1)
 # The repository contains one mandatory package.
 pkg = rpmfluff.SimpleRpmBuild(
     'mandatory-package-from-{}'.format(repo_name),
-    '1.0',
-    '1'
+    version='1.0',
+    release='1',
+    tmpdir=False,
 )
 pkg.make()
 
 # The repository contains one optional package.
 pkg = rpmfluff.SimpleRpmBuild(
     'optional-package-from-{}'.format(repo_name),
-    '1.0',
-    '1'
+    version='1.0',
+    release='1',
+    tmpdir=False,
 )
 pkg.make()
 
@@ -93,8 +95,9 @@ pkg.make()
 for i in (1, 2, 3):
     pkg = rpmfluff.SimpleRpmBuild(
         'package-{}'.format(i),
-        '1.0',
-        '1'
+        version='1.0',
+        release='1',
+        tmpdir=False,
     )
     pkg.add_installed_file(
         '/usr/share/package-{}/{}'.format(i, repo_name),

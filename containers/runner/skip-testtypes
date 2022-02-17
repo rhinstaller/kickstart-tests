@@ -24,6 +24,7 @@ daily_iso_skip_array=(
   gh641       # packages-multilib failing on systemd conflict
   rhbz2052038 # selinux-context failing on rpm database location change
   gh658       # module-3 can't find 'nodejs:16' module
+  gh669       # module-1 and module-4 can't find some modules
 )
 
 rhel8_skip_array=(

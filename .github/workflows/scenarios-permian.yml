@@ -167,3 +167,14 @@ jobs:
           name: 'logs-permian-${{ matrix.scenario }}'
           path: |
             permian/permian.log
+
+      # Keep compatibility of the overall results, Permian now hides the exit code of launcher
+      - name: Pass the launch script exit code
+        working-directory: ./permian
+        run: |
+          rc=$( awk '/Runner return code: /{ print $4 }' permian.log)
+          if [ -n "$rc" ]; then
+            exit $rc
+          else
+            exit 111
+          fi

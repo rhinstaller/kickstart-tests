@@ -42,10 +42,12 @@ prepare() {
     start_httpd "${tmp_dir}/http" "${tmp_dir}"
     start_proxy "${tmp_dir}/proxy" "squid-pass.conf"
 
+    # Get the proxy IP:PORT to replace in the kickstart file
+    local proxy_ip_port="$(echo $proxy_url | grep -oE '([0-9]+\.){3}[0-9]+:[0-9]+')"
+
     # Substitute variables in the kickstart file.
     sed -e  "/^repo/ s|HTTP-ADDON-REPO|${httpd_url}|" \
-        -re "/^(repo|url)/ s|PROXY-ADDON|${proxy_url##http://}|" \
-        -e  "/'proxy=/ s|PROXY-ADDON|${proxy_url%%/*}|" \
+        -e  "/^[^#]/ s|PROXY-ADDON|${proxy_ip_port}|" \
         "${ks}" > "${tmp_dir}/ks.cfg"
 
     echo "${tmp_dir}/ks.cfg"

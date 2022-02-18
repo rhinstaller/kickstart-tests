@@ -48,7 +48,7 @@ validate() {
 
     check_proxy_settings $tmpdir
 
-    result=$(cat ${disksdir}/RESULT)
+    result=$(cat ${tmpdir}/RESULT)
     if [[ $? != 0 ]]; then
         echo '*** /root/RESULT does not exist in VM image.'
         return 1

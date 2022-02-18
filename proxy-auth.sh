@@ -42,11 +42,21 @@ prepare() {
     start_httpd "${tmp_dir}/http" "${tmp_dir}"
     start_proxy "${tmp_dir}/proxy" "squid-pass.conf"
 
+    # The test runs in a VM with user mode networking (10.0.0.0/24). Networking
+    # inside the container also uses the 10.0.0.0/24 (or /16) subnet. Both proxy
+    # and http servers run inside the container, accessible at IP address 10.0.2.2
+    # from the VM. A problem appears when the VM requests repodata from the http
+    # server at 10.0.2.2 via proxy running at 10.0.2.2 - the request is routed
+    # outside of the container.
+    # As a not-so-nice solution/workaround, use the container's loopback device
+    # instead of the IP address 10.0.2.2 to access the http server via proxy.
+    local httpd_local_url="$(echo $httpd_url | sed -r 's|([0-9]+\.){3}[0-9]+|127.0.0.1|')"
+
     # Get the proxy IP:PORT to replace in the kickstart file
     local proxy_ip_port="$(echo $proxy_url | grep -oE '([0-9]+\.){3}[0-9]+:[0-9]+')"
 
     # Substitute variables in the kickstart file.
-    sed -e  "/^repo/ s|HTTP-ADDON-REPO|${httpd_url}|" \
+    sed -e  "/^repo/ s|HTTP-ADDON-REPO|${httpd_local_url}|" \
         -e  "/^[^#]/ s|PROXY-ADDON|${proxy_ip_port}|" \
         "${ks}" > "${tmp_dir}/ks.cfg"
 

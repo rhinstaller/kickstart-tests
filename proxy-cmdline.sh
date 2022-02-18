@@ -18,7 +18,7 @@
 # Red Hat Author(s): David Shea <dshea@redhat.com>
 #                    Jiri Konecny <jkonecny@redhat.com>
 
-TESTTYPE="method proxy gh595"
+TESTTYPE="method proxy"
 
 . ${KSTESTDIR}/functions.sh
 . ${KSTESTDIR}/functions-proxy.sh

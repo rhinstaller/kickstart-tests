@@ -31,6 +31,7 @@ rhel8_skip_array=(
   skip-on-rhel-8
   gh576       # clearpart-4 test is flaky on all scenarios
   gh595       # proxy-cmdline failing on all scenarios
+  gh670       # repo-include failing on rhel
 )
 
 rhel9_skip_array=(
@@ -40,6 +41,7 @@ rhel9_skip_array=(
   gh595       # proxy-cmdline failing on all scenarios
   rhbz1960279 # packages-weakdeps: "gnupg2 --recommends has changed, test needs to be updated"
   gh641       # packages-multilib failing on systemd conflict
+  gh670       # repo-include failing on rhel
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

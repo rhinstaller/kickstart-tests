@@ -9,7 +9,7 @@
 
 %packages
 # lets use a non-default profile to see if it is correctly set afterwards
-@nodejs:16/default
+@nodejs:16/common
 @nodejs:16/development
 %end
 
@@ -46,7 +46,7 @@ dnf module list --enabled nodejs || echo "*** nodejs module not marked as enable
 dnf module list --installed nodejs || echo "*** nodejs module not marked as installed" >> /root/RESULT
 
 # check the profile
-dnf module list --installed nodejs | grep "default[^,]*\[i\]" || echo "*** nodejs module default profile not marked as installed" >> /root/RESULT
+dnf module list --installed nodejs | grep "common[^,]*\[i\]" || echo "*** nodejs module common profile not marked as installed" >> /root/RESULT
 dnf module list --installed nodejs | grep "development[^,]*\[i\]" || echo "*** nodejs module development profile not marked as installed" >> /root/RESULT
 dnf module list --installed nodejs | grep "minimal[^,]*\[i\]" && echo "*** nodejs module minimal profile marked as installed" >> /root/RESULT
 

@@ -1,0 +1,46 @@
+#version=DEVEL
+#test name: packages-ignorebroken
+#
+# what we are testing there:
+# - that packages with dependency solving problems are ignored if --ignorebroken is used
+# - that such an installation finishes
+
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
+
+repo --name=addon --baseurl=REPO_URL
+
+%packages --ignorebroken
+optional-package-from-addon
+conflicting-package-from-addon
+%end
+
+%post --nochroot
+
+journalctl \
+| grep "User has requested to skip broken packages." \
+| grep "Using this option may result in an UNUSABLE system!"
+
+if [[ $? != 0 ]]; then
+    echo "*** a missing warning about unusable system" >> /mnt/sysroot/root/RESULT
+fi
+
+%end
+
+%post
+
+# At this moment, DNF will skip the optional package and not the conflicting one.
+# Let's not rely on the DNF logic and interpretation and check that exactly one
+# of these packages is installed without specifying which one.
+
+if rpm -q optional-package-from-addon && rpm -q conflicting-package-from-addon; then
+    echo '*** only one of the packages should be installed' >> /root/RESULT
+fi
+
+if ! rpm -q optional-package-from-addon && ! rpm -q conflicting-package-from-addon; then
+    echo '*** one of the packages should be installed' >> /root/RESULT
+fi
+
+%end
+
+%ksappend validation/success_if_result_empty_standalone.ks

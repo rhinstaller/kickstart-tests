@@ -30,6 +30,11 @@
 #       * Provided only by the repository x.
 #       * It has to be explicitly requested for installation.
 #
+#   conflicting-package-from-x
+#       * Provided only by the repository x.
+#       * It has to be explicitly requested for installation.
+#       * It conflicts with optional-package-from-x.
+#
 #   package-1
 #       * It is provided by all generated repositories.
 #       * It has to be explicitly requested for installation.
@@ -86,6 +91,18 @@ pkg = rpmfluff.SimpleRpmBuild(
     version='1.0',
     release='1',
     tmpdir=False,
+)
+pkg.make()
+
+# The repository contains one conflicting package.
+pkg = rpmfluff.SimpleRpmBuild(
+    'conflicting-package-from-{}'.format(repo_name),
+    version='1.0',
+    release='1',
+    tmpdir=False,
+)
+pkg.add_conflicts(
+    'optional-package-from-{}'.format(repo_name)
 )
 pkg.make()
 

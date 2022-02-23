@@ -13,3 +13,5 @@ verified_by:
             "rhbz1960279" not in tc.tags and
             "gh576" not in tc.tags and
             "gh595" not in tc.tags'
+reporting:
+  - type: xunit

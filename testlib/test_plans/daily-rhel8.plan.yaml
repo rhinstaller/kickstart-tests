@@ -12,3 +12,5 @@ verified_by:
             "skip-on-rhel-8" not in tc.tags and
             "gh576" not in tc.tags and
             "gh595" not in tc.tags'
+reporting:
+  - type: xunit

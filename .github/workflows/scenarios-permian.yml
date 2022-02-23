@@ -141,13 +141,21 @@ jobs:
             kickstart-tests/data/logs/kstest-*/*.log
             kickstart-tests/data/logs/kstest-*/anaconda/lorax-packages.log
 
-      - name: Collect pipeline logs
+      - name: Collect Permian logs
         if: always()
         uses: actions/upload-artifact@v2
         with:
           name: 'logs-permian-${{ matrix.scenario }}'
           path: |
             permian/permian.log
+
+      - name: Collect Permian xunit reporter results
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: 'results-xunit-${{ matrix.scenario }}'
+          path: |
+            permian/xunit-*.xml
 
       # Keep compatibility of the overall results, Permian now hides the exit code of launcher
       - name: Pass the launch script exit code

@@ -18,7 +18,7 @@
 # Red Hat Author(s): David Shea <dshea@redhat.com>
 #                    Jiri Konecny <jkonecny@redhat.com>
 
-TESTTYPE="method proxy gh595"
+TESTTYPE="method proxy"
 
 . ${KSTESTDIR}/functions.sh
 . ${KSTESTDIR}/functions-proxy.sh
@@ -48,7 +48,7 @@ validate() {
 
     check_proxy_settings $tmpdir
 
-    result=$(cat ${disksdir}/RESULT)
+    result=$(cat ${tmpdir}/RESULT)
     if [[ $? != 0 ]]; then
         echo '*** /root/RESULT does not exist in VM image.'
         return 1

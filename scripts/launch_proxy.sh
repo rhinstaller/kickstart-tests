@@ -33,9 +33,9 @@ fi
 
 # Try to run squid on different ports to find usable port
 for i in $(shuf -i "${PORT_START}-${PORT_END}" -n 60); do
-    sed -e "s;@PROXY_PORT@;$i;g" -e "s;@TMP_DIR@;$BASE_DIR;g" -i $BASE_DIR/squid.conf
+    sed -e "s;@PROXY_PORT@;$i;g" -e "s;@TMP_DIR@;$BASE_DIR;g" $BASE_DIR/squid.conf > $BASE_DIR/squid_mod.conf
 
-    $PROXY_BIN -f $BASE_DIR/squid.conf
+    $PROXY_BIN -f $BASE_DIR/squid_mod.conf
     sleep 2
 
     if [ -f $BASE_DIR/squid.pid ]; then

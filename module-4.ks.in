@@ -9,8 +9,8 @@
 module --name=nodejs --stream=16
 module --name=nodejs --stream=16 --disable
 module --name=nodejs --stream=16
-module --name=postgresql --stream=14 --disable
-module --name=perl --stream=5.32
+module --name=mysql --stream=8.0 --disable
+module --name=swig --stream=4.0
 
 %packages
 %end
@@ -25,19 +25,19 @@ if [[ $? == 0 ]]; then
     echo '*** nodejs for module only enabled nodejs installed' >> /root/RESULT
 fi
 
-rpm -q postgresql
+rpm -q community-mysql
 if [[ $? == 0 ]]; then
-    echo '*** postgresql for the only enabled postgresql module installed' >> /root/RESULT
+    echo '*** community-mysql is installed' >> /root/RESULT
 fi
 
-rpm -q postgresql-server
+rpm -q community-mysql-server
 if [[ $? == 0 ]]; then
-    echo '*** postgresql-server for the only enabled postgresql module installed' >> /root/RESULT
+    echo '*** community-mysql-server is installed' >> /root/RESULT
 fi
 
-rpm -q perl
+rpm -q swig
 if [[ $? == 0 ]]; then
-    echo '*** perl for the only enabled perl module installed' >> /root/RESULT
+    echo '*** swig is installed' >> /root/RESULT
 fi
 
 # next we will check if the module is seen as enabled/installed from the
@@ -48,13 +48,13 @@ dnf module list
 
 # all installed modules should be also enabled
 dnf module list --enabled nodejs || echo "** nodejs module not marked as enabled" >> /root/RESULT
-dnf module list --enabled postgresql && echo "** postgresql module not marked as enabled" >> /root/RESULT
-dnf module list --enabled perl || echo "** perl module not marked as enabled" >> /root/RESULT
+dnf module list --enabled mysql && echo "** mysql module not marked as enabled" >> /root/RESULT
+dnf module list --enabled swig || echo "** swig module not marked as enabled" >> /root/RESULT
 
 # check all modules are also marked as installed
 dnf module list --installed nodejs && echo "*** nodejs module marked as installed" >> /root/RESULT
-dnf module list --installed postgresql && echo "postgresql module marked as installed" >> /root/RESULT
-dnf module list --installed perl && echo "perl module marked as installed" >> /root/RESULT
+dnf module list --installed mysql && echo "mysql module marked as installed" >> /root/RESULT
+dnf module list --installed swig && echo "swig module marked as installed" >> /root/RESULT
 
 %ksappend validation/success_if_result_empty.ks
 %end

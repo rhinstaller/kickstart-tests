@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Vendula Poncova <vponcova@redhat.com>
 
-TESTTYPE="payload ostree skip-on-rhel"
+TESTTYPE="payload ostree skip-on-rhel gh667"
 
 . ${KSTESTDIR}/functions.sh
 

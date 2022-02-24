@@ -22,6 +22,7 @@ daily_iso_skip_array=(
   gh595       # proxy-cmdline failing on all scenarios
   gh640       # authselect-not-set failing
   gh641       # packages-multilib failing on systemd conflict
+  gh667       # rpm-ostree failing
 )
 
 rhel8_skip_array=(

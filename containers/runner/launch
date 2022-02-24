@@ -148,6 +148,8 @@ fi
 set -x
 $CRUN run -it --rm --device=/dev/kvm --publish 127.0.0.1::16509 $PODMAN_SELINUX_FIX \
     --env KSTESTS_TEST="$KSTESTS_TEST" --env TESTTYPE="${TESTTYPE:-}" --env SKIP_TESTTYPES="${SKIP_TESTTYPES:-}" \
+    --env KSTEST_URL="${KSTEST_URL:-}" --env KSTEST_METALINK="${KSTEST_METALINK:-}" --env KSTEST_MIRRORLIST="${KSTEST_MIRRORLIST:-}" \
+    --env KSTEST_MODULAR_URL="${KSTEST_MODULAR_URL:-}" --env KSTEST_FTP_URL="${KSTEST_FTP_URL:-}" \
     --env KSTESTS_RUN_TIMEOUT="${TIMEOUT:-}" \
     --env TEST_JOBS="$TEST_JOBS" --env PLATFORM="${PLATFORM:-}" --env TEST_RETRY="${TEST_RETRY:-}" ${UPDATES_IMG_ARGS:-} ${CONTAINER_RUN_ARGS:-} \
     ${VAR_TMP:-} -v "$PWD/data:/opt/kstest/data:z" -v "$BASEDIR:/kickstart-tests:ro,z" ${DEFAULTS_SH_ARGS:-} \

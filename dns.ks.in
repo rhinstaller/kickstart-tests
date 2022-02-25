@@ -15,14 +15,8 @@ if [ "@KSTEST_OS_NAME@" == "rhel" ]; then
     # rhbz#1989472
     check_resolv_conf_is_by_nm
 else
-    # rhbz#2018913: creating of the symlink by systemd-resolved
-    # is broken, but it does not seem to be a big deal for installer.
-    # Non-existing /etc/resolv.conf is ok as well, the symlink will
-    # be created during boot.
-    #check_resolv_conf_is_by_resolved
-    if [ -e /etc/resolv.conf ]; then
-        echo "*** Failed check: /etc/resolv.conf does not exist on target system" >> /root/RESULT
-    fi
+    # rhbz#2018913
+    check_resolv_conf_is_by_resolved
 fi
 
 # No error was written to /root/RESULT file, everything is OK

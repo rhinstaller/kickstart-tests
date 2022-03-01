@@ -175,9 +175,11 @@ kickstart file, the target of a substitution is any string starting with
 
 Configuration parameters may also come from special shell scripts that are
 sourced during run_kickstart_tests.sh.  It will first look at the defaults in
-scripts/defaults.sh.  It will then look at any user-specific defaults in
-~/.kstests.defaults.sh.  These take precedence over the local environment.
-Environment variables set on the command line have the highest priority.
+scripts/defaults.sh.  Next, if platform is specified using -p PLATFORM option,
+the scripts/defaults-PLATFORM.sh file is sourced.  Finally it will source any
+user-specific defaults in ~/.kstests.defaults.sh.  These take precedence over
+the local environment.  Environment variables set on the command line have the
+highest priority.
 
 Note that not every test needs every setting.  You can determine which are
 required for the test you are running by simply running "grep KSTEST_" on it.

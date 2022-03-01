@@ -157,6 +157,13 @@ if [[ -e scripts/defaults.sh ]]; then
     . scripts/defaults.sh
 fi
 
+# Platform-specific defaults
+if [[ -n "${PLATFORM_NAME}" ]]; then
+    if [[ -e "scripts/defaults-${PLATFORM_NAME}.sh" ]]; then
+        . "scripts/defaults-${PLATFORM_NAME}.sh"
+    fi
+fi
+
 if [[ -e $HOME/.kstests.defaults.sh ]]; then
     . $HOME/.kstests.defaults.sh
 fi

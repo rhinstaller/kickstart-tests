@@ -101,7 +101,7 @@ jobs:
       - name: Run coverage tests
         run: |
           source $PWD/containers/runner/skip-testtypes
-          sudo TEST_JOBS=16 containers/runner/launch --retry --testtype coverage --skip-testtypes "$SKIP_TESTTYPES_RHEL8_DAILY" --platform rhel8 --defaults $PWD/scripts/defaults-rhel8.sh
+          sudo TEST_JOBS=16 containers/runner/launch --retry --testtype coverage --skip-testtypes "$SKIP_TESTTYPES_RHEL8_DAILY" --platform rhel8
 
       - name: Upload test logs
         if: always()

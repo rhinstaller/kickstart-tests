@@ -24,7 +24,7 @@ case "$SCENARIO" in
             mkdir -p data/images
             curl -L http://download.eng.bos.redhat.com/rhel-8/development/RHEL-8/latest-RHEL-8.6/compose/BaseOS/x86_64/os/images/boot.iso --output data/images/boot.iso
         fi
-        $LAUNCH --skip-testtypes "$SKIP_TESTTYPES_RHEL8" --platform rhel8 --defaults "$ROOTDIR/scripts/defaults-rhel8.sh" all
+        $LAUNCH --skip-testtypes "$SKIP_TESTTYPES_RHEL8" --platform rhel8 all
         ;;
 
     rhel9)
@@ -33,7 +33,7 @@ case "$SCENARIO" in
             mkdir -p data/images
             curl -L http://download.eng.bos.redhat.com/rhel-9/development/RHEL-9/latest-RHEL-9.0/compose/BaseOS/x86_64/os/images/boot.iso --output data/images/boot.iso
         fi
-        $LAUNCH --skip-testtypes "$SKIP_TESTTYPES_RHEL9" --platform rhel9 --defaults "$ROOTDIR/scripts/defaults-rhel9.sh" all
+        $LAUNCH --skip-testtypes "$SKIP_TESTTYPES_RHEL9" --platform rhel9 all
         ;;
 
     # just run a single test on standard Rawhide; mostly for testing infrastructure

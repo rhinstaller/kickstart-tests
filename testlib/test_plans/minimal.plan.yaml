@@ -9,3 +9,5 @@ verified_by:
 configurations:
   - architecture: x86_64
     platform: fedora_rawhide
+reporting:
+  - type: xunit

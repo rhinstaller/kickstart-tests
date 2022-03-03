@@ -13,3 +13,5 @@ verified_by:
 configurations:
   - architecture: x86_64
     platform: rhel8
+reporting:
+  - type: xunit

@@ -116,6 +116,14 @@ jobs:
           path: |
             permian/permian.log
 
+      - name: Collect Permian xunit reporter results
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: 'results-xunit-${{ matrix.scenario }}'
+          path: |
+            permian/xunit-*.xml
+
       # Keep compatibility of the overall results, Permian now hides the exit code of launcher
       - name: Pass the launch script exit code
         working-directory: ./permian

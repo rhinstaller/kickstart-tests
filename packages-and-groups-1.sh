@@ -17,6 +17,6 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-TESTTYPE="packaging"
+TESTTYPE="packaging gh686"
 
 . ${KSTESTDIR}/functions.sh

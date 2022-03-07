@@ -37,7 +37,7 @@ def setup_logger(log_path):
     # output without debugging to console
     h_console = logging.StreamHandler(sys.stdout)
     h_console.setLevel(logging.INFO)
-    h_console.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
+    h_console.setFormatter(logging.Formatter("%(asctime)s %(levelname)s: %(message)s"))
     log.addHandler(h_console)
 
 

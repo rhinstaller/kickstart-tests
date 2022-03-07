@@ -6,6 +6,9 @@
 # Set up the RPM OSTree source.
 ostreesetup --nogpg --osname=fedora-iot --remote=fedora-iot --url=https://kojipkgs.fedoraproject.org/compose/iot/repo/ --ref=fedora/rawhide/${basearch}/iot
 
+# Disable the bootloader (gh#667).
+bootloader --location=none
+
 %post
 # Check the name of the remote.
 name="$(ostree remote list)"

@@ -23,6 +23,10 @@ kacst*
 
 # (4) Test that you can remove packages with a glob.
 -grub2-efi*
+
+# Skip kmod-kvdo to avoid conflicts with kernel (gh#686).
+-vdo
+-kmod-kvdo
 %end
 
 %post

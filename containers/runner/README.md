@@ -20,6 +20,11 @@ You can also build the container yourself to test modifications to it:
 
     podman build --no-cache -t quay.io/rhinstaller/kstest-runner containers/runner/
 
+The container to use can be overridden by setting the `CONTAINER` environmental
+variable to the name of the container to use when calling launch. eg:
+
+    CONTAINER="kstest-local:latest" containers/runner/launch keyboard
+
 The `launch` script creates a `./data/` directory for passing of data between
 the container and the system (via volume).  By default it downloads the current
 Fedora Rawhide boot.iso, but to test some other image you can put it into

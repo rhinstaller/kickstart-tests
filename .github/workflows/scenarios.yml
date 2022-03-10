@@ -55,5 +55,6 @@ jobs:
           # skip the /anaconda subdirectories, too large
           path: |
             data/logs/kstest.log
+            data/logs/kstest.log.json
             data/logs/kstest-*/*.log
             data/logs/kstest-*/anaconda/lorax-packages.log

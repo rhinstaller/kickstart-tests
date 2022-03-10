@@ -1,0 +1,186 @@
+#!/bin/python3
+#
+# Copyright (C) 2022  Red Hat, Inc.
+#
+# This copyrighted material is made available to anyone wishing to use,
+# modify, copy, or redistribute it subject to the terms and conditions of
+# the GNU General Public License v.2, or (at your option) any later version.
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY expressed or implied, including the implied warranties of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+# Public License for more details.  You should have received a copy of the
+# GNU General Public License along with this program; if not, write to the
+# Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301, USA.  Any Red Hat trademarks that are incorporated in the
+# source code or documentation are not subject to the GNU General Public
+# License and may only be used or replicated with the express permission of
+# Red Hat, Inc.
+
+# This script takes the combined logfile from the tests and summarizes
+# the results as JSON that can be imported into a log analyzer.
+#
+# The results are similar to this:
+#
+# [
+#         {
+#             "group": "logs-daily-iso",
+#             "logfile": "INFO: install_log = /var/tmp/kstest-anaconda-conf.2022_03_04-03_50_44.h13p_9sy/virt-install.log",
+#             "start_time": 1646383844.0,
+#             "summary": [
+#                 "Logs are in /var/tmp/kstest-anaconda-conf.2022_03_04-03_50_44.h13p_9sy",
+#                 "Disk image(s) at /var/tmp/kstest-anaconda-conf.2022_03_04-03_50_44.h13p_9sy/disk-a.img,cache=unsafe",
+#                 "Results are in /var/tmp/kstest-anaconda-conf.2022_03_04-03_50_44.h13p_9sy"
+#             ],
+#             "result": "INFO: RESULT:anaconda-conf:ea89963f4984:SUCCESS:test done",
+#             "success": true,
+#             "name": "anaconda-conf",
+#             "end_time": 1646385568.0,
+#             "elapsed_time": 1724.0
+#         },
+# 
+#         ...
+# 
+#         {
+#             "group": "logs-daily-iso",
+#             "logfile": "INFO: install_log = /var/tmp/kstest-driverdisk-disk-kargs.2022_03_04-02_42_13._25nhiki/virt-install.log",
+#             "start_time": 1646379735.0,
+#             "errors": [
+#                 "ERROR: Install failed: Test timed out",
+#                 "ERROR: ERROR: Image creation failed: Test timed out"
+#             ],
+#             "result": "INFO: RESULT:driverdisk-disk-kargs:ea89963f4984:FAILED:Test timed out",
+#             "success": false,
+#             "name": "driverdisk-disk-kargs",
+#             "end_time": 1646383341.0,
+#             "elapsed_time": 3606.0
+#         }
+# ]
+
+import argparse
+import json
+import os
+import re
+from time import strptime, mktime
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Convert kstest logs to JSON")
+    parser.add_argument("--group", required=True, help="Name of test group")
+    parser.add_argument("--output", help="Output filename (default is stdout)")
+    parser.add_argument("LOGFILE", type=os.path.abspath, help="File to convert")
+
+    return parser.parse_args()
+
+# Skip lines that are not from tests, or that should be ignored
+def skip(line):
+    if "apply-ksappend" in line:
+        return True
+
+    # Ignore the virt-install cmdline
+    if "virt-install [" in line:
+        return True
+
+    return False
+
+def main(args):
+    # Read the file, a line at a time
+    # Start by ignoring lines
+    capture_summary = False
+    tests = []
+    entry = {}
+
+    # Some assumptions about the logs are made:
+    # individual tests start with install_log INFO line and end with INFO RESULT line
+    with open(args.LOGFILE) as f:
+        for line in f.readlines():
+            line = line.strip()
+
+            if skip(line):
+                capture_summary = False
+                continue
+
+            # Parse the optional timestamp, the format is from python logging 'asctime'
+            m = re.match(r"(\d+-\d+-\d+\s\d+:\d+:\d+,\d+)", line)
+            timestamp = None
+            if m is not None:
+                try:
+                    timestamp = mktime(strptime(m.group(), "%Y-%m-%d %H:%M:%S,%f"))
+                except ValueError:
+                    pass
+
+            if m is not None:
+                idx = len(m.group())
+                line = line[idx:].strip()
+
+            # RESULT line may occurr at INFO or ERROR level
+            # It is the last line for a test and triggers saving it in the tests[] list
+            if "RESULT" in line:
+                entry["result"] = line
+                entry["success"] = "SUCCESS" in line
+
+                # Grab the test name from the result entry
+                # RESULT line is in the form of:
+                #     INFO: RESULT:[NAME]:[HOSTID]:[SUCCESS|FAIL]:[MESSAGE]
+                try:
+                    entry["name"] = line.split(":")[2]
+                except IndexError:
+                    entry["name"] = "unknown"
+
+                # Add the test group name
+                entry["group"] = args.group
+
+                # If there is a timestamp record the elapsed time for the test
+                if timestamp:
+                    entry["end_time"] = timestamp
+                    if "start_time" not in entry:
+                        # ERROR RESULT has no start time, make it the same as the end
+                        entry["start_time"] = timestamp
+                    entry["elapsed_time"] = timestamp - entry["start_time"]
+
+                tests.append(entry)
+                capture_summary = False
+                entry = {}
+                continue
+
+            if "INFO" in line:
+                # install_log is the first line of a test
+                if "install_log" in line:
+                    entry["logfile"] = line
+                    if timestamp:
+                        entry["start_time"] = timestamp
+                    capture_summary = False
+
+                # Start capturing the summary section as raw lines with no prefixes
+                if "SUMMARY" in line:
+                    entry["summary"] = []
+                    capture_summary = True
+
+            elif "ERROR" in line:
+                if "logfile" in entry:
+                    if "errors" in entry:
+                        entry["errors"].append(line)
+                    else:
+                        entry["errors"] = [line]
+            else:
+                # Ignore DEBUG lines
+                if "DEBUG" in line:
+                    continue
+
+                if capture_summary:
+                    # Capture raw summary lines, but not separator lines
+                    if all(c in ('-', '=') for c in line):
+                        continue
+                    # Capturing summary lines
+                    entry["summary"].append(line)
+
+    return tests
+
+
+if __name__ == '__main__':
+    args = parse_args()
+    results = main(args)
+    if args.output:
+        with open(args.output, "w") as f:
+            json.dump(results, f)
+    else:
+        print(json.dumps(results))

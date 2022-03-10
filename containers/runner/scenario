@@ -4,12 +4,13 @@ set -eux
 
 SCENARIO_TIMEOUT=${SCENARIO_TIMEOUT:-0}
 MYDIR=$(dirname $(realpath "$0"))
-# tests often fail due to random infrastructure flakes; enable auto-retry
-LAUNCH="$MYDIR/launch --retry --timeout=$SCENARIO_TIMEOUT"
 ROOTDIR=$(dirname $(dirname "$MYDIR"))
 RUN_TESTS=${RUN_TESTS:-all}
 SCENARIO="$1"
 shift
+
+# tests often fail due to random infrastructure flakes; enable auto-retry
+LAUNCH="$MYDIR/launch --kstest-group=$SCENARIO --retry --timeout=$SCENARIO_TIMEOUT"
 
 # Read the test types (SKIP_TESTTYPES_*) to be skipped by scenarios
 source "$MYDIR/skip-testtypes"
@@ -40,5 +41,5 @@ case "$SCENARIO" in
     # just run a single test on standard Rawhide; mostly for testing infrastructure
     minimal) $LAUNCH "$@" container ;;
 
-    *) echo "ERROR: unknown scenario $1" >&2; exit 1 ;;
+    *) echo "ERROR: unknown scenario - $SCENARIO" >&2; exit 1 ;;
 esac

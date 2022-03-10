@@ -13,6 +13,7 @@ CONTAINER=${CONTAINER:-quay.io/rhinstaller/kstest-runner}
 # disable selinux container separation when podman is executed as user
 PODMAN_SELINUX_FIX=
 RUN_COMMAND=/kickstart-tests/containers/runner/run-kstest
+KSTEST_GROUP=${KSTEST_GROUP:-unknown}
 
 # Get number of jobs to be run in parallel based on number of CPUs and amount of RAM
 recommended_jobs() {
@@ -60,12 +61,14 @@ Options:
  --recommended-jobs                   Print the number of jobs (--jobs option) used
                                       by default and exit. It is calulated from the number
                                       of CPUs and the size of RAM.
+ --kstest-group NAME                  Name of the tests being run, used to group results in json
+                                      logs.
  -h, --help                           Show this help
 EOF
 }
 
 # parse options
-eval set -- "$(getopt -o j:p:t:s:u:rch --long jobs:,platform:,testtype:,skip-testtypes:,updates:,retry,connect-shell,daily-iso:,defaults:,run-args:,recommended-jobs,timeout:,help -- "$@")"
+eval set -- "$(getopt -o j:p:t:s:u:rch --long jobs:,platform:,testtype:,skip-testtypes:,updates:,retry,connect-shell,daily-iso:,defaults:,run-args:,recommended-jobs,kstest-group:,timeout:,help -- "$@")"
 
 while true; do
     case "${1:-}" in
@@ -81,6 +84,7 @@ while true; do
         --run-args) shift; CONTAINER_RUN_ARGS="$1" ;;
         --recommended-jobs) recommended_jobs; exit 0 ;;
         --timeout) shift; TIMEOUT="$1" ;;
+        --kstest-group) shift; KSTEST_GROUP="$1" ;;
         -h|--help) usage; exit 0 ;;
         --) shift; break ;;
     esac
@@ -147,6 +151,7 @@ fi
 # virsh -c qemu+tcp://localhost:<port>/session list
 set -x
 $CRUN run -it --rm --device=/dev/kvm --publish 127.0.0.1::16509 $PODMAN_SELINUX_FIX \
+    --env KSTEST_GROUP="${KSTEST_GROUP:-unknown}" \
     --env KSTESTS_TEST="$KSTESTS_TEST" --env TESTTYPE="${TESTTYPE:-}" --env SKIP_TESTTYPES="${SKIP_TESTTYPES:-}" \
     --env KSTESTS_RUN_TIMEOUT="${TIMEOUT:-}" \
     --env TEST_JOBS="$TEST_JOBS" --env PLATFORM="${PLATFORM:-}" --env TEST_RETRY="${TEST_RETRY:-}" ${UPDATES_IMG_ARGS:-} ${CONTAINER_RUN_ARGS:-} \

@@ -1,0 +1,22 @@
+#test name: network-bootopts-noautodefault
+#Test option to disable default autoconnections
+
+# Use defaults, but no network that could activate the other device
+# because of device --link
+%ksappend common/common.ks
+%ksappend repos/default.ks
+%ksappend l10n/default.ks
+%ksappend users/default.ks
+%ksappend storage/default.ks
+%ksappend payload/default_packages.ks
+
+%post
+
+@KSINCLUDE@ post-lib-network.sh
+
+check_device_connected @KSTEST_NETDEV1@ yes
+check_device_connected @KSTEST_NETDEV2@ no
+
+%ksappend validation/success_if_result_empty.ks
+%end
+

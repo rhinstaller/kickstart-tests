@@ -114,7 +114,9 @@ def main(args):
 
             # RESULT line may occurr at INFO or ERROR level
             # It is the last line for a test and triggers saving it in the tests[] list
-            if "RESULT" in line:
+            # Other messages may mention 'RESULT' or 'RESULT:' when referring to the filename
+            # so this needs to also look for the leading :
+            if ": RESULT:" in line:
                 entry["result"] = line
                 entry["success"] = "SUCCESS" in line
 

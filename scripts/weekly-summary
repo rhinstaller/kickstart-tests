@@ -1,0 +1,373 @@
+#!/usr/bin/python3
+#
+# Copyright (C) 2022  Red Hat, Inc.
+#
+# This copyrighted material is made available to anyone wishing to use,
+# modify, copy, or redistribute it subject to the terms and conditions of
+# the GNU General Public License v.2, or (at your option) any later version.
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY expressed or implied, including the implied warranties of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+# Public License for more details.  You should have received a copy of the
+# GNU General Public License along with this program; if not, write to the
+# Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301, USA.  Any Red Hat trademarks that are incorporated in the
+# source code or documentation are not subject to the GNU General Public
+# License and may only be used or replicated with the express permission of
+# Red Hat, Inc.
+#
+# This script generates a weekly report of kickstart-test runs.
+# It downloads the daily json summary reports and combines them into a single text
+# report.
+#
+# It requires a github token in GITHUB_TOKEN environmental variable. This token
+# needs to have access to the kickstart-tests artifacts via the github API.
+
+import argparse
+from datetime import datetime, timedelta
+from glob import glob
+import io
+import json
+import os
+import sys
+from subprocess import check_call
+import tempfile
+from urllib.request import Request, urlopen
+import zipfile
+
+import pycurl
+
+URL = "https://api.github.com/repos/rhinstaller/kickstart-tests/actions/artifacts?per_page=100"
+
+# TODO - only works after we have a week of json summary runs
+#ARTIFACTS = ["summary-daily-iso", "summary-rhel9", "summary-rhel8"]
+
+# For now use the full log artifacts
+ARTIFACTS = ["logs-daily-iso", "logs-rhel9", "logs-rhel8"]
+
+
+# We should ignore SIGPIPE when using pycurl.NOSIGNAL - see
+# the libcurl tutorial for more info.
+try:
+    import signal
+    from signal import SIGPIPE, SIG_IGN
+except ImportError:
+    pass
+else:
+    signal.signal(SIGPIPE, SIG_IGN)
+
+
+def get_artifacts(token, start, end):
+    """
+    get_artifacts retrieves a list of artifact from the selected date range
+
+    It returns a list of artifact dicts like this:
+
+    {
+      "id": 187278866,
+      "node_id": "MDg6QXJ0aWZhY3QxODcyNzg4NjY=",
+      "name": "logs-daily-iso",
+      "size_in_bytes": 1047408950,
+      "url": "https://api.github.com/repos/rhinstaller/kickstart-tests/actions/artifacts/187278866",
+      "archive_download_url": "https://api.github.com/repos/rhinstaller/kickstart-tests/actions/artifacts/187278866/zip",
+      "expired": false,
+      "created_at": "2022-03-17T03:30:12Z",
+      "updated_at": "2022-03-17T03:30:13Z",
+      "expires_at": "2022-03-25T03:29:06Z"
+    },
+    """
+    req = Request(URL)
+    req.add_header("Accept", "application/vnd.github.v3+json")
+    req.add_header("Authorization", f"token {token}")
+    with urlopen(req) as r:
+        data = json.load(r)
+
+    # Filter out the artifacts within the date range and names
+    artifacts = []
+    for a in data["artifacts"]:
+        if a["name"] not in ARTIFACTS:
+            continue
+        updated_at = datetime.fromisoformat(a["updated_at"][:-1])
+        if start <= updated_at <= end:
+            artifacts.append(a)
+
+    return sorted(artifacts, key=lambda x: x["updated_at"])
+
+
+def run_curl(token, url, filename):
+    """
+    run_curl downloads an artifact file
+    """
+    with open(filename, "wb") as f:
+        c = pycurl.Curl()
+        headers = [
+           "Accept: application/vnd.github.v3+json",
+           f"Authorization: token {token}",
+        ]
+
+        options = {
+            pycurl.FOLLOWLOCATION:  1,
+            pycurl.MAXREDIRS:       5,
+            pycurl.CONNECTTIMEOUT:  30,
+            pycurl.TIMEOUT:         300,
+            pycurl.NOSIGNAL:        1,
+            pycurl.URL:             url,
+            pycurl.HTTPHEADER:      headers,
+            pycurl.WRITEDATA:       f
+        }
+        for k, v in options.items():
+            c.setopt(k, v)
+
+        try:
+            c.perform()
+            ok = (True, None)
+        except Exception as e:
+            print(f"ERROR: {e}", file=sys.stderr)
+            sys.stderr.flush()
+            ok = (False, e)
+        c.close()
+
+    return ok
+
+
+def download_artifacts(token, artifacts):
+    """
+    download_artifacts downloads the artifacts as uniquely named files
+    """
+    zipfiles = []
+    for a in artifacts:
+        updated_at = datetime.fromisoformat(a["updated_at"][:-1])
+        datename = a["name"]+updated_at.strftime("-%Y-%m-%d")
+        filename = datename + ".zip"
+        zipfiles.append((a["name"], datename, filename))
+        if os.path.exists(filename):
+            print(f"{filename} skipped, already downloaded")
+            continue
+
+        print(f"Fetching {filename}")
+        run_curl(token, a["archive_download_url"], filename)
+
+    return zipfiles
+
+
+def extract_logs(f):
+    """
+    extract_logs unzips the archive into a temporary directory
+
+    This directory is deleted when the object goes out of scope
+    """
+    tdir = tempfile.TemporaryDirectory(prefix="kstest-log-", dir="/var/tmp/")
+    with zipfile.ZipFile(f) as zf:
+        zf.extractall(tdir.name)
+
+    # Return the object so that the temporary directory isn't deleted yet
+    return tdir
+
+
+def rebuild_logs(tdir):
+    """
+    rebuild_logs recreates kstest.log with timestamps
+
+    It does this by appending all the individual kstest.log files, which do contain
+    timestamps, into a new kstest.log
+    """
+    # Remove the old log with no timestamps
+    kstest_log = os.path.join(tdir.name, "kstest.log")
+    os.unlink(kstest_log)
+
+    # Find all the test's kstest.log files and append them to kstest.log
+    with open(kstest_log, "w") as ksf:
+        for log in glob(os.path.join(tdir.name, "*", "kstest.log")):
+            with open(log) as f:
+                data = f.read(1024**2)
+                while data:
+                    ksf.write(data)
+                    data = f.read(1024**2)
+
+
+def pass_fail(tests):
+    """
+    pass_fail returns stats on the tests
+
+    It returns a tuple of total tests run, number passed
+    """
+    success = sum(1 for t in tests if t["success"])
+    return len(tests), success
+
+
+def get_failed(tests):
+    """
+    get_failed returns a dict of failed tests
+
+    Tests may fail multiple times, so they are sorted by their start time
+    and the dict key is the name of the test.
+    """
+    failed = {}
+    for t in tests:
+        if not t["success"]:
+            if t["name"] not in failed:
+                failed[t["name"]] = [t]
+            else:
+                failed[t["name"]].append(t)
+
+    # Sort each failed test list by the start time
+    for t in failed:
+        failed[t] = sorted(failed[t], key=lambda x: x.get("start_time", 0))
+
+    return failed
+
+
+def summary(args, logs):
+    """
+    summary generates a summary of all the tests run in the selected date range
+
+    It returns a string with the summary text
+    """
+    all_data = {}
+    for log in logs:
+        with open(log) as f:
+            data = json.load(f)
+
+            # Group them by group, assume each file is from one group
+            if "group" in data[0]:
+                if data[0]["group"] not in all_data:
+                    all_data[data[0]["group"]] = data
+                else:
+                    all_data[data[0]["group"]].extend(data)
+
+    if args.debug:
+        print(json.dumps(all_data))
+
+    buf = io.StringIO()
+
+    start = args.start.strftime("%m/%d/%Y %H:%M:%S")
+    end = args.end.strftime("%m/%d/%Y %H:%M:%S")
+    print(f"Test Summary Report: {start} -> {end}\n", file=buf)
+
+    # Summary of tests per group
+    for g in sorted(all_data.keys()):
+        total, good = pass_fail(all_data[g])
+        bad = total - good
+        print(f"{g}: Ran {total} tests. {good} passed, {bad} failed.", file=buf)
+    print("\n", file=buf)
+
+    # Test failures per day/group
+    days = {}
+    for g in sorted(all_data.keys()):
+        for t in all_data[g]:
+            if t["success"]:
+                continue
+            # Get the Year Month Day if 'start_time' is present
+            # otherwise day is set to '19691231'
+            day = datetime.fromtimestamp(t.get("start_time", 0)).strftime("%Y%m%d")
+            if day not in days:
+                days[day] = {g: [t["name"]]}
+            else:
+                if g not in days[day]:
+                    days[day][g] = [t["name"]]
+                else:
+                    days[day][g].append(t["name"])
+
+    for day in sorted(days.keys()):
+        if day == "19691231":
+            # 'start_time' wasn't included, no wat to tell when it was run.
+            print("unknown day", file=buf)
+        else:
+            print(datetime.strptime(day, "%Y%m%d").strftime("%m/%d/%Y"), file=buf)
+        for g in sorted(days[day].keys()):
+            print(f"    {g}:", file=buf)
+            for n in sorted(days[day][g]):
+                print(f"        {n}", file=buf)
+        print("\n", file=buf)
+
+    # Gather up detailed failure results
+    for g in sorted(all_data.keys()):
+        print("=" * 40, file=buf)
+        total, good = pass_fail(all_data[g])
+        bad = total - good
+        print(f"{g} summary: Ran {total} tests. {good} passed, {bad} failed.", file=buf)
+        print("=" * 40, file=buf)
+
+        # Print the details of each failed test occurrence
+        failed = get_failed(all_data[g])
+        for name in failed:
+            # Print the details of the failed test
+            ess = "s" if (len(failed[name]) > 1) else ""
+            print(f"{name} failed {len(failed[name])} time{ess}", file=buf)
+            print("-" * 40, file=buf)
+            for f in failed[name]:
+                if "start_time" not in f:
+                    start_time = ""
+                else:
+                    start_time = datetime.fromtimestamp(f["start_time"]).strftime("%m/%d/%Y %H:%M:%S")
+
+                if "elapsed_time" not in f:
+                    elapsed_time = 0
+                else:
+                    elapsed_time = f["elapsed_time"]
+
+                # Get the result message
+                msg = f["result"].rsplit("FAILED:")[-1]
+                print(f'\n{start_time} ({elapsed_time}s): {msg}', file=buf)
+            print("\n", file=buf)
+
+        if len(failed):
+            print("\n", file=buf)
+
+    return buf.getvalue()
+
+
+def main(args, token):
+    artifacts = get_artifacts(token, args.start, args.end)
+    if args.verbose:
+        print(json.dumps(artifacts))
+    zipfiles = download_artifacts(token, artifacts)
+
+    for name, datename, f in zipfiles:
+        if args.rebuild or not os.path.exists(datename+".json"):
+            logs = extract_logs(f)
+
+            # This is needed for logs without timestamps
+            if args.rebuild:
+                rebuild_logs(logs)
+
+            # Run summary on kstest.log
+            cmd = ["log2json",
+                   "--group", name,
+                   "--output", datename+".json",
+                   os.path.join(logs.name, "kstest.log")
+            ]
+            if args.debug:
+                print(cmd)
+            check_call(cmd)
+
+    report = summary(args, (d+".json" for _, d, _ in zipfiles))
+    if args.output:
+        with open(args.output, "w") as f:
+            f.write(report)
+    else:
+        print(report)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Generate a weekly summary of test results")
+    parser.add_argument("--start", type=datetime.fromisoformat,
+            default=(datetime.now() - timedelta(days=7)),
+            help="Start time. eg. 2022-03-03T03:46:11 (default is -7 days)")
+    parser.add_argument("--end", type=datetime.fromisoformat,
+            default=datetime.now(),
+            help="end time. eg. 2022-03-03T03:46:11 (default is now)")
+    parser.add_argument("--rebuild",
+            default=False, action="store_true",
+            help="Rebuild logs with timestamps")
+    parser.add_argument("--output",
+            help="Path and filename to write summary report to")
+    parser.add_argument("--debug", default=False, action="store_true")
+    parser.add_argument("--verbose", default=False, action="store_true")
+    args = parser.parse_args()
+
+    if "GITHUB_TOKEN" not in os.environ:
+        print("Set GITHUB_TOKEN environmental variable to github token with access to the artifact api.")
+        sys.exit(1)
+
+    main(args, os.environ["GITHUB_TOKEN"])

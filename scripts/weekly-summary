@@ -230,12 +230,12 @@ def summary(args, logs):
         with open(log) as f:
             data = json.load(f)
 
-            # Group them by group, assume each file is from one group
-            if "group" in data[0]:
-                if data[0]["group"] not in all_data:
-                    all_data[data[0]["group"]] = data
+            # Group them by scenario, assume each file is from one scenario
+            if "scenario" in data[0]:
+                if data[0]["scenario"] not in all_data:
+                    all_data[data[0]["scenario"]] = data
                 else:
-                    all_data[data[0]["group"]].extend(data)
+                    all_data[data[0]["scenario"]].extend(data)
 
     if args.debug:
         print(json.dumps(all_data))
@@ -246,14 +246,14 @@ def summary(args, logs):
     end = args.end.strftime("%m/%d/%Y %H:%M:%S")
     print(f"Test Summary Report: {start} -> {end}\n", file=buf)
 
-    # Summary of tests per group
+    # Summary of tests per scenario
     for g in sorted(all_data.keys()):
         total, good = pass_fail(all_data[g])
         bad = total - good
         print(f"{g}: Ran {total} tests. {good} passed, {bad} failed.", file=buf)
     print("\n", file=buf)
 
-    # Test failures per day/group
+    # Test failures per day/scenario
     days = {}
     for g in sorted(all_data.keys()):
         for t in all_data[g]:
@@ -337,7 +337,7 @@ def main(args, token):
 
             # Run summary on kstest.log
             cmd = ["log2json",
-                   "--group", name,
+                   "--scenario", name,
                    "--output", datename+".json",
                    os.path.join(logs.name, "kstest.log")
             ]

@@ -10,7 +10,7 @@ SCENARIO="$1"
 shift
 
 # tests often fail due to random infrastructure flakes; enable auto-retry
-LAUNCH="$MYDIR/launch --kstest-group=$SCENARIO --retry --timeout=$SCENARIO_TIMEOUT"
+LAUNCH="$MYDIR/launch --scenario=$SCENARIO --retry --timeout=$SCENARIO_TIMEOUT"
 
 # Read the test types (SKIP_TESTTYPES_*) to be skipped by scenarios
 source "$MYDIR/skip-testtypes"

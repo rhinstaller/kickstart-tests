@@ -23,7 +23,7 @@
 #
 # [
 #         {
-#             "group": "logs-daily-iso",
+#             "scenario": "logs-daily-iso",
 #             "logfile": "INFO: install_log = /var/tmp/kstest-anaconda-conf.2022_03_04-03_50_44.h13p_9sy/virt-install.log",
 #             "start_time": 1646383844.0,
 #             "summary": [
@@ -41,7 +41,7 @@
 #         ...
 # 
 #         {
-#             "group": "logs-daily-iso",
+#             "scenario": "logs-daily-iso",
 #             "logfile": "INFO: install_log = /var/tmp/kstest-driverdisk-disk-kargs.2022_03_04-02_42_13._25nhiki/virt-install.log",
 #             "start_time": 1646379735.0,
 #             "errors": [
@@ -65,7 +65,7 @@ from time import strptime, mktime
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Convert kstest logs to JSON")
-    parser.add_argument("--group", required=True, help="Name of test group")
+    parser.add_argument("--scenario", required=True, help="Name of test scenario")
     parser.add_argument("--output", help="Output filename (default is stdout)")
     parser.add_argument("LOGFILE", type=os.path.abspath, help="File to convert")
 
@@ -129,7 +129,7 @@ def main(args):
                     entry["name"] = "unknown"
 
                 # Add the test group name
-                entry["group"] = args.group
+                entry["scenario"] = args.scenario
 
                 # If there is a timestamp record the elapsed time for the test
                 if timestamp:

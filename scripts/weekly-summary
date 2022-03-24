@@ -39,11 +39,12 @@ import pycurl
 
 URL = "https://api.github.com/repos/rhinstaller/kickstart-tests/actions/artifacts?per_page=100"
 
-# TODO - only works after we have a week of json summary runs
-#ARTIFACTS = ["summary-daily-iso", "summary-rhel9", "summary-rhel8"]
+# Defaults list of artifacts
+# For now use the full log artifacts, eventually this will be the json summaries
+ARTIFACT_NAMES = ["logs-daily-iso", "logs-rhel9", "logs-rhel8"]
 
-# For now use the full log artifacts
-ARTIFACTS = ["logs-daily-iso", "logs-rhel9", "logs-rhel8"]
+# TODO - only works after we have a week of json summary runs
+#ARTIFACT_NAMES = ["summary-daily-iso", "summary-rhel9", "summary-rhel8"]
 
 
 # We should ignore SIGPIPE when using pycurl.NOSIGNAL - see
@@ -57,9 +58,10 @@ else:
     signal.signal(SIGPIPE, SIG_IGN)
 
 
-def get_artifacts(token, start, end):
+def get_artifacts(token, artifact_names, start, end):
     """
-    get_artifacts retrieves a list of artifact from the selected date range
+    get_artifacts retrieves a list of artifacts from the selected date range
+    that are listed in artifact_names
 
     It returns a list of artifact dicts like this:
 
@@ -85,7 +87,7 @@ def get_artifacts(token, start, end):
     # Filter out the artifacts within the date range and names
     artifacts = []
     for a in data["artifacts"]:
-        if a["name"] not in ARTIFACTS:
+        if a["name"] not in artifact_names:
             continue
         updated_at = datetime.fromisoformat(a["updated_at"][:-1])
         if start <= updated_at <= end:
@@ -318,10 +320,12 @@ def summary(args, logs):
 
 
 def main(args, token):
-    artifacts = get_artifacts(token, args.start, args.end)
+    artifacts = get_artifacts(token, args.artifact_names, args.start, args.end)
     if args.verbose:
         print(json.dumps(artifacts))
     zipfiles = download_artifacts(token, artifacts)
+    if args.debug:
+        print(f"zipfiles = {zipfiles}")
 
     for name, datename, f in zipfiles:
         if args.rebuild or not os.path.exists(datename+".json"):
@@ -351,6 +355,11 @@ def main(args, token):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Generate a weekly summary of test results")
+    parser.add_argument("--artifacts",
+                        type=lambda x: x.split(","),
+                        default=ARTIFACT_NAMES,
+                        dest="artifact_names",
+                        help="Comma separated list of artifact names to summarize")
     parser.add_argument("--start", type=datetime.fromisoformat,
             default=(datetime.now() - timedelta(days=7)),
             help="Start time. eg. 2022-03-03T03:46:11 (default is -7 days)")
@@ -369,5 +378,8 @@ if __name__ == '__main__':
     if "GITHUB_TOKEN" not in os.environ:
         print("Set GITHUB_TOKEN environmental variable to github token with access to the artifact api.")
         sys.exit(1)
+
+    if args.debug:
+        print(f"args = {args}")
 
     main(args, os.environ["GITHUB_TOKEN"])

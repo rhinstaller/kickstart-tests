@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2019  Red Hat, Inc.
+# Copyright (C) 2022  Red Hat, Inc.
 #
 # This copyrighted material is made available to anyone wishing to use,
 # modify, copy, or redistribute it subject to the terms and conditions of
@@ -15,32 +15,37 @@
 # License and may only be used or replicated with the express permission of
 # Red Hat, Inc.
 #
-# Red Hat Author(s): Jiri Konecny <jkonecny@redhat.com>
 
-TESTTYPE="packaging repo"
+TESTTYPE="packaging repo harddrive"
 
 . ${KSTESTDIR}/functions.sh
 
+prepare_disks() {
+    local tmp_dir="${1}"
+    qemu-img create -q -f qcow2 ${tmpdir}/disk-a.img 10G
+    qemu-img create -q -f qcow2 ${tmpdir}/disk-b.img 12G
+    echo ${tmpdir}/disk-a.img ${tmpdir}/disk-b.img
+}
+
 prepare() {
-    local ks=$1
-    local tmp_dir=$2
+    local ks="$1"
+    local tmp_dir="$2"
+    local httpd_url=""
 
-    # Create the addon repository.
-    "${PWD}/scripts/generate-repository.py" "${tmp_dir}/addon" "addon"
+    # Create an empty repository.
+    mkdir -p "${tmp_dir}/http/repo"
+    createrepo_c -q "${tmp_dir}/http/repo"
 
-    # Start a http server that will provide the repository.
-    start_httpd "${tmp_dir}/addon" "${tmp_dir}"
+    # Start a http server to serve the repository.
+    start_httpd "${tmp_dir}/http" "${tmp_dir}"
 
-    echo "${ks}"
+    # Substitute variables in the kickstart file.
+    sed -e "s|EMPTY_REPO_URL|${httpd_url}/repo|" "${ks}" > "${tmp_dir}/ks.cfg"
+    echo "${tmp_dir}/ks.cfg"
 }
 
 kernel_args() {
-    local tmp_dir="$1"
-    local httpd_url=""
-
-    httpd_url="$(cat ${tmp_dir}/httpd_url)"
-    echo ${tmp_dir} -- ${httpd_url} > /tmp/addrepo-test.log
-    echo "${DEFAULT_BOOTOPTS} inst.addrepo=addon,${httpd_url}"
+    echo "${DEFAULT_BOOTOPTS} inst.addrepo=addon,hd:/dev/vdb:/"
 }
 
 cleanup() {

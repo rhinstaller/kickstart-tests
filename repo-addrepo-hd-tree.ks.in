@@ -1,0 +1,45 @@
+#test name: repo-addrepo-hd-tree
+
+## Test the inst.addrepo boot option with a installation tree on a hard drive.
+# The test is based on the harddrive-install-tree test.
+
+# This test is resource demanding! It downloads a full DVD ISO during
+# the test execution, so it needs additional storage and takes more time.
+
+%ksappend common/common_no_storage_and_payload.ks
+
+# FIXME: ignoredisk is much better solution to avoid using the installation source HDD removal.
+# However, payload is using devicetree data to work with source so the source disk won't be
+# visible to Anaconda. Fix this when this behavior is fixed in the payload.
+
+zerombr
+clearpart --all --initlabel --drives=/dev/vda
+
+reqpart
+part / --fstype=ext4 --grow --size=4400 --ondisk=/dev/vda
+part /boot --fstype=ext4 --size=500 --ondisk=/dev/vda
+part swap --fstype=swap --size=500 --ondisk=/dev/vda
+
+# Specify the mandatory base repo, but keep it empty.
+url --url=EMPTY_REPO_URL
+
+%ksappend payload/default_packages.ks
+
+%pre
+# Include helpful functions.
+@KSINCLUDE@ pre-lib-harddrive.sh
+
+# This will add ISO_LOCATION with link to an ISO
+%ksappend section-data/server-dvd-link.ks
+
+# Where we want to download the content of the ISO?
+DISK="/dev/vdb"
+DIRECTORY="repo"
+
+# Download the content of the ISO.
+prepare_tree "${ISO_LOCATION}" "${DISK}" "${DIRECTORY}"
+%end
+
+%post
+%ksappend validation/success_if_result_empty.ks
+%end

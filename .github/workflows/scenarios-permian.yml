@@ -110,16 +110,34 @@ jobs:
           BOOT_ISO_URL="file://$BOOT_ISO_PATH"
           if [ "${{ matrix.scenario }}" == "daily-iso" ] || [ "${{ matrix.scenario }}" == "minimal" ]; then
             ${{ github.workspace }}/kickstart-tests/containers/runner/fetch_daily_iso.sh $GITHUB_TOKEN $BOOT_ISO_PATH
-          elif [ "${{ matrix.scenario }}" == "rhel8" ]; then
-            curl -L http://download.eng.bos.redhat.com/rhel-8/development/RHEL-8/latest-RHEL-8.6/compose/BaseOS/x86_64/os/images/boot.iso --output $BOOT_ISO_PATH
-          elif [ "${{ matrix.scenario }}" == "rhel9" ]; then
-            curl -L http://download.eng.bos.redhat.com/rhel-9/development/RHEL-9/latest-RHEL-9.0/compose/BaseOS/x86_64/os/images/boot.iso --output $BOOT_ISO_PATH
           else
             echo "Boot.iso URL for ${{ matrix.scenario }} not configured"
             BOOT_ISO_URL=
-            exit 2
           fi
           echo "::set-output name=boot_iso::$BOOT_ISO_URL"
+
+      # Configure location of installation repositories for the scenario
+      # Also default boot.iso is defined by the value of urls.installation_tree
+      # of kstestParams event structure.
+      - name: Set installation_tree for the scenario
+        id: set_installation_urls
+        run: |
+          set -eux
+          if [ "${{ matrix.scenario }}" == "rhel8" ]; then
+            echo "::set-output name=installation_tree::http://download.eng.bos.redhat.com/rhel-8/development/RHEL-8/latest-RHEL-8/compose/BaseOS/x86_64/os"
+            echo "::set-output name=modular_url::http://download.eng.bos.redhat.com/rhel-8/development/RHEL-8/latest-RHEL-8/compose/AppStream/x86_64/os"
+          elif [ "${{ matrix.scenario }}" == "rhel9" ]; then
+            echo "::set-output name=installation_tree::http://download.eng.bos.redhat.com/rhel-9/development/RHEL-9/latest-RHEL-9/compose/BaseOS/x86_64/os"
+            echo "::set-output name=modular_url::http://download.eng.bos.redhat.com/rhel-9/development/RHEL-9/latest-RHEL-9/compose/AppStream/x86_64/os"
+          else
+            echo "Installation tree location for ${{ matrix.scenario }} not configured"
+            if [ -z "${{ steps.boot_iso_from_scenario.outputs.boot_iso }}" ]; then
+              echo "No boot.iso source is defined"
+              exit 2
+            fi
+            echo "::set-output name=installation_tree::"
+            echo "::set-output name=modular_url::"
+          fi
 
       - name: Set launcher timeout from job timeout
         id: set_timeout
@@ -138,7 +156,7 @@ jobs:
             -o kickstart_test.timeout="${{ steps.set_timeout.outputs.timeout }}" \
             -o kickstart_test.retry_on_failure=True \
             -o kickstart_test.kstest_local_repo="${{ github.workspace }}/kickstart-tests" \
-            run_event '{"type":"github.scheduled.daily.kstest.${{ matrix.scenario }}","bootIso":{"x86_64":"${{ steps.boot_iso_from_scenario.outputs.boot_iso }}"},"kstestParams":{"platform":"${{ steps.platform_from_scenario.outputs.platform }}"}}'
+            run_event '{"type":"github.scheduled.daily.kstest.${{ matrix.scenario }}","bootIso":{"x86_64":"${{ steps.boot_iso_from_scenario.outputs.boot_iso }}"},"kstestParams":{"platform":"${{ steps.platform_from_scenario.outputs.platform }}","urls":{"x86_64":{"installation_tree":"${{ steps.set_installation_urls.outputs.installation_tree }}","modular_url":"${{ steps.set_installation_urls.outputs.modular_url }}"}}}}'
 
       - name: Collect anaconda logs
         if: always()

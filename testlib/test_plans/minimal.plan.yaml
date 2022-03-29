@@ -8,3 +8,5 @@ verified_by:
       - container
 configurations:
   - architecture: x86_64
+reporting:
+  - type: xunit

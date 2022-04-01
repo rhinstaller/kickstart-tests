@@ -8,6 +8,7 @@ KSTESTS_DIR=${APP_ROOT}/kickstart-tests
 KSTESTS_TEST=${KSTESTS_TEST:-}
 KSTESTS_KEEP=${KSTESTS_KEEP:-1}
 TIMEOUT=${KSTESTS_RUN_TIMEOUT:-0}
+SCENARIO=${SCENARIO:-unknown}
 
 UPDATES_IMAGE=${UPDATES_IMAGE:-""}
 BOOT_ISO=${BOOT_ISO:-boot.iso}
@@ -80,6 +81,9 @@ RC=$?
 set -e
 popd
 
+# Create json log
+${KSTESTS_DIR}/scripts/log2json --scenario $SCENARIO --output $TEST_LOG.json $TEST_LOG
+
 # Copy logs to a volume
 # Fixup permissions
 chmod -R a+rw /var/tmp/kstest-*
@@ -87,6 +91,7 @@ chmod -R a+rw /var/tmp/kstest-*
 find /var/tmp/kstest-* -name "*.iso" -delete
 find /var/tmp/kstest-* -name "*.img" -delete
 cp $TEST_LOG ${LOGS_DIR}
+cp $TEST_LOG.json ${LOGS_DIR}
 # Move to target logs directory; this sometimes fails on nested directory permission/ownership
 cp -pr /var/tmp/kstest-* ${LOGS_DIR} || true
 

@@ -1,0 +1,25 @@
+# Generate a weekly summary of test failures
+name: Weekly Summary
+on:
+  schedule:
+    # Run early Monday mornings, but long enough after daily test run for results
+    - cron: 0 8 * * 1
+  # be able to start this action manually from a actions tab when needed
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  weekly_summary:
+    name: Create weekly summary of test runs
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+      - name: Install pycurl
+        run: sudo apt-get install -y python3-pycurl
+      - name: Run weekly-summary script
+        run: |
+          PATH=./scripts/:$PATH ./scripts/weekly-summary --rebuild --artifacts=logs-daily-iso,logs-rhel9,logs-rhel8

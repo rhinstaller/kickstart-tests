@@ -55,5 +55,14 @@ jobs:
           # skip the /anaconda subdirectories, too large
           path: |
             data/logs/kstest.log
+            data/logs/kstest.log.json
             data/logs/kstest-*/*.log
             data/logs/kstest-*/anaconda/lorax-packages.log
+
+      - name: Collect json summary
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: 'summary-${{ matrix.scenario }}'
+          path: |
+            data/logs/kstest.log.json

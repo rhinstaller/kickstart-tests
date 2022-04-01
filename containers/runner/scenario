@@ -4,19 +4,21 @@ set -eux
 
 SCENARIO_TIMEOUT=${SCENARIO_TIMEOUT:-0}
 MYDIR=$(dirname $(realpath "$0"))
-# tests often fail due to random infrastructure flakes; enable auto-retry
-LAUNCH="$MYDIR/launch --retry --timeout=$SCENARIO_TIMEOUT"
 ROOTDIR=$(dirname $(dirname "$MYDIR"))
+RUN_TESTS=${RUN_TESTS:-all}
 SCENARIO="$1"
 shift
+
+# tests often fail due to random infrastructure flakes; enable auto-retry
+LAUNCH="$MYDIR/launch --scenario=$SCENARIO --retry --timeout=$SCENARIO_TIMEOUT"
 
 # Read the test types (SKIP_TESTTYPES_*) to be skipped by scenarios
 source "$MYDIR/skip-testtypes"
 
 case "$SCENARIO" in
-    rawhide) $LAUNCH --skip-testtypes "$SKIP_TESTTYPES_RAWHIDE" "$@" all ;;
-    rawhide-text) $LAUNCH --skip-testtypes "$SKIP_TESTTYPES_RAWHIDE_TEXT" --run-args '-eKSTEST_EXTRA_BOOTOPTS=inst.text' "$@" all ;;
-    daily-iso) $LAUNCH --skip-testtypes "$SKIP_TESTTYPES_DAILY_ISO" --daily-iso="$GITHUB_TOKEN" "$@" all ;;
+    rawhide) $LAUNCH --skip-testtypes "$SKIP_TESTTYPES_RAWHIDE" "$@" $RUN_TESTS ;;
+    rawhide-text) $LAUNCH --skip-testtypes "$SKIP_TESTTYPES_RAWHIDE_TEXT" --run-args '-eKSTEST_EXTRA_BOOTOPTS=inst.text' "$@" $RUN_TESTS ;;
+    daily-iso) $LAUNCH --skip-testtypes "$SKIP_TESTTYPES_DAILY_ISO" --daily-iso="$GITHUB_TOKEN" "$@" $RUN_TESTS ;;
 
     rhel8)
         if [ ! -e data/images/boot.iso ]; then
@@ -24,7 +26,7 @@ case "$SCENARIO" in
             mkdir -p data/images
             curl -L http://download.eng.bos.redhat.com/rhel-8/development/RHEL-8/latest-RHEL-8.6/compose/BaseOS/x86_64/os/images/boot.iso --output data/images/boot.iso
         fi
-        $LAUNCH --skip-testtypes "$SKIP_TESTTYPES_RHEL8" --platform rhel8 all
+        $LAUNCH --skip-testtypes "$SKIP_TESTTYPES_RHEL8" --platform rhel8 $RUN_TESTS
         ;;
 
     rhel9)
@@ -33,11 +35,11 @@ case "$SCENARIO" in
             mkdir -p data/images
             curl -L http://download.eng.bos.redhat.com/rhel-9/development/RHEL-9/latest-RHEL-9.0/compose/BaseOS/x86_64/os/images/boot.iso --output data/images/boot.iso
         fi
-        $LAUNCH --skip-testtypes "$SKIP_TESTTYPES_RHEL9" --platform rhel9 all
+        $LAUNCH --skip-testtypes "$SKIP_TESTTYPES_RHEL9" --platform rhel9 $RUN_TESTS
         ;;
 
     # just run a single test on standard Rawhide; mostly for testing infrastructure
     minimal) $LAUNCH "$@" container ;;
 
-    *) echo "ERROR: unknown scenario $1" >&2; exit 1 ;;
+    *) echo "ERROR: unknown scenario - $SCENARIO" >&2; exit 1 ;;
 esac

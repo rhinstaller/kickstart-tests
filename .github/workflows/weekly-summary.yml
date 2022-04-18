@@ -22,4 +22,4 @@ jobs:
         run: sudo apt-get install -y python3-pycurl
       - name: Run weekly-summary script
         run: |
-          PATH=./scripts/:$PATH ./scripts/weekly-summary --rebuild --artifacts=logs-daily-iso,logs-rhel9,logs-rhel8
+          PATH=./scripts/:$PATH ./scripts/weekly-summary --flake-details --rebuild --artifacts=logs-daily-iso,logs-rhel9,logs-rhel8

@@ -34,8 +34,7 @@ class VirtualLogRequestHandler(LogRequestHandler):
         "CRIT kernel:Warning: Deprecated Driver is detected: team ",
 
         # Ignore a call trace during debugging.
-        # Enabled tempoarily for rhbz#2070019
-        "Call Trace:"
+        # "Call Trace:"
     ]
 
     # Specify error lines you want to add on top

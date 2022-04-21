@@ -1,0 +1,13 @@
+name: daily rhel9
+description: Daily run on current RHEL 9 development compose
+point_person: rvykydal@redhat.com
+artifact_type: github.scheduled.daily.kstest.rhel9
+verified_by:
+  test_cases:
+    query: '
+{% for tag in skiptags %}
+            "{{ tag }}" not in tc.tags and
+{% endfor %}
+            True'
+configurations:
+  - architecture: x86_64

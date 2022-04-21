@@ -39,6 +39,28 @@ jobs:
         working-directory: ./kickstart-tests
         run: scripts/generate-testcases.py -t ./testlib/test_cases/kstest-template.tc.yaml.j2 . -o ./testlib/test_cases
 
+      - name: Generate test plan for the scenario
+        working-directory: ./kickstart-tests
+        run: |
+          set -eux
+          TESTPLAN="./testlib/test_plans/daily-${{ matrix.scenario }}.plan.yaml"
+          TEMPLATE="${TESTPLAN}.j2"
+          if [ "${{ matrix.scenario }}" == "daily-iso" ]; then
+            VARIABLE="SKIP_TESTTYPES_DAILY_ISO"
+          elif [ "${{ matrix.scenario }}" == "rhel8" ]; then
+            VARIABLE="SKIP_TESTTYPES_RHEL8"
+          elif [ "${{ matrix.scenario }}" == "rhel9" ]; then
+            VARIABLE="SKIP_TESTTYPES_RHEL9"
+          fi
+          if [ -e ${TEMPLATE} ] && [ -n ${VARIABLE} ]; then
+            scripts/generate-testplan.py \
+              -t ${TEMPLATE} \
+              -f ./containers/runner/skip-testtypes \
+              -s ${VARIABLE} \
+              -o ${TESTPLAN} \
+              --verbose
+          fi
+
       - name: Clone Permian repository
         uses: actions/checkout@v2
         with:

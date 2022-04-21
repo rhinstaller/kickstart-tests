@@ -24,7 +24,7 @@
 # [
 #         {
 #             "scenario": "logs-daily-iso",
-#             "logfile": "INFO: install_log = /var/tmp/kstest-anaconda-conf.2022_03_04-03_50_44.h13p_9sy/virt-install.log",
+#             "logfile": "/var/tmp/kstest-anaconda-conf.2022_03_04-03_50_44.h13p_9sy/virt-install.log",
 #             "start_time": 1646383844.0,
 #             "summary": [
 #                 "Logs are in /var/tmp/kstest-anaconda-conf.2022_03_04-03_50_44.h13p_9sy",
@@ -42,7 +42,7 @@
 # 
 #         {
 #             "scenario": "logs-daily-iso",
-#             "logfile": "INFO: install_log = /var/tmp/kstest-driverdisk-disk-kargs.2022_03_04-02_42_13._25nhiki/virt-install.log",
+#             "logfile": "/var/tmp/kstest-driverdisk-disk-kargs.2022_03_04-02_42_13._25nhiki/virt-install.log",
 #             "start_time": 1646379735.0,
 #             "errors": [
 #                 "ERROR: Install failed: Test timed out",
@@ -81,6 +81,18 @@ def skip(line):
         return True
 
     return False
+
+def parse_install_log(line):
+    """
+    Parse the log line including the install_log into a path to the
+    logfile.
+
+    The line looks like:
+
+    INFO: install_log = /var/tmp/kstest-proxy-kickstart.2022_04_15-23_41_39.lqd_4mlo/virt-install.log
+    """
+    # We know it contains 'install_log =' so take the part after the =
+    return line.split("=")[-1].strip()
 
 def main(args):
     # Read the file, a line at a time
@@ -146,8 +158,8 @@ def main(args):
 
             if "INFO" in line:
                 # install_log is the first line of a test
-                if "install_log" in line:
-                    entry["logfile"] = line
+                if "install_log =" in line:
+                    entry["logfile"] = parse_install_log(line)
                     if timestamp:
                         entry["start_time"] = timestamp
                     capture_summary = False

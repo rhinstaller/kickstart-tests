@@ -29,6 +29,7 @@ from glob import glob
 import io
 import json
 import os
+import shutil
 import sys
 from subprocess import check_call
 import tempfile
@@ -42,10 +43,6 @@ URL = "https://api.github.com/repos/rhinstaller/kickstart-tests/actions/artifact
 # Defaults list of artifacts
 # For now use the full log artifacts, eventually this will be the json summaries
 ARTIFACT_NAMES = ["logs-daily-iso", "logs-rhel9", "logs-rhel8"]
-
-# TODO - only works after we have a week of json summary runs
-#ARTIFACT_NAMES = ["summary-daily-iso", "summary-rhel9", "summary-rhel8"]
-
 
 # We should ignore SIGPIPE when using pycurl.NOSIGNAL - see
 # the libcurl tutorial for more info.
@@ -272,6 +269,72 @@ def print_test_details(scenario, days, test_name, buf):
                 print(f'        {start_time} ({elapsed_time}s): {msg}', file=buf)
 
 
+def kstest_logdir(tmpdir, test):
+    """
+    Return the directory of the logs for the test
+
+    The logfile path should start with /var/tmp/kstest-*
+    but this finds the kstest-* no matter what the leading
+    path elements are.
+    """
+    logfile = test["logfile"]
+    for e in logfile.split(os.path.sep):
+        if e.startswith("kstest-"):
+            return os.path.join(tmpdir, e)
+
+    raise RuntimeError(f"No kstest-* directory found in {logfile}")
+
+
+def archive_test_logs(days, archive_path, all_logs):
+    """
+    Store the logs from the failed/flaky tests for archiving
+    and later examination. Paths follow the pattern:
+
+    MM-DD-YYYY / scenario / failed|flakes / TESTNAME / [1...] /
+
+    and each directory contains the logs for that run of the test.
+    Currently this is the kstest.log and virt-install.log files
+    """
+    for day in days.keys():
+        daydir = datetime.strptime(day, "%Y%m%d").strftime("%m-%d-%Y")
+        for scenario in days[day].keys():
+            # temporary log directories are stored by scenario + date
+            datename = scenario + "-" + datetime.strptime(day, "%Y%m%d").strftime("%Y-%m-%d")
+            if datename not in all_logs:
+                raise RuntimeError(f"Missing all_log entry for {datename}")
+
+            if not os.path.exists(all_logs[datename].name):
+                raise RuntimeError(f"Missing log directory for {datename}")
+
+            tmpdir = all_logs[datename].name
+            failed = days[day][scenario]["failed-tests"]
+            flakes = days[day][scenario]["flaky-tests"]
+
+            scenario_archive = os.path.join(archive_path, daydir, scenario)
+            os.makedirs(os.path.join(scenario_archive, "failed"))
+            os.makedirs(os.path.join(scenario_archive, "flakes"))
+            # data is organized by test names as keys with lists of tests
+            for name in failed:
+                i = 1
+                for t in sorted(failed[name], key=lambda x: x["start_time"]):
+                    logdir = kstest_logdir(tmpdir, t)
+                    if not os.path.exists(logdir):
+                        raise RuntimeError(f"Missing logdir - {logdir}")
+                    dst = os.path.join(scenario_archive, "failed", name, str(i))
+                    shutil.copytree(logdir, dst)
+                    i += 1
+
+            for name in flakes:
+                i = 1
+                for t in sorted(flakes[name], key=lambda x: x["start_time"]):
+                    logdir = kstest_logdir(tmpdir, t)
+                    if not os.path.exists(logdir):
+                        raise RuntimeError(f"Missing logdir - {logdir}")
+                    dst = os.path.join(scenario_archive, "flakes", name, str(i))
+                    shutil.copytree(logdir, dst)
+                    i += 1
+
+
 def process_logs(logs):
     """
     Process the logfiles into a data structure
@@ -305,13 +368,13 @@ def process_logs(logs):
     return all_data
 
 
-def summary(args, logs):
+def summary(args, json_logs, all_logs):
     """
     summary generates a summary of all the tests run in the selected date range
 
     It returns a string with the summary text
     """
-    all_data = process_logs(logs)
+    all_data = process_logs(json_logs)
     if args.debug:
         print(json.dumps(all_data))
 
@@ -416,6 +479,14 @@ def summary(args, logs):
 
         print("\n", file=buf)
 
+
+    # Save the logs for the failures and flakes if a path is specified
+    try:
+        if args.archive_logs:
+            archive_test_logs(days, args.archive_logs, all_logs)
+    except RuntimeError as e:
+        print(f"\nERROR: Problem archiving test logs - {e}", file=buf)
+
     return buf.getvalue()
 
 
@@ -428,10 +499,11 @@ def main(args, token):
         print(f"zipfiles = {zipfiles}")
 
     datenames = []          # List of valid logfile names
+    all_logs = {}           # Keep track of all the log tempdirs
     for name, datename, f in zipfiles:
         if args.rebuild or not os.path.exists(datename+".json"):
             try:
-                logs = extract_logs(f)
+                all_logs[datename] = extract_logs(f)
             except zipfile.BadZipFile:
                 # GitHub can responds with a 200 and a json error instead of a zip
                 # so if it isn't a valid zip, just skip it.
@@ -440,13 +512,13 @@ def main(args, token):
 
             # This is needed for logs without timestamps
             if args.rebuild:
-                rebuild_logs(logs)
+                rebuild_logs(all_logs[datename])
 
             # Run summary on kstest.log
             cmd = ["log2json",
                    "--scenario", name,
                    "--output", datename+".json",
-                   os.path.join(logs.name, "kstest.log")
+                   os.path.join(all_logs[datename].name, "kstest.log")
             ]
             if args.debug:
                 print(cmd)
@@ -456,7 +528,7 @@ def main(args, token):
         if os.path.exists(datename+".json"):
             datenames.append(datename)
 
-    report = summary(args, (d+".json" for d in datenames))
+    report = summary(args, (d+".json" for d in datenames), all_logs)
     if args.output:
         with open(args.output, "w") as f:
             f.write(report)
@@ -483,6 +555,8 @@ if __name__ == '__main__':
     parser.add_argument("--flake-details",
             default=False, action="store_true",
             help="Include details about flaky tests in summary")
+    parser.add_argument("--archive-logs",
+            help="Optionally collect the failed/flake logs in an archive directory tree")
     parser.add_argument("--output",
             help="Path and filename to write summary report to")
     parser.add_argument("--debug", default=False, action="store_true")

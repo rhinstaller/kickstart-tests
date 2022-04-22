@@ -226,7 +226,6 @@ def check_tests(tests):
             if name in failed:
                 # Previously failed, move that to flakes and remove it from the failed list
                 flakes[name] = failed[name]
-                flakes[name].append(t)
                 del failed[name]
         else:
             if name in success:

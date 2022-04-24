@@ -22,4 +22,14 @@ jobs:
         run: sudo apt-get install -y python3-pycurl
       - name: Run weekly-summary script
         run: |
-          PATH=./scripts/:$PATH ./scripts/weekly-summary --flake-details --rebuild --artifacts=logs-daily-iso,logs-rhel9,logs-rhel8
+          PATH=./scripts/:$PATH \
+          ./scripts/weekly-summary --rebuild --flake-details \
+          --artifacts=logs-daily-iso,logs-rhel9,logs-rhel8 \
+          --archive-logs /var/tmp/kstest-archive/
+
+      - name: Collect logs
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: 'weekly-logs-archive'
+          path: /var/tmp/kstest-archive/*

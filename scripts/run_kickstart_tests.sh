@@ -330,6 +330,14 @@ for t in ${tests}; do
     done
 done
 
+# Save the names of the tests that should be executed to /var/tmp/kstest-list
+echo "Saving list of expected tests to /var/tmp/kstest-list"
+[ -e /var/tmp/kstest-list ] && rm /var/tmp/kstest-list
+for t in ${tests}; do
+    name=$(basename "${t/.sh/}")
+    echo "${name}" >> /var/tmp/kstest-list
+done
+
 # collect the prerequisite list for the requested tests. If there is
 # anything in the list, build it.
 

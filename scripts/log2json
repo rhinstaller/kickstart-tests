@@ -37,9 +37,9 @@
 #             "end_time": 1646385568.0,
 #             "elapsed_time": 1724.0
 #         },
-# 
+#
 #         ...
-# 
+#
 #         {
 #             "scenario": "logs-daily-iso",
 #             "logfile": "/var/tmp/kstest-driverdisk-disk-kargs.2022_03_04-02_42_13._25nhiki/virt-install.log",
@@ -67,6 +67,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Convert kstest logs to JSON")
     parser.add_argument("--scenario", required=True, help="Name of test scenario")
     parser.add_argument("--output", help="Output filename (default is stdout)")
+    parser.add_argument("--kstest-list", help="File containing list of expected tests")
     parser.add_argument("LOGFILE", type=os.path.abspath, help="File to convert")
 
     return parser.parse_args()
@@ -177,7 +178,7 @@ def main(args):
                     # that indicates there is a missing RESULT. Guess the test name and build a fake RESULT
                     entry["name"] = guess_test_name(entry["logfile"])
                     entry["scenario"] = args.scenario
-                    entry["result"] = "INFO: RESULT:%s:missing:FAILED:Missing RESULT line" % entry["name"]
+                    entry["result"] = "INFO: RESULT:%s:missing:MISSING:Missing RESULT line" % entry["name"]
                     entry["success"] = False
 
 
@@ -220,9 +221,25 @@ def main(args):
     if entry.get("logfile") and not entry.get("result"):
         entry["name"] = guess_test_name(entry["logfile"])
         entry["scenario"] = args.scenario
-        entry["result"] = "INFO: RESULT:%s:missing:FAILED:Missing RESULT line" % entry["name"]
+        entry["result"] = "INFO: RESULT:%s:missing:MISSING:Missing RESULT line" % entry["name"]
         entry["success"] = False
-        tests.append(entry)
+
+    # Optionally check for any missing tests, adding entries for them
+    kstest_list = args.kstest_list or os.path.join(os.path.dirname(args.LOGFILE), "kstest-list")
+    if os.path.exists(kstest_list):
+        # The kstest-list file is a list of test names, one per line.
+        with open(kstest_list) as f:
+            expected_tests = set(t.strip() for t in f.readlines())
+        ran_tests = set(t["name"] for t in tests)
+        missing = expected_tests - ran_tests
+        for t in missing:
+            entry = {
+                "name": t,
+                "result": "INFO: RESULT:%s:missing:MISSING:Missing test" % t,
+                "success": False,
+                "logfile": ""
+            }
+            tests.append(entry)
 
     return tests
 

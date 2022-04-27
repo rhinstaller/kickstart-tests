@@ -202,14 +202,16 @@ def rebuild_logs(tdir):
 
 def check_tests(tests):
     """
-    Check the tests for success, failing, or flakes -- success after first failing
+    Check the tests for success, failing, missing, or flakes -- success after first failing
 
     This returns a tuple of:
     - list of the names of successful tests
+    - list of the names of the missing tests
     - dict of failed tests, each entry being a list of the failure details dict
     - dict of flaky tests, each entry being a list of the flaky details dict
     """
     success = []
+    missing = []
     failed = {}
     flakes = {}
 
@@ -228,7 +230,10 @@ def check_tests(tests):
                 flakes[name] = failed[name]
                 del failed[name]
         else:
-            if name in success:
+            if "MISSING" in t["result"]:
+                # Test is completely missing, don't count it as failed
+                missing.append(name)
+            elif name in success:
                 # Test was also successful, make sure to record it in flakes list
                 if name in flakes:
                     flakes[name].append(t)
@@ -240,7 +245,7 @@ def check_tests(tests):
                 else:
                     failed[name] = [t]
 
-    return sorted(success), failed, flakes
+    return sorted(success), sorted(missing), failed, flakes
 
 
 def print_test_details(scenario, days, test_name, buf):
@@ -316,9 +321,12 @@ def archive_test_logs(days, archive_path, all_logs):
             for name in failed:
                 i = 1
                 for t in sorted(failed[name], key=lambda x: x["start_time"]):
-                    logdir = kstest_logdir(tmpdir, t)
-                    if not os.path.exists(logdir):
-                        raise RuntimeError(f"Missing logdir - {logdir}")
+                    try:
+                        logdir = kstest_logdir(tmpdir, t)
+                        if not os.path.exists(logdir):
+                            raise RuntimeError(f"Missing logdir - {logdir}")
+                    except RuntimeError:
+                        continue
                     dst = os.path.join(scenario_archive, "failed", name, str(i))
                     shutil.copytree(logdir, dst)
                     i += 1
@@ -326,9 +334,12 @@ def archive_test_logs(days, archive_path, all_logs):
             for name in flakes:
                 i = 1
                 for t in sorted(flakes[name], key=lambda x: x["start_time"]):
-                    logdir = kstest_logdir(tmpdir, t)
-                    if not os.path.exists(logdir):
-                        raise RuntimeError(f"Missing logdir - {logdir}")
+                    try:
+                        logdir = kstest_logdir(tmpdir, t)
+                        if not logdir or not os.path.exists(logdir):
+                            raise RuntimeError(f"Missing logdir - {logdir}")
+                    except RuntimeError:
+                        continue
                     dst = os.path.join(scenario_archive, "flakes", name, str(i))
                     shutil.copytree(logdir, dst)
                     i += 1
@@ -392,18 +403,21 @@ def summary(args, json_logs, all_logs):
         days[day] = {}
         for scenario in sorted(all_data[day].keys()):
             if scenario not in all_days:
-                all_days[scenario] = {"success": 0, "failed": 0, "flakes": 0}
+                all_days[scenario] = {"success": 0, "missing": 0, "failed": 0, "flakes": 0}
 
             # Figure out how many were successful, failed, or were flakes
-            success, failed, flakes = check_tests(all_data[day][scenario])
+            success, missing, failed, flakes = check_tests(all_data[day][scenario])
 
             days[day][scenario] = {
                     "success": len(success),
+                    "missing": len(missing),
                     "failed": len(failed),
                     "flakes": len(flakes),
+                    "missing-tests": missing,
                     "failed-tests": failed,
                     "flaky-tests": flakes}
             all_days[scenario]["success"] += len(success)
+            all_days[scenario]["missing"] += len(missing)
             all_days[scenario]["failed"] += len(failed)
             all_days[scenario]["flakes"] += len(flakes)
 
@@ -419,10 +433,11 @@ def summary(args, json_logs, all_logs):
     print("==============", file=buf)
     for scenario in sorted(all_days.keys()):
         success = all_days[scenario]["success"]
+        missing = all_days[scenario]["missing"]
         failed = all_days[scenario]["failed"]
         flakes = all_days[scenario]["flakes"]
 
-        print(f"{scenario}: Ran {success+failed} tests. {success} passed, {failed} failed, {flakes} flakes.", file=buf)
+        print(f"{scenario}: Ran {success+failed+missing} tests. {success} passed, {failed} failed, {missing} missing, {flakes} flakes.", file=buf)
     print("\n", file=buf)
 
     print("Top 5 failed tests for the week", file=buf)
@@ -441,10 +456,15 @@ def summary(args, json_logs, all_logs):
         for scenario in sorted(days[day].keys()):
             s = days[day][scenario]
             success = s["success"]
+            missing = s["missing"]
             failed = s["failed"]
-            total = success + failed
+            total = success + failed + missing
             flakes = s["flakes"]
-            print(f"    {scenario} (Ran {total}, {success} passed, {failed} failed. {flakes} flakes) :", file=buf)
+            print(f"    {scenario} (Ran {total}, {success} passed, {failed} failed, {missing} missing. {flakes} flakes) :", file=buf)
+            if s["missing-tests"]:
+                print("        Missing:", file=buf)
+                for n in sorted(s["missing-tests"].keys()):
+                    print(f"            {n}", file=buf)
             if s["failed-tests"]:
                 print("        Failed:", file=buf)
                 for n in sorted(s["failed-tests"].keys()):

@@ -179,6 +179,36 @@ def extract_logs(f):
     return tdir
 
 
+def generate_test_list(tdir):
+    """
+    Build kstest-list if it is missing
+
+    This is a list of the expected tests, and it is used to help detect when
+    tests are totally missing from the results.
+
+    The original kstest.log has a line:
+    Running tests: ./bridge-httpks.sh ./packages-instlangs-1.sh  ...
+
+    Parse this and create kstest-list, one test name per line for later use.
+    """
+
+    # Skip this if it already exists
+    if os.path.exists(os.path.join(tdir.name, "kstest-list")):
+        return
+
+    kstest_log = os.path.join(tdir.name, "kstest.log")
+    with open(kstest_log) as f:
+        for line in f.readlines():
+            if not line.startswith("Running tests: "):
+                continue
+
+            tests = [os.path.basename(os.path.splitext(s)[0]) for s in line[15:].split()]
+            with open(os.path.join(tdir.name, "kstest-list"), "wt") as klf:
+                for t in tests:
+                    print(t, file=klf)
+            break
+
+
 def rebuild_logs(tdir):
     """
     rebuild_logs recreates kstest.log with timestamps
@@ -531,6 +561,7 @@ def main(args, token):
 
             # This is needed for logs without timestamps
             if args.rebuild:
+                generate_test_list(all_logs[datename])
                 rebuild_logs(all_logs[datename])
 
             # Run summary on kstest.log

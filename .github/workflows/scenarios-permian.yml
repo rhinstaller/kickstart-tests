@@ -156,7 +156,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: 'logs-${{ matrix.scenario }}'
+          name: 'logs-testing-${{ matrix.scenario }}'
           # skip the /anaconda subdirectories, too large
           path: |
             kickstart-tests/data/logs/kstest.log
@@ -168,7 +168,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: 'summary-${{ matrix.scenario }}'
+          name: 'summary-testing-${{ matrix.scenario }}'
           path: |
             kickstart-tests/data/logs/kstest.log.json
 

@@ -493,7 +493,7 @@ def summary(args, json_logs, all_logs):
             print(f"    {scenario} (Ran {total}, {success} passed, {failed} failed, {missing} missing. {flakes} flakes) :", file=buf)
             if s["missing-tests"]:
                 print("        Missing:", file=buf)
-                for n in sorted(s["missing-tests"].keys()):
+                for n in s["missing-tests"]:
                     print(f"            {n}", file=buf)
             if s["failed-tests"]:
                 print("        Failed:", file=buf)
@@ -537,6 +537,34 @@ def summary(args, json_logs, all_logs):
         print(f"\nERROR: Problem archiving test logs - {e}", file=buf)
 
     return buf.getvalue()
+
+
+def test_summary(args, path):
+    """
+    Test the weekly summary on a single directory
+
+    Instead of pulling artifacts from github use a single directory with
+    kstest.log.json and the log directories.
+    """
+    log = os.path.join(path, "kstest.log.json")
+    with open(log) as f:
+        data = json.load(f)
+        scenario = data[0].get("scenario", None)
+    if not scenario:
+        raise RuntimeError("No scenario found in %s" % log)
+
+    # The json log filename needs to be in the form of <scenario>-<YYYY-MM-DD>.json
+    datename = f"{scenario}-1990-01-01"
+    shutil.copy(log, datename+".json")
+    datenames = [datename]
+    all_logs = {datename: path}
+
+    report = summary(args, (d+".json" for d in datenames), all_logs)
+    if args.output:
+        with open(args.output, "w") as f:
+            f.write(report)
+    else:
+        print(report)
 
 
 def main(args, token):
@@ -609,6 +637,7 @@ if __name__ == '__main__':
             help="Optionally collect the failed/flake logs in an archive directory tree")
     parser.add_argument("--output",
             help="Path and filename to write summary report to")
+    parser.add_argument("--test", help=argparse.SUPPRESS)
     parser.add_argument("--debug", default=False, action="store_true")
     parser.add_argument("--verbose", default=False, action="store_true")
     args = parser.parse_args()
@@ -620,4 +649,7 @@ if __name__ == '__main__':
     if args.debug:
         print(f"args = {args}")
 
-    main(args, os.environ["GITHUB_TOKEN"])
+    if args.test:
+        test_summary(args, args.test)
+    else:
+        main(args, os.environ["GITHUB_TOKEN"])

@@ -107,13 +107,7 @@ mkdir -p -m 777 data/logs
 if ! [ -e data/images/boot.iso ]; then
     if [ -n "${DAILY_ISO_TOKEN:-}" ]; then
         echo "INFO: data/images/boot.iso does not exist, downloading daily iso..."
-        CURL="curl -u token:$(cat $DAILY_ISO_TOKEN) --show-error --fail"
-        RESPONSE=$($CURL --silent https://api.github.com/repos/rhinstaller/kickstart-tests/actions/artifacts)
-        ZIP=$(echo "$RESPONSE" | jq --raw-output '.artifacts | map(select(.name == "images"))[0].archive_download_url')
-        echo "INFO: Downloading $ZIP ..."
-        $CURL -L -o data/images.zip "$ZIP"
-        # there is on unzip on RHEL 7, so fall back to 7za (p7zip package)
-        (cd data/images && if type unzip >/dev/null 2>&1; then unzip ../images.zip; else 7za x ../images.zip; fi)
+        $PWD/containers/runner/fetch_daily_iso.sh ${DAILY_ISO_TOKEN} data/images/boot.iso
     else
         echo "INFO: data/images/boot.iso does not exist, downloading current Fedora Rawhide Server image..."
         curl -L https://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Server/x86_64/os/images/boot.iso --output data/images/boot.iso

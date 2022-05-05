@@ -16,13 +16,13 @@ jobs:
       fail-fast: false
 
     # these settings depend on the infrastructure; on upshift ocp-master-xxl they take about 4 hours
-    timeout-minutes: 480
+    timeout-minutes: 500
     env:
       TEST_JOBS: 16
       GITHUB_TOKEN: /home/github/github-token
       # The timeout should be ~20 minutes less then the job's timeout-minutes
       # so that we get partial results and logs in case of the timeout.
-      LAUNCHER_TIMEOUT_MINUTES: 460
+      LAUNCHER_TIMEOUT_MINUTES: 480
 
     steps:
       # self-hosted runners don't do this automatically; also useful to keep stuff around for debugging

@@ -1,6 +1,9 @@
 # Run all kickstart tests for all active branches in Permian
 name: Daily run in Permian
 on:
+  schedule:
+    # run after daily-boot-iso.yml
+    - cron: 0 23 * * *
   workflow_dispatch:
 
 permissions:

@@ -127,11 +127,11 @@ jobs:
         run: |
           set -eux
           if [ "${{ matrix.scenario }}" == "rhel8" ]; then
-            echo "::set-output name=installation_tree::http://download.eng.bos.redhat.com/rhel-8/development/RHEL-8/latest-RHEL-8/compose/BaseOS/x86_64/os"
-            echo "::set-output name=modular_url::http://download.eng.bos.redhat.com/rhel-8/development/RHEL-8/latest-RHEL-8/compose/AppStream/x86_64/os"
+            echo "::set-output name=installation_tree::http://download.eng.bos.redhat.com/rhel-8/development/RHEL-8/latest-RHEL-8.6/compose/BaseOS/x86_64/os"
+            echo "::set-output name=modular_url::http://download.eng.bos.redhat.com/rhel-8/development/RHEL-8/latest-RHEL-8.6/compose/AppStream/x86_64/os"
           elif [ "${{ matrix.scenario }}" == "rhel9" ]; then
-            echo "::set-output name=installation_tree::http://download.eng.bos.redhat.com/rhel-9/development/RHEL-9/latest-RHEL-9/compose/BaseOS/x86_64/os"
-            echo "::set-output name=modular_url::http://download.eng.bos.redhat.com/rhel-9/development/RHEL-9/latest-RHEL-9/compose/AppStream/x86_64/os"
+            echo "::set-output name=installation_tree::http://download.eng.bos.redhat.com/rhel-9/development/RHEL-9/latest-RHEL-9.0/compose/BaseOS/x86_64/os"
+            echo "::set-output name=modular_url::http://download.eng.bos.redhat.com/rhel-9/development/RHEL-9/latest-RHEL-9.0/compose/AppStream/x86_64/os"
           else
             echo "Installation tree location for ${{ matrix.scenario }} not configured"
             if [ -z "${{ steps.boot_iso_from_scenario.outputs.boot_iso }}" ]; then

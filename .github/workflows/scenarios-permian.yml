@@ -70,9 +70,8 @@ jobs:
       - name: Clone Permian repository
         uses: actions/checkout@v2
         with:
-          repository: rvykydal/permian
+          repository: rhinstaller/permian
           path: permian
-          ref: kstest-revert-boot-iso-conversion
 
       - name: Clone tclib repository
         uses: actions/checkout@v2

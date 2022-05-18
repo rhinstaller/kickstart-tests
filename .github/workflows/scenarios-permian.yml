@@ -143,17 +143,26 @@ jobs:
             echo "::set-output name=modular_url::"
           fi
 
+      - name: Create Permian settings file
+        working-directory: ./permian
+        run: |
+          cat <<EOF > settings.ini
+          [kickstart_test]
+          timeout=${LAUNCHER_TIMEOUT_MINUTES}m
+          retry_on_failure=True
+          kstest_local_repo=${{ github.workspace }}/kickstart-tests
+          [library]
+          directPath=${{ github.workspace }}/kickstart-tests/testlib
+          EOF
+
       - name: Run scenario ${{ matrix.scenario }} in container
         working-directory: ./permian
         run: |
           sudo --preserve-env=TEST_JOBS \
           PYTHONPATH=${PYTHONPATH:-}:${{ github.workspace }}/tclib \
           ./pipeline --debug-log permian.log \
-            -o library.directPath="${{ github.workspace }}/kickstart-tests/testlib" \
-            -o workflows.dry_run=False \
-            -o kickstart_test.timeout=${LAUNCHER_TIMEOUT_MINUTES}m \
-            -o kickstart_test.retry_on_failure=True \
-            -o kickstart_test.kstest_local_repo="${{ github.workspace }}/kickstart-tests" \
+            --settings settings.ini \
+            --override workflows.dry_run=False \
             run_event '{"type":"github.scheduled.daily.kstest.${{ matrix.scenario }}","bootIso":{"x86_64":"${{ steps.boot_iso_from_scenario.outputs.boot_iso }}"},"kstestParams":{"platform":"${{ steps.platform_from_scenario.outputs.platform }}","urls":{"x86_64":{"installation_tree":"${{ steps.set_installation_urls.outputs.installation_tree }}","modular_url":"${{ steps.set_installation_urls.outputs.modular_url }}"}}}}'
 
       - name: Collect anaconda logs

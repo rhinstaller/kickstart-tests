@@ -37,9 +37,9 @@
 #             "end_time": 1646385568.0,
 #             "elapsed_time": 1724.0
 #         },
-# 
+#
 #         ...
-# 
+#
 #         {
 #             "scenario": "logs-daily-iso",
 #             "logfile": "/var/tmp/kstest-driverdisk-disk-kargs.2022_03_04-02_42_13._25nhiki/virt-install.log",
@@ -67,6 +67,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Convert kstest logs to JSON")
     parser.add_argument("--scenario", required=True, help="Name of test scenario")
     parser.add_argument("--output", help="Output filename (default is stdout)")
+    parser.add_argument("--kstest-list", help="File containing list of expected tests")
     parser.add_argument("LOGFILE", type=os.path.abspath, help="File to convert")
 
     return parser.parse_args()
@@ -93,6 +94,21 @@ def parse_install_log(line):
     """
     # We know it contains 'install_log =' so take the part after the =
     return line.split("=")[-1].strip()
+
+def guess_test_name(logfile):
+    """
+    Guess a test name based on the install_log
+
+    Used only as a last resort when RESULT is missing.
+    """
+    for e in logfile.split(os.path.sep):
+        if e.startswith("kstest-"):
+            # test name is after kstest- and before first '.' (unless this changes in the future)
+            # This should return the bare test name or fail by returning the full name
+            return e[7:].partition('.')[0]
+
+    # fall back to full directory name
+    return os.path.basename(os.path.dirname(logfile))
 
 def main(args):
     # Read the file, a line at a time
@@ -134,7 +150,7 @@ def main(args):
 
                 # Grab the test name from the result entry
                 # RESULT line is in the form of:
-                #     INFO: RESULT:[NAME]:[HOSTID]:[SUCCESS|FAIL]:[MESSAGE]
+                #     INFO: RESULT:[NAME]:[HOSTID]:[SUCCESS|FAILED]:[MESSAGE]
                 try:
                     entry["name"] = line.split(":")[2]
                 except IndexError:
@@ -157,6 +173,20 @@ def main(args):
                 continue
 
             if "INFO" in line:
+                if "install_log =" in line and entry.get("logfile"):
+                    # entry should be empty for every complete logfile entry, if it is not
+                    # that indicates there is a missing RESULT. Guess the test name and build a fake RESULT
+                    entry["name"] = guess_test_name(entry["logfile"])
+                    entry["scenario"] = args.scenario
+                    entry["result"] = "INFO: RESULT:%s:missing:MISSING:Missing RESULT line" % entry["name"]
+                    entry["success"] = False
+
+
+                    # Reset for the next entry
+                    tests.append(entry)
+                    capture_summary = False
+                    entry = {}
+
                 # install_log is the first line of a test
                 if "install_log =" in line:
                     entry["logfile"] = parse_install_log(line)
@@ -186,6 +216,30 @@ def main(args):
                         continue
                     # Capturing summary lines
                     entry["summary"].append(line)
+
+    # Check for a missing result at the end of the logfile
+    if entry.get("logfile") and not entry.get("result"):
+        entry["name"] = guess_test_name(entry["logfile"])
+        entry["scenario"] = args.scenario
+        entry["result"] = "INFO: RESULT:%s:missing:MISSING:Missing RESULT line" % entry["name"]
+        entry["success"] = False
+
+    # Optionally check for any missing tests, adding entries for them
+    kstest_list = args.kstest_list or os.path.join(os.path.dirname(args.LOGFILE), "kstest-list")
+    if os.path.exists(kstest_list):
+        # The kstest-list file is a list of test names, one per line.
+        with open(kstest_list) as f:
+            expected_tests = set(t.strip() for t in f.readlines())
+        ran_tests = set(t["name"] for t in tests)
+        missing = expected_tests - ran_tests
+        for t in missing:
+            entry = {
+                "name": t,
+                "result": "INFO: RESULT:%s:missing:MISSING:Missing test" % t,
+                "success": False,
+                "logfile": ""
+            }
+            tests.append(entry)
 
     return tests
 

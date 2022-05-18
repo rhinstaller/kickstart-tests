@@ -179,6 +179,36 @@ def extract_logs(f):
     return tdir
 
 
+def generate_test_list(tdir):
+    """
+    Build kstest-list if it is missing
+
+    This is a list of the expected tests, and it is used to help detect when
+    tests are totally missing from the results.
+
+    The original kstest.log has a line:
+    Running tests: ./bridge-httpks.sh ./packages-instlangs-1.sh  ...
+
+    Parse this and create kstest-list, one test name per line for later use.
+    """
+
+    # Skip this if it already exists
+    if os.path.exists(os.path.join(tdir.name, "kstest-list")):
+        return
+
+    kstest_log = os.path.join(tdir.name, "kstest.log")
+    with open(kstest_log) as f:
+        for line in f.readlines():
+            if not line.startswith("Running tests: "):
+                continue
+
+            tests = [os.path.basename(os.path.splitext(s)[0]) for s in line[15:].split()]
+            with open(os.path.join(tdir.name, "kstest-list"), "wt") as klf:
+                for t in tests:
+                    print(t, file=klf)
+            break
+
+
 def rebuild_logs(tdir):
     """
     rebuild_logs recreates kstest.log with timestamps
@@ -202,14 +232,16 @@ def rebuild_logs(tdir):
 
 def check_tests(tests):
     """
-    Check the tests for success, failing, or flakes -- success after first failing
+    Check the tests for success, failing, missing, or flakes -- success after first failing
 
     This returns a tuple of:
     - list of the names of successful tests
+    - list of the names of the missing tests
     - dict of failed tests, each entry being a list of the failure details dict
     - dict of flaky tests, each entry being a list of the flaky details dict
     """
     success = []
+    missing = []
     failed = {}
     flakes = {}
 
@@ -228,7 +260,10 @@ def check_tests(tests):
                 flakes[name] = failed[name]
                 del failed[name]
         else:
-            if name in success:
+            if "MISSING" in t["result"]:
+                # Test is completely missing, don't count it as failed
+                missing.append(name)
+            elif name in success:
                 # Test was also successful, make sure to record it in flakes list
                 if name in flakes:
                     flakes[name].append(t)
@@ -240,7 +275,7 @@ def check_tests(tests):
                 else:
                     failed[name] = [t]
 
-    return sorted(success), failed, flakes
+    return sorted(success), sorted(missing), failed, flakes
 
 
 def print_test_details(scenario, days, test_name, buf):
@@ -316,9 +351,12 @@ def archive_test_logs(days, archive_path, all_logs):
             for name in failed:
                 i = 1
                 for t in sorted(failed[name], key=lambda x: x["start_time"]):
-                    logdir = kstest_logdir(tmpdir, t)
-                    if not os.path.exists(logdir):
-                        raise RuntimeError(f"Missing logdir - {logdir}")
+                    try:
+                        logdir = kstest_logdir(tmpdir, t)
+                        if not os.path.exists(logdir):
+                            raise RuntimeError(f"Missing logdir - {logdir}")
+                    except RuntimeError:
+                        continue
                     dst = os.path.join(scenario_archive, "failed", name, str(i))
                     shutil.copytree(logdir, dst)
                     i += 1
@@ -326,9 +364,12 @@ def archive_test_logs(days, archive_path, all_logs):
             for name in flakes:
                 i = 1
                 for t in sorted(flakes[name], key=lambda x: x["start_time"]):
-                    logdir = kstest_logdir(tmpdir, t)
-                    if not os.path.exists(logdir):
-                        raise RuntimeError(f"Missing logdir - {logdir}")
+                    try:
+                        logdir = kstest_logdir(tmpdir, t)
+                        if not logdir or not os.path.exists(logdir):
+                            raise RuntimeError(f"Missing logdir - {logdir}")
+                    except RuntimeError:
+                        continue
                     dst = os.path.join(scenario_archive, "flakes", name, str(i))
                     shutil.copytree(logdir, dst)
                     i += 1
@@ -392,18 +433,21 @@ def summary(args, json_logs, all_logs):
         days[day] = {}
         for scenario in sorted(all_data[day].keys()):
             if scenario not in all_days:
-                all_days[scenario] = {"success": 0, "failed": 0, "flakes": 0}
+                all_days[scenario] = {"success": 0, "missing": 0, "failed": 0, "flakes": 0}
 
             # Figure out how many were successful, failed, or were flakes
-            success, failed, flakes = check_tests(all_data[day][scenario])
+            success, missing, failed, flakes = check_tests(all_data[day][scenario])
 
             days[day][scenario] = {
                     "success": len(success),
+                    "missing": len(missing),
                     "failed": len(failed),
                     "flakes": len(flakes),
+                    "missing-tests": missing,
                     "failed-tests": failed,
                     "flaky-tests": flakes}
             all_days[scenario]["success"] += len(success)
+            all_days[scenario]["missing"] += len(missing)
             all_days[scenario]["failed"] += len(failed)
             all_days[scenario]["flakes"] += len(flakes)
 
@@ -419,10 +463,11 @@ def summary(args, json_logs, all_logs):
     print("==============", file=buf)
     for scenario in sorted(all_days.keys()):
         success = all_days[scenario]["success"]
+        missing = all_days[scenario]["missing"]
         failed = all_days[scenario]["failed"]
         flakes = all_days[scenario]["flakes"]
 
-        print(f"{scenario}: Ran {success+failed} tests. {success} passed, {failed} failed, {flakes} flakes.", file=buf)
+        print(f"{scenario}: Ran {success+failed+missing} tests. {success} passed, {failed} failed, {missing} missing, {flakes} flakes.", file=buf)
     print("\n", file=buf)
 
     print("Top 5 failed tests for the week", file=buf)
@@ -441,10 +486,15 @@ def summary(args, json_logs, all_logs):
         for scenario in sorted(days[day].keys()):
             s = days[day][scenario]
             success = s["success"]
+            missing = s["missing"]
             failed = s["failed"]
-            total = success + failed
+            total = success + failed + missing
             flakes = s["flakes"]
-            print(f"    {scenario} (Ran {total}, {success} passed, {failed} failed. {flakes} flakes) :", file=buf)
+            print(f"    {scenario} (Ran {total}, {success} passed, {failed} failed, {missing} missing. {flakes} flakes) :", file=buf)
+            if s["missing-tests"]:
+                print("        Missing:", file=buf)
+                for n in s["missing-tests"]:
+                    print(f"            {n}", file=buf)
             if s["failed-tests"]:
                 print("        Failed:", file=buf)
                 for n in sorted(s["failed-tests"].keys()):
@@ -489,6 +539,34 @@ def summary(args, json_logs, all_logs):
     return buf.getvalue()
 
 
+def test_summary(args, path):
+    """
+    Test the weekly summary on a single directory
+
+    Instead of pulling artifacts from github use a single directory with
+    kstest.log.json and the log directories.
+    """
+    log = os.path.join(path, "kstest.log.json")
+    with open(log) as f:
+        data = json.load(f)
+        scenario = data[0].get("scenario", None)
+    if not scenario:
+        raise RuntimeError("No scenario found in %s" % log)
+
+    # The json log filename needs to be in the form of <scenario>-<YYYY-MM-DD>.json
+    datename = f"{scenario}-1990-01-01"
+    shutil.copy(log, datename+".json")
+    datenames = [datename]
+    all_logs = {datename: path}
+
+    report = summary(args, (d+".json" for d in datenames), all_logs)
+    if args.output:
+        with open(args.output, "w") as f:
+            f.write(report)
+    else:
+        print(report)
+
+
 def main(args, token):
     artifacts = get_artifacts(token, args.artifact_names, args.start, args.end)
     if args.verbose:
@@ -511,6 +589,7 @@ def main(args, token):
 
             # This is needed for logs without timestamps
             if args.rebuild:
+                generate_test_list(all_logs[datename])
                 rebuild_logs(all_logs[datename])
 
             # Run summary on kstest.log
@@ -558,6 +637,7 @@ if __name__ == '__main__':
             help="Optionally collect the failed/flake logs in an archive directory tree")
     parser.add_argument("--output",
             help="Path and filename to write summary report to")
+    parser.add_argument("--test", help=argparse.SUPPRESS)
     parser.add_argument("--debug", default=False, action="store_true")
     parser.add_argument("--verbose", default=False, action="store_true")
     args = parser.parse_args()
@@ -569,4 +649,7 @@ if __name__ == '__main__':
     if args.debug:
         print(f"args = {args}")
 
-    main(args, os.environ["GITHUB_TOKEN"])
+    if args.test:
+        test_summary(args, args.test)
+    else:
+        main(args, os.environ["GITHUB_TOKEN"])

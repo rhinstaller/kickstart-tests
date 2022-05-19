@@ -70,9 +70,8 @@ jobs:
       - name: Clone Permian repository
         uses: actions/checkout@v2
         with:
-          repository: rvykydal/permian
+          repository: rhinstaller/permian
           path: permian
-          ref: kstest-revert-boot-iso-conversion
 
       - name: Clone tclib repository
         uses: actions/checkout@v2
@@ -114,11 +113,11 @@ jobs:
           BOOT_ISO_URL="file://$BOOT_ISO_PATH"
           if [ "${{ matrix.scenario }}" == "daily-iso" ] || [ "${{ matrix.scenario }}" == "minimal" ]; then
             ${{ github.workspace }}/kickstart-tests/containers/runner/fetch_daily_iso.sh $GITHUB_TOKEN $BOOT_ISO_PATH
+            echo "::set-output name=boot_iso::,\"bootIso\":{\"x86_64\":\"${BOOT_ISO_URL}\"}"
           else
             echo "Boot.iso URL for ${{ matrix.scenario }} not configured"
-            BOOT_ISO_URL=
+            echo "::set-output name=boot_iso::"
           fi
-          echo "::set-output name=boot_iso::$BOOT_ISO_URL"
 
       # Configure location of installation repositories for the scenario
       # Also default boot.iso is defined by the value of urls.installation_tree
@@ -163,7 +162,7 @@ jobs:
           ./pipeline --debug-log permian.log \
             --settings settings.ini \
             --override workflows.dry_run=False \
-            run_event '{"type":"github.scheduled.daily.kstest.${{ matrix.scenario }}","bootIso":{"x86_64":"${{ steps.boot_iso_from_scenario.outputs.boot_iso }}"},"kstestParams":{"platform":"${{ steps.platform_from_scenario.outputs.platform }}","urls":{"x86_64":{"installation_tree":"${{ steps.set_installation_urls.outputs.installation_tree }}","modular_url":"${{ steps.set_installation_urls.outputs.modular_url }}"}}}}'
+            run_event '{"type":"github.scheduled.daily.kstest.${{ matrix.scenario }}"${{ steps.boot_iso_from_scenario.outputs.boot_iso }},"kstestParams":{"platform":"${{ steps.platform_from_scenario.outputs.platform }}","urls":{"x86_64":{"installation_tree":"${{ steps.set_installation_urls.outputs.installation_tree }}","modular_url":"${{ steps.set_installation_urls.outputs.modular_url }}"}}}}'
 
       - name: Collect anaconda logs
         if: always()

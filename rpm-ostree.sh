@@ -23,7 +23,7 @@ TESTTYPE="payload ostree skip-on-rhel"
 
 kernel_args() {
     # Enforce the Fedora-IoT configuration.
-    echo ${DEFAULT_BOOTOPTS} inst.product=Fedora-IoT inst.variant=IoT
+    echo ${DEFAULT_BOOTOPTS} inst.profile=fedora-iot
 }
 
 validate() {

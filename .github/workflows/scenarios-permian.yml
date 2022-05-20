@@ -12,20 +12,20 @@ permissions:
 jobs:
   scenario:
     name: Scenario in Permian
-    runs-on: [self-hosted, kstest-permian]
+    runs-on: [self-hosted, kstest]
     strategy:
       matrix:
         scenario: [daily-iso, rhel8, rhel9]
       fail-fast: false
 
     # these settings depend on the infrastructure; on upshift ocp-master-xxl they take about 4 hours
-    timeout-minutes: 500
+    timeout-minutes: 530
     env:
       TEST_JOBS: 16
       GITHUB_TOKEN: /home/github/github-token
       # The timeout should be ~20 minutes less then the job's timeout-minutes
       # so that we get partial results and logs in case of the timeout.
-      LAUNCHER_TIMEOUT_MINUTES: 480
+      LAUNCHER_TIMEOUT_MINUTES: 510
 
     steps:
       # self-hosted runners don't do this automatically; also useful to keep stuff around for debugging
@@ -168,7 +168,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: 'logs-testing-${{ matrix.scenario }}'
+          name: 'logs-${{ matrix.scenario }}'
           # skip the /anaconda subdirectories, too large
           path: |
             kickstart-tests/data/logs/kstest.log
@@ -180,7 +180,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v2
         with:
-          name: 'summary-testing-${{ matrix.scenario }}'
+          name: 'summary-${{ matrix.scenario }}'
           path: |
             kickstart-tests/data/logs/kstest.log.json
 

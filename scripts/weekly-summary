@@ -33,6 +33,7 @@ import shutil
 import sys
 from subprocess import check_call
 import tempfile
+import time
 from urllib.request import Request, urlopen
 import zipfile
 
@@ -75,20 +76,52 @@ def get_artifacts(token, artifact_names, start, end):
       "expires_at": "2022-03-25T03:29:06Z"
     },
     """
-    req = Request(URL)
-    req.add_header("Accept", "application/vnd.github.v3+json")
-    req.add_header("Authorization", f"token {token}")
-    with urlopen(req) as r:
-        data = json.load(r)
 
-    # Filter out the artifacts within the date range and names
     artifacts = []
-    for a in data["artifacts"]:
-        if a["name"] not in artifact_names:
-            continue
-        updated_at = datetime.fromisoformat(a["updated_at"][:-1])
-        if start <= updated_at <= end:
-            artifacts.append(a)
+    page = 1
+    retry_limit = 3
+    while True:
+        req = Request(URL + f"&page={page}")
+        req.add_header("Accept", "application/vnd.github.v3+json")
+        req.add_header("Authorization", f"token {token}")
+        with urlopen(req) as r:
+            # Handle hitting the GitHub rate limit
+            # If the reset time is < 90s in the future, wait for it (trying 3 times)
+            # Otherwise raise an error
+            if r.status == 403:
+                try:
+                    reset = int(r.headers.get("X-RateLimit-Reset"))
+                except:
+                    raise RuntimeError("Hit GitHub rate limit. Reset header missing.")
+                if retry_limit == 0 or time.time() > reset or reset - time.time() > 90:
+                    raise RuntimeError("Hit GitHub rate limit. Reset is at %s" % time.ctime(reset))
+
+                # Try waiting until after the reset time
+                time.sleep(10 + (reset - time.time()))
+                retry_limit = retry_limit - 1
+                continue
+
+            if r.status != 200:
+                raise RuntimeError("Error (%d) with API request: %s" % (r.status, str(r)))
+
+            data = json.load(r)
+
+        # Only include the artifacts within the date range and names
+        for a in data["artifacts"]:
+            if a["name"] not in artifact_names:
+                continue
+            updated_at = datetime.fromisoformat(a["updated_at"][:-1])
+            if start <= updated_at <= end:
+                artifacts.append(a)
+
+        if len(data["artifacts"]) < 100:
+            break
+
+        # There are more results, get the next page
+        page = page + 1
+
+        # Avoid hitting per-second rate limits
+        time.sleep(2)
 
     return sorted(artifacts, key=lambda x: x["updated_at"])
 

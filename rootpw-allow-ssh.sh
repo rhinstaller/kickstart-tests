@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
-TESTTYPE="users"
+TESTTYPE="users skip-on-rhel-8"
 
 . ${KSTESTDIR}/functions.sh
 

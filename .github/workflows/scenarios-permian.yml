@@ -74,11 +74,11 @@ jobs:
           path: permian
           ref: main
 
-      - name: Clone tclib repository
+      - name: Clone tplib repository
         uses: actions/checkout@v2
         with:
-          repository: rhinstaller/tclib
-          path: tclib
+          repository: rhinstaller/tplib
+          path: tplib
 
 
       # use the latest official packages for the nightly runs
@@ -159,7 +159,7 @@ jobs:
         working-directory: ./permian
         run: |
           sudo --preserve-env=TEST_JOBS \
-          PYTHONPATH=${PYTHONPATH:-}:${{ github.workspace }}/tclib \
+          PYTHONPATH=${PYTHONPATH:-}:${{ github.workspace }}/tplib \
           ./pipeline --debug-log permian.log \
             --settings settings.ini \
             --override workflows.dry_run=False \

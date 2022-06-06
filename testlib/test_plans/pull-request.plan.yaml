@@ -8,8 +8,3 @@ verified_by:
     query: 'True'
 configurations:
   - architecture: x86_64
-reporting:
-  - type: github-pr
-    data:
-      pr-check-name: "Kickstart tests"
-      pr-check-summary: "Kickstart tests run on a pull request comment"

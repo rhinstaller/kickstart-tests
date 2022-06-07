@@ -1,0 +1,15 @@
+name: pull request permian
+description: Kickstart tests run on GitHub Permian pull requests
+point_person: rvykydal@redhat.com
+artifact_type: github.pr.permian
+verified_by:
+  test_cases:
+    # Smoke tests on Fedora
+    query: '"smoke" in tc.tags and "knownfailure" not in tc.tags and "skip-on-fedora" not in tc.tags'
+configurations:
+  - architecture: x86_64
+reporting:
+  - type: github-pr
+    data:
+      pr-check-name: "Kickstart tests"
+      pr-check-summary: "Kickstart tests run on a pull request comment"

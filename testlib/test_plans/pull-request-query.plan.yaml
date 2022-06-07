@@ -1,7 +1,7 @@
-name: pull request
+name: pull request query
 description: Tests run on GitHub pull requests with supplied query
 point_person: rvykydal@redhat.com
-artifact_type: github.pr
+artifact_type: github.pr.query
 verified_by:
   test_cases:
     # Specific query should be supplied by run_subset or everything event

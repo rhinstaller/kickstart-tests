@@ -1,0 +1,43 @@
+#test name: rootpw-allow-ssh
+#
+# Test that root ssh login with password is working.
+
+# Use defaults except for users, payload(sshpass package), and common (no shutdown)
+%ksappend repos/default.ks
+%ksappend l10n/default.ks
+%ksappend network/default.ks
+%ksappend storage/default.ks
+
+# allow ssh to root
+rootpw --plaintext --allow-ssh qweqwe
+
+%packages
+sshpass
+%end
+
+# Reboot the installed system.
+reboot
+
+# Validate on the first boot.
+%ksappend validation/success_on_first_boot.ks
+
+# Set up the actual test.
+%post
+
+# Write the code to run after reboot.
+cat > /usr/libexec/kickstart-test.sh << 'EOF'
+
+# Make login silent
+touch .hushlogin
+# Ssh login silently
+sshpass -p qweqwe ssh -q -o strictHostKeyChecking=no root@localhost
+login_result=$?
+
+if [[ ${login_result} != 0 ]]; then
+    echo "*** Failed check: Ssh login failed with exit code ${login_result}"
+fi
+
+
+EOF
+
+%end

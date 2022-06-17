@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Martin Kolman <mkolman@redhat.com>
 
-TESTTYPE="packaging skip-on-rhel"
+TESTTYPE="packaging skip-on-rhel gh740"
 
 . ${KSTESTDIR}/functions.sh
 

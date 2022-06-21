@@ -165,7 +165,7 @@ class VirtualInstall(object):
             args.append(extra_args)
 
             args.append("--location")
-            args.append(self._iso + ",kernel=isolinux/vmlinuz,initrd=isolinux/initrd.img")
+            args.append(self._iso + ",kernel=images/pxeboot/vmlinuz,initrd=images/pxeboot/initrd.img")
 
         channel_args = "tcp,host={0}:{1},mode=connect,target_type=virtio" \
                        ",name=org.fedoraproject.anaconda.log.0".format(

@@ -36,8 +36,6 @@ Chapter 2. How to run kickstart tests manually on the host
 Setting up
 ----------
 
-Tooling for running tests on remote hosts is in linchpin_ and ansible_.
-
 First you need to install the needed dependencies:
 
 - livemedia-creator
@@ -382,8 +380,6 @@ These jobs don't have any particular infrastructure requirements. They run on
 GitHub's infrastructure and can be run manually by a developer.
 
 .. _runner documentation: ./containers/runner/README.md
-.. _linchpin: ./linchpin
-.. _ansible: ./ansible
 .. _containers: ./containers
 .. _self-hosted GitHub action runners: https://docs.github.com/en/free-pro-team@latest/actions/hosting-your-own-runners
 .. _scenarios workflow: .github/workflows/scenarios.yml

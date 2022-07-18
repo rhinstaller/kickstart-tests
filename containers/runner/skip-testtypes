@@ -44,6 +44,7 @@ rhel9_skip_array=(
   gh641       # packages-multilib failing on systemd conflict
   gh670       # repo-include failing on rhel
   gh748       # network-addr-gen-mode-* failing
+  gh749       # network-bootopts-team-dhcp-httpks test is failing
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

@@ -22,7 +22,8 @@ shutdown
 # We will copy /root/RESULT to /mnt/sysimage/root/RESULT at the beginning of the %post (--nochroot) checks
 @KSINCLUDE@ post-lib-network.sh
 
-check_connection_setting "Wired Connection" ipv6.addr-gen-mode eui64
+# See rhbz#2082682
+check_connection_setting "Wired Connection" ipv6.addr-gen-mode default-or-eui64
 check_connection_setting "Wired Connection" ipv6.method auto
 
 %end

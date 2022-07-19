@@ -24,7 +24,6 @@ daily_iso_skip_array=(
   gh641       # packages-multilib failing on systemd conflict
   gh680       # proxy-kickstart and proxy-auth failing
   gh740       # fedora-live-image-build fails on comps changes
-  gh748       # network-addr-gen-mode-* failing
 )
 
 rhel8_skip_array=(
@@ -43,7 +42,6 @@ rhel9_skip_array=(
   rhbz1960279 # packages-weakdeps: "gnupg2 --recommends has changed, test needs to be updated"
   gh641       # packages-multilib failing on systemd conflict
   gh670       # repo-include failing on rhel
-  gh748       # network-addr-gen-mode-* failing
   gh749       # network-bootopts-team-dhcp-httpks test is failing
 )
 

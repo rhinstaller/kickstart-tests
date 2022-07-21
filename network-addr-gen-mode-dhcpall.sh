@@ -22,7 +22,7 @@
 # The latter is causing that kickstart network commands are not applied (ifcfg
 # files created) in initramfs.
 
-TESTTYPE="network"
+TESTTYPE="network gh748"
 
 . ${KSTESTDIR}/functions.sh
 

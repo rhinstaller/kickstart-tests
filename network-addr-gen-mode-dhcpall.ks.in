@@ -43,9 +43,9 @@ check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@
 
 @KSINCLUDE@ post-lib-network.sh
 
-check_device_config_value @KSTEST_NETDEV1@ IPV6_ADDR_GEN_MODE __NONE ipv6 addr-gen-mode eui64
+check_device_config_value @KSTEST_NETDEV1@ IPV6_ADDR_GEN_MODE eui64 ipv6 addr-gen-mode eui64
 check_connection_setting "@KSTEST_NETDEV1@" ipv6.addr-gen-mode eui64
-check_device_config_value @KSTEST_NETDEV2@ IPV6_ADDR_GEN_MODE __NONE ipv6 addr-gen-mode eui64
+check_device_config_value @KSTEST_NETDEV2@ IPV6_ADDR_GEN_MODE eui64 ipv6 addr-gen-mode eui64
 check_connection_setting "@KSTEST_NETDEV2@" ipv6.addr-gen-mode eui64
 
 # No error was written to /root/RESULT file, everything is OK

@@ -32,7 +32,6 @@ rhel8_skip_array=(
   gh576       # clearpart-4 test is flaky on all scenarios
   gh595       # proxy-cmdline failing on all scenarios
   gh670       # repo-include failing on rhel
-  gh748       # network-addr-gen-mode-* waiting for new build
 )
 
 rhel9_skip_array=(

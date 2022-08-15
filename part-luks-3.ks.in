@@ -9,6 +9,7 @@ clearpart --all --initlabel
 
 # Test LUKS 2 with pbkdf2 and the --pbkdf-time option.
 
+reqpart
 part / --fstype="ext4" --size=8191 --encrypted --passphrase="passphrase" --luks-version=luks2 --pbkdf=pbkdf2 --pbkdf-time=10
 part /boot --fstype="ext4" --size=1024
 part swap --fstype="swap" --size=1024

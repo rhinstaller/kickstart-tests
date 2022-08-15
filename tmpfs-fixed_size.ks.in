@@ -6,6 +6,7 @@ bootloader --timeout=1
 zerombr
 clearpart --all
 
+reqpart
 part --fstype=ext4 --size=4400 --label=rootfs --fsoptions=loud,noatime /
 part --fstype=ext4 --size=500 /boot
 part --fstype=swap --size=500 swap

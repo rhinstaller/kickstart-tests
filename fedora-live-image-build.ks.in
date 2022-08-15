@@ -37,6 +37,7 @@ zerombr
 # Partition clearing information
 clearpart --all
 # Disk partitioning information
+reqpart
 part / --grow
 
 %post

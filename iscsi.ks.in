@@ -12,6 +12,7 @@ autopart
 
 # for non-offload iSCSI /boot can be on iSCSI only when using iBFT,
 # so put it to local disk
+#reqpart
 #part /boot --size=500 --ondisk=vda
 #part / --size=5000 --ondisk=vdb --grow
 #part swap --size=1000 --ondisk=vdb

@@ -6,6 +6,8 @@ network --bootproto=dhcp
 bootloader --timeout=1
 zerombr
 clearpart --all --initlabel
+
+reqpart
 part /boot --fstype=ext4 --size=500
 part raid.01 --size=7500 --ondisk=vda
 part raid.02 --size=7500 --ondisk=vdb

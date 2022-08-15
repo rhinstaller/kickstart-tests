@@ -6,6 +6,8 @@ network --bootproto=dhcp
 bootloader --timeout=1
 zerombr
 clearpart --all --initlabel
+
+reqpart
 part /boot --fstype=ext4 --size=500
 part pv.1 --fstype=lvmpv --size=9004
 volgroup fedora pv.1

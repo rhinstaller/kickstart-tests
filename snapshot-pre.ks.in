@@ -3,6 +3,8 @@
 network --bootproto=dhcp
 
 bootloader --timeout=1
+
+reqpart
 part /boot --fstype=ext4 --size=600
 volgroup testvg --useexisting --noformat
 logvol swap --name=swap --vgname=testvg --size=500 --fstype=swap

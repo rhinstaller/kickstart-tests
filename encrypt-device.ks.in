@@ -5,6 +5,8 @@ network --bootproto=dhcp
 bootloader --timeout=1
 zerombr
 clearpart --all --initlabel
+
+reqpart
 part pv.68 --asprimary --fstype="lvmpv" --ondisk=vda --size=7691
 part /boot --asprimary --fstype="ext4" --ondisk=vda --size=500
 volgroup vg01 --pesize=4096 pv.68

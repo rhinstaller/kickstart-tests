@@ -16,6 +16,7 @@
 zerombr
 clearpart --all --initlabel --drives=/dev/vda
 
+reqpart
 part / --fstype=ext4 --grow --size=4400 --ondisk=/dev/vda
 part /boot --fstype=ext4 --size=500 --ondisk=/dev/vda
 part swap --fstype=swap --size=500 --ondisk=/dev/vda

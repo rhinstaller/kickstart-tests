@@ -5,6 +5,8 @@ network --bootproto=dhcp
 bootloader --timeout=1
 zerombr
 clearpart --all
+
+reqpart
 part /boot --fstype=ext4 --size=600
 part pv.1 --fstype=lvmpv --size=6000 --grow
 

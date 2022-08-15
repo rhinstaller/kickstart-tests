@@ -9,6 +9,7 @@ clearpart --all --initlabel
 
 # Test LUKS 2 with argon2i and options --pbkdf-iterations and --pbkdf-memory.
 
+reqpart
 part / --fstype="ext4" --size=8191 --encrypted --passphrase="passphrase" --luks-version=luks2 --pbkdf=argon2i --pbkdf-iterations=4 --pbkdf-memory=64
 part /boot --fstype="ext4" --size=1024
 part swap --fstype="swap" --size=1024

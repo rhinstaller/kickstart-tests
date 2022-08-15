@@ -10,6 +10,7 @@ clearpart --all --initlabel
 # Test LUKS 2 with default values.
 # FIXME: remove the --pbkdf-time option
 
+reqpart
 part /boot --fstype="ext4" --size=1024
 part pv.1 --fstype="lvmpv" --size=9215
 

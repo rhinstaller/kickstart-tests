@@ -31,7 +31,7 @@ shutdown
 # Set the crypted device.
 crypted="/dev/md/root"
 
-# Check the PBKDF of /dev/vda2.
+# Check the PBKDF of the root device.
 result="$(cryptsetup luksDump ${crypted} | awk '{ if ($1 == "PBKDF:") print $2; }' )"
 
 if [[ "$result" != "pbkdf2" ]] ; then

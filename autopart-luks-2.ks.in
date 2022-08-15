@@ -21,18 +21,15 @@ shutdown
 
 %post
 
-# Set the crypted device.
-crypted="/dev/vda2"
+# Find the LUKS device.
+crypted="$(blkid --match-token TYPE="crypto_LUKS" --output device)"
 
-# Check if the type of /dev/vda2 is crypto_LUKS.
-type="$(blkid -o value -s TYPE ${crypted})"
-
-if [[ "$type" != "crypto_LUKS" ]] ; then
-    echo "*** unexpected type ${type} of ${crypted}" > /root/RESULT
+if [[ $? != 0 ]] ; then
+    echo "*** couldn't find a LUKS device" > /root/RESULT
     exit 1
 fi
 
-# Check if the LUKS version of /dev/vda2 is luks2.
+# Check if the LUKS version is luks2.
 result="$(cryptsetup luksDump ${crypted} | awk '{ if ($1 == "Version:") print $2; }' )"
 
 if [[ "$result" != "2" ]] ; then

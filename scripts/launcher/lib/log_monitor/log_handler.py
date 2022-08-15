@@ -34,7 +34,9 @@ class VirtualLogRequestHandler(LogRequestHandler):
         "CRIT kernel:Warning: Deprecated Driver is detected: team ",
 
         # Ignore a call trace during debugging.
-        # "Call Trace:"
+        # Enabled temporarily for issue gh761
+        # https://github.com/rhinstaller/kickstart-tests/issues/761
+        "Call Trace:"
     ]
 
     # Specify error lines you want to add on top

@@ -7,12 +7,12 @@ bootloader --timeout=1
 clearpart --all --initlabel
 
 reqpart
-partition raid.01 --size=500 --ondisk=vda --asprimary
-partition raid.02 --size=500 --ondisk=vdb --asprimary
-partition raid.11 --size=4000 --ondisk=vda
-partition raid.12 --size=4000 --ondisk=vdb
-partition raid.21 --size=1024 --ondisk=vda
-partition raid.22 --size=1024 --ondisk=vdb
+part raid.01 --size=500 --ondisk=vda --asprimary
+part raid.02 --size=500 --ondisk=vdb --asprimary
+part raid.11 --size=4000 --ondisk=vda
+part raid.12 --size=4000 --ondisk=vdb
+part raid.21 --size=1024 --ondisk=vda
+part raid.22 --size=1024 --ondisk=vdb
 
 # Yes, using 0,1,2 is wrong, but /proc/mounts uses /dev/mdX not /dev/md/X
 raid /boot --level=1 --device=0 --fstype=ext4 raid.01 raid.02

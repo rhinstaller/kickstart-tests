@@ -6,6 +6,7 @@ network --bootproto=dhcp
 bootloader --timeout=1
 clearpart --all --initlabel
 
+reqpart
 partition raid.01 --size=500 --ondisk=vda --asprimary
 partition raid.02 --size=500 --ondisk=vdb --asprimary
 partition raid.11 --size=4000 --ondisk=vda

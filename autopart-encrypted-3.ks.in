@@ -68,7 +68,7 @@ if [[ $? != 0 ]] || [[ -z "$backup_passphrase" ]]; then
 fi
 
 # Try to use the backup passphrase.
-crypted="/dev/vda2"
+crypted="$(blkid --match-token TYPE="crypto_LUKS" --output device)"
 echo -n $backup_passphrase | cryptsetup luksOpen --test-passphrase "${crypted}"
 
 if [[ $? != 0 ]] ; then

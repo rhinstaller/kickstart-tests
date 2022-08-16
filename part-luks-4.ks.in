@@ -25,8 +25,13 @@ shutdown
 
 %post
 
-# Set the crypted device.
-crypted="/dev/vda2"
+# Find the LUKS device.
+crypted="$(blkid --match-token TYPE="crypto_LUKS" --output device)"
+
+if [[ $? != 0 ]] ; then
+    echo "*** couldn't find a LUKS device" > /root/RESULT
+    exit 1
+fi
 
 # Check the PBKDF.
 result="$(cryptsetup luksDump ${crypted} | awk '{ if ($1 == "PBKDF:") print $2; }' )"

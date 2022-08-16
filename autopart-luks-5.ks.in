@@ -21,24 +21,29 @@ shutdown
 
 %post
 
-# Set the crypted device.
-crypted="/dev/vda2"
+# Find the LUKS device.
+crypted="$(blkid --match-token TYPE="crypto_LUKS" --output device)"
 
-# Check the PBKDF of /dev/vda2.
+if [[ $? != 0 ]] ; then
+    echo "*** couldn't find a LUKS device" > /root/RESULT
+    exit 1
+fi
+
+# Check the PBKDF of the LUKS device.
 result="$(cryptsetup luksDump ${crypted} | awk '{ if ($1 == "PBKDF:") print $2; }' )"
 
 if [[ "$result" != "argon2id" ]] ; then
     echo "*** unexpected PBKDF for ${crypted}: ${result}" >> /root/RESULT
 fi
 
-# Check the iterations of /dev/vda2.
+# Check the iterations of the LUKS device.
 result="$(cryptsetup luksDump ${crypted} | awk '{ if ($1 == "Time" && $2 == "cost:") print $3; }' )"
 
 if [[ "$result" != "4" ]] ; then
     echo "*** unexpected iterations for ${crypted}: ${result}" >> /root/RESULT
 fi
 
-# Check the memory of /dev/vda2.
+# Check the memory of the LUKS device.
 result="$(cryptsetup luksDump ${crypted} | awk '{ if ($1 == "Memory:") print $2; }' )"
 
 if [[ "$result" != "64" ]] ; then

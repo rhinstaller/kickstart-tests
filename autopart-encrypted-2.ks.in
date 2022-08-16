@@ -18,9 +18,8 @@ shutdown
 %end
 
 %post
-# Check the cipher name of /dev/vda2.
-crypted="/dev/vda2"
-
+# Check the cipher name of the LUKS device.
+crypted="$(blkid --match-token TYPE="crypto_LUKS" --output device)"
 cipher="$(cryptsetup luksDump ${crypted} | awk '{ if ($1 == "Cipher:") print $2; }' )"
 
 if [[ "$cipher" != "aes-xts-plain64" ]] ; then

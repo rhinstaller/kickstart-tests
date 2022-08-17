@@ -25,6 +25,7 @@ daily_iso_skip_array=(
   gh680       # proxy-kickstart and proxy-auth failing
   gh740       # fedora-live-image-build fails on comps changes
   gh769       # nodejs:16 and swig:4 missing in module-X tests
+  gh774       # autopart-luks-1 failing
 )
 
 rhel8_skip_array=(
@@ -33,6 +34,7 @@ rhel8_skip_array=(
   gh576       # clearpart-4 test is flaky on all scenarios
   gh595       # proxy-cmdline failing on all scenarios
   gh670       # repo-include failing on rhel
+  gh774       # autopart-luks-1 failing
 )
 
 rhel9_skip_array=(
@@ -43,6 +45,7 @@ rhel9_skip_array=(
   rhbz1960279 # packages-weakdeps: "gnupg2 --recommends has changed, test needs to be updated"
   gh641       # packages-multilib failing on systemd conflict
   gh670       # repo-include failing on rhel
+  gh774       # autopart-luks-1 failing
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

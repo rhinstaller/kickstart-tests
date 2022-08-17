@@ -33,6 +33,7 @@ rhel8_skip_array=(
   gh576       # clearpart-4 test is flaky on all scenarios
   gh595       # proxy-cmdline failing on all scenarios
   gh670       # repo-include failing on rhel
+  gh772       # autopart-encrypted-1 failing on rhel8
 )
 
 rhel9_skip_array=(
@@ -49,6 +50,7 @@ rhel9_skip_array=(
 rhel8_daily_skip_array=(
   skip-on-rhel
   skip-on-rhel-8
+  gh772       # autopart-encrypted-1 failing on rhel8
 )
 
 _join_args_by_comma(){

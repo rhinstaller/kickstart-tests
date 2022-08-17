@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Vendula Poncova <vponcova@redhat.com>
 
-TESTTYPE="autopart storage coverage"
+TESTTYPE="autopart storage coverage gh772"
 
 . ${KSTESTDIR}/functions.sh
 

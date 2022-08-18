@@ -30,7 +30,7 @@ if [[ $? != 0 ]] ; then
 fi
 
 # The LUKS device should be a parent of a root device.
-lsblk ${crypted} --output mountpoints | grep -x /
+lsblk ${crypted} --output mountpoint | grep -x /
 
 if [[ $? != 0 ]] ; then
     echo "*** ${crypted} doesn't contain a root device" > /root/RESULT

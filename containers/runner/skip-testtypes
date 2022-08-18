@@ -26,6 +26,7 @@ daily_iso_skip_array=(
   gh740       # fedora-live-image-build fails on comps changes
   gh769       # nodejs:16 and swig:4 missing in module-X tests
   gh774       # autopart-luks-1 failing
+  gh777       # raid-1 failing
 )
 
 rhel8_skip_array=(

@@ -17,7 +17,7 @@
 #
 # Red Hat Author(s): Vendula Poncova <vponcova@redhat.com>
 
-TESTTYPE="autopart storage luks"
+TESTTYPE="autopart storage luks gh774"
 
 . ${KSTESTDIR}/functions.sh
 

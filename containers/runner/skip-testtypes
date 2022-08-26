@@ -27,6 +27,7 @@ daily_iso_skip_array=(
   gh769       # nodejs:16 and swig:4 missing in module-X tests
   gh774       # autopart-luks-1 failing
   gh777       # raid-1 failing
+  rhbz2122327 # installation with an existing DDF RAID device fails
 )
 
 rhel8_skip_array=(

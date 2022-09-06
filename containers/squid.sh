@@ -26,6 +26,8 @@ start() {
     # clean up stopped container from previous boot (usually one does not remember to call "squid.sh stop")
     $CRUN rm squid 2>/dev/null || true
     # This image is well-maintained (auto-built) and really small
+    # However, we have to manually grab it and dump into our account because RH is limited by docker.io
+    # docker.io/b4tman/squid -> quay.io/rhinstaller/squid
     $CRUN run --net host --name squid --detach \
         --volume "$MYDIR"/squid-cache.conf:/etc/squid/conf.d.tail/cache.conf:ro,z \
         --volume ks-squid-cache:/var/cache/squid quay.io/rhinstaller/squid

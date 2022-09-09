@@ -1,0 +1,41 @@
+#version=DEVEL
+#test name: raid-ddf
+# This test covers https://bugzilla.redhat.com/show_bug.cgi?id=2063791
+
+%ksappend repos/default.ks
+%ksappend common/common_no_storage_and_payload.ks
+%ksappend payload/default_packages.ks
+# Validate on the first boot.
+%ksappend validation/success_on_first_boot.ks
+
+clearpart --all --initlabel
+reqpart --add-boot
+part swap --size=512
+part / --size=1024 --grow --label=rootfs
+
+%post
+# Check whether the RAID device was used for installation as expected
+devlink=$(readlink /dev/md/test-raid-ddf_0)
+if ! lsblk -nlo MOUNTPOINT /dev/md/${devlink} | grep -q "^/$"; then
+    echo "*** DDF RAID device /dev/md/test-raid-ddf wasn't used for installation" > /root/RESULT
+    echo -e "\n\nlsblk output:\n" >> /root/RESULT
+    lsblk -i >> /root/RESULT
+    echo -e "\n\n/dev/md:\n" >> /root/RESULT
+    ls /dev/md >> /root/RESULT
+fi
+
+cat <<EOF > /usr/libexec/kickstart-test.sh
+# Check that the system booted with the RAID device assembled
+devlink=$(readlink /dev/md/test-raid-ddf_0)
+if ! lsblk -nlo MOUNTPOINT /dev/md/${devlink} | grep -q "^/$"; then
+    echo "*** The system hasn't booted with the DDF RAID device /dev/md/test-raid-ddf assembled."
+    echo -e "\n\nlsblk output:\n"
+    lsblk -i
+    echo -e "\n\n/dev/md content:\n"
+    ls /dev/md
+fi
+
+EOF
+
+# 'SUCCESS' should be written into /root/RESULT after a successful reboot and additional check
+%end

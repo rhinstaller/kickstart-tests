@@ -1,10 +1,10 @@
-#version=DEVEL
-#test name: harddrive-iso
+#test name: repo-addrepo-hd-iso
 
-# This test is for testing the install from an harddrive ks command with ISO.
-#
-# Server dvd is downloaded during the test execution. This test can be resource demanding!
-#
+## Test the inst.addrepo boot option with an ISO on a hard drive.
+# The test is based on the harddrive-iso test.
+
+# This test is resource demanding! It downloads a full DVD ISO during
+# the test execution, so it needs additional storage and takes more time.
 
 %ksappend common/common_no_storage_and_payload.ks
 
@@ -20,7 +20,8 @@ part / --fstype=ext4 --grow --size=4400 --ondisk=/dev/vda
 part /boot --fstype=ext4 --size=500 --ondisk=/dev/vda
 part swap --fstype=swap --size=500 --ondisk=/dev/vda
 
-harddrive --partition=/dev/vdb --dir=/
+# Specify the mandatory base repo, but keep it empty.
+url --url=EMPTY_REPO_URL
 
 %ksappend payload/default_packages.ks
 

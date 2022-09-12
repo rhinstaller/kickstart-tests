@@ -29,37 +29,18 @@ harddrive --partition=/dev/vdb --dir=repo/
 %ksappend payload/default_packages.ks
 
 %pre
+# Include helpful functions.
+@KSINCLUDE@ pre-lib-harddrive.sh
+
 # This will add ISO_LOCATION with link to an ISO
 %ksappend section-data/server-dvd-link.ks
 
+# Where we want to download the content of the ISO?
 DISK="/dev/vdb"
+DIRECTORY="repo"
 
-wipefs -a $DISK
-mkfs.ext4 -F $DISK
-mkdir /prep-mount
-
-
-# Mount the new source
-mount $DISK /prep-mount
-
-pushd /prep-mount
-
-# Mount the ISO
-curl -L "$ISO_LOCATION" -o source.iso
-mkdir iso-mount
-mount -oro source.iso iso-mount
-
-# Copy ISO content inside
-mkdir repo
-rsync -ahHvS --stats --exclude=/isolinux --exclude=/images --exclude=/EFI iso-mount/ repo/
-
-# Clean up
-umount iso-mount
-rm source.iso
-rm -rf iso-mount
-popd
-umount /prep-mount
-rm -rf /prep-mount
+# Download the content of the ISO.
+prepare_tree "${ISO_LOCATION}" "${DISK}" "${DIRECTORY}"
 %end
 
 %post

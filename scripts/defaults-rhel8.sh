@@ -3,3 +3,4 @@
 source network-device-names.cfg
 export KSTEST_URL='http://download.eng.bos.redhat.com/rhel-8/development/RHEL-8/latest-RHEL-8.7/compose/BaseOS/x86_64/os/'
 export KSTEST_MODULAR_URL='http://download.eng.bos.redhat.com/rhel-8/development/RHEL-8/latest-RHEL-8.7/compose/AppStream/x86_64/os/'
+export KSTEST_DVD_ISO_URL='http://download.eng.bos.redhat.com/rhel-8/development/RHEL-8/latest-RHEL-8.7/compose/BaseOS/x86_64/iso/RHEL-.*?-x86_64-dvd1.iso'

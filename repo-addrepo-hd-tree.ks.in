@@ -29,8 +29,8 @@ url --url=EMPTY_REPO_URL
 # Include helpful functions.
 @KSINCLUDE@ pre-lib-harddrive.sh
 
-# This will add ISO_LOCATION with link to an ISO
-%ksappend section-data/server-dvd-link.ks
+# Where is the ISO that we want to download?
+ISO_LOCATION="@KSTEST_DVD_ISO_URL@"
 
 # Where we want to download the content of the ISO?
 DISK="/dev/vdb"

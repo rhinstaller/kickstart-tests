@@ -12,3 +12,4 @@ export KSTEST_METALINK='http://mirrors.fedoraproject.org/metalink?repo=fedora-$r
 export KSTEST_MIRRORLIST='http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch'
 export KSTEST_MODULAR_URL='http://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Modular/$basearch/os/'
 export KSTEST_FTP_URL='ftp://ftp.tu-chemnitz.de/pub/linux/fedora/linux/development/rawhide/Everything/$basearch/os/'
+export KSTEST_DVD_ISO_URL='http://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Server/x86_64/iso/Fedora-Server-dvd-x86_64-.*?.iso'

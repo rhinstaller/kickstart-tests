@@ -17,9 +17,7 @@
 #
 # Red Hat Author(s): Jiri Konecny <jkonecny@redhat.com>
 
-# FIXME: fails on RHEL 8:
-# SourceSetupError: Nothing useful found for Hard drive ISO source at partition=/dev/sdb directory=/repo/
-TESTTYPE=${TESTTYPE:-"packaging skip-on-rhel"}
+TESTTYPE=${TESTTYPE:-"packaging"}
 
 . ${KSTESTDIR}/functions.sh
 

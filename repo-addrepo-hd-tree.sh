@@ -17,7 +17,7 @@
 #
 
 # FIXME: Fails on RHEL 8: "Nothing useful found for Hard drive ISO source"
-TESTTYPE="packaging repo harddrive skip-on-rhel-8"
+TESTTYPE="packaging repo harddrive skip-on-rhel-8 gh790"
 
 . ${KSTESTDIR}/functions.sh
 

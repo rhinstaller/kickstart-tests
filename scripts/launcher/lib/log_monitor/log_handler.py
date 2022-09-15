@@ -57,6 +57,7 @@ class VirtualLogRequestHandler(LogRequestHandler):
         "storage configuration failed:",
         "Not enough space in file systems for the current software selection.",
         "anabot.service: Failed with result 'exit-code'.",
+        "Reporting the IPMI event: 10",
     ]
 
     def iserror(self, line):

@@ -21,6 +21,10 @@ TESTTYPE="packaging repo harddrive skip-on-rhel-8 gh790"
 
 . ${KSTESTDIR}/functions.sh
 
+get_timeout() {
+    echo "120"
+}
+
 prepare_disks() {
     local tmp_dir="${1}"
     qemu-img create -q -f qcow2 ${tmpdir}/disk-a.img 10G

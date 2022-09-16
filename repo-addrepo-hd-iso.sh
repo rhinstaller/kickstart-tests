@@ -20,6 +20,10 @@ TESTTYPE="packaging repo harddrive"
 
 . ${KSTESTDIR}/functions.sh
 
+get_timeout() {
+    echo "120"
+}
+
 prepare_disks() {
     local tmp_dir="${1}"
     qemu-img create -q -f qcow2 ${tmpdir}/disk-a.img 10G

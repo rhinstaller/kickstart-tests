@@ -21,6 +21,10 @@ TESTTYPE="packaging repo"
 
 . ${KSTESTDIR}/functions.sh
 
+get_timeout() {
+    echo "120"
+}
+
 prepare() {
     local ks=$1
     local tmp_dir=$2

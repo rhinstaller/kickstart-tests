@@ -23,6 +23,10 @@ TESTTYPE=${TESTTYPE:-"packaging skip-on-rhel"}
 
 . ${KSTESTDIR}/functions.sh
 
+get_timeout() {
+    echo "120"
+}
+
 prepare_disks() {
     tmpdir=$1
 

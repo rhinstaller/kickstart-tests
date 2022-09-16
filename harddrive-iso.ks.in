@@ -24,7 +24,7 @@ harddrive --partition=/dev/vdb --dir=/
 
 %ksappend payload/default_packages.ks
 
-%pre
+%pre --erroronfail
 # Include helpful functions.
 @KSINCLUDE@ pre-lib-harddrive.sh
 

@@ -49,7 +49,7 @@ rhel9_skip_array=(
   gh670       # repo-include failing on rhel
   gh774       # autopart-luks-1 failing
   rhbz2120690 # DDF RAID not automatically assembled; likely should get fixed in 9.1
-  gh709       # repo-addrepo-hd-tree failing
+  gh790       # repo-addrepo-hd-tree failing
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

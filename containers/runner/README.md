@@ -55,7 +55,7 @@ Environment variables for the container (`--env` option):
 * KSTESTS_REPOSITORY - kickstart-tests git repository to be used
 * KSTESTS_BRANCH - kickstart-tests git branch to be used
 * BOOT_ISO - name of the installer boot iso from `data/images` to be tested (default is "boot.iso")
-* KSTEST_EXTRA_BOOTOPTS - additional boot options applied to all tests
+* KSTEST_EXTRA_BOOTOPTS - additional boot options applied to all tests (semicolon separated)
 
 By default, the container runs the [run-kstest](./run-kstest) script. To get an
 interactive shell, append `bash` to the command line.

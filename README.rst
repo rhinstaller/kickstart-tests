@@ -239,7 +239,8 @@ The following environment variables are currently supported:
 
 - KSTEST_EXTRA_BOOTOPTS - This variable is used in functions.sh to pass
   additional kernel command line options. For example, setting this to `inst.text`
-  enables Anaconda's text mode (instead of the default GUI).
+  enables Anaconda's text mode (instead of the default GUI). Multiple values
+  separated by semicolon can be passed.
 
 Chapter 5. Sharing common code in kickstart (.ks.in) files
 ==========================================================

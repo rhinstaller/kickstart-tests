@@ -19,7 +19,7 @@
 
 # This test covers https://bugzilla.redhat.com/show_bug.cgi?id=2063791
 
-TESTTYPE="raid storage skip-on-fedora rhbz2122327 rhbz2120690"
+TESTTYPE="raid storage skip-on-fedora rhbz2122327"
 
 . ${KSTESTDIR}/functions.sh
 

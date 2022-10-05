@@ -1,0 +1,13 @@
+# Dependabot checks our dependencies and opens pull requests for new versions.
+# See the current status: https://github.com/rhinstaller/kickstart-tests/network/updates
+
+version: 2
+updates:
+
+  # Set update schedule for GitHub actions.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "infra"

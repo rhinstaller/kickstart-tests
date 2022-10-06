@@ -39,7 +39,9 @@ inject_ks_to_initrd() {
     echo "true"
 }
 
-DEFAULT_BASIC_BOOTOPTS="debug=1 inst.debug ${KSTEST_EXTRA_BOOTOPTS}"
+EXTRA_BOOTOPTS=$(echo "${KSTEST_EXTRA_BOOTOPTS}" | tr ';' ' ')
+
+DEFAULT_BASIC_BOOTOPTS="debug=1 inst.debug ${EXTRA_BOOTOPTS}"
 
 DEFAULT_DRACUT_BOOTOPTS="rd.shell=0 rd.emergency=poweroff"
 

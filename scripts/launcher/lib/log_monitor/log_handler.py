@@ -33,6 +33,9 @@ class VirtualLogRequestHandler(LogRequestHandler):
         # Team networking is deprecated
         "CRIT kernel:Warning: Deprecated Driver is detected: team ",
 
+        # See rhbz#2133437
+        "CRIT sss_cache:No domains configured, fatal error!",
+
         # Ignore a call trace during debugging.
         # Ignoring permanently for gh768.
         # https://github.com/rhinstaller/kickstart-tests/issues/768

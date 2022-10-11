@@ -151,6 +151,8 @@ jobs:
           timeout=${LAUNCHER_TIMEOUT_MINUTES}m
           retry_on_failure=True
           kstest_local_repo=${{ github.workspace }}/kickstart-tests
+          # gh#795
+          added_boot_options=inst.xtimeout=100
           [library]
           directPath=${{ github.workspace }}/kickstart-tests/testlib
           EOF

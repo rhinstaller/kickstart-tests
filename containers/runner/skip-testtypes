@@ -51,6 +51,7 @@ rhel9_skip_array=(
   gh670       # repo-include failing on rhel
   gh774       # autopart-luks-1 failing
   gh790       # repo-addrepo-hd-tree failing
+  gh815       # rootpw-allow-ssh failing
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

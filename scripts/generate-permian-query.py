@@ -24,7 +24,11 @@ if __name__ == "__main__":
 
     conditions = []
     if args.tests:
-        conditions = ['tc.name == "{}"'.format(test) for test in args.tests]
+        conditions = [
+            "("
+            + " or ".join(['tc.name == "{}"'.format(test) for test in args.tests])
+            + ")"
+        ]
     else:
         if args.testtype:
             conditions.extend(['"{}" in tc.tags'.format(args.testtype), '"knownfailure" not in tc.tags'])

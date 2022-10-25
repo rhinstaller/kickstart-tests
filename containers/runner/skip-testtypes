@@ -53,6 +53,7 @@ rhel9_skip_array=(
   gh774       # autopart-luks-1 failing
   gh790       # repo-addrepo-hd-tree failing
   gh815       # rootpw-allow-ssh failing
+  rhbz2133053 # bond-ks-initramfs should be fixed in RHEL 9.2
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

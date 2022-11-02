@@ -54,11 +54,6 @@ if [[ $? != 0 ]]; then
     echo '*** podman was not installed for @container-management --optional' >> /root/RESULT
 fi
 
-rpm -q origin-clients
-if [[ $? != 0 ]]; then
-    echo '*** origin-clients was not installed for @container-management --optional' >> /root/RESULT
-fi
-
 # Testing #4 - rpm-build is mandatory so it should be installed.  rpmdevtools is
 # default so it should not.  rpmlint is optional so it should not.
 rpm -q rpm-build

@@ -28,7 +28,6 @@ daily_iso_skip_array=(
   gh774       # autopart-luks-1 failing
   gh777       # raid-1 failing
   rhbz2122327 # installation with an existing DDF RAID device fails
-  gh812       # groups-and-envs-2 needs package check update
 )
 
 rhel8_skip_array=(

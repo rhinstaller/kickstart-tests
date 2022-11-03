@@ -24,11 +24,12 @@ reboot
 # Set up the actual test.
 %post
 
+# Make login silent
+touch /root/.hushlogin
+
 # Write the code to run after reboot.
 cat > /usr/libexec/kickstart-test.sh << 'EOF'
 
-# Make login silent
-touch .hushlogin
 # Ssh login silently
 sshpass -p qweqwe ssh -q -o strictHostKeyChecking=no root@localhost
 login_result=$?

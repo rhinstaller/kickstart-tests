@@ -38,6 +38,7 @@ rhel8_skip_array=(
   gh670       # repo-include failing on rhel
   gh774       # autopart-luks-1 failing
   rhbz1940919 # bond-ks-initramfs should be fixed in RHEL 8.8
+  gh830       # packages-weakdeps failing
 )
 
 rhel9_skip_array=(

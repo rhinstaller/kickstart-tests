@@ -37,7 +37,6 @@ rhel8_skip_array=(
   gh595       # proxy-cmdline failing on all scenarios
   gh670       # repo-include failing on rhel
   gh774       # autopart-luks-1 failing
-  rhbz1940919 # bond-ks-initramfs should be fixed in RHEL 8.8
   gh830       # packages-weakdeps failing
 )
 
@@ -51,7 +50,6 @@ rhel9_skip_array=(
   gh670       # repo-include failing on rhel
   gh774       # autopart-luks-1 failing
   gh790       # repo-addrepo-hd-tree failing
-  rhbz2133053 # bond-ks-initramfs should be fixed in RHEL 9.2
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

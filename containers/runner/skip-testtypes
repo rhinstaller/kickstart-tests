@@ -37,7 +37,6 @@ rhel8_skip_array=(
   gh595       # proxy-cmdline failing on all scenarios
   gh670       # repo-include failing on rhel
   gh774       # autopart-luks-1 failing
-  gh830       # packages-weakdeps failing
 )
 
 rhel9_skip_array=(

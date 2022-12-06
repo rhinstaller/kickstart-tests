@@ -33,7 +33,8 @@ else
     check_config_exists bond0 no
     check_config_exists @KSTEST_NETDEV1@ no
     check_config_exists @KSTEST_NETDEV2@ no
-    check_number_of_connections 3
+    # includes "lo" connection
+    check_number_of_connections 4
 fi
 
 check_device_connected bond0 yes

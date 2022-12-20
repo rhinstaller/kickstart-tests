@@ -38,6 +38,7 @@ rhel8_skip_array=(
   gh670       # repo-include failing on rhel
   gh774       # autopart-luks-1 failing
   gh830       # packages-weakdeps failing
+  gh841       # 4 tests disabled due to dnf rhbz#2152846
 )
 
 rhel9_skip_array=(

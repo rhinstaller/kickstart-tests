@@ -16,6 +16,6 @@
 # Red Hat, Inc.
 #
 
-TESTTYPE="packaging url"
+TESTTYPE="packaging url gh841"
 
 . ${KSTESTDIR}/functions.sh

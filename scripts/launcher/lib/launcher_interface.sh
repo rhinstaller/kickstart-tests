@@ -92,6 +92,10 @@ case $1 in
         msg="$(inject_ks_to_initrd)"
         ret=$?
         ;;
+    stage2_from_ks)
+        msg="$(stage2_from_ks)"
+        ret=$?
+        ;;
     prepare)
         msg="$(prepare ${ks} ${tmpdir})"
         ret=$?

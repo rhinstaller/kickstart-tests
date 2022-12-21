@@ -166,6 +166,7 @@ class Runner(object):
         v_conf.disk_paths = disk_args
         v_conf.networks = nics_args
         v_conf.runner_args = self._shell.additional_runner_args()
+        v_conf.stage2_from_ks = self._shell.stage2_from_ks()
 
         return v_conf
 

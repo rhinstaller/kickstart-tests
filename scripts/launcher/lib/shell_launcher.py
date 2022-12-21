@@ -190,8 +190,8 @@ class ShellLauncher(ProcessLauncher):
     def validate(self):
         return self._run_shell_func("validate")
 
-    def inject_ks_to_initrd(self):
-        out = self._run_shell_func("inject_ks_to_initrd")
+    def _run_bool_shell_func(self, name):
+        out = self._run_shell_func(name)
 
         out.check_ret_code_with_exception()
 
@@ -200,8 +200,14 @@ class ShellLauncher(ProcessLauncher):
         elif out.stdout == "false":
             return False
         else:
-            raise ShellProcessError("Shell function inject_ks_to_initrd must return 'true' or "
-                                    "'false' but returned {}".format(out.stdout))
+            raise ShellProcessError("Shell function {} must return 'true' or "
+                                    "'false' but returned {}".format(name, out.stdout))
+
+    def inject_ks_to_initrd(self):
+        return self._run_bool_shell_func("inject_ks_to_initrd")
+
+    def stage2_from_ks(self):
+        return self._run_bool_shell_func("stage2_from_ks")
 
     def _run_shell_func(self, func_name):
         cmd_args = []

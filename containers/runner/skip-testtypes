@@ -28,6 +28,7 @@ daily_iso_skip_array=(
   gh774       # autopart-luks-1 failing
   gh777       # raid-1 failing
   rhbz2122327 # installation with an existing DDF RAID device fails
+  rhbz2153361 # stage2-from-ks should be fixed in RHEL 9.2
 )
 
 rhel8_skip_array=(
@@ -51,6 +52,7 @@ rhel9_skip_array=(
   gh670       # repo-include failing on rhel
   gh774       # autopart-luks-1 failing
   gh790       # repo-addrepo-hd-tree failing
+  rhbz2153361 # stage2-from-ks should be fixed in RHEL 9.2
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

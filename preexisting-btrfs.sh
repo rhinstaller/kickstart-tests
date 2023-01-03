@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Copyright (C) 2023  Red Hat, Inc.
 #
@@ -31,9 +32,11 @@
 #   sudo losetup -d /dev/<device>
 #   tar caSf preexisting-btrfs.tar.xz disk-a.img
 
+# shellcheck disable=SC2034
 TESTTYPE="btrfs storage"
 
-. ${KSTESTDIR}/functions.sh
+# shellcheck source=/dev/null
+. "${KSTESTDIR}/functions.sh"
 
 prepare_disks() {
     local tmpdir="${1}"

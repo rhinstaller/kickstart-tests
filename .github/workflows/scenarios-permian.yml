@@ -95,11 +95,11 @@ jobs:
         run: |
           set -eux
           if [ "${{ matrix.scenario }}" == "daily-iso" ] || [ "${{ matrix.scenario }}" == "minimal" ]; then
-            echo "::set-output name=platform::fedora_rawhide"
+            echo "platform=fedora_rawhide" >> $GITHUB_OUTPUT
           elif [ "${{ matrix.scenario }}" == "rhel8" ]; then
-            echo "::set-output name=platform::rhel8"
+            echo "platform=rhel8" >> $GITHUB_OUTPUT
           elif [ "${{ matrix.scenario }}" == "rhel9" ]; then
-            echo "::set-output name=platform::rhel9"
+            echo "platform=rhel9" >> $GITHUB_OUTPUT
           else
             echo "Scenario ${{ matrix.scenario }} can't be mapped to platform"
             exit 1
@@ -114,10 +114,10 @@ jobs:
           BOOT_ISO_URL="file://$BOOT_ISO_PATH"
           if [ "${{ matrix.scenario }}" == "daily-iso" ] || [ "${{ matrix.scenario }}" == "minimal" ]; then
             ${{ github.workspace }}/kickstart-tests/containers/runner/fetch_daily_iso.sh $GITHUB_TOKEN $BOOT_ISO_PATH
-            echo "::set-output name=boot_iso::\"bootIso\":{\"x86_64\":\"${BOOT_ISO_URL}\"},"
+            echo "boot_iso=\"bootIso\":{\"x86_64\":\"${BOOT_ISO_URL}\"}," >> $GITHUB_OUTPUT
           else
             echo "Boot.iso URL for ${{ matrix.scenario }} not configured"
-            echo "::set-output name=boot_iso::"
+            echo "boot_iso=" >> $GITHUB_OUTPUT
           fi
 
       # Configure location of installation repositories for the scenario
@@ -128,19 +128,19 @@ jobs:
         run: |
           set -eux
           if [ "${{ matrix.scenario }}" == "rhel8" ]; then
-            echo "::set-output name=installation_tree::http://download.eng.bos.redhat.com/rhel-8/development/RHEL-8/latest-RHEL-8.8.0/compose/BaseOS/x86_64/os"
-            echo "::set-output name=modular_url::http://download.eng.bos.redhat.com/rhel-8/development/RHEL-8/latest-RHEL-8.8.0/compose/AppStream/x86_64/os"
+            echo "installation_tree=http://download.eng.bos.redhat.com/rhel-8/development/RHEL-8/latest-RHEL-8.8.0/compose/BaseOS/x86_64/os" >> $GITHUB_OUTPUT
+            echo "modular_url=http://download.eng.bos.redhat.com/rhel-8/development/RHEL-8/latest-RHEL-8.8.0/compose/AppStream/x86_64/os" >> $GITHUB_OUTPUT
           elif [ "${{ matrix.scenario }}" == "rhel9" ]; then
-            echo "::set-output name=installation_tree::http://download.eng.bos.redhat.com/rhel-9/development/RHEL-9/latest-RHEL-9.2.0/compose/BaseOS/x86_64/os"
-            echo "::set-output name=modular_url::http://download.eng.bos.redhat.com/rhel-9/development/RHEL-9/latest-RHEL-9.2.0/compose/AppStream/x86_64/os"
+            echo "installation_tree=http://download.eng.bos.redhat.com/rhel-9/development/RHEL-9/latest-RHEL-9.2.0/compose/BaseOS/x86_64/os" >> $GITHUB_OUTPUT
+            echo "modular_url=http://download.eng.bos.redhat.com/rhel-9/development/RHEL-9/latest-RHEL-9.2.0/compose/AppStream/x86_64/os" >> $GITHUB_OUTPUT
           else
             echo "Installation tree location for ${{ matrix.scenario }} not configured"
             if [ -z "${{ steps.boot_iso_from_scenario.outputs.boot_iso }}" ]; then
               echo "No boot.iso source is defined"
               exit 2
             fi
-            echo "::set-output name=installation_tree::"
-            echo "::set-output name=modular_url::"
+            echo "installation_tree=" >> $GITHUB_OUTPUT
+            echo "modular_url=" >> $GITHUB_OUTPUT
           fi
 
       - name: Create Permian settings file

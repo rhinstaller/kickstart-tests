@@ -18,8 +18,14 @@
 #
 # Red Hat Author(s): Petr Beranek <pberanek@redhat.com>
 
-# This test covers https://bugzilla.redhat.com/show_bug.cgi?id=2139169 and
-# https://bugzilla.redhat.com/show_bug.cgi?id=2139166
+# Short summary:
+#
+# python-blivet hits an error when trying to use a device with an existing
+# Btrfs file system. A typical use case might be installation of Fedora or
+# RHEL on a device containing an existing installation of Fedora (uses Btrfs
+# by default). For details see bugs covered by this test:
+#   * https://bugzilla.redhat.com/show_bug.cgi?id=2139169
+#   * https://bugzilla.redhat.com/show_bug.cgi?id=2139166
 #
 # Disk image was created via the following commands:
 #   dd if=/dev/zero of=disk-a.img bs=1M seek=10240 count=1

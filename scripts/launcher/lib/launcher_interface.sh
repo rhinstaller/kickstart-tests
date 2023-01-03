@@ -128,6 +128,10 @@ case $1 in
         msg="$(get_timeout)"
         ret=$?
         ;;
+    get_required_ram)
+        msg="$(get_required_ram)"
+        ret=$?
+        ;;
     validate)
         msg="$(validate ${tmpdir})"
         ret=$?

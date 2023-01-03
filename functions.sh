@@ -408,3 +408,8 @@ stage2_from_ks() {
     # returns: "true" or "false"
     echo "false"
 }
+
+# RAM size of VM for the test in MiB
+get_required_ram() {
+    echo "2048"
+}

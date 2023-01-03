@@ -137,6 +137,9 @@ class Runner(object):
         timeout_string = self._shell.get_timeout()
         timeout = int(timeout_string)
 
+        ram_string = self._shell.get_required_ram()
+        ram = int(ram_string)
+
         if self._conf.updates_img_path:
             kernel_args += " inst.updates={}".format(self._conf.updates_img_path)
 
@@ -167,6 +170,7 @@ class Runner(object):
         v_conf.networks = nics_args
         v_conf.runner_args = self._shell.additional_runner_args()
         v_conf.stage2_from_ks = self._shell.stage2_from_ks()
+        v_conf.ram = ram
 
         return v_conf
 

@@ -187,6 +187,18 @@ class ShellLauncher(ProcessLauncher):
         out.check_ret_code_with_exception()
         return out.stdout
 
+    def get_required_ram(self):
+        """Per test timeout override.
+
+        The value returned by the get_required_ram() function should be
+        a string representing an integer value of the size of RAM (in MiB)
+        of the VM used for the test.
+        """
+        out = self._run_shell_func("get_required_ram")
+
+        out.check_ret_code_with_exception()
+        return out.stdout
+
     def validate(self):
         return self._run_shell_func("validate")
 

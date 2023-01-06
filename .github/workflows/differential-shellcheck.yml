@@ -21,6 +21,10 @@ jobs:
 
       - name: Differential ShellCheck
         uses: redhat-plumbers-in-action/differential-shellcheck@v3
+        env:
+          # -e SC2034: ignore because of TESTTYPE variable which is parsed out by
+          #            tooling scripts as test case tags (gh#853)
+          SHELLCHECK_OPTS: -e SC2034
         with:
           severity: warning
           token: ${{ secrets.GITHUB_TOKEN }}

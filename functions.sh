@@ -72,6 +72,12 @@ prepare_disks() {
     # echo '<disk_path>'                                    -- ',bus=virtio' will be added automatically
     # echo '<disk_path>,<virt_install_disk_arguments>'      -- ',bus=virtio' will be added automatically
     # echo 'path=<disk_path>,<virt_install_disk_arguments>' -- the string is taken in this form (nothing will be added)
+    #
+    # DISK NAME(S):
+    # End of '<disk_path>' must match 'disk-*.img', where '*' is any string
+    # (though a letter starting from 'a' is recommened for consistency). So
+    # for a single disk use 'disk-a.img', and for additional disks use
+    # 'disk-b.img', 'disk-c.img' etc.
     tmpdir=$1
 
     qemu-img create -q -f qcow2 ${tmpdir}/disk-a.img 10G

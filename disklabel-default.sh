@@ -18,6 +18,8 @@
 # Red Hat Author(s): Vendula Poncova <vponcova@redhat.com>
 
 # The GPT partitioning is enabled by default since Fedora 37.
+# Ignore unused variable parsed out by tooling scripts as test tags metadata
+# shellcheck disable=SC2034
 TESTTYPE="storage disklabel skip-on-rhel-8 skip-on-rhel-9"
 
 . ${KSTESTDIR}/functions.sh

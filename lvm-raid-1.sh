@@ -17,6 +17,8 @@
 #
 # Red Hat Author(s): Vratislav Podzimek <vpodzime@redhat.com>
 
+# Ignore unused variable parsed out by tooling scripts as test tags metadata
+# shellcheck disable=SC2034
 TESTTYPE="lvm storage"
 
 . ${KSTESTDIR}/functions.sh

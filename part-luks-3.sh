@@ -18,6 +18,8 @@
 # Red Hat Author(s): Vendula Poncova <vponcova@redhat.com>
 
 # Check the results on the running VM.
+# Ignore unused variable parsed out by tooling scripts as test tags metadata
+# shellcheck disable=SC2034
 TESTTYPE="manual storage partition luks"
 
 . ${KSTESTDIR}/functions.sh

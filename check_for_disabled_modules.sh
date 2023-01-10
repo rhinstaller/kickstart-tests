@@ -16,6 +16,8 @@
 #
 # mlewando@redhat.com
 
+# Ignore unused variable parsed out by tooling scripts as test tags metadata
+# shellcheck disable=SC2034
 TESTTYPE="ui anaconda addons"
 
 . ${KSTESTDIR}/functions.sh

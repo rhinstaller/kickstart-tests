@@ -18,6 +18,8 @@
 # Red Hat Author(s): David Shea <dshea@redhat.com>
 #                    Jiri Konecny <jkonecny@redhat.com>
 
+# Ignore unused variable parsed out by tooling scripts as test tags metadata
+# shellcheck disable=SC2034
 TESTTYPE="method proxy gh680 gh841"
 
 . ${KSTESTDIR}/functions.sh

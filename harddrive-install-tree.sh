@@ -19,6 +19,8 @@
 
 # FIXME: fails on RHEL 8:
 # SourceSetupError: Nothing useful found for Hard drive ISO source at partition=/dev/sdb directory=/repo/
+# Ignore unused variable parsed out by tooling scripts as test tags metadata
+# shellcheck disable=SC2034
 TESTTYPE=${TESTTYPE:-"packaging skip-on-rhel"}
 
 . ${KSTESTDIR}/functions.sh

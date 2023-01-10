@@ -19,6 +19,8 @@
 
 # This test covers https://bugzilla.redhat.com/show_bug.cgi?id=2063791
 
+# Ignore unused variable parsed out by tooling scripts as test tags metadata
+# shellcheck disable=SC2034
 TESTTYPE="raid storage skip-on-fedora rhbz2122327"
 
 . ${KSTESTDIR}/functions.sh

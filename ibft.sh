@@ -24,6 +24,8 @@
 #   - just use sanboot in ipxe script:
 #     sanboot iscsi:${target_ip}:::0:${wwn}
 
+# Ignore unused variable parsed out by tooling scripts as test tags metadata
+# shellcheck disable=SC2034
 TESTTYPE="knownfailure iscsi"
 
 . ${KSTESTDIR}/functions.sh

@@ -17,6 +17,8 @@
 #
 
 # Anaconda raises the noninteractive error for the progress spoke.
+# Ignore unused variable parsed out by tooling scripts as test tags metadata
+# shellcheck disable=SC2034
 TESTTYPE="ui knownfailure"
 
 . ${KSTESTDIR}/functions.sh

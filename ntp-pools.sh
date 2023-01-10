@@ -18,6 +18,8 @@
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
 # Fails in rhel8 with "Unknown command: timesource"
+# Ignore unused variable parsed out by tooling scripts as test tags metadata
+# shellcheck disable=SC2034
 TESTTYPE="time coverage skip-on-rhel-8"
 
 . ${KSTESTDIR}/functions.sh

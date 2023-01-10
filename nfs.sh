@@ -18,6 +18,8 @@
 # Red Hat Author(s): David Shea <dshea@redhat.com>
 
 # requires special setup (NFS server) which we don't have in our test environments
+# Ignore unused variable parsed out by tooling scripts as test tags metadata
+# shellcheck disable=SC2034
 TESTTYPE="method packaging knownfailure"
 
 . ${KSTESTDIR}/functions.sh

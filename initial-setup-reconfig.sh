@@ -17,6 +17,8 @@
 #
 # Red Hat Author(s): Martin Kolman <mkolman@redhat.com>
 
+# Ignore unused variable parsed out by tooling scripts as test tags metadata
+# shellcheck disable=SC2034
 TESTTYPE="initial-setup"
 
 . ${KSTESTDIR}/functions.sh

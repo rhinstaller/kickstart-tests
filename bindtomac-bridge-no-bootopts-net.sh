@@ -17,6 +17,8 @@
 #
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
+# Ignore unused variable parsed out by tooling scripts as test tags metadata
+# shellcheck disable=SC2034
 TESTTYPE="knownfailure network"
 
 . ${KSTESTDIR}/bridge-no-bootopts-net.sh

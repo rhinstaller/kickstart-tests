@@ -24,6 +24,8 @@
 # injected in initrd) network devices are not found in sysfs in the time of
 # parsing the kickstart.
 
+# Ignore unused variable parsed out by tooling scripts as test tags metadata
+# shellcheck disable=SC2034
 TESTTYPE=${TESTTYPE:-"network"}
 
 . ${KSTESTDIR}/functions.sh

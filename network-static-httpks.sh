@@ -22,6 +22,8 @@
 # The latter is causing that kickstart network commands are not applied (ifcfg
 # files created) in initramfs.
 
+# Ignore unused variable parsed out by tooling scripts as test tags metadata
+# shellcheck disable=SC2034
 TESTTYPE="network"
 
 . ${KSTESTDIR}/functions.sh

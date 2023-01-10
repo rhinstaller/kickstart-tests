@@ -19,6 +19,8 @@
 
 # This is duplicate test of RHEL test which is changing the configuration
 # option on Fedora to be able to test the functionality also there.
+# Ignore unused variable parsed out by tooling scripts as test tags metadata
+# shellcheck disable=SC2034
 TESTTYPE="bootloader skip-on-rhel"
 
 . ${KSTESTDIR}/functions.sh

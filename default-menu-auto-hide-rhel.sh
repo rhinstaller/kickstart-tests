@@ -20,6 +20,8 @@
 # We have this feature on Fedora, however, only for Workstation which is not
 # used by KS tests. There is another test which works for Fedora only and
 # changing configuration file.
+# Ignore unused variable parsed out by tooling scripts as test tags metadata
+# shellcheck disable=SC2034
 TESTTYPE="bootloader skip-on-rhel-8 skip-on-fedora"
 
 . ${KSTESTDIR}/functions.sh

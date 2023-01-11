@@ -16,6 +16,8 @@
 # Red Hat, Inc.
 #
 # The fix requires https://github.com/rhinstaller/anaconda/commit/6b80b7b.
+# Ignore unused variable parsed out by tooling scripts as test tags metadata
+# shellcheck disable=SC2034
 TESTTYPE="reboot initial-setup smoke skip-on-rhel-8"
 
 . ${KSTESTDIR}/functions.sh

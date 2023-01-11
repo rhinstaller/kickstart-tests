@@ -17,6 +17,8 @@
 #
 # Red Hat Author(s): Zdenek Veleba <zveleba@redhat.com>
 
+# Ignore unused variable parsed out by tooling scripts as test tags metadata
+# shellcheck disable=SC2034
 TESTTYPE="deprecated skip-on-rhel-8 skip-on-fedora"
 
 . ${KSTESTDIR}/functions.sh

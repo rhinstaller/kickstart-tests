@@ -22,6 +22,8 @@
 #      code actually ignores the command without --device specified
 #      (and no ksdevice set), so it will be applied in anaconda.
 
+# Ignore unused variable parsed out by tooling scripts as test tags metadata
+# shellcheck disable=SC2034
 TESTTYPE=${TESTTYPE:-"network"}
 
 . ${KSTESTDIR}/functions.sh

@@ -18,6 +18,8 @@
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
 # FIXME: https://github.com/rhinstaller/kickstart-tests/issues/447
+# Ignore unused variable parsed out by tooling scripts as test tags metadata
+# shellcheck disable=SC2034
 TESTTYPE="network skip-on-rhel-8"
 
 . ${KSTESTDIR}/bridged-bond-httpks.sh

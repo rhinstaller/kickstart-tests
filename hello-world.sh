@@ -18,6 +18,8 @@
 # Red Hat Author(s): Vendula Poncova <vponcova@redhat.com>
 
 # FIXME: %pre script uses python3, which does not exist in RHEL8 env; times out there
+# Ignore unused variable parsed out by tooling scripts as test tags metadata
+# shellcheck disable=SC2034
 TESTTYPE="addon coverage skip-on-rhel"
 
 . ${KSTESTDIR}/functions.sh

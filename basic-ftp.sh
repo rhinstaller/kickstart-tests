@@ -18,6 +18,8 @@
 #
 # Red Hat Author(s): David Shea <dshea@redhat.com>
 
+# Ignore unused variable parsed out by tooling scripts as test tags metadata
+# shellcheck disable=SC2034
 TESTTYPE="method skip-on-rhel"
 
 . ${KSTESTDIR}/functions.sh

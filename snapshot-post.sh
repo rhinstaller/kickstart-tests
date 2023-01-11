@@ -18,6 +18,8 @@
 # Red Hat Author(s): Jiri Konecny <jkonecny@redhat.com>
 
 # FIXME: Anaconda crashes with "Logical volume testvg/testLV contains a filesystem in use"
+# Ignore unused variable parsed out by tooling scripts as test tags metadata
+# shellcheck disable=SC2034
 TESTTYPE="snapshot lvm storage coverage knownfailure"
 
 . ${KSTESTDIR}/functions.sh

@@ -18,6 +18,8 @@
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
 # On RHEL, boot option is not enough for unattended installation
+# Ignore unused variable parsed out by tooling scripts as test tags metadata
+# shellcheck disable=SC2034
 TESTTYPE="keyboard i18n skip-on-rhel"
 
 . ${KSTESTDIR}/functions.sh

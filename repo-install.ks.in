@@ -18,8 +18,8 @@ repo --name=test05 --baseurl=EMPTY_REPO_URL --includepkgs=p1,p2 --excludepkgs=p3
 if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
     cost='^cost=25$'
     sslverify='^sslverify=0$'
-    includepkgs='^include=p1,p2$'
-    excludepkgs='^exclude=p3,p4$'
+    includepkgs='^includepkgs=p1,p2$'
+    excludepkgs='^excludepkgs=p3,p4$'
 else
     cost='^cost = 25$'
     sslverify='^sslverify = 0$'

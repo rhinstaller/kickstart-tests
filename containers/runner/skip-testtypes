@@ -37,7 +37,6 @@ rhel8_skip_array=(
   gh595       # proxy-cmdline failing on all scenarios
   gh774       # autopart-luks-1 failing
   gh830       # packages-weakdeps failing
-  gh841       # 4 tests disabled due to dnf rhbz#2152846
 )
 
 rhel9_skip_array=(

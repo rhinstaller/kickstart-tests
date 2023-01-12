@@ -66,12 +66,15 @@ repo=/etc/yum.repos.d/test05.repo
 
 if [[ ! -e ${repo} ]]; then
     echo "*** ${repo} should be installed" >> /root/RESULT
-elif ! grep -q "${includepkgs}" ${repo}; then
-    echo "*** ${repo} should specify the includepkgs option" >> /root/RESULT
-    cat ${repo} >> /root/RESULT
-elif ! grep -q "${excludepkgs}" ${repo}; then
-    echo "*** ${repo} should specify the excludepkgs option" >> /root/RESULT
-    cat ${repo} >> /root/RESULT
+else
+    if ! grep -q "${includepkgs}" ${repo}; then
+        echo "*** ${repo} should specify the includepkgs option" >> /root/RESULT
+        cat ${repo} >> /root/RESULT
+    fi
+    if ! grep -q "${excludepkgs}" ${repo}; then
+        echo "*** ${repo} should specify the excludepkgs option" >> /root/RESULT
+        cat ${repo} >> /root/RESULT
+    fi
 fi
 
 %ksappend validation/success_if_result_empty.ks

@@ -187,11 +187,23 @@ class ShellLauncher(ProcessLauncher):
         out.check_ret_code_with_exception()
         return out.stdout
 
+    def get_required_ram(self):
+        """Per test timeout override.
+
+        The value returned by the get_required_ram() function should be
+        a string representing an integer value of the size of RAM (in MiB)
+        of the VM used for the test.
+        """
+        out = self._run_shell_func("get_required_ram")
+
+        out.check_ret_code_with_exception()
+        return out.stdout
+
     def validate(self):
         return self._run_shell_func("validate")
 
-    def inject_ks_to_initrd(self):
-        out = self._run_shell_func("inject_ks_to_initrd")
+    def _run_bool_shell_func(self, name):
+        out = self._run_shell_func(name)
 
         out.check_ret_code_with_exception()
 
@@ -200,8 +212,14 @@ class ShellLauncher(ProcessLauncher):
         elif out.stdout == "false":
             return False
         else:
-            raise ShellProcessError("Shell function inject_ks_to_initrd must return 'true' or "
-                                    "'false' but returned {}".format(out.stdout))
+            raise ShellProcessError("Shell function {} must return 'true' or "
+                                    "'false' but returned {}".format(name, out.stdout))
+
+    def inject_ks_to_initrd(self):
+        return self._run_bool_shell_func("inject_ks_to_initrd")
+
+    def stage2_from_ks(self):
+        return self._run_bool_shell_func("stage2_from_ks")
 
     def _run_shell_func(self, func_name):
         cmd_args = []

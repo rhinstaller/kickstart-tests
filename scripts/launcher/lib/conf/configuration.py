@@ -183,6 +183,7 @@ class VirtualConfiguration(BaseConfiguration):
         self._kernel_args = None
         self._timeout = None
         self._runner_args = []
+        self._stage2_from_ks = False
 
     @property
     def test_name(self):
@@ -370,3 +371,13 @@ class VirtualConfiguration(BaseConfiguration):
     def runner_args(self, value: list):
         """Set additional arguments to pass to virt-install"""
         self._runner_args = value
+
+    @property
+    def stage2_from_ks(self) -> bool:
+        """Use installer image from location defined in kickstart"""
+        return self._stage2_from_ks
+
+    @stage2_from_ks.setter
+    def stage2_from_ks(self, value: list):
+        """Set use installer image from location defined in kickstart"""
+        self._stage2_from_ks = value

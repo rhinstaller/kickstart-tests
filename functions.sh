@@ -408,3 +408,14 @@ append_additional_repo_to_kernel_args() {
 get_timeout() {
     echo "60"
 }
+
+stage2_from_ks() {
+    # Return true to get stage2 location from kickstart (inst.stage2 option will not be supplied).
+    # returns: "true" or "false"
+    echo "false"
+}
+
+# RAM size of VM for the test in MiB
+get_required_ram() {
+    echo "2048"
+}

@@ -92,6 +92,10 @@ case $1 in
         msg="$(inject_ks_to_initrd)"
         ret=$?
         ;;
+    stage2_from_ks)
+        msg="$(stage2_from_ks)"
+        ret=$?
+        ;;
     prepare)
         msg="$(prepare ${ks} ${tmpdir})"
         ret=$?
@@ -122,6 +126,10 @@ case $1 in
         ;;
     get_timeout)
         msg="$(get_timeout)"
+        ret=$?
+        ;;
+    get_required_ram)
+        msg="$(get_required_ram)"
         ret=$?
         ;;
     validate)

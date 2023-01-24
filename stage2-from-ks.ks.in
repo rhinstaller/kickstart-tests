@@ -1,0 +1,13 @@
+#test name: stage2-from-ks
+#
+# Test configuration of stage2 location via kickstart url command
+# and activation of network in initramfs from kickstart configuration.
+# rhbz#2153361
+
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+%post
+%ksappend validation/success_if_result_empty.ks
+%end

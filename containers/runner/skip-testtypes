@@ -30,6 +30,7 @@ daily_iso_skip_array=(
   rhbz2122327 # installation with an existing DDF RAID device fails
   rhbz2153361 # stage2-from-ks should be fixed in RHEL 9.2
   gh874       # network-bootopts-noautodefault failing
+  gh875       # dracut-visible-warnings failing
 )
 
 rhel8_skip_array=(

@@ -52,7 +52,6 @@ rhel9_skip_array=(
   gh774       # autopart-luks-1 failing
   gh790       # repo-addrepo-hd-tree failing
   rhbz2153361 # stage2-from-ks should be fixed in RHEL 9.2
-  gh879       # raid-1 is failing on bootloader
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

@@ -19,7 +19,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="raid storage coverage gh777 gh879"
+TESTTYPE="raid storage coverage gh777"
 
 . ${KSTESTDIR}/functions.sh
 

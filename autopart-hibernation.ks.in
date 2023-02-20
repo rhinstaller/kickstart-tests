@@ -1,0 +1,65 @@
+#test name: autopart-hibernation
+%ksappend repos/default.ks
+
+zerombr
+clearpart --all --initlabel
+autopart --hibernation
+
+%ksappend common/common_no_storage_and_payload.ks
+
+%ksappend payload/default_packages.ks
+
+%post
+err=0
+# Test if swap is equal or greater than ram size
+# Path to swap partition
+swap_device="$(blkid --match-token TYPE=\"swap\" --output device | grep -v /dev/zram)"
+
+if [ -z $swap_device ]; then
+    echo "SWAP partition was not created" >> /root/RESULT
+    err=1
+elif [ -z "$(grep $swap_device /etc/fstab)" ]; then
+    echo "SWAP is missing from fstab" >> /root/RESULT
+    err=1
+fi
+
+# Test if Grub is configured to resume from sleep.
+grub_path="/etc/default/grub"
+grub_param="GRUB_CMDLINE_LINUX"
+
+cmdline="$(grep $grub_param $grub_path | grep -o "resume=$swap_device")"
+
+if [ -z "$cmdline" ]; then
+    echo "\"resume\" parameter is missing from $grub_param in $grub_path" >> /root/RESULT
+    err=1
+fi
+
+# Mount swap so we can accurately measure it's size.
+swapon "$swap_device"
+# Size of swap in bytes
+swap_size=$(swapon --raw --bytes --noheadings | grep -v "zram" | cut -d ' ' -f 3)
+# Size of total memory in bytes
+mem_size="$(free -b | awk '$1 == "Mem:" {print $2}')"
+
+# Check if swap is large enough for current memory configuration
+if [ -z "$swap_size" ]; then
+   swap_size=0
+fi
+if [ "$swap_size" -le "$mem_size" ]; then
+    echo "SWAP of size ${swap_size}B is too small to hibernate with ${mem_size}B of memory" >> /root/RESULT
+    err=1
+fi
+
+if [ "$err" -eq 0 ]; then
+    echo "SUCCESS" >> /root/RESULT
+else
+    echo "blkid:" >> /root/RESULT
+    blkid >> /root/RESULT
+    echo "fstab:" >> /root/RESULT
+    cat /etc/fstab | sed -e '/^$/d' -e '/^#/d' >> /root/RESULT
+    echo "grub:" >> /root/RESULT
+    cat $grub_path >> /root/RESULT
+fi
+
+exit $err
+%end

@@ -18,7 +18,7 @@
 # Red Hat Author(s): Ondřej Zobal <ozobal@redhat.com>
 
 # shellcheck disable=SC2034
-TESTTYPE="autopart storage"
+TESTTYPE="autopart storage gh891"
 
 . ${KSTESTDIR}/functions.sh
 

@@ -30,6 +30,7 @@ daily_iso_skip_array=(
   rhbz2122327 # installation with an existing DDF RAID device fails
   rhbz2153361 # stage2-from-ks should be fixed in RHEL 9.2
   gh891       # autopart-hibernation failing
+  gh890       # default-systemd-target-vnc-graphical-provides flaking too much
 )
 
 rhel8_skip_array=(

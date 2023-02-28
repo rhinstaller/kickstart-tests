@@ -13,12 +13,18 @@ autopart --hibernation
 err=0
 # Test if swap is equal or greater than ram size
 # Path to swap partition
-swap_device="$(blkid --match-token TYPE=\"swap\" --output device | grep -v /dev/zram)"
+swap_device="$(blkid --match-token TYPE=\"swap\" | grep -v /dev/zram)"
+if [ "$(echo "$swap_device" | wc -l)" -ne 1 ]; then
+   echo "Too many swap devices were created" >> /root/RESULT
+   err=1
+fi
+swap_device_uuid="$(echo "$swap_device" | sed -e 's/.* UUID="\([^ ]*\)".*/\1/')"
+swap_device_path="$(echo "$swap_device" | cut -d ":" -f1)"
 
-if [ -z $swap_device ]; then
+if [ -z "$swap_device_uuid" ] || [ -z "$swap_device_path" ]; then
     echo "SWAP partition was not created" >> /root/RESULT
     err=1
-elif [ -z "$(grep $swap_device /etc/fstab)" ]; then
+elif [ -z "$(grep $swap_device_uuid /etc/fstab)" ] && [ -z "$(grep $swap_device_path /etc/fstab)" ]; then
     echo "SWAP is missing from fstab" >> /root/RESULT
     err=1
 fi
@@ -27,9 +33,10 @@ fi
 grub_path="/etc/default/grub"
 grub_param="GRUB_CMDLINE_LINUX"
 
-cmdline="$(grep $grub_param $grub_path | grep -o "resume=$swap_device")"
+cmdline_uuid="$(grep $grub_param $grub_path | grep -o "resume=UUID=$swap_device_uuid")"
+cmdline_path="$(grep $grub_param $grub_path | grep -o "resume=$swap_device_path")"
 
-if [ -z "$cmdline" ]; then
+if [ -z "$cmdline_uuid" ] && [ -z "$cmdline_path" ]; then
     echo "\"resume\" parameter is missing from $grub_param in $grub_path" >> /root/RESULT
     err=1
 fi

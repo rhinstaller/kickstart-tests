@@ -18,7 +18,7 @@
 # Red Hat Author(s): Ondřej Zobal <ozobal@redhat.com>
 
 # shellcheck disable=SC2034
-TESTTYPE="autopart storage skip-on-rhel-8 skip-on-rhel-9 gh891"
+TESTTYPE="autopart storage skip-on-rhel-8 skip-on-rhel-9"
 
 . ${KSTESTDIR}/functions.sh
 

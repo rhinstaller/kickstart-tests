@@ -1,0 +1,41 @@
+#version=DEVEL
+#test name: network-dns-search
+# Test domain name search properties set from kickstart
+
+# Use defaults.
+%ksappend common/common.ks
+%ksappend repos/default.ks
+%ksappend l10n/default.ks
+%ksappend users/default.ks
+%ksappend storage/default.ks
+%ksappend payload/default_packages.ks
+
+# some params together, some alone - check they are all applied anyway
+network --device=@KSTEST_NETDEV1@ --ipv4-dns-search=fedoraproject.org,example.com --ipv6-dns-search=whatever.nonexistent --ipv6-ignore-auto-dns
+
+%post
+
+@KSINCLUDE@ post-lib-network.sh
+
+check_device_connected "@KSTEST_NETDEV1@" yes
+check_connection_device "@KSTEST_NETDEV1@" "@KSTEST_NETDEV1@"
+
+check_connection_setting "@KSTEST_NETDEV1@" ipv4.dns-search fedoraproject.org,example.com
+check_connection_setting "@KSTEST_NETDEV1@" ipv6.dns-search whatever.nonexistent
+check_device_config_value "@KSTEST_NETDEV1@" DOMAIN fedoraproject.org,example.com ipv4 dns-search "fedoraproject.org;example.com;"
+check_device_config_value "@KSTEST_NETDEV1@" IPV6_DOMAIN whatever.nonexistent ipv6 dns-search "whatever.nonexistent;"
+
+check_connection_setting "@KSTEST_NETDEV1@" ipv4.ignore-auto-dns no
+check_connection_setting "@KSTEST_NETDEV1@" ipv6.ignore-auto-dns yes
+# for ipv4, no ks param means stay with default yes, which is no action, so nothing is written to the ifcfg file
+check_device_config_value "@KSTEST_NETDEV1@" PEERDNS __NONE ipv4 ignore-auto-dns __NONE
+# the ifcfg format field is in inverse logic relative to the command line, while keyfile agrees
+# with it but uses a different name for the value, so: ks <present>, nmcli "yes", ifcfg "no", keyfile "true"
+check_device_config_value "@KSTEST_NETDEV1@" IPV6_PEERDNS no ipv6 ignore-auto-dns true
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+   echo SUCCESS > /root/RESULT
+fi
+
+%end

@@ -28,7 +28,7 @@ daily_iso_skip_array=(
   gh774       # autopart-luks-1 failing
   gh777       # raid-1 failing
   rhbz2122327 # installation with an existing DDF RAID device fails
-  rhbz2153361 # stage2-from-ks should be fixed in RHEL 9.2
+  gh910       # stage2-from-ks test needs to be fixed for daily-iso
   gh890       # default-systemd-target-vnc-graphical-provides flaking too much
 )
 

@@ -41,12 +41,16 @@ fi
 # verify root entry in /etc/fstab is correct
 root_lv_entry="$(grep ^$root_lv\\s\\+/\\s /etc/fstab)"
 root_uuid_entry="$(grep ^$root_uuid\\s\\+/\\s /etc/fstab)"
-if [ -z "$root_lv_entry" -a -z "$root_uuid_entry" ] ; then
+if [ "$root_lv_entry" ] ; then
+    if [ -z "$(echo $root_lv_entry | grep loud,noatime)" ]; then
+        echo "*** root lv did not preserve --fsoptions" >> /root/RESULT
+    fi
+elif [ "$root_uuid_entry" ]; then
+    if [ -z "$(echo $root_uuid_entry | grep loud,noatime)" ]; then
+        echo "*** root lv did not preserve --fsoptions" >> /root/RESULT
+    fi
+else
     echo "*** root lv is not the root entry in /etc/fstab" >> /root/RESULT
-fi
-
-if [ -z "$(echo $root_lv_entry | grep loud,noatime)" ]; then
-    echo "*** root lv did not preserve --fsoptions" >> /root/RESULT
 fi
 
 # verify size of root lv

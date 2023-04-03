@@ -62,6 +62,7 @@ jobs:
             -s https://download.copr.fedorainfracloud.org/results/rpmsoftwaremanagement/dnf-nightly/fedora-rawhide-x86_64/ \
             -s https://download.copr.fedorainfracloud.org/results/@rhinstaller/Anaconda/fedora-rawhide-x86_64/ \
             -s https://copr-be.cloud.fedoraproject.org/results/@storage/blivet-daily/fedora-rawhide-x86_64/ \
+            -s https://copr-be.cloud.fedoraproject.org/results/@storage/udisks-daily/fedora-rawhide-x86_64/ \
             lorax
           cp lorax/images/boot.iso /images/
           cp *.txt /images/

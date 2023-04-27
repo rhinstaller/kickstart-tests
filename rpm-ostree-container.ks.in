@@ -1,0 +1,29 @@
+#test name: rpm-ostree-container
+# https://github.com/rhinstaller/anaconda/pull/4617
+
+# Use the default settings.
+%ksappend common/common_no_payload.ks
+
+# Set up the RPM OSTree source.
+ostreecontainer --no-signature-verification --transport=registry --stateroot=fedora-silverblue --remote=fedora-silverblue --url=quay.io/fedora/fedora-silverblue:rawhide
+
+%post
+
+if ! ostree remote list | grep -q "fedora-silverblue"; then
+    echo "Unexpected name fedora-silverblue in \"$(ostree remote list)\"" >> /root/RESULT
+fi
+
+# Check the url of the remote.
+url="$(ostree remote show-url fedora-silverblue)"
+
+if [ "${url}" != "quay.io/fedora/fedora-silverblue:rawhide" ]; then
+    echo "Unexpected URL: ${url}" >> /root/RESULT
+fi
+
+if [ ! -e /root/RESULT ]; then
+    echo SUCCESS > /root/RESULT
+fi
+
+# Write the result into logs.
+cat /root/RESULT
+%end

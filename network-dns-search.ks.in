@@ -22,7 +22,7 @@ check_connection_device "@KSTEST_NETDEV1@" "@KSTEST_NETDEV1@"
 
 check_connection_setting "@KSTEST_NETDEV1@" ipv4.dns-search fedoraproject.org,example.com
 check_connection_setting "@KSTEST_NETDEV1@" ipv6.dns-search whatever.nonexistent
-check_device_config_value "@KSTEST_NETDEV1@" DOMAIN fedoraproject.org,example.com ipv4 dns-search "fedoraproject.org;example.com;"
+check_device_config_value "@KSTEST_NETDEV1@" DOMAIN "fedoraproject.org example.com" ipv4 dns-search "fedoraproject.org;example.com;"
 check_device_config_value "@KSTEST_NETDEV1@" IPV6_DOMAIN whatever.nonexistent ipv6 dns-search "whatever.nonexistent;"
 
 check_connection_setting "@KSTEST_NETDEV1@" ipv4.ignore-auto-dns no

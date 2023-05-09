@@ -20,13 +20,13 @@ function check_device_config_value() {
 
     if [[ -e ${ifcfg_file} ]]; then
         if [[ "${ifcfg_value}" == "__NONE" ]]; then
-            ! egrep -q '^'${ifcfg_key}'=' ${ifcfg_file}
+            ! egrep -q '^'"${ifcfg_key}"'=' "${ifcfg_file}"
             ifcfg_result=$?
         elif [[ "${ifcfg_value}" == "__ANY" ]]; then
-            egrep -q '^'${ifcfg_key}'=' ${ifcfg_file}
+            egrep -q '^'"${ifcfg_key}"'=' "${ifcfg_file}"
             ifcfg_result=$?
         else
-            egrep -q '^'${ifcfg_key}'="?'${ifcfg_value}'"?$' ${ifcfg_file}
+            egrep -q '^'"${ifcfg_key}"'="?'"${ifcfg_value}"'"?$' "${ifcfg_file}"
             ifcfg_result=$?
         fi
     fi

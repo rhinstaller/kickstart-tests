@@ -33,5 +33,5 @@ prepare_disks() {
 }
 
 kernel_args() {
-   echo inst.dd=/dev/disk/by-label/TEST_DD
+   echo ${DEFAULT_BOOTOPTS} inst.dd=/dev/disk/by-label/TEST_DD
 }

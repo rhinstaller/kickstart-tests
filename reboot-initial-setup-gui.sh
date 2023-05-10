@@ -29,7 +29,7 @@ additional_runner_args() {
 
 kernel_args() {
     export_additional_repo $tmpdir
-    echo $(append_additional_repo_to_kernel_args $DEFAULT_BOOTOPTS)
+    echo $(append_additional_repo_to_kernel_args "$DEFAULT_BOOTOPTS")
 }
 
 cleanup() {

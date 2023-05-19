@@ -16,7 +16,8 @@ grep "org.fedoraproject.Anaconda.Modules" | cut -d"'" -f2 \
 | sort > /tmp/generated.out
 
 # Generate the expected output.
-cat > /tmp/expected.out << EOF
+if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
+    cat > /tmp/expected.out << EOF
 org.fedoraproject.Anaconda.Modules.Localization
 org.fedoraproject.Anaconda.Modules.Network
 org.fedoraproject.Anaconda.Modules.Payloads
@@ -27,6 +28,20 @@ org.fedoraproject.Anaconda.Modules.Subscription
 org.fedoraproject.Anaconda.Modules.Timezone
 org.fedoraproject.Anaconda.Modules.Users
 EOF
+else
+    cat > /tmp/expected.out << EOF
+org.fedoraproject.Anaconda.Modules.Localization
+org.fedoraproject.Anaconda.Modules.Network
+org.fedoraproject.Anaconda.Modules.Payloads
+org.fedoraproject.Anaconda.Modules.Runtime
+org.fedoraproject.Anaconda.Modules.Security
+org.fedoraproject.Anaconda.Modules.Services
+org.fedoraproject.Anaconda.Modules.Storage
+org.fedoraproject.Anaconda.Modules.Subscription
+org.fedoraproject.Anaconda.Modules.Timezone
+org.fedoraproject.Anaconda.Modules.Users
+EOF
+fi
 
 # Check the output
 diff /tmp/expected.out /tmp/generated.out

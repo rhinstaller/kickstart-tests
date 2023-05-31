@@ -39,5 +39,6 @@ validate() {
         return 1
     fi
 
-    return $(validate_RESULT ${disksdir})
+    validate_RESULT ${disksdir}
+    return $?
 }

@@ -1,0 +1,56 @@
+#test name: storage-multipath-autopart
+
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+# Reboot the installed system.
+reboot
+
+# Validate also on the first boot.
+%ksappend validation/success_on_first_boot.ks
+
+%pre
+# Create a script that's used for testing during the installation in %post
+# as well as on the installed system during the first boot.
+# It reports to /root/RESULT as well as stdout due to the first boot testing approach.
+cat > /tmp/validation_script.sh << 'EOF'
+check_mntpoint_on_mpath() {
+    local mount_point="$1"
+
+    # Get the block device of the mount point
+    blk_device="$(findmnt -o SOURCE --noheadings "${mount_point}")"
+    # Any device in the device tree of blk_device should be a multipath device
+    lsblk --inverse --raw --output TYPE --noheadings "${blk_device}" | grep -q mpath
+    mpath_found=$?
+
+    # Report a failure if no mpath device was detected
+    if [ $mpath_found -ne 0 ]; then
+        echo "*** Mount point ${mount_point} is not on a multipath device." | tee -a /root/RESULT
+        echo "findmnt:" | tee -a /root/RESULT
+        findmnt | tee -a /root/RESULT
+        echo "lsblk:" | tee -a /root/RESULT
+        lsblk | tee -a /root/RESULT
+    fi
+}
+
+check_mntpoint_on_mpath /
+check_mntpoint_on_mpath /boot
+
+EOF
+%end
+
+%post
+# Check if the specified mount points are placed on a multipath device during the installation
+%include /tmp/validation_script.sh
+%end
+
+%post
+# Check if the specified mount points are placed on a multipath device on the installed
+# system - to ensure the multipath device was correctly assembled during boot.
+
+# Create a script with the first boot test.
+cat > /usr/libexec/kickstart-test.sh << 'EOF'
+%include /tmp/validation_script.sh
+EOF
+%end

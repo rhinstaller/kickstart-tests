@@ -111,7 +111,7 @@ copy_file() {
     file="$2"
     dir="$3"
 
-    run_with_timeout 1000s "virt-copy-out ${disks} ${file} ${dir}"
+    run_with_timeout 300s "virt-copy-out ${disks} ${file} ${dir}"
 }
 
 copy_interesting_files_from_system() {
@@ -185,7 +185,7 @@ validate_journal_contains() {
     error=$3
     args=$(for d in ${disksdir}/disk-*img; do echo -a ${d}; done)
     # Copy the journal.log file
-    run_with_timeout 1000s "virt-copy-out ${args} /var/log/anaconda/journal.log ${disksdir}"
+    run_with_timeout 300s "virt-copy-out ${args} /var/log/anaconda/journal.log ${disksdir}"
     egrep -i "${regexp}" ${disksdir}/journal.log
     if [[ $? != 0 ]]; then
         echo "${error}" >> ${disksdir}/RESULT

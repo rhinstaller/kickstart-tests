@@ -29,7 +29,7 @@ kernel_args() {
 
 validate_logs() {
     # Does the file exists?
-    existence=$(guestfish --ro $1 -i exists $2)
+    existence=$(run_with_timeout ${COPY_FROM_IMAGE_TIMEOUT} "guestfish --ro $1 -i exists $2")
     # Check the result.
     if [[ "${existence}" != "${3}" ]]; then
         status=1

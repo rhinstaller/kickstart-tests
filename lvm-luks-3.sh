@@ -1,4 +1,4 @@
-#
+
 # Copyright (C) 2018  Red Hat, Inc.
 #
 # This copyrighted material is made available to anyone wishing to use,
@@ -25,10 +25,5 @@ TESTTYPE="manual storage lvm luks"
 . ${KSTESTDIR}/functions.sh
 
 copy_file() {
-    disks="$1"
-    file="$2"
-    dir="$3"
-
-    echo "passphrase" | \
-    guestfish --keys-from-stdin --ro ${disks} -i copy-out ${file} ${dir}
+    copy_file_encrypted "$@"
 }

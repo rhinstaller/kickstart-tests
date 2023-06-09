@@ -30,7 +30,7 @@ validate() {
     # There should be a /home/RESULT (because / is encrypted) file with results
     # in it.  Check its contents and decide whether the test finally succeeded
     # or not.
-    result=$(virt-cat ${args} -m /dev/mapper/vg01-home_lv /RESULT)
+    result=$(run_with_timeout ${COPY_FROM_IMAGE_TIMEOUT} "virt-cat ${args} -m /dev/mapper/vg01-home_lv /RESULT")
     if [[ $? != 0 ]]; then
         status=1
         echo '*** /home/RESULT does not exist in VM image.'

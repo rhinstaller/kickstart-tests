@@ -50,6 +50,8 @@ DEFAULT_BOOTOPTS="${DEFAULT_BASIC_BOOTOPTS} ${DEFAULT_DRACUT_BOOTOPTS}"
 # host IP with QEMU user mode network
 USER_NET_HOST_IP=10.0.2.2
 
+COPY_FROM_IMAGE_TIMEOUT=300s
+
 kernel_args() {
     echo $DEFAULT_BOOTOPTS
 }
@@ -111,7 +113,16 @@ copy_file() {
     file="$2"
     dir="$3"
 
-    run_with_timeout 300s "virt-copy-out ${disks} ${file} ${dir}"
+    run_with_timeout ${COPY_FROM_IMAGE_TIMEOUT} "virt-copy-out ${disks} ${file} ${dir}"
+}
+
+copy_file_encrypted() {
+    disks="$1"
+    file="$2"
+    dir="$3"
+
+    echo "passphrase" | \
+    run_with_timeout ${COPY_FROM_IMAGE_TIMEOUT} "guestfish --keys-from-stdin --ro ${disks} -i copy-out ${file} ${dir}"
 }
 
 copy_interesting_files_from_system() {
@@ -185,7 +196,7 @@ validate_journal_contains() {
     error=$3
     args=$(for d in ${disksdir}/disk-*img; do echo -a ${d}; done)
     # Copy the journal.log file
-    run_with_timeout 300s "virt-copy-out ${args} /var/log/anaconda/journal.log ${disksdir}"
+    run_with_timeout ${COPY_FROM_IMAGE_TIMEOUT} "virt-copy-out ${args} /var/log/anaconda/journal.log ${disksdir}"
     egrep -i "${regexp}" ${disksdir}/journal.log
     if [[ $? != 0 ]]; then
         echo "${error}" >> ${disksdir}/RESULT

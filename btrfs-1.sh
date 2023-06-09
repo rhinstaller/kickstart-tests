@@ -30,7 +30,7 @@ validate() {
     # There should be a /root/root/RESULT file with results in it.  Check
     # its contents and decide whether the test finally succeeded or
     # not.
-    result=$(virt-cat ${args} -m /dev/disk/by-label/fedora-btrfs /root/root/RESULT)
+    result=$(run_with_timeout ${COPY_FROM_IMAGE_TIMEOUT} "virt-cat ${args} -m /dev/disk/by-label/fedora-btrfs /root/root/RESULT")
     if [[ $? != 0 ]]; then
         status=1
         echo '*** /root/RESULT does not exist in VM image.'

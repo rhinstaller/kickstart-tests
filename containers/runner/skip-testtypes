@@ -10,10 +10,12 @@ common_skip_array=(
 
 rawhide_skip_array=(
   skip-on-fedora
+  rhbz1853668 # multipath device not constructed back after installation
 )
 
 rawhide_text_skip_array=(
   skip-on-fedora
+  rhbz1853668 # multipath device not constructed back after installation
 )
 
 daily_iso_skip_array=(
@@ -32,6 +34,7 @@ daily_iso_skip_array=(
   gh890       # default-systemd-target-vnc-graphical-provides flaking too much
   gh942       # rpm-ostree failing
   gh871       # basic-ftp failing due to mirror
+  rhbz1853668 # multipath device not constructed back after installation
 )
 
 rhel8_skip_array=(

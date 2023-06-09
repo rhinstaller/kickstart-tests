@@ -26,7 +26,7 @@ jobs:
           sudo podman pull quay.io/rhinstaller/kstest-runner:latest
 
       - name: Checkout repository
-        uses: actions/checkout@v3.3.0
+        uses: actions/checkout@v4
 
       - name: Build boot.iso with lorax
         run: |

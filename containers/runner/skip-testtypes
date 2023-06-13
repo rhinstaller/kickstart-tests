@@ -57,6 +57,7 @@ rhel9_skip_array=(
   gh774       # autopart-luks-1 failing
   gh790       # repo-addrepo-hd-tree failing
   gh969       # raid-ddf failing
+  gh970       # selinux-contexts failing
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

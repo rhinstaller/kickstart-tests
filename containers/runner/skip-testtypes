@@ -29,12 +29,12 @@ daily_iso_skip_array=(
   gh769       # nodejs:16 and swig:4 missing in module-X tests
   gh774       # autopart-luks-1 failing
   gh777       # raid-1 failing
-  rhbz2122327 # installation with an existing DDF RAID device fails
   gh910       # stage2-from-ks test needs to be fixed for daily-iso
   gh890       # default-systemd-target-vnc-graphical-provides flaking too much
   gh942       # rpm-ostree failing
   gh871       # basic-ftp failing due to mirror
   rhbz1853668 # multipath device not constructed back after installation
+  gh969       # raid-ddf failing
 )
 
 rhel8_skip_array=(

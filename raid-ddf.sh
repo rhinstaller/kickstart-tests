@@ -21,7 +21,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="raid storage skip-on-fedora rhbz2122327 gh969"
+TESTTYPE="raid storage skip-on-fedora gh969"
 
 . ${KSTESTDIR}/functions.sh
 

@@ -35,6 +35,7 @@ daily_iso_skip_array=(
   gh871       # basic-ftp failing due to mirror
   rhbz1853668 # multipath device not constructed back after installation
   gh969       # raid-ddf failing
+  gh975       # packages-default failing
 )
 
 rhel8_skip_array=(

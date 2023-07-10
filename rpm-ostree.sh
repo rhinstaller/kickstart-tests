@@ -19,7 +19,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="payload ostree skip-on-rhel gh942"
+TESTTYPE="payload ostree skip-on-rhel"
 
 . ${KSTESTDIR}/functions.sh
 

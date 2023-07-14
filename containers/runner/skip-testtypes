@@ -35,7 +35,6 @@ daily_iso_skip_array=(
   rhbz1853668 # multipath device not constructed back after installation
   gh969       # raid-ddf failing
   gh975       # packages-default failing
-  gh978       # vnc tests failing
 )
 
 rhel8_skip_array=(

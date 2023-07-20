@@ -33,7 +33,7 @@ prepare_updates() {
 
 [Anaconda]
 # List of enabled Anaconda DBus modules.
-kickstart_modules =
+activatable_modules =
      org.fedoraproject.Anaconda.Modules.Network
      org.fedoraproject.Anaconda.Modules.Payloads
      org.fedoraproject.Anaconda.Modules.Storage

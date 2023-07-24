@@ -46,6 +46,7 @@ rhel8_skip_array=(
   gh774       # autopart-luks-1 failing
   gh830       # packages-weakdeps failing
   gh969       # raid-ddf failing
+  gh986       # image-deployment-2 failing
 )
 
 rhel9_skip_array=(

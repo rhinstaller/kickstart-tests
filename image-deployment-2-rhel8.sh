@@ -17,7 +17,7 @@
 #
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="image-deployment skip-on-rhel-8"
+TESTTYPE="image-deployment skip-on-fedora skip-on-rhel-9"
 
 . ${KSTESTDIR}/functions.sh
 
@@ -33,7 +33,7 @@ prepare_updates() {
 
 [Anaconda]
 # List of enabled Anaconda DBus modules.
-activatable_modules =
+kickstart_modules =
      org.fedoraproject.Anaconda.Modules.Network
      org.fedoraproject.Anaconda.Modules.Payloads
      org.fedoraproject.Anaconda.Modules.Storage

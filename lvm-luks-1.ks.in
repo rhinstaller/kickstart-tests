@@ -12,7 +12,7 @@ clearpart --all --initlabel
 
 reqpart
 part /boot --fstype="ext4" --size=1024
-part pv.1 --fstype="lvmpv" --size=9215
+part pv.1 --fstype="lvmpv" --size=8915
 
 volgroup fedora pv.1
 

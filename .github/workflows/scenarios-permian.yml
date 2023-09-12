@@ -179,6 +179,14 @@ jobs:
               }
             }'
 
+          # Permian hides the exit code of launcher, so error out this step manually based on logs
+          rc=$( awk '/Runner return code: /{ print $4 }' permian.log)
+          if [ -n "$rc" ]; then
+            exit $rc
+          else
+            exit 111
+          fi
+
       - name: Collect anaconda logs
         if: always()
         uses: actions/upload-artifact@v3
@@ -214,14 +222,3 @@ jobs:
           name: 'results-xunit-${{ matrix.scenario }}'
           path: |
             permian/xunit-*.xml
-
-      # Keep compatibility of the overall results, Permian now hides the exit code of launcher
-      - name: Pass the launch script exit code
-        working-directory: ./permian
-        run: |
-          rc=$( awk '/Runner return code: /{ print $4 }' permian.log)
-          if [ -n "$rc" ]; then
-            exit $rc
-          else
-            exit 111
-          fi

@@ -125,6 +125,32 @@ copy_file_encrypted() {
     run_with_timeout ${COPY_FROM_IMAGE_TIMEOUT} "guestfish --keys-from-stdin --ro ${disks} -i copy-out ${file} ${dir}"
 }
 
+copy_file_encrypted_raid() {
+    disks="$1"
+    file="$2"
+    dir="$3"
+
+    # we only assume 1 RAID device
+    md_device=$(run_with_timeout ${COPY_FROM_IMAGE_TIMEOUT} "guestfish --ro ${disks} launch : list-md-devices" 2>&1)
+    md_devices_count=$(wc -l <<< ${md_device})
+    if [ ${md_devices_count} -ne 1 ]; then
+        echo "Only 1 RAID device supported by encrypted_file_encrypted_raid()" > ${dir}/RESULT
+        exit 1
+    fi
+
+    # the here-string is unindented on purpose, as the passphrase can't contain leading spaces;
+    # it's not possible to use --key /dev/xyz:key:key_string, likely due to a bug?
+    run_with_timeout ${COPY_FROM_IMAGE_TIMEOUT} "guestfish --ro --keys-from-stdin ${disks}" <<< "
+launch
+# the line following after cryptsetup-open contains a LUKS passphrase
+cryptsetup-open ${md_device} encrypted-root
+passphrase
+mount /dev/mapper/encrypted-root /
+copy_out ${file} ${dir}
+" >> /tmp/copy_encrypted_files_raid.debug
+    echo "disks: '$disks'" >> /tmp/copy_encrypted_files_raid.debug
+}
+
 copy_interesting_files_from_system() {
     local disksdir="$1"
 

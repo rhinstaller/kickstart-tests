@@ -17,11 +17,9 @@
 #
 # Red Hat Author(s): Vendula Poncova <vponcova@redhat.com>
 
-# On RHEL the test is manual because of broken reading of the results from image.
-# Check the results on the running VM.
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="skip-on-rhel storage partition luks"
+TESTTYPE="storage partition luks"
 
 . ${KSTESTDIR}/functions.sh
 

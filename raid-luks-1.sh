@@ -20,7 +20,7 @@
 # Check the results on the running VM.
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="manual storage raid luks"
+TESTTYPE="storage raid luks"
 
 . ${KSTESTDIR}/functions.sh
 
@@ -33,5 +33,5 @@ prepare_disks() {
 }
 
 copy_file() {
-    copy_file_encrypted "$@"
+    copy_file_encrypted_raid "$@"
 }

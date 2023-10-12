@@ -128,11 +128,11 @@ jobs:
         run: |
           set -eux
           if [ "${{ matrix.scenario }}" == "rhel8" ]; then
-            echo "installation_tree=http://download.eng.bos.redhat.com/rhel-8/nightly/RHEL-8/latest-RHEL-8.9.0/compose/BaseOS/x86_64/os" >> $GITHUB_OUTPUT
-            echo "modular_url=http://download.eng.bos.redhat.com/rhel-8/nightly/RHEL-8/latest-RHEL-8.9.0/compose/AppStream/x86_64/os" >> $GITHUB_OUTPUT
+            echo "installation_tree=http://download.eng.bos.redhat.com/rhel-8/nightly/RHEL-8/latest-RHEL-8.10.0/compose/BaseOS/x86_64/os" >> $GITHUB_OUTPUT
+            echo "modular_url=http://download.eng.bos.redhat.com/rhel-8/nightly/RHEL-8/latest-RHEL-8.10.0/compose/AppStream/x86_64/os" >> $GITHUB_OUTPUT
           elif [ "${{ matrix.scenario }}" == "rhel9" ]; then
-            echo "installation_tree=http://download.eng.bos.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9.3.0/compose/BaseOS/x86_64/os" >> $GITHUB_OUTPUT
-            echo "modular_url=http://download.eng.bos.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9.3.0/compose/AppStream/x86_64/os" >> $GITHUB_OUTPUT
+            echo "installation_tree=http://download.eng.bos.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9.4.0/compose/BaseOS/x86_64/os" >> $GITHUB_OUTPUT
+            echo "modular_url=http://download.eng.bos.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9.4.0/compose/AppStream/x86_64/os" >> $GITHUB_OUTPUT
           else
             echo "Installation tree location for ${{ matrix.scenario }} not configured"
             if [ -z "${{ steps.boot_iso_from_scenario.outputs.boot_iso }}" ]; then

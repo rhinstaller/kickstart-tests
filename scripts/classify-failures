@@ -128,6 +128,10 @@ ISSUES = [
         "[997] https://github.com/rhinstaller/kickstart-tests/issues/997",
         "CRIT.*gnome-kiosk exited with status 1",
     ),
+    (
+        "[869] https://github.com/rhinstaller/kickstart-tests/issues/869",
+        "CRIT.*Failed to call the 'Snapshot' method on the '/com/redhat/lvmdbus1/Lv/1' object: Timeout was reached"
+    ),
 ]
 
 CLOSED_ISSUES = [

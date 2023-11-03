@@ -132,6 +132,10 @@ ISSUES = [
         "[869] https://github.com/rhinstaller/kickstart-tests/issues/869",
         "CRIT.*Failed to call the 'Snapshot' method on the '/com/redhat/lvmdbus1/Lv/1' object: Timeout was reached"
     ),
+    (
+        "[1021] https://github.com/rhinstaller/kickstart-tests/issues/1021",
+        "Storage:AttributeError: 'SwapSpace' object has no attribute 'fstab'"
+    ),
 ]
 
 CLOSED_ISSUES = [

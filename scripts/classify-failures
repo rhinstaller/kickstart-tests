@@ -42,7 +42,7 @@ ISSUES = [
     ),
     (
         "[992] https://github.com/rhinstaller/kickstart-tests/issues/992 - or it can some more recent issue, the string is pretty generic.",
-        "Process Core Dump",
+        "Started Process Core Dump",
     ),
     (
         "[846] on rhel8 ([26]) https://github.com/rhinstaller/kickstart-tests/issues/846",

@@ -47,6 +47,7 @@ rhel8_skip_array=(
   gh830       # packages-weakdeps failing
   gh969       # raid-ddf failing
   gh1018      # bridge-no-bootopts-net failing
+  jiraRHEL-13151 # timezone-noncommon failing
 )
 
 rhel9_skip_array=(
@@ -60,6 +61,7 @@ rhel9_skip_array=(
   gh790       # repo-addrepo-hd-tree failing
   gh969       # raid-ddf failing
   gh970       # selinux-contexts failing
+  jiraRHEL-13150 # timezone-noncommon failing
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

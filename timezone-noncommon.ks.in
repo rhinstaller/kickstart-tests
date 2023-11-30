@@ -1,0 +1,35 @@
+#version=DEVEL
+#test name: timezone-noncommon
+# Test that timezones that are in pytz.all_timezones but not in
+# pytz.common_timezones can be used in kickstart
+# (jira#RHEL-13150, jira#RHEL-13151, rhbz#1452873)
+%ksappend repos/default.ks
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+clearpart --all --initlabel
+autopart
+
+keyboard us
+lang en
+timezone Japan
+rootpw testcase
+
+shutdown
+
+%packages
+%end
+
+%post
+
+link=$(readlink /etc/localtime)
+if [[ ${link#*zoneinfo/} != "Japan" ]]; then
+    echo "*** /etc/localtime does not point to the configured timezone" >> /root/RESULT
+fi
+
+# everything passes
+if [[ ! -e /root/RESULT ]]; then
+    echo SUCCESS > /root/RESULT
+fi
+%end

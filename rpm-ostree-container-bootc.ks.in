@@ -1,0 +1,44 @@
+#test name: rpm-ostree-container-bootc
+# for bootc/bootupd
+# depends on the referenced ostree container being bootable
+
+# Use the default settings.
+%ksappend common/common_no_payload.ks
+
+# Set up the RPM OSTree source.
+ostreecontainer --no-signature-verification --url=quay.io/centos-bootc/fedora-bootc:eln
+
+# Reboot the installed system.
+reboot
+
+# Validate on the first boot.
+%ksappend validation/success_on_first_boot.ks
+
+%post
+
+# Checks in %post
+# Check the url of the remote.
+url="$(ostree remote show-url default)"
+if [ "${url}" != "quay.io/centos-bootc/fedora-bootc:eln" ]; then
+    echo "Unexpected URL: ${url}" >> /root/RESULT
+fi
+
+# Checks after boot
+cat > /etc/kickstart-test.sh << 'EOF'
+
+# propagate any errors from %post validations
+if [ -e /root/RESULT ]; then
+    cat /root/RESULT
+fi
+
+# Check that bootupd information is present
+if [ ! -e /boot/bootupd-state.json ]; then
+    echo "/boot/bootupd-state.json not found on installed system after booting"
+fi
+
+bootupctl --help || echo "bootupctl command not available after booting"
+bootc --help || echo "bootc command not available after booting"
+
+EOF
+
+%end

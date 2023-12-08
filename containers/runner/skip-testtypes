@@ -62,6 +62,7 @@ rhel9_skip_array=(
   gh969       # raid-ddf failing
   gh970       # selinux-contexts failing
   jiraRHEL-13150 # timezone-noncommon failing
+  RHEL-4766   # network-bootopts-bond-bootif should be fixed in RHEL 9.4
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

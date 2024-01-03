@@ -136,6 +136,14 @@ ISSUES = [
         "[1035] https://github.com/rhinstaller/kickstart-tests/issues/1035",
         "CRIT.*UnavailableValueError: The kernel version list is not available.",
     ),
+    (
+        "[1039] https://github.com/rhinstaller/kickstart-tests/issues/1039",
+        "WARNING.*requires /usr/bin/readlink, but none of the providers can be installed",
+    ),
+    (
+        "[996] https://github.com/rhinstaller/kickstart-tests/issues/996",
+        "CRIT.*dasbus.error.DBusError: Process reported exit code 2: mdadm: /dev/vda3 is busy - skipping",
+    ),
 ]
 
 CLOSED_ISSUES = [

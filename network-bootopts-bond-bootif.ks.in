@@ -1,0 +1,50 @@
+#test name: network-bootopts-bond-bootif
+# Test bond configured via boot options with BOOTIF present.
+# The slave ifaces configuration files are correct slave files.
+# rhbz#2175664, RHEL-4766
+
+%ksappend repos/default.ks
+
+shutdown
+# network
+# no network configuration
+# storage & bootloader
+bootloader --timeout=1
+zerombr
+clearpart --all
+autopart
+# l10n
+keyboard us
+lang en
+timezone America/New_York
+# user confguration
+rootpw testcase
+
+%ksappend payload/default_packages.ks
+
+%post --nochroot
+
+@KSINCLUDE@ post-nochroot-lib-network.sh
+
+check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ bond0
+
+%end
+
+%post
+
+@KSINCLUDE@ post-lib-network.sh
+
+# config files are not named bond0_slave_1 as opposed to kickstart config
+check_device_config_value @KSTEST_NETDEV1@ ONBOOT yes connection autoconnect __NONE
+check_device_config_value @KSTEST_NETDEV1@ SLAVE yes connection slave-type bond
+check_device_config_value @KSTEST_NETDEV2@ ONBOOT yes connection autoconnect __NONE
+check_device_config_value @KSTEST_NETDEV2@ SLAVE yes connection slave-type bond
+check_device_connected bond0 yes
+check_bond_has_slave bond0 @KSTEST_NETDEV1@ yes
+check_bond_has_slave bond0 @KSTEST_NETDEV2@ yes
+
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+   echo SUCCESS > /root/RESULT
+fi
+%end

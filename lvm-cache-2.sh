@@ -17,10 +17,9 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-# blivet crashes with BlockDev.LVMError: https://bugzilla.redhat.com/show_bug.cgi?id=1886767
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="lvm storage knownfailure"
+TESTTYPE="lvm storage"
 
 . ${KSTESTDIR}/functions.sh
 

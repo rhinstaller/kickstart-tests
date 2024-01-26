@@ -7,11 +7,11 @@ zerombr
 clearpart --all --initlabel
 
 reqpart
-part pv.68 --asprimary --fstype="lvmpv" --ondisk=vda --size=7691
+part pv.68 --asprimary --fstype="lvmpv" --ondisk=vda --size=9000
 part /boot --asprimary --fstype="ext4" --ondisk=vda --size=500
 volgroup vg01 --pesize=4096 pv.68
 logvol /  --fstype="ext4" --size=5000 --encrypted --name=root_lv --vgname=vg01 --passphrase=OntarioIsAProvince --label=root
-logvol /var  --fstype="ext4" --size=1200 --name=var_lv --vgname=vg01
+logvol /var  --fstype="ext4" --size=2000 --name=var_lv --vgname=vg01
 logvol swap  --fstype="swap" --size=1024 --name=swap_lv --vgname=vg01
 logvol /home  --fstype="ext4" --grow --size=1 --name=home_lv --vgname=vg01
 

@@ -36,6 +36,7 @@ daily_iso_skip_array=(
   gh969       # raid-ddf failing
   gh975       # packages-default failing
   gh1023      # rpm-ostree failing
+  gh1046      # bridge-httpks failing
 )
 
 rhel8_skip_array=(

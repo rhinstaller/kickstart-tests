@@ -3,9 +3,9 @@
 %ksappend repos/default.ks
 network --bootproto=dhcp
 
-# test timezone in GUI mode
-# with --nontp
-timezone --utc --nontp Europe/Prague
+# test timezone in GUI mode with NTP disabled
+%ksappend timezone/ntp_disabled.ks
+graphical
 
 bootloader --timeout=1
 zerombr

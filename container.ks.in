@@ -19,7 +19,8 @@ bootloader --disabled
 # Disable the NTP service.
 keyboard us
 lang en_US.UTF-8
-timezone Etc/UTC --utc --nontp
+timezone Etc/UTC --utc
+timesource --ntp-disable
 
 # Create only / with the ext4 filesystem type.
 autopart --type=plain --fstype=ext4 --nohome --noboot --noswap

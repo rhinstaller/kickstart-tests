@@ -3,9 +3,9 @@
 %ksappend repos/default.ks
 network --bootproto=dhcp
 
-# test timezone in GUI mode
-# with --chrony
-timezone --utc --ntpservers=ntp.cesnet.cz Europe/Prague
+# test timezone in GUI mode without chrony
+%ksappend timezone/ntp_enabled.ks
+graphical
 
 bootloader --timeout=1
 zerombr

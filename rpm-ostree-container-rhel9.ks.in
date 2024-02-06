@@ -3,18 +3,9 @@
 #
 # Test that ostreecontainer ks command works on rhel9.
 # Tests only installation of the palyload.
-# Does not test that the installation is bootable, bootloader is disabled,
-# its installation should be fixed in a follow-up bootupd work.
+# Does not test that the installation is bootable.
 
-
-%ksappend common/common.ks
-%ksappend users/default.ks
-%ksappend network/default.ks
-%ksappend l10n/default.ks
-%ksappend storage/default.ks
-
-# Disable the boot loader.
-bootloader --disabled
+%ksappend common/common_no_payload.ks
 
 # Set up the RPM OSTree source.
 ostreecontainer --no-signature-verification --transport=registry --url=quay.io/centos-bootc/centos-bootc:stream9

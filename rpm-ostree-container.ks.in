@@ -1,7 +1,7 @@
-#test name: rpm-ostree-container-rhel9
+#test name: rpm-ostree-container
 # https://github.com/rhinstaller/anaconda/pull/5399
 #
-# Test that ostreecontainer ks command works on rhel9.
+# Test that ostreecontainer ks command works.
 # Tests only installation of the palyload.
 # Does not test that the installation is bootable.
 

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024  Red Hat, Inc.
+# Copyright (C) 2023  Red Hat, Inc.
 #
 # This copyrighted material is made available to anyone wishing to use,
 # modify, copy, or redistribute it subject to the terms and conditions of
@@ -19,9 +19,14 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="payload ostree skip-on-rhel-8 skip-on-fedora"
+TESTTYPE="payload ostree skip-on-rhel"
 
 . ${KSTESTDIR}/functions.sh
+
+kernel_args() {
+    # Enforce the Fedora-Silverblue configuration.
+    echo ${DEFAULT_BOOTOPTS} inst.profile=fedora-silverblue
+}
 
 validate() {
     # We are not able to copy files from the system.

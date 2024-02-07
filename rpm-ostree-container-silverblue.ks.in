@@ -1,5 +1,9 @@
-#test name: rpm-ostree-container
+#test name: rpm-ostree-container-silverblue
 # https://github.com/rhinstaller/anaconda/pull/4617
+
+# Test that ostreecontainer ks command works on Silverblue.
+# Tests only installation of the palyload.
+# Does not test that the installation is bootable.
 
 # Use the default settings.
 %ksappend common/common_no_payload.ks

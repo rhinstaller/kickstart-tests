@@ -69,6 +69,7 @@ rhel9_skip_array=(
 rhel8_daily_skip_array=(
   skip-on-rhel
   skip-on-rhel-8
+  gh1055      # some tests failing due to RHEL-25020
 )
 
 _join_args_by_comma(){

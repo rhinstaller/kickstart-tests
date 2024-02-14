@@ -47,7 +47,6 @@ rhel8_skip_array=(
   gh830       # packages-weakdeps failing
   gh969       # raid-ddf failing
   gh1018      # bridge-no-bootopts-net failing
-  jiraRHEL-13151 # timezone-noncommon failing
   gh1055      # 12 tests failing due to RHEL-25020
 )
 

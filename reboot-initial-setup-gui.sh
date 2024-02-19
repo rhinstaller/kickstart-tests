@@ -17,7 +17,7 @@
 #
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="reboot initial-setup smoke gh1055"
+TESTTYPE="reboot initial-setup smoke"
 
 . ${KSTESTDIR}/functions.sh
 

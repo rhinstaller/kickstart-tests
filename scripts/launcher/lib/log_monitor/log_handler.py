@@ -24,6 +24,9 @@ class VirtualLogRequestHandler(LogRequestHandler):
 
     # Specify the error lines you want to ignore.
     ignored_simple_tests = [
+        # shadow-utils CRIT messages, gh1061 BZ2265291
+        ":shadow: unknown configuration item ",
+
         # Non critical error blocking the installation.
         "CRIT systemd-coredump:",
 

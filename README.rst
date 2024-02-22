@@ -316,13 +316,15 @@ Chapter 7. Continuous Integration structure
 Regular test runs
 -----------------
 Every night, the `scenarios workflow`_ runs all tests on all our supported
-operating systems/repositories, like "Fedora Rawhide" or "RHEL 8". These are
-defined in the `containers/runner/scenario`_ script, which essentially calls
-the runner container's ``launch`` script documented above with the desired
-parameters.
+operating systems/repositories, like "Fedora Rawhide" or "RHEL 9". They
+essentially call the runner container's ``launch`` script documented above with
+the desired parameters.
+
+The actual set of tests run in a scenario is defined using `TESTTYPE` tags in
+`skip-testtypes file`_.
 
 The ``rawhide`` and ``daily-iso`` scenarios can in principle run on any host
-that has enough resources. The ``rhel8`` test however needs to run on RHEL
+that has enough resources. The ``rhelX`` tests however needs to run on RHEL
 internal infrastructure.
 
 Currently all scenarios run on `self-hosted GitHub action runners`_, which are
@@ -383,8 +385,8 @@ GitHub's infrastructure and can be run manually by a developer.
 .. _runner documentation: ./containers/runner/README.md
 .. _containers: ./containers
 .. _self-hosted GitHub action runners: https://docs.github.com/en/free-pro-team@latest/actions/hosting-your-own-runners
-.. _scenarios workflow: .github/workflows/scenarios.yml
-.. _containers/runner/scenario: ./containers/runner/scenario
+.. _scenarios workflow: .github/workflows/scenarios-permian.yml
+.. _skip-testtypes file: ./containers/runner/skip-testtypes
 .. _GitHub Daily run workflows page: https://github.com/rhinstaller/kickstart-tests/actions?query=workflow%3A%22Daily+run%22
 .. _Travis: https://travis-ci.com/
 .. _.travis.yml: ./.travis.yml

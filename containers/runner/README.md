@@ -41,6 +41,11 @@ The result logs get written into `./data/logs/`:
     tree -L 3 data/logs
     cat data/logs/kstest-*/anaconda/virt-install.log
 
+To run the tests on a RHEL 9 installer, download the RHEL 9 boot.iso into
+`.data/images` folder and run the test with `--platform rhel9` option. It will
+make sure the kickstart fragments for the respective platform (`rhel9`) from
+[fragments/platform](/fragments/platform) are used.
+
 # Configuration of the test
 
 For more control, you can run the container manually:

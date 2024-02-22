@@ -151,3 +151,11 @@ container after the run. To do that:
 1. Run `containers/runner/launch` with `-c` argument in addition to other arguments. This will
 open shell of the container where you can do what you want to before starting the test. 
 2. Start the test(s) execution with `/kickstart-tests/containers/runner/run-kstest`.
+
+## Debugging test failures
+
+If you want to keep virtual machine of a finished test alive for further investigation add a `halt` command to the end of the test kickstart.
+
+If you want to prevent killing virtual machine of a test on a failure detected in the log before the installation finishes (eg `Traceback` indicated in the log) it is possible to configure monitored messages in the [log monitor](/scripts/launcher/lib/log_monitor/log_handler.py) file.
+
+We are tracking the test suite issues and flakes in the repository issues. There is a [script](/scripts/classify-failures) to detect such known issues from test logs.

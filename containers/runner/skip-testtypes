@@ -33,7 +33,6 @@ daily_iso_skip_array=(
   gh890       # default-systemd-target-vnc-graphical-provides flaking too much
   gh871       # basic-ftp failing due to mirror
   rhbz1853668 # multipath device not constructed back after installation
-  gh969       # raid-ddf failing
   gh975       # packages-default failing
   gh1023      # rpm-ostree failing
 )
@@ -45,7 +44,6 @@ rhel8_skip_array=(
   gh595       # proxy-cmdline failing on all scenarios
   gh774       # autopart-luks-1 failing
   gh830       # packages-weakdeps failing
-  gh969       # raid-ddf failing
   gh1018      # bridge-no-bootopts-net failing
 )
 
@@ -58,7 +56,6 @@ rhel9_skip_array=(
   gh641       # packages-multilib failing on systemd conflict
   gh774       # autopart-luks-1 failing
   gh790       # repo-addrepo-hd-tree failing
-  gh969       # raid-ddf failing
   gh970       # selinux-contexts failing
 )
 

@@ -1,6 +1,8 @@
 #version=DEVEL
 #test name: dns
-# Test domain name resolution.
+# Test domain name resolution:
+# - origin of /etc/resolv.conf (rhbz#2018913, rhbz#1989472)
+# - dns resolution in %post scripts (RHEL-26651)
 
 # Use defaults.
 %ksappend repos/default.ks
@@ -17,6 +19,11 @@ if [ "@KSTEST_OS_NAME@" == "rhel" ]; then
 else
     # rhbz#2018913
     check_resolv_conf_is_by_resolved
+fi
+
+curl fedoraproject.org
+if [[ $? != 0 ]]; then
+    echo '*** curl fedoraproject.org failed' >> /root/RESULT
 fi
 
 # No error was written to /root/RESULT file, everything is OK

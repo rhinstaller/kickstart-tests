@@ -478,6 +478,10 @@ fi
 find /var/tmp/kstest-* -type d -print -exec chmod 755 {} + 2>/dev/null || \
     find /var/tmp/kstest-* -type d -print -exec chmod 755 {} +
 
+# Logs from remote runners are not gathered.
+echo "copying virt-install command log"
+cp ~/.cache/virt-manager/virt-install.log /var/tmp/kstest.virt-install.log
+
 # Return exit code from above.  This is structure for future improvement,
 # you can do a cleaning here.
 echo "test finished"

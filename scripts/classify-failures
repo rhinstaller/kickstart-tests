@@ -144,6 +144,10 @@ ISSUES = [
         "[996] https://github.com/rhinstaller/kickstart-tests/issues/996",
         "CRIT.*dasbus.error.DBusError: Process reported exit code 2: mdadm: /dev/vda3 is busy - skipping",
     ),
+    (
+        "[1060] https://github.com/rhinstaller/kickstart-tests/issues/1060",
+        "CRIT.*pyanaconda.ui.gui.xkl_wrapper.XklWrapperError: Failed to initialize layouts",
+    ),
 ]
 
 CLOSED_ISSUES = [

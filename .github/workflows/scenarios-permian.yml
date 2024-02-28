@@ -194,7 +194,7 @@ jobs:
           name: 'logs-${{ matrix.scenario }}'
           # skip the /anaconda subdirectories, too large
           path: |
-            kickstart-tests/data/logs/kstest.log
+            kickstart-tests/data/logs/kstest*.log
             kickstart-tests/data/logs/kstest.log.json
             kickstart-tests/data/logs/kstest-*/*.log
             kickstart-tests/data/logs/kstest-*/anaconda/lorax-packages.log

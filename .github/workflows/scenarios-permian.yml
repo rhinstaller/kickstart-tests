@@ -15,7 +15,7 @@ jobs:
     runs-on: [self-hosted, kstest]
     strategy:
       matrix:
-        scenario: [daily-iso, rhel8, rhel9]
+        scenario: [daily-iso, rhel8, rhel9, rhel10]
       fail-fast: false
 
     # these settings depend on the infrastructure; on upshift ocp-master-xxl they take about 4 hours
@@ -57,6 +57,8 @@ jobs:
             VARIABLE="SKIP_TESTTYPES_RHEL8"
           elif [ "${{ matrix.scenario }}" == "rhel9" ]; then
             VARIABLE="SKIP_TESTTYPES_RHEL9"
+          elif [ "${{ matrix.scenario }}" == "rhel10" ]; then
+            VARIABLE="SKIP_TESTTYPES_RHEL10"
           fi
           if [ -e ${TEMPLATE} ] && [ -n ${VARIABLE} ]; then
             scripts/generate-testplan.py \
@@ -100,6 +102,8 @@ jobs:
             echo "platform=rhel8" >> $GITHUB_OUTPUT
           elif [ "${{ matrix.scenario }}" == "rhel9" ]; then
             echo "platform=rhel9" >> $GITHUB_OUTPUT
+          elif [ "${{ matrix.scenario }}" == "rhel10" ]; then
+            echo "platform=rhel10" >> $GITHUB_OUTPUT
           else
             echo "Scenario ${{ matrix.scenario }} can't be mapped to platform"
             exit 1
@@ -133,6 +137,9 @@ jobs:
           elif [ "${{ matrix.scenario }}" == "rhel9" ]; then
             echo "installation_tree=http://download.eng.bos.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9.4.0/compose/BaseOS/x86_64/os" >> $GITHUB_OUTPUT
             echo "modular_url=http://download.eng.bos.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9.4.0/compose/AppStream/x86_64/os" >> $GITHUB_OUTPUT
+          elif [ "${{ matrix.scenario }}" == "rhel10" ]; then
+            echo "installation_tree=http://download.eng.bos.redhat.com/rhel-10/nightly/RHEL-10-Public-Beta/latest-RHEL-10.0/compose/BaseOS/x86_64/os" >> $GITHUB_OUTPUT
+            echo "modular_url=http://download.eng.bos.redhat.com/rhel-10/nightly/RHEL-10-Public-Beta/latest-RHEL-10.0/compose/AppStream/x86_64/os" >> $GITHUB_OUTPUT
           else
             echo "Installation tree location for ${{ matrix.scenario }} not configured"
             if [ -z "${{ steps.boot_iso_from_scenario.outputs.boot_iso }}" ]; then

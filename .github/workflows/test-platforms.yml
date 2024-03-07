@@ -1,0 +1,179 @@
+# Run kickstart tests in a PR triggered by a "/test-platforms" command from an organization member
+#
+# /test-platforms - tests all tests affected by the PR or smoke tests if there is no such
+# Or specify tests by combination of test names and/or options:
+# /test-platforms --testtype TESTTYPE --skip-testtypes TYPE[,TYPE..] TEST1 TEST2
+name: test-platforms
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  statuses: write
+
+jobs:
+  pr-info:
+    if: startsWith(github.event.comment.body, '/test-platforms')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query comment author repository permissions
+        uses: octokit/request-action@v2.x
+        id: user_permission
+        with:
+          route: GET /repos/${{ github.repository }}/collaborators/${{ github.event.sender.login }}/permission
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # restrict running of tests to users with admin or write permission for the repository
+      # see https://docs.github.com/en/free-pro-team@latest/rest/reference/repos#get-repository-permissions-for-a-user
+      # store output if user is allowed in allowed_user job output so it has to be checked in downstream job
+      - name: Check if user does have correct permissions
+        if: contains('admin write', fromJson(steps.user_permission.outputs.data).permission)
+        id: check_user_perm
+        run: |
+          echo "User '${{ github.event.sender.login }}' has permission '${{ fromJson(steps.user_permission.outputs.data).permission }}' allowed values: 'admin', 'write'"
+          echo "allowed_user=true" >> $GITHUB_OUTPUT
+
+      - name: Get information for pull request
+        uses: octokit/request-action@v2.x
+        id: pr_api
+        with:
+          route: GET /repos/${{ github.repository }}/pulls/${{ github.event.issue.number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Parse launch arguments
+        id: parse_launch_args
+        # Do not use comment body directly in the shell command to avoid possible code injection.
+        env:
+          BODY: ${{ github.event.comment.body }}
+        run: |
+          # extract first line and cut out the "/kickstart-tests" first word
+          LAUNCH_ARGS=$(echo "$BODY" | sed -n '1 s/^[^ ]* *//p' | sed 's/[[:space:]]*$//')
+          echo "launch arguments are: $LAUNCH_ARGS"
+          echo "launch_args=${LAUNCH_ARGS}" >> $GITHUB_OUTPUT
+
+          #      - name: Set KS test arguments
+          #        id: ks_test_args
+          #        run: |
+          #          set -eux
+          #          TARGET_BRANCH="${{ fromJson(steps.pr_api.outputs.data).base.ref }}"
+          #
+          #          if [ "$TARGET_BRANCH" == "master" ]; then
+          #            echo "skip_tests=skip-on-fedora" >> $GITHUB_OUTPUT
+          #            echo "platform=fedora_rawhide" >> $GITHUB_OUTPUT
+          #          elif echo "$TARGET_BRANCH" | grep -qE "fedora-[[:digit:]]+$"; then
+          #            echo "skip_tests=skip-on-fedora" >> $GITHUB_OUTPUT
+          #            echo "platform=fedora_rawhide" >> $GITHUB_OUTPUT
+          #          elif echo "$TARGET_BRANCH" | grep -qE "rhel-8(\.[[:digit:]]+)?$"; then
+          #            echo "skip_tests=skip-on-rhel,skip-on-rhel-8" >> $GITHUB_OUTPUT
+          #            echo "platform=rhel8" >> $GITHUB_OUTPUT
+          #          elif echo "$TARGET_BRANCH" | grep -qE "rhel-9(\.[[:digit:]]+)?$"; then
+          #            echo "skip_tests=skip-on-rhel,skip-on-rhel-9" >> $GITHUB_OUTPUT
+          #            echo "platform=rhel9" >> $GITHUB_OUTPUT
+          #          else
+          #            echo "Branch $TARGET_BRANCH is not supported by kickstart tests yet!"
+          #            exit 1
+          #          fi
+
+    outputs:
+      allowed_user: ${{ steps.check_user_perm.outputs.allowed_user }}
+      base_ref: ${{ fromJson(steps.pr_api.outputs.data).base.ref }}
+      sha: ${{ fromJson(steps.pr_api.outputs.data).head.sha }}
+      # TODO: generate test names
+      launch_args: ${{ steps.parse_launch_args.outputs.launch_args }}
+        #      skip_tests: ${{ steps.ks_test_args.outputs.skip_tests }}
+        #      platform: ${{ steps.ks_test_args.outputs.platform }}
+
+
+  platform:
+    needs: pr-info
+    if: needs.pr-info.outputs.allowed_user == 'true' && ! contains(github.event.comment.body, '--waive')
+    name: Run tests on the platform
+    runs-on: [self-hosted, kstest-test]
+    env:
+       TARGET_BRANCH: ${{ needs.pr-info.outputs.base_ref }}
+    strategy:
+      matrix:
+        #platform: [daily-iso, rawhide, rhel8, rhel9]
+        platform: [daily-iso]
+      fail-fast: false
+
+    steps:
+      # self-hosted runners don't do this automatically; also useful to keep stuff around for debugging
+      # need to run sudo as the launch script and the container create root/other user owned files
+      - name: Clean up previous run
+        run: |
+          sudo podman ps -q --all --filter='ancestor=kstest-runner' | xargs -tr sudo podman rm -f
+          sudo podman volume rm --all || true
+          sudo rm -rf * .git
+
+      - name: Clone repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.pr-info.outputs.sha }}
+          # TODO use just main directory?
+          path: kickstart-tests
+
+            #      - name: Rebase to current ${{ env.TARGET_BRANCH }}
+            #        working-directory: ./kickstart-tests
+            #        run: |
+            #          git fetch origin
+            #          git config user.name github-actions
+            #          git config user.email github-actions@github.com
+            #          git log --oneline -1 origin/${{ env.TARGET_BRANCH }}
+            #          git rebase origin/${{ env.TARGET_BRANCH }}
+            #
+
+
+      - name: Get changed tests
+        working-directory: ./kickstart-tests
+        id: get_changed_tests
+        run: |
+          git fetch origin
+          # TODO: share with scripts/run-travis.sh
+          CHANGED_TESTS=$(git diff --name-only origin/$TARGET_BRANCH ${{ needs.pr-info.outputs.sha }} -- *.ks.in $(find -maxdepth 1 -name '*.sh' -perm -u+x) | sed 's/\.ks\.in$//; s/\.sh$//' | sort -u | tr '\n' ' ')
+          echo "changed_tests=${CHANGED_TESTS}" >> $GITHUB_OUTPUT
+
+      - name: Get skipped tests for platform ${{ matrix.platform }}
+        id: get_platform_skiptest
+        working-directory: ./kickstart-tests
+        run: |
+          set -eux
+
+          if [ ${{ matrix.platform }} == "daily-iso" ]; then
+            echo "skip_tests=skip-on-fedora" >> $GITHUB_OUTPUT
+          elif [ ${{ matrix.platform }} == "rawhide" ]; then
+            echo "skip_tests=skip-on-fedora" >> $GITHUB_OUTPUT
+          elif [ ${{ matrix.platform }} == "rhel8" ]; then
+            echo "skip_tests=skip-on-rhel,skip-on-rhel-8" >> $GITHUB_OUTPUT
+          elif [ ${{ matrix.platform }} == "rhel9" ]; then
+            echo "skip_tests=skip-on-rhel,skip-on-rhel-9" >> $GITHUB_OUTPUT
+          else
+            echo "Platform is not supported by kickstart tests yet!"
+            exit 1
+          fi
+
+      - name: Generate query arguments for "${{ steps.get_changed_tests.outputs.changed_tests }}"
+        id: generate_query
+        working-directory: ./kickstart-tests
+        run: |
+          set -eux
+          source ./containers/runner/skip-testtypes
+          PERMIAN_QUERY=$(scripts/generate-permian-query.py \
+             --skip-testtypes $SKIP_TESTTYPES_ANACONDA_PR \
+             --skip-testtypes ${{ steps.get_platform_skiptest.outputs.skip_tests }} \
+             ${{ steps.get_changed_tests.outputs.changed_tests }} )
+          if [ $? == 0 ]; then
+            echo "query=$PERMIAN_QUERY" >> $GITHUB_OUTPUT
+          else
+            echo "Parsing of the request arguments failed"
+            exit 1
+          fi
+
+
+
+    # TODO: use supplied arguments (overriding)
+    # TODO: timeouts?
+    # TODO: implement progress from anaconda repo

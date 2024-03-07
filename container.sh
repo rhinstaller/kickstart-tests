@@ -21,4 +21,6 @@
 # shellcheck disable=SC2034
 TESTTYPE="bootloader packaging coverage skip-on-rhel"
 
+# modified
+
 . ${KSTESTDIR}/functions.sh

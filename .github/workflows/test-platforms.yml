@@ -129,7 +129,6 @@ jobs:
         id: get_changed_tests
         run: |
           git fetch origin
-          # TODO: share with scripts/run-travis.sh
           CHANGED_TESTS=$(git diff --name-only origin/$TARGET_BRANCH ${{ needs.pr-info.outputs.sha }} -- *.ks.in $(find -maxdepth 1 -name '*.sh' -perm -u+x) | sed 's/\.ks\.in$//; s/\.sh$//' | sort -u | tr '\n' ' ')
           echo "changed_tests=${CHANGED_TESTS}" >> $GITHUB_OUTPUT
 
@@ -196,113 +195,111 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
-          #      # Fetch boot.iso and configiure its local location
-          #      - name: Fetch boot.iso if available for platform ${{ matrix.platform }}
-          #        id: boot_iso_for_platform
-          #        run: |
-          #          set -eux
-          #          BOOT_ISO_PATH="${{ github.workspace }}/${{ matrix.platform }}.boot.iso"
-          #          BOOT_ISO_URL="file://$BOOT_ISO_PATH"
-          #          if [ "${{ matrix.platform }}" == "daily-iso" ]; then
-          #            ${{ github.workspace }}/kickstart-tests/containers/runner/fetch_daily_iso.sh $GITHUB_TOKEN $BOOT_ISO_PATH
-          #            echo "boot_iso=\"bootIso\":{\"x86_64\":\"${BOOT_ISO_URL}\"}," >> $GITHUB_OUTPUT
-          #          elif [ "${{ matrix.platform }}" == "rawhide" ]; then
-          #            curl -L https://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Server/x86_64/os/images/boot.iso --output $BOOT_ISO_PATH
-          #            echo "boot_iso=\"bootIso\":{\"x86_64\":\"${BOOT_ISO_URL}\"}," >> $GITHUB_OUTPUT
-          #          else
-          #            echo "Boot.iso for ${{ matrix.platform }} can't be fetched."
-          #            echo "boot_iso=" >> $GITHUB_OUTPUT
-          #          fi
-          #
-          #      # Configure location of installation repositories for the platform
-          #      # Also default boot.iso is defined by the value of urls.installation_tree
-          #      # of kstestParams event structure.
-          #      - name: Set installation_tree for the platform
-          #        id: set_installation_urls
-          #        run: |
-          #          set -eux
-          #          if [ "${{ matrix.platform }}" == "rhel8" ]; then
-          #            echo "installation_tree=http://download.eng.bos.redhat.com/rhel-8/nightly/RHEL-8/latest-RHEL-8.10.0/compose/BaseOS/x86_64/os" >> $GITHUB_OUTPUT
-          #            echo "modular_url=http://download.eng.bos.redhat.com/rhel-8/nightly/RHEL-8/latest-RHEL-8.10.0/compose/AppStream/x86_64/os" >> $GITHUB_OUTPUT
-          #          elif [ "${{ matrix.platform }}" == "rhel9" ]; then
-          #            echo "installation_tree=http://download.eng.bos.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9.4.0/compose/BaseOS/x86_64/os" >> $GITHUB_OUTPUT
-          #            echo "modular_url=http://download.eng.bos.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9.4.0/compose/AppStream/x86_64/os" >> $GITHUB_OUTPUT
-          #          else
-          #            echo "Installation tree location for ${{ matrix.platform }} not configured"
-          #            if [ -z "${{ steps.boot_iso_for_platform.outputs.boot_iso }}" ]; then
-          #              echo "No boot.iso source is defined"
-          #              exit 2
-          #            fi
-          #            echo "installation_tree=" >> $GITHUB_OUTPUT
-          #            echo "modular_url=" >> $GITHUB_OUTPUT
-          #          fi
-          #
-          #      - name: Create Permian settings file
-          #        working-directory: ./permian
-          #        run: |
-          #          cat <<EOF > settings.ini
-          #          [kickstart_test]
-          #          kstest_local_repo=${{ github.workspace }}/kickstart-tests
-          #          [library]
-          #          directPath=${{ github.workspace }}/kickstart-tests/testlib
-          #          EOF
-          #
-          #      - name: Run kickstart tests in container
-          #        working-directory: ./permian
-          #        run: |
-          #          sudo --preserve-env=TEST_JOBS \
-          #          PYTHONPATH=${PYTHONPATH:-}:${{ github.workspace }}/tplib \
-          #          ./run_subset --debug-log permian.log \
-          #            --settings settings.ini \
-          #            --override workflows.dry_run=True \
-          #            --testcase-query '${{ steps.generate_query.outputs.query }}' \
-          #            run_event '{
-          #              "type":"everything",
-          #              "everything_testplan":{
-          #                "configurations":[{"architecture":"x86_64"}],
-          #                "point_person":"rvykydal@redhat.com"
-          #              },
-          #              ${{ steps.boot_iso_from_platform.outputs.boot_iso }}
-          #              "kstestParams":{
-          #                "platform":"${{ steps.platform_from_scenario.outputs.platform }}",
-          #                "urls":{
-          #                  "x86_64":{
-          #                    "installation_tree":"${{ steps.set_installation_urls.outputs.installation_tree }}",
-          #                    "modular_url":"${{ steps.set_installation_urls.outputs.modular_url }}"
-          #                  }
-          #                }
-          #              }
-          #            }'
-          #
-          #          # Permian hides the exit code of launcher, so error out this step manually based on logs
-          #          rc=$( awk '/Runner return code: /{ print $4 }' permian.log)
-          #          if [ -n "$rc" ]; then
-          #            exit $rc
-          #          else
-          #            exit 111
-          #          fi
-          #
-          #      - name: Collect anaconda logs
-          #        if: always()
-          #        uses: actions/upload-artifact@v3
-          #        with:
-          #          name: 'logs-${{ matrix.scenario }}'
-          #          # skip the /anaconda subdirectories, too large
-          #          path: |
-          #            kickstart-tests/data/logs/kstest*.log
-          #            kickstart-tests/data/logs/kstest.log.json
-          #            kickstart-tests/data/logs/kstest-*/*.log
-          #            kickstart-tests/data/logs/kstest-*/anaconda/lorax-packages.log
-          #
-          #      - name: Collect Permian logs
-          #        if: always()
-          #        uses: actions/upload-artifact@v3
-          #        with:
-          #          name: 'logs-permian-${{ matrix.scenario }}'
-          #          path: |
-          #            permian/permian.log
-          #
-          #    # TODO: timeouts?
+      # Fetch boot.iso and configiure its local location
+      - name: Fetch boot.iso if available for platform ${{ matrix.platform }}
+        id: boot_iso_for_platform
+        run: |
+          set -eux
+          BOOT_ISO_PATH="${{ github.workspace }}/${{ matrix.platform }}.boot.iso"
+          BOOT_ISO_URL="file://$BOOT_ISO_PATH"
+          if [ "${{ matrix.platform }}" == "daily-iso" ]; then
+            ${{ github.workspace }}/kickstart-tests/containers/runner/fetch_daily_iso.sh $GITHUB_TOKEN $BOOT_ISO_PATH
+            echo "boot_iso=\"bootIso\":{\"x86_64\":\"${BOOT_ISO_URL}\"}," >> $GITHUB_OUTPUT
+          elif [ "${{ matrix.platform }}" == "rawhide" ]; then
+            curl -L https://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Server/x86_64/os/images/boot.iso --output $BOOT_ISO_PATH
+            echo "boot_iso=\"bootIso\":{\"x86_64\":\"${BOOT_ISO_URL}\"}," >> $GITHUB_OUTPUT
+          else
+            echo "Boot.iso for ${{ matrix.platform }} can't be fetched."
+            echo "boot_iso=" >> $GITHUB_OUTPUT
+          fi
+
+      # Configure location of installation repositories for the platform
+      # Also default boot.iso is defined by the value of urls.installation_tree
+      # of kstestParams event structure.
+      - name: Set installation tree for the platform
+        id: set_installation_urls
+        run: |
+          set -eux
+          if [ "${{ matrix.platform }}" == "rhel8" ]; then
+            echo "installation_tree=http://download.eng.bos.redhat.com/rhel-8/nightly/RHEL-8/latest-RHEL-8.10.0/compose/BaseOS/x86_64/os" >> $GITHUB_OUTPUT
+            echo "modular_url=http://download.eng.bos.redhat.com/rhel-8/nightly/RHEL-8/latest-RHEL-8.10.0/compose/AppStream/x86_64/os" >> $GITHUB_OUTPUT
+          elif [ "${{ matrix.platform }}" == "rhel9" ]; then
+            echo "installation_tree=http://download.eng.bos.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9.4.0/compose/BaseOS/x86_64/os" >> $GITHUB_OUTPUT
+            echo "modular_url=http://download.eng.bos.redhat.com/rhel-9/nightly/RHEL-9/latest-RHEL-9.4.0/compose/AppStream/x86_64/os" >> $GITHUB_OUTPUT
+          else
+            echo "Installation tree location for ${{ matrix.platform }} not configured"
+            if [ -z "${{ steps.boot_iso_for_platform.outputs.boot_iso }}" ]; then
+              echo "No boot.iso source is defined"
+              exit 2
+            fi
+            echo "installation_tree=" >> $GITHUB_OUTPUT
+            echo "modular_url=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Permian settings file
+        working-directory: ./permian
+        run: |
+          cat <<EOF > settings.ini
+          [kickstart_test]
+          kstest_local_repo=${{ github.workspace }}/kickstart-tests
+          [library]
+          directPath=${{ github.workspace }}/kickstart-tests/testlib
+          EOF
+
+      - name: Run kickstart tests in container
+        working-directory: ./permian
+        run: |
+          sudo --preserve-env=TEST_JOBS \
+          PYTHONPATH=${PYTHONPATH:-}:${{ github.workspace }}/tplib \
+          ./run_subset --debug-log permian.log \
+            --settings settings.ini \
+            --override workflows.dry_run=True \
+            --testcase-query '${{ steps.generate_query.outputs.query }}' \
+            run_event '{
+              "type":"everything",
+              "everything_testplan":{
+                "configurations":[{"architecture":"x86_64"}],
+                "point_person":"rvykydal@redhat.com"
+              },
+              ${{ steps.boot_iso_from_platform.outputs.boot_iso }}
+              "kstestParams":{
+                "platform":"${{ matrix.platform }}",
+                "urls":{
+                  "x86_64":{
+                    "installation_tree":"${{ steps.set_installation_urls.outputs.installation_tree }}",
+                    "modular_url":"${{ steps.set_installation_urls.outputs.modular_url }}"
+                  }
+                }
+              }
+            }'
+
+          # Permian hides the exit code of launcher, so error out this step manually based on logs
+          rc=$( awk '/Runner return code: /{ print $4 }' permian.log)
+          if [ -n "$rc" ]; then
+            exit $rc
+          else
+            exit 111
+          fi
+
+      - name: Collect anaconda logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'logs-${{ matrix.platform }}'
+          # skip the /anaconda subdirectories, too large
+          path: |
+            kickstart-tests/data/logs/kstest*.log
+            kickstart-tests/data/logs/kstest.log.json
+            kickstart-tests/data/logs/kstest-*/*.log
+            kickstart-tests/data/logs/kstest-*/anaconda/lorax-packages.log
+
+      - name: Collect Permian logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: 'logs-permian-${{ matrix.platform }}'
+          path: |
+            permian/permian.log
 
   result:
     if: ${{ always() }}

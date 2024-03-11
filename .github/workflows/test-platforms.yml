@@ -63,7 +63,7 @@ jobs:
 
   platform:
     needs: pr-info
-    if: needs.pr-info.outputs.allowed_user == 'true' && ! contains(github.event.comment.body, '--waive')
+    if: needs.pr-info.outputs.allowed_user == 'true'
     name: Run tests on the platform
     runs-on: [self-hosted, kstest-test]
     env:
@@ -73,25 +73,10 @@ jobs:
       GITHUB_TOKEN: /home/github/github-token
     strategy:
       matrix:
-        #platform: [daily-iso, rawhide, rhel8, rhel9]
-        #platform: [daily-iso]
-        platform: [rawhide]
+        platform: [daily-iso, rawhide, rhel8, rhel9]
       fail-fast: false
 
     steps:
-      # we post statuses manually as this does not run from a pull_request event
-      # https://developer.github.com/v3/repos/statuses/#create-a-status
-      - name: Create in-progress status
-        uses: octokit/request-action@v2.x
-        with:
-          route: 'POST /repos/${{ github.repository }}/statuses/${{ needs.pr-info.outputs.sha }}'
-          context: '${{ env.STATUS_NAME }} ${{ needs.pr-info.outputs.launch_args }}'
-          description: 'running tests'
-          state: pending
-          target_url: 'https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       # self-hosted runners don't do this automatically; also useful to keep stuff around for debugging
       # need to run sudo as the launch script and the container create root/other user owned files
       - name: Clean up previous run
@@ -197,13 +182,14 @@ jobs:
             exit 1
           fi
 
-          # TODO move before run
-      - name: Post status test selection
+      # we post statuses manually as this does not run from a pull_request event
+      # https://developer.github.com/v3/repos/statuses/#create-a-status
+      - name: Create in-progress status
         uses: octokit/request-action@v2.x
         with:
           route: 'POST /repos/${{ github.repository }}/statuses/${{ needs.pr-info.outputs.sha }}'
           context: '${{ env.STATUS_NAME }} ${{ needs.pr-info.outputs.launch_args }}'
-          description: 'running tests with args: ${{ steps.generate_query.outputs.launch_args }}'
+          description: 'running tests with args ${{ steps.generate_query.outputs.launch_args }}'
           state: pending
           target_url: 'https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
         env:
@@ -317,5 +303,22 @@ jobs:
           #            permian/permian.log
           #
           #    # TODO: timeouts?
-          #    # TODO: implement waive
-          #    # TODO: implement progress from anaconda repo
+
+  result:
+    if: ${{ always() }}
+    name: Set result status
+    runs-on: ubuntu-latest
+    env:
+      STATUS_NAME: test-platforms
+    needs: [platform, pr-info]
+    steps:
+      - name: Show overall status
+        uses: octokit/request-action@v2.x
+        with:
+          route: 'POST /repos/${{ github.repository }}/statuses/${{ needs.pr-info.outputs.sha }}'
+          context: '${{ env.STATUS_NAME }} ${{ needs.pr-info.outputs.launch_args }}'
+          description: 'finished'
+          state: ${{ needs.platform.result }}
+          target_url: 'https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

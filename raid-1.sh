@@ -21,6 +21,8 @@
 # shellcheck disable=SC2034
 TESTTYPE="raid storage coverage gh777"
 
+# modification to trigger CI on /test-platforms comment
+
 . ${KSTESTDIR}/functions.sh
 
 prepare_disks() {

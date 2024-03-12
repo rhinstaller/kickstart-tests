@@ -3,6 +3,9 @@
 # /test-platforms - tests all tests affected by the PR or smoke tests if there is no such.
 # Or specify tests by combination of test names and/or options:
 # /test-platforms --testtype TESTTYPE --skip-testtypes TYPE[,TYPE..] TEST1 TEST2
+#
+# For dry run use:
+# /test-platforms-dryrun
 name: test-platforms
 on:
   issue_comment:
@@ -53,12 +56,18 @@ jobs:
           LAUNCH_ARGS=$(echo "$BODY" | sed -n '1 s/^[^ ]* *//p' | sed 's/[[:space:]]*$//')
           echo "launch arguments are: $LAUNCH_ARGS"
           echo "launch_args=${LAUNCH_ARGS}" >> $GITHUB_OUTPUT
+          # check for dry run mode
+          DRY_RUN=False
+          echo "$BODY" | grep -q "/test-platforms-dryrun" && DRY_RUN=True
+          echo "Dry run: ${DRY_RUN}"
+          echo "dry_run=${DRY_RUN}" >> $GITHUB_OUTPUT
 
     outputs:
       allowed_user: ${{ steps.check_user_perm.outputs.allowed_user }}
       base_ref: ${{ fromJson(steps.pr_api.outputs.data).base.ref }}
       sha: ${{ fromJson(steps.pr_api.outputs.data).head.sha }}
       launch_args: ${{ steps.parse_launch_args.outputs.launch_args }}
+      dry_run: ${{ steps.parse_launch_args.outputs.dry_run }}
 
 
   platform:
@@ -267,7 +276,7 @@ jobs:
           PYTHONPATH=${PYTHONPATH:-}:${{ github.workspace }}/tplib \
           ./run_subset --debug-log permian.log \
             --settings settings.ini \
-            --override workflows.dry_run=True \
+            --override workflows.dry_run=${{ needs.pr-info.outputs.dry_run }} \
             --testcase-query '${{ steps.generate_query.outputs.query }}' \
             run_event '{
               "type":"everything",

@@ -133,7 +133,7 @@ jobs:
           echo "changed_tests=${CHANGED_TESTS}" >> $GITHUB_OUTPUT
 
       - name: Get skipped tests for platform ${{ matrix.platform }}
-        id: get_platform_skiptest
+        id: get_platform_specs
         working-directory: ./kickstart-tests
         run: |
           set -eux
@@ -142,15 +142,19 @@ jobs:
           if [ ${{ matrix.platform }} == "daily-iso" ]; then
             echo "skip_tests=skip-on-fedora" >> $GITHUB_OUTPUT
             echo "disabled_testtypes=$SKIP_TESTTYPES_DAILY_ISO" >> $GITHUB_OUTPUT
+            echo "platform=rawhide" >> $GITHUB_OUTPUT
           elif [ ${{ matrix.platform }} == "rawhide" ]; then
             echo "skip_tests=skip-on-fedora" >> $GITHUB_OUTPUT
             echo "disabled_testtypes=$SKIP_TESTTYPES_RAWHIDE" >> $GITHUB_OUTPUT
+            echo "platform=rawhide" >> $GITHUB_OUTPUT
           elif [ ${{ matrix.platform }} == "rhel8" ]; then
             echo "skip_tests=skip-on-rhel,skip-on-rhel-8" >> $GITHUB_OUTPUT
             echo "disabled_testtypes=$SKIP_TESTTYPES_RHEL8" >> $GITHUB_OUTPUT
+            echo "platform=rhel8" >> $GITHUB_OUTPUT
           elif [ ${{ matrix.platform }} == "rhel9" ]; then
             echo "skip_tests=skip-on-rhel,skip-on-rhel-9" >> $GITHUB_OUTPUT
             echo "disabled_testtypes=$SKIP_TESTTYPES_RHEL9" >> $GITHUB_OUTPUT
+            echo "platform=rhel9" >> $GITHUB_OUTPUT
           else
             echo "Platform is not supported by kickstart tests yet!"
             exit 1
@@ -163,13 +167,13 @@ jobs:
           set -eux
 
           CHANGED_TESTS="${{steps.get_changed_tests.outputs.changed_tests }}"
-          DISABLED_TESTTYPES="${{ steps.get_platform_skiptest.outputs.disabled_testtypes }}"
+          DISABLED_TESTTYPES="${{ steps.get_platform_specs.outputs.disabled_testtypes }}"
           LAUNCH_ARGS="${{ needs.pr-info.outputs.launch_args }}"
 
           if [ -n "${LAUNCH_ARGS}" ]; then
             echo "description=Running tests required by the PR comment explicitly." >> $GITHUB_OUTPUT
           elif [ -n "${CHANGED_TESTS}" ]; then
-            echo "description=Running tests affected by changes." >> $GITHUB_OUTPUT
+            echo "description=Running tests affected by changes (excluding disabled)." >> $GITHUB_OUTPUT
             LAUNCH_ARGS="${CHANGED_TESTS}"
             if [ -n "${DISABLED_TESTTYPES}" ]; then
               LAUNCH_ARGS="--skip-testtypes ${DISABLED_TESTTYPES} ${LAUNCH_ARGS}"
@@ -182,7 +186,7 @@ jobs:
           source ./containers/runner/skip-testtypes
           PERMIAN_QUERY=$(scripts/generate-permian-query.py \
              --skip-testtypes $SKIP_TESTTYPES_ANACONDA_PR \
-             --skip-testtypes ${{ steps.get_platform_skiptest.outputs.skip_tests }} \
+             --skip-testtypes ${{ steps.get_platform_specs.outputs.skip_tests }} \
              ${LAUNCH_ARGS} )
           if [ $? == 0 ]; then
             echo "launch_args=$LAUNCH_ARGS" >> $GITHUB_OUTPUT
@@ -204,7 +208,6 @@ jobs:
           target_url: 'https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 
       # Fetch boot.iso and configiure its local location
       - name: Fetch boot.iso if available for platform ${{ matrix.platform }}
@@ -272,9 +275,9 @@ jobs:
                 "configurations":[{"architecture":"x86_64"}],
                 "point_person":"rvykydal@redhat.com"
               },
-              ${{ steps.boot_iso_from_platform.outputs.boot_iso }}
+              ${{ steps.boot_iso_for_platform.outputs.boot_iso }}
               "kstestParams":{
-                "platform":"${{ matrix.platform }}",
+                "platform":"${{ steps.get_platform_specs.outputs.platform }}",
                 "urls":{
                   "x86_64":{
                     "installation_tree":"${{ steps.set_installation_urls.outputs.installation_tree }}",
@@ -289,7 +292,7 @@ jobs:
           if [ -n "$rc" ]; then
             exit $rc
           else
-            exit 111
+            grep -q "All execution and reporting is done" permian.log || exit 111
           fi
 
       - name: Collect anaconda logs

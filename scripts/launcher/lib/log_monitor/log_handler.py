@@ -36,6 +36,9 @@ class VirtualLogRequestHandler(LogRequestHandler):
         # Team networking is deprecated
         "CRIT kernel:Warning: Deprecated Driver is detected: team ",
 
+        # qla4xxx driver is deprecated (gh#1077)
+        "CRIT kernel:Warning: Deprecated Driver is detected: qla4xxx ",
+
         # Ignore a call trace during debugging.
         # Ignoring permanently for gh768.
         # https://github.com/rhinstaller/kickstart-tests/issues/768

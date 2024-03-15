@@ -10,7 +10,21 @@ common_skip_array=(
 
 rawhide_skip_array=(
   skip-on-fedora
+  gh576       # clearpart-4 test is flaky on all scenarios
+  gh595       # proxy-cmdline failing on all scenarios
+  gh640       # authselect-not-set failing
+  gh641       # packages-multilib failing on systemd conflict
+  gh680       # proxy-kickstart and proxy-auth failing
+  gh740       # fedora-live-image-build fails on comps changes
+  gh769       # nodejs:16 and swig:4 missing in module-X tests
+  gh774       # autopart-luks-1 failing
+  gh777       # raid-1 failing
+  gh910       # stage2-from-ks test needs to be fixed for daily-iso
+  gh890       # default-systemd-target-vnc-graphical-provides flaking too much
+  gh871       # basic-ftp failing due to mirror
   rhbz1853668 # multipath device not constructed back after installation
+  gh975       # packages-default failing
+  gh1023      # rpm-ostree failing
 )
 
 rawhide_text_skip_array=(

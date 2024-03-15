@@ -368,6 +368,10 @@ PR runs do *not* auto-retry test failures. This avoids introducing unstable
 tests, and PRs usually just run a few tests so that flakes are much less likely
 to ruin the result.
 
+To test a PR on all supported platforms (including rhel) there is a
+`test-platforms`_ workflow running the tests on a comment in a PR.
+Running it requires admin repository permissions.
+
 Service jobs
 ------------
 * The `container-autoupdate`_ workflow refreshes the runner container
@@ -391,5 +395,6 @@ GitHub's infrastructure and can be run manually by a developer.
 .. _Travis: https://travis-ci.com/
 .. _.travis.yml: ./.travis.yml
 .. _container-autoupdate: ./.github/workflows/container-autoupdate.yml
+.. _test-platforms: ./.github/workflows/test-platforms.yml
 .. _quay.io/rhinstaller/kstest-runner: https://quay.io/repository/rhinstaller/kstest-runner
 .. _daily-boot-iso: ./.github/workflows/daily-boot-iso.yml

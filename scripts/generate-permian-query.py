@@ -29,6 +29,9 @@ if __name__ == "__main__":
             + " or ".join(['tc.name == "{}"'.format(test) for test in args.tests])
             + ")"
         ]
+        if args.skip_testtypes:
+            skiptypes = ','.join(itertools.chain(*args.skip_testtypes)).split(',')
+            conditions.extend(['"{}" not in tc.tags'.format(skiptype) for skiptype in skiptypes])
     else:
         if args.testtype:
             conditions.extend(['"{}" in tc.tags'.format(args.testtype), '"knownfailure" not in tc.tags'])

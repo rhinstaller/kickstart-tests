@@ -82,7 +82,7 @@ jobs:
       GITHUB_TOKEN: /home/github/github-token
     strategy:
       matrix:
-        platform: [daily-iso, rawhide, rhel8, rhel9]
+        platform: [daily-iso, rawhide, rhel8, rhel9, rhel10]
       fail-fast: false
 
     steps:
@@ -160,6 +160,10 @@ jobs:
             echo "skip_tests=skip-on-rhel,skip-on-rhel-9" >> $GITHUB_OUTPUT
             echo "disabled_testtypes=$SKIP_TESTTYPES_RHEL9" >> $GITHUB_OUTPUT
             echo "platform=rhel9" >> $GITHUB_OUTPUT
+          elif [ ${{ matrix.platform }} == "rhel10" ]; then
+            echo "skip_tests=skip-on-rhel,skip-on-rhel-10" >> $GITHUB_OUTPUT
+            echo "disabled_testtypes=$SKIP_TESTTYPES_RHEL10" >> $GITHUB_OUTPUT
+            echo "platform=rhel10" >> $GITHUB_OUTPUT
           else
             echo "Platform is not supported by kickstart tests yet!"
             exit 1
@@ -241,7 +245,8 @@ jobs:
         run: |
           set -eux
           if [ "${{ matrix.platform }}" == "rhel8" ] || \
-             [ "${{ matrix.platform }}" == "rhel9" ]; then
+             [ "${{ matrix.platform }}" == "rhel9" ] || \
+             [ "${{ matrix.platform }}" == "rhel10" ]; then
             source ./scripts/defaults-${{ matrix.platform }}.sh
             echo "installation_tree=${KSTEST_URL}" >> $GITHUB_OUTPUT
             echo "modular_url=${KSTEST_MODULAR_URL}" >> $GITHUB_OUTPUT

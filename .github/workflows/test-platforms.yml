@@ -74,7 +74,7 @@ jobs:
     needs: pr-info
     if: needs.pr-info.outputs.allowed_user == 'true'
     name: Run tests on the platform
-    runs-on: [self-hosted, kstest]
+    runs-on: [self-hosted, kstest-test]
     env:
       STATUS_NAME: test-platforms
       TARGET_BRANCH: ${{ needs.pr-info.outputs.base_ref }}
@@ -97,7 +97,7 @@ jobs:
       - name: Check out kickstart-tests
         uses: actions/checkout@v4
         with:
-          repository: rhinstaller/kickstart-tests
+          repository: rvykydal/kickstart-tests
           ref: ${{ needs.pr-info.outputs.sha }}
           fetch-depth: 0
           path: kickstart-tests

@@ -326,12 +326,12 @@ jobs:
             permian/permian.log
 
   result:
-    if: ${{ always() }}
+    needs: [platform, pr-info]
+    if: needs.pr-info.outputs.allowed_user == 'true'
     name: Set result status
     runs-on: ubuntu-latest
     env:
       STATUS_NAME: test-platforms
-    needs: [platform, pr-info]
     steps:
       - name: Show overall status
         uses: octokit/request-action@v2.x

@@ -14,8 +14,11 @@ repo --name=test05 --baseurl=EMPTY_REPO_URL --includepkgs=p1,p2 --excludepkgs=p3
 
 %post
 
+@KSINCLUDE@ scripts-lib.sh
+
 # Define patterns for repo options.
-if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
+if [ $(is_rhel8 @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@) == "yes" ] || \
+   [ $(is_rhel9 @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@) == "yes" ]; then
     cost='^cost=25$'
     sslverify='^sslverify=0$'
     includepkgs='^includepkgs=p1,p2$'

@@ -118,10 +118,12 @@ class VirtualInstall(object):
             args.append("--noreboot")
 
 
+        args.append("--osinfo")
         os_info = os.environ.get('KSTEST_OSINFO_NAME')
         if os_info:
-            args.append("--osinfo")
             args.append("require=off,detect=on,name={0}".format(os_info))
+        else:
+            args.append("require=off,detect=on")
 
         args.append("--graphics")
 

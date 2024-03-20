@@ -242,6 +242,11 @@ The following environment variables are currently supported:
   enables Anaconda's text mode (instead of the default GUI). Multiple values
   separated by semicolon can be passed.
 
+- KSTEST_OSINFO_NAME - This variable is used as the default to be used in
+  case of failed virt-install os detection (--osinfo name=).  It may by useful
+  to specify for a new platform (os release) that is not detectable yet, for
+  example to make sure the expected network device naming scheme is used.
+
 Chapter 5. Sharing common code in kickstart (.ks.in) files
 ==========================================================
 

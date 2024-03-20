@@ -117,6 +117,12 @@ class VirtualInstall(object):
         if not self._boot and "--wait" not in self._runner_args:
             args.append("--noreboot")
 
+
+        os_info = os.environ.get('KSTEST_OSINFO_NAME')
+        if os_info:
+            args.append("--osinfo")
+            args.append("require=off,detect=on,name={0}".format(os_info))
+
         args.append("--graphics")
 
         if self._vnc:

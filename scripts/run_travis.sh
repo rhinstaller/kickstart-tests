@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -eu
 
 # rebase on current upstream master, so that we run current tests
@@ -8,18 +8,8 @@ git rebase upstream/master
 
 # list of tests that are changed by the current PR; ignore non-executable *.sh as these are helpers, not tests
 CHANGED_TESTS=$(git diff --name-only upstream/master..HEAD -- *.ks.in $(find -maxdepth 1 -name '*.sh' -perm -u+x) | sed 's/\.ks\.in$//; s/\.sh$//' | sort -u)
-# weed out known failures
-TESTS=""
-for t in $CHANGED_TESTS; do
-    if grep -q 'TESTTYPE.*knownfailure' ${t}.sh; then
-        echo "Not running $t as it is a known failure"
-    elif grep -q 'TESTTYPE.*manual' ${t}.sh; then
-        echo "Not running $t as it requires manual preparation"
-    else
-        TESTS="$TESTS
-$t"
-    fi
-done
+
+TESTS=$CHANGED_TESTS
 
 # if the PR changes anything in the test runner, or does not touch any tests, pick a few representative tests
 # FIXME: Once the runner container can run groups properly, replace with a TESTTYPE="travis" group
@@ -51,4 +41,5 @@ sudo -n containers/squid.sh start
 while true; do echo '.'; sleep 60; done &
 trap "kill $!" EXIT INT QUIT PIPE
 
-containers/runner/launch $TESTS
+source containers/runner/skip-testtypes
+containers/runner/launch $TESTS --skip-testtypes $SKIP_TESTTYPES_RAWHIDE

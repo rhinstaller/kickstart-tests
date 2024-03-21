@@ -244,9 +244,12 @@ if [[ $# != 0 ]]; then
     # Allow people to leave off the .sh.
     for t in $*; do
         if [[ "${t}" == *.sh ]]; then
-            tests+="${t} "
+            test="${t}"
         else
-            tests+="${t}.sh "
+            test="${t}.sh"
+        fi
+        if ! should_skip_test ${test}; then
+            tests+="${test} "
         fi
     done
 elif [[ "${ghprbActualCommit}" != "" ]]; then

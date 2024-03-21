@@ -26,6 +26,6 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="network"
+TESTTYPE="network skip-on-rhel-10"
 
 . ${KSTESTDIR}/team-pre.sh

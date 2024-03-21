@@ -78,7 +78,7 @@ rhel10_skip_array=(
   skip-on-rhel
   skip-on-rhel-10
   gh640       # authselect-not-set failing
-  gh790       # repo-addrepo-hd-tree failing
+  gh804       # repo-addrepo-hd-tree failing
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

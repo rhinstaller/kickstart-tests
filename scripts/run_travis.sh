@@ -42,4 +42,14 @@ while true; do echo '.'; sleep 60; done &
 trap "kill $!" EXIT INT QUIT PIPE
 
 source containers/runner/skip-testtypes
+set +e
 containers/runner/launch $TESTS --skip-testtypes $SKIP_TESTTYPES_RAWHIDE
+RC=$?
+set -e
+
+# No tests to be executed is not a failure.
+if [ ${RC} = 77 ]; then
+    exit 0
+else
+    exit ${RC}
+fi

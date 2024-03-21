@@ -84,20 +84,22 @@ popd
 # Create json log
 ${KSTESTS_DIR}/scripts/log2json --scenario $SCENARIO --output $TEST_LOG.json $TEST_LOG
 
-# Copy logs to a volume
-# Fixup permissions
-chmod -R a+rw /var/tmp/kstest-*
-# Clean up (artifacts from broken test)
-find /var/tmp/kstest-* -name "*.iso" -delete
-find /var/tmp/kstest-* -name "*.img" -delete
-cp $TEST_LOG ${LOGS_DIR}
-cp $TEST_LOG.json ${LOGS_DIR}
-cp /var/tmp/kstest-list ${LOGS_DIR}
-cp /var/tmp/kstest.virt-install.log ${LOGS_DIR}
-# Move to target logs directory; this sometimes fails on nested directory permission/ownership
-cp -pr /var/tmp/kstest-* ${LOGS_DIR} || true
+# If some tests were run copy logs to a volume
+if [ ${RC} != 77 ] && [ ${RC} != 78 ] ; then
+    # Fixup permissions
+    chmod -R a+rw /var/tmp/kstest-*
+    # Clean up (artifacts from broken test)
+    find /var/tmp/kstest-* -name "*.iso" -delete
+    find /var/tmp/kstest-* -name "*.img" -delete
+    cp $TEST_LOG ${LOGS_DIR}
+    cp $TEST_LOG.json ${LOGS_DIR}
+    cp /var/tmp/kstest-list ${LOGS_DIR}
+    cp /var/tmp/kstest.virt-install.log ${LOGS_DIR}
+    # Move to target logs directory; this sometimes fails on nested directory permission/ownership
+    cp -pr /var/tmp/kstest-* ${LOGS_DIR} || true
 
-# Show summary report
-${KSTESTS_DIR}/scripts/run_report.sh < $TEST_LOG
+    # Show summary report
+    ${KSTESTS_DIR}/scripts/run_report.sh < $TEST_LOG
+fi
 
 exit $RC

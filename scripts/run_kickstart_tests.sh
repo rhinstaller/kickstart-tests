@@ -296,7 +296,7 @@ echo "Running tests: ${tests}"
 
 if [[ -z "${sed_args}" ]]; then
     echo "No substitutions provided, tests will fail; skipping."
-    exit 77
+    exit 78
 fi
 
 export KSTESTDIR=$(pwd)

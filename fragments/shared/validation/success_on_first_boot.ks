@@ -3,7 +3,22 @@
 # by the kickstart test that includes this fragment. This file is empty
 # by default.
 
+# A somewhat different approach via systemd-sysext/overlayfs is needed
+# in ostree systems with read-only /usr
+
 %post
+# detect if the system uses ostree and change path prefix if needed
+if ostree admin status &> /dev/null; then
+    # based on info from https://www.reddit.com/r/Fedora/comments/wir3cq/comment/ijhjfah
+    mkdir -p /var/lib/extensions/kickstart-tests/usr/lib/extension-release.d \
+        /var/lib/extensions/kickstart-tests/usr/libexec
+    cp /etc/os-release /var/lib/extensions/kickstart-tests/usr/lib/extension-release.d/extension-release.kickstart-tests
+    script_prefix="/var/lib/extensions/kickstart-tests"
+    systemd-sysext merge
+    systemctl enable systemd-sysext
+else
+    script_prefix=""
+fi
 
 # Create a systemd service.
 cat > /etc/systemd/system/kickstart-test.service << EOF
@@ -16,7 +31,7 @@ After=graphical.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/sh /usr/libexec/kickstart-service.sh
+ExecStart=/bin/sh ${script_prefix}/usr/libexec/kickstart-service.sh
 
 [Install]
 WantedBy=graphical.target
@@ -26,13 +41,13 @@ EOF
 
 # Create a script with the actual test. Print errors to stdout.
 # IMPORTANT: This file should be rewritten in tests!
-touch /usr/libexec/kickstart-test.sh
+touch ${script_prefix}/usr/libexec/kickstart-test.sh
 
 # Create a script for the service
-cat > /usr/libexec/kickstart-service.sh << 'EOF'
+cat > ${script_prefix}/usr/libexec/kickstart-service.sh << 'EOF'
 
 # Check error messages in the syslog.
-error_messages="$(/bin/sh /usr/libexec/kickstart-test.sh)"
+error_messages="$(/bin/sh ${script_prefix}/usr/libexec/kickstart-test.sh)"
 
 if [[ ! -z "${error_messages}" ]]; then
     echo "*** System has started with errors:" >> /root/RESULT

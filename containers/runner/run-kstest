@@ -88,8 +88,10 @@ ${KSTESTS_DIR}/scripts/log2json --scenario $SCENARIO --output $TEST_LOG.json $TE
 # Fixup permissions
 chmod -R a+rw /var/tmp/kstest-*
 # Clean up (artifacts from broken test)
-find /var/tmp/kstest-* -name "*.iso" -delete
-find /var/tmp/kstest-* -name "*.img" -delete
+if [ "$KSTESTS_KEEP" != "2" ]; then
+    find /var/tmp/kstest-* -name "*.iso" -delete
+    find /var/tmp/kstest-* -name "*.img" -delete
+fi
 cp $TEST_LOG ${LOGS_DIR}
 cp $TEST_LOG.json ${LOGS_DIR}
 cp /var/tmp/kstest-list ${LOGS_DIR}

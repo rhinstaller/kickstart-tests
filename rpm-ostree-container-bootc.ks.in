@@ -1,0 +1,42 @@
+#test name: rpm-ostree-container-bootc
+# for bootc/bootupd, remote and stateroot ostreecontainer options
+# depends on the referenced ostree container being bootable
+
+# Use the default settings.
+%ksappend common/common_no_payload.ks
+
+# The RPM OSTree source is set up by the test script
+
+# Reboot the installed system.
+reboot
+
+# Validate on the first boot.
+%ksappend validation/success_on_first_boot.ks
+
+%post
+# Checks in %post
+# Check of the remote URL is appended by the test script
+
+# Checks after boot
+cat >> /opt/kickstart-tests/kickstart-test.sh << 'EOF'
+
+# propagate any errors from %post validations
+if [ -e /root/RESULT ]; then
+    cat /root/RESULT
+fi
+
+# Check that state root 'test-stateroot' exists
+if [ ! -d /ostree/deploy/test-stateroot ]; then
+    echo "Couldn't find 'test-stateroot' stateroot"
+fi
+
+# Check that bootupd information is present
+if [ ! -e /boot/bootupd-state.json ]; then
+    echo "/boot/bootupd-state.json not found on installed system after booting"
+fi
+
+bootupctl --help &> /dev/null || echo "bootupctl command not available after booting"
+bootc --help &> /dev/null || echo "bootc command not available after booting"
+
+EOF
+%end

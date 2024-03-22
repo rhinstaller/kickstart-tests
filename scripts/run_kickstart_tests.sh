@@ -341,6 +341,16 @@ for t in ${tests}; do
     echo "${name}" >> /var/tmp/kstest-list
 done
 
+# Dump the kickstarts with substitution
+substituted_dir=/var/tmp/kstest-list-substituted
+echo "Saving substituted kickstarts to ${substituted_dir}"
+rm -rf ${substituted_dir}
+mkdir ${substituted_dir}
+for t in ${tests}; do
+    inclks=${t/.sh/.ks}
+    cp ${inclks} ${substituted_dir}
+done
+
 # collect the prerequisite list for the requested tests. If there is
 # anything in the list, build it.
 

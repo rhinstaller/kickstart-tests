@@ -19,7 +19,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE=${TESTTYPE:-"network"}
+TESTTYPE=${TESTTYPE:-"network skip-on-rhel-10"}
 
 . ${KSTESTDIR}/functions.sh
 

@@ -298,7 +298,6 @@ jobs:
             }'
 
           # Permian hides the exit code of launcher, so error out this step manually based on logs
-          exit 111
           rc=$( awk '/Runner return code: /{ print $4 }' permian.log)
           if [ -n "$rc" ]; then
             exit $rc
@@ -328,7 +327,6 @@ jobs:
 
   result:
     needs: [platform, pr-info]
-    #if: ${{ always() }}
     if: ${{ always() && needs.pr-info.outputs.allowed_user == 'true' }}
     name: Set result status
     runs-on: ubuntu-latest

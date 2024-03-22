@@ -328,7 +328,8 @@ jobs:
 
   result:
     needs: [platform, pr-info]
-    if: ${{ always() }}
+    #if: ${{ always() }}
+    if: ${{ always() && needs.pr-info.outputs.allowed_user == 'true' }}
     name: Set result status
     runs-on: ubuntu-latest
     env:

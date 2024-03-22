@@ -293,7 +293,7 @@ fi
 
 if [[ "${tests}" == "" ]]; then
     echo "No tests provided; skipping."
-    exit 77
+    exit 0
 fi
 
 echo "Running tests: ${tests}"

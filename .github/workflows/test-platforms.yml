@@ -336,7 +336,6 @@ jobs:
       STATUS_NAME: test-platforms
     steps:
       - name: Show overall status
-        if: needs.pr-info.outputs.allowed_user == 'true'
         uses: octokit/request-action@v2.x
         with:
           route: 'POST /repos/${{ github.repository }}/statuses/${{ needs.pr-info.outputs.sha }}'

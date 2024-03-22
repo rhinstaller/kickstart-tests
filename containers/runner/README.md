@@ -163,4 +163,6 @@ If you want to keep virtual machine of a finished test alive for further investi
 
 If you want to prevent killing virtual machine of a test on a failure detected in the log before the installation finishes (eg `Traceback` indicated in the log) it is possible to configure monitored messages in the [log monitor](/scripts/launcher/lib/log_monitor/log_handler.py) file.
 
+You can run the tests in dry-run mode using `--dry-run` option. It can be used to see which tests would be actually run and the kickstarts with substitutions applied.
+
 We are tracking the test suite issues and flakes in the repository issues. There is a [script](/scripts/classify-failures) to detect such known issues from test logs.

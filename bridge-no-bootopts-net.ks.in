@@ -38,7 +38,7 @@ check_gui_configurations @KSTEST_NETDEV1@ bridge0
 check_device_connected bridge0 yes
 check_device_connected @KSTEST_NETDEV1@ yes
 
-if [ $(is_rhel8 @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@) == "yes" ]; then
+if is_rhel8 @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@ ; then
     # RHEL-8-FAILURE: in rhel 8 the ifcfg is generated in initramfs by Anaconda
     check_device_config_value bridge0_slave_1 BRIDGE bridge0 connection master bridge0
     check_device_config_value bridge0_slave_1 BRIDGE bridge0 connection slave-type bridge

@@ -31,7 +31,7 @@ shutdown
 # check_config_exists @KSTEST_NETDEV1@ yes
 check_config_exists @KSTEST_NETDEV1@ no
 # In RHEL8 ifcfg files are created from kickstart already in initramfs
-if [ $(is_rhel8 @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@) == "yes" ]; then
+if is_rhel8 @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@ ; then
     check_config_exists @KSTEST_NETDEV2@ yes
 else
     check_config_exists @KSTEST_NETDEV2@ no
@@ -40,7 +40,7 @@ check_config_exists @KSTEST_NETDEV3@ no
 
 check_device_connected @KSTEST_NETDEV1@ yes
 check_connection_device @KSTEST_NETDEV1@ @KSTEST_NETDEV1@
-if [ $(is_rhel8 @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@) == "yes" ]; then
+if is_rhel8 @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@ ; then
     check_connection_device "System @KSTEST_NETDEV2@"
 fi
 
@@ -53,7 +53,7 @@ check_connection_setting "@KSTEST_NETDEV1@" 802-3-ethernet.mac-address --
 detect_nm_has_autoconnections_off
 nm_has_autoconnections_off=$?
 if [[ $nm_has_autoconnections_off -eq 0 ]]; then
-    if [ $(is_rhel8 @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@) == "yes" ]; then
+    if is_rhel8 @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@ ; then
         check_number_of_connections 2
     else
         # includes "lo" connection
@@ -103,7 +103,7 @@ detect_nm_has_autoconnections_off
 nm_has_autoconnections_off=$?
 if [[ $nm_has_autoconnections_off -eq 0 ]]; then
     check_device_config_value @KSTEST_NETDEV3@ ONBOOT no connection autoconnect false
-    if [ $(is_rhel8 @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@) == "yes" ]; then
+    if is_rhel8 @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@ ; then
         check_number_of_connections 3
     else
         # includes "lo" connection

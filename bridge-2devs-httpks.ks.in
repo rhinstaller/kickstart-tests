@@ -77,7 +77,7 @@ check_device_config_value bridge1 ONBOOT yes connection autoconnect __NONE
 
 check_device_config_value bridge1_slave_1 ONBOOT yes connection autoconnect __NONE
 
-if [ $(is_rhel8 @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@) == "yes" ]; then
+if is_rhel8 @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@ ; then
     # RHEL-8-FAILURE: anaconda does not create default config file for enslaved device in RHEL8
     check_config_exists @KSTEST_NETDEV2@ no
 else

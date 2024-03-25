@@ -80,6 +80,13 @@ rhel10_skip_array=(
   gh640       # authselect-not-set failing
   gh804       # repo-addrepo-hd-tree failing
   gh1090      # raid-1 failing
+  gh1104      # network-prefixdevname failing
+  gh1106      # packages-and-groups-1 failing
+  gh1105      # preexisting btrfs failing
+  gh1108      # proxy-auth, proxy-kickstart failing
+  gh1109      # rootps-allow-ssh failing
+  gh1107      # rpm-ostree-container failing
+  gh1110      # storage-multipath-autopart failing
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

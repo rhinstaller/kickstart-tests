@@ -98,7 +98,7 @@ find /var/tmp/kstest-* -name "*.img" -delete
 cp $TEST_LOG ${LOGS_DIR}
 cp $TEST_LOG.json ${LOGS_DIR}
 cp /var/tmp/kstest-list ${LOGS_DIR}
-cp /var/tmp/kstest.virt-install.log ${LOGS_DIR}
+cp /var/tmp/kstest.virt-install.log ${LOGS_DIR} || true
 # Move to target logs directory; this sometimes fails on nested directory permission/ownership
 cp -pr /var/tmp/kstest-* ${LOGS_DIR} || true
 

@@ -291,9 +291,17 @@ else
     tests=$(find_tests)
 fi
 
+# Save the names of the tests that should be executed to /var/tmp/kstest-list
+echo "Saving list of expected tests to /var/tmp/kstest-list"
+echo -n "" > /var/tmp/kstest-list
+for t in ${tests}; do
+    name=$(basename "${t/.sh/}")
+    echo "${name}" >> /var/tmp/kstest-list
+done
+
 if [[ "${tests}" == "" ]]; then
     echo "No tests provided; skipping."
-    exit 77
+    exit 0
 fi
 
 echo "Running tests: ${tests}"
@@ -335,14 +343,6 @@ for t in ${tests}; do
         echo "Including $sfile into ${inclks}"
         sed -i -e '\_'${iline}'_ { r'${sfile} -e 'd }' ${inclks}
     done
-done
-
-# Save the names of the tests that should be executed to /var/tmp/kstest-list
-echo "Saving list of expected tests to /var/tmp/kstest-list"
-[ -e /var/tmp/kstest-list ] && rm /var/tmp/kstest-list
-for t in ${tests}; do
-    name=$(basename "${t/.sh/}")
-    echo "${name}" >> /var/tmp/kstest-list
 done
 
 # Dump the kickstarts with substitution

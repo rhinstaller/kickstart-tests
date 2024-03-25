@@ -316,6 +316,7 @@ jobs:
             kickstart-tests/data/logs/kstest.log.json
             kickstart-tests/data/logs/kstest-*/*.log
             kickstart-tests/data/logs/kstest-*/anaconda/lorax-packages.log
+            kickstart-tests/data/logs/kstest-*/original-ks.cfg
 
       - name: Collect Permian logs
         if: always()

@@ -148,6 +148,10 @@ ISSUES = [
         "[1060] https://github.com/rhinstaller/kickstart-tests/issues/1060",
         "CRIT.*pyanaconda.ui.gui.xkl_wrapper.XklWrapperError: Failed to initialize layouts",
     ),
+    (
+        "[907] https://github.com/rhinstaller/kickstart-tests/issues/907",
+        "ERROR:anaconda.modules.storage.partitioning.base_partitioning:Storage configuration has failed: No usable disks.",
+    ),
 ]
 
 CLOSED_ISSUES = [

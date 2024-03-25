@@ -176,8 +176,10 @@ if [[ $? -ne 0 ]]; then
 fi
 ISO_OS_NAME=$(echo "${output}" | grep 'NAME=')
 ISO_OS_NAME="${ISO_OS_NAME##NAME=}"
+export KSTEST_OS_NAME="${ISO_OS_NAME}"
 ISO_OS_VERSION=$(echo "${output}" | grep 'VERSION=')
 ISO_OS_VERSION="${ISO_OS_VERSION##VERSION=}"
+export KSTEST_OS_VERSION="${ISO_OS_VERSION}"
 
 
 # Append sed args to substitute

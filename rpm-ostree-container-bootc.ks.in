@@ -5,7 +5,7 @@
 # Use the default settings.
 %ksappend common/common_no_payload.ks
 
-# The RPM OSTree source is set up by the test script
+%ksappend payload/ostreecontainer-bootc.ks
 
 # Reboot the installed system.
 reboot
@@ -14,11 +14,9 @@ reboot
 %ksappend validation/success_on_first_boot.ks
 
 %post
-# Checks in %post
-# Check of the remote URL is appended by the test script
 
 # Checks after boot
-cat >> /opt/kickstart-tests/kickstart-test.sh << 'EOF'
+cat >> /var/lib/extensions/kickstart-tests/usr/libexec/kickstart-test.sh << 'EOF'
 
 # propagate any errors from %post validations
 if [ -e /root/RESULT ]; then
@@ -37,6 +35,22 @@ fi
 
 bootupctl --help &> /dev/null || echo "bootupctl command not available after booting"
 bootc --help &> /dev/null || echo "bootc command not available after booting"
+
+if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
+    expected_url="quay.io/centos-bootc/centos-bootc:stream9"
+else
+    expected_url="quay.io/centos-bootc/fedora-bootc:eln"
+fi
+
+remote_url="$(ostree remote show-url test-remote)"
+if [ ${?} -ne 0 ]; then
+    echo "Couldn't list remote URL for 'test-remote'" >> /root/RESULT
+fi
+
+if [ "${remote_url}" != "${expected_url}" ]; then
+    echo "Unexpected URL: ${remote_url}, expected ${expected_url}"" >> /root/RESULT
+fi
+
 
 EOF
 %end

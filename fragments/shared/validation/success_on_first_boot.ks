@@ -1,5 +1,5 @@
 # Report success if no errors have been reported on the first boot.
-# Additional tests can be implemented in /usr/libexec/kickstart-test.sh
+# Additional tests can be implemented in /etc/kickstart-test.sh
 # by the kickstart test that includes this fragment. This file is empty
 # by default.
 
@@ -16,7 +16,7 @@ After=graphical.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/sh /usr/libexec/kickstart-service.sh
+ExecStart=/bin/sh /etc/kickstart-service.sh
 
 [Install]
 WantedBy=graphical.target
@@ -26,13 +26,13 @@ EOF
 
 # Create a script with the actual test. Print errors to stdout.
 # IMPORTANT: This file should be rewritten in tests!
-touch /usr/libexec/kickstart-test.sh
+touch /etc/kickstart-test.sh
 
 # Create a script for the service
-cat > /usr/libexec/kickstart-service.sh << 'EOF'
+cat > /etc/kickstart-service.sh << 'EOF'
 
 # Check error messages in the syslog.
-error_messages="$(/bin/sh /usr/libexec/kickstart-test.sh)"
+error_messages="$(/bin/sh /etc/kickstart-test.sh)"
 
 if [[ ! -z "${error_messages}" ]]; then
     echo "*** System has started with errors:" >> /root/RESULT

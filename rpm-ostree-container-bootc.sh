@@ -19,16 +19,8 @@
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
 TESTTYPE="payload ostree bootc reboot skip-on-rhel-8 skip-on-rhel-10"
-# skip-on-rhel"
 
 . ${KSTESTDIR}/functions.sh
-
-os_major=${KSTEST_OS_VERSION%%.*}
-if [ "${KSTEST_OS_NAME}" == "rhel" ]; then
-    container_url="quay.io/centos-bootc/centos-bootc:stream${os_major}"
-else
-    container_url="quay.io/centos-bootc/fedora-bootc:eln"
-fi
 
 copy_interesting_files_from_system() {
     local disksdir
@@ -59,7 +51,7 @@ copy_interesting_files_from_system() {
         launch
         lvs" | \
         grep root)
-    
+
     for item in /ostree/deploy/test-stateroot/var/roothome/original-ks.cfg \
                 /ostree/deploy/test-stateroot/var/roothome/anaconda-ks.cfg \
                 /ostree/deploy/test-stateroot/var/roothome/anabot.log \
@@ -72,27 +64,6 @@ copy_interesting_files_from_system() {
             copy-out '${item}' '${disksdir}'
             " 2>/dev/null
     done
-}
-
-prepare() {
-    ks=${1}
-    cat >> ${ks} << EOF1
-ostreecontainer --no-signature-verification --remote=test-remote --stateroot=test-stateroot --url=${container_url}
-
-%post
-cat >> /var/lib/extensions/kickstart-tests/usr/libexec/kickstart-test.sh << EOF2
-remote_url="\\\$(ostree remote show-url test-remote)"
-if [ \\\${?} -ne 0 ]; then
-    echo "Couldn't list remote URL for 'test-remote'" >> /root/RESULT
-fi
-
-if [ "\\\${remote_url}" != "${container_url}" ]; then
-    echo "Unexpected URL: \\\${remote_url}, expected ${container_url}" >> /root/RESULT
-fi
-EOF2
-%end
-EOF1
-    echo ${ks}
 }
 
 get_timeout() {

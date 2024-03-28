@@ -7,20 +7,13 @@
 
 %ksappend common/common_no_payload.ks
 
-# Set up the RPM OSTree source.
-%ksappend payload/ostreecontainer.ks
+ostreecontainer --no-signature-verification --transport=registry --url=@KSTEST_OSTREECONTAINER_URL@
 
 %post
 
-if [[ "@KSTEST_OS_NAME@" == "rhel" ]]; then
-    EXPECTED_URL="quay.io/centos-bootc/centos-bootc:stream9"
-else
-    EXPECTED_URL="quay.io/centos-bootc/fedora-bootc:eln"
-fi
-
 # Check the url of the remote.
 url="$(ostree remote show-url default)"
-if [ "${url}" != "${EXPECTED_URL}" ]; then
+if [ "${url}" != "@KSTEST_OSTREECONTAINER_URL@" ]; then
     echo "Unexpected URL: ${url}" >> /root/RESULT
 fi
 

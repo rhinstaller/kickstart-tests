@@ -1,0 +1,45 @@
+#test name: rpm-ostree-container-luks
+# for bootc/bootupd, remote and stateroot ostreecontainer options
+# depends on the referenced ostree container being bootable
+
+# Use the default settings.
+%ksappend common/common_no_storage_and_payload.ks
+
+# Validate on the first boot.
+%ksappend validation/success_on_first_boot.ks
+
+# Set up RPM ostree container image as installation payload
+ostreecontainer --no-signature-verification --remote=test-remote --stateroot=test-stateroot --url=@KSTEST_OSTREECONTAINER_URL@
+
+# Reboot the installed system.
+reboot
+
+# On Fedora enforce lvm scheme (overriding btrfs default)
+%ksappend storage/ostreecontainer_autopart_encrypted.ks
+
+%post
+# Automatically unlock the encrypted filesystems on boot; code
+# borrowed from Anabot's profiles/default/hooks/95-add_luks_key-post.hook
+keyfile="/root/keyfile"
+echo -n "passphrase" > ${keyfile} # actual passphrase
+chmod 0400 ${keyfile}
+# modify /etc/crypttab, set key file in the third column of the file
+awk -v KEYFILE=${keyfile} '{$3=KEYFILE; print $0}' /etc/crypttab > /tmp/crypttab_mod
+mv -Z /tmp/crypttab_mod /etc/crypttab
+chmod 0600 /etc/crypttab
+kernel_version=$(rpm -q kernel | sed 's/^kernel-//')
+initrd_file=$(find /boot -name initramfs-${kernel_version}.img)
+dracut -f --tmpdir /tmp -I "${keyfile} /etc/crypttab" ${initrd_file} ${kernel_version}
+
+# Checks after boot
+cat >> /var/lib/extensions/kickstart-tests/usr/libexec/kickstart-test.sh << 'EOF'
+
+# propagate any errors from %post validations;
+# we only check that the system booted, so the following generic
+# snippet is left in place just for potential future purposes
+if [ -e /root/RESULT ]; then
+    cat /root/RESULT
+fi
+
+EOF
+%end

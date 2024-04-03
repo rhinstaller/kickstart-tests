@@ -1,0 +1,33 @@
+summary: TMT/TFT plan for running kickstart tests on Fedora system
+description: |
+    Run kickstart tests on Fedora
+
+discover:
+    how: shell
+    tests:
+    - name: 'repository: $REPO_NAME'
+      framework: shell
+      test: cd /root/$REPO_NAME && scripts/run_travis.sh
+      duration: 6h
+
+provision:
+    hardware:
+        virtualization:
+            is-supported: true
+
+prepare:
+    - name: Update guest
+      how: shell
+      script: |
+        dnf distro-sync -y
+
+    - name: prepare repository
+      how: shell
+      script: |
+        git clone $REPO_URL /root/$REPO_NAME
+        cd /root/$REPO_NAME
+        git fetch origin +refs/pull/*:refs/remotes/origin/pr/*
+        git checkout origin/pr/$PR_NUMBER/head
+
+execute:
+    how: tmt

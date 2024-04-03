@@ -229,7 +229,7 @@ jobs:
             ${{ github.workspace }}/kickstart-tests/containers/runner/fetch_daily_iso.sh $GITHUB_TOKEN $BOOT_ISO_PATH
             echo "boot_iso=\"bootIso\":{\"x86_64\":\"${BOOT_ISO_URL}\"}," >> $GITHUB_OUTPUT
           elif [ "${{ matrix.platform }}" == "rawhide" ]; then
-            curl -L https://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Server/x86_64/os/images/boot.iso --output $BOOT_ISO_PATH
+            curl -L https://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/x86_64/os/images/boot.iso --output $BOOT_ISO_PATH
             echo "boot_iso=\"bootIso\":{\"x86_64\":\"${BOOT_ISO_URL}\"}," >> $GITHUB_OUTPUT
           else
             echo "Boot.iso for ${{ matrix.platform }} can't be fetched."

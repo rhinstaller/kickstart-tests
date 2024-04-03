@@ -3,7 +3,9 @@
 # depends on the referenced ostree container being bootable
 
 # Use the default settings.
-%ksappend common/common_no_payload.ks
+%ksappend common/common_no_storage_and_payload.ks
+# On Fedora enforce lvm scheme (overriding btrfs default)
+%ksappend storage/ostreecontainer_autopart.ks
 
 ostreecontainer --no-signature-verification --remote=test-remote --stateroot=test-stateroot --url=@KSTEST_OSTREECONTAINER_URL@
 

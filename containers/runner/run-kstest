@@ -51,6 +51,11 @@ if [ -n "${TEST_RETRY}" ]; then
     RETRY_ARG="-r"
 fi
 
+DRY_RUN_ARG=""
+if [ -n "${DRY_RUN}" ]; then
+    DRY_RUN_ARG="-d"
+fi
+
 # work around virt-install TOCTOU race <https://github.com/virt-manager/virt-manager/pull/175>
 mkdir -p ~/.cache/virt-manager/boot
 
@@ -76,7 +81,7 @@ fi
 TEST_LOG=/var/tmp/kstest.log
 pushd ${KSTESTS_DIR}
 set +e
-scripts/run_kickstart_tests.sh -x ${TIMEOUT} -k ${KSTESTS_KEEP} -i ${ISO_DIR}/${BOOT_ISO} ${UPDATES_IMAGE_ARG} ${PLATFORM_ARG} ${TESTTYPE_ARG} ${SKIP_TESTTYPES_ARG} ${RETRY_ARG} ${KSTESTS_TEST} 2>&1 | tee $TEST_LOG
+scripts/run_kickstart_tests.sh -x ${TIMEOUT} ${DRY_RUN_ARG} -k ${KSTESTS_KEEP} -i ${ISO_DIR}/${BOOT_ISO} ${UPDATES_IMAGE_ARG} ${PLATFORM_ARG} ${TESTTYPE_ARG} ${SKIP_TESTTYPES_ARG} ${RETRY_ARG} ${KSTESTS_TEST} 2>&1 | tee $TEST_LOG
 RC=$?
 set -e
 popd
@@ -93,7 +98,7 @@ find /var/tmp/kstest-* -name "*.img" -delete
 cp $TEST_LOG ${LOGS_DIR}
 cp $TEST_LOG.json ${LOGS_DIR}
 cp /var/tmp/kstest-list ${LOGS_DIR}
-cp /var/tmp/kstest.virt-install.log ${LOGS_DIR}
+cp /var/tmp/kstest.virt-install.log ${LOGS_DIR} || true
 # Move to target logs directory; this sometimes fails on nested directory permission/ownership
 cp -pr /var/tmp/kstest-* ${LOGS_DIR} || true
 

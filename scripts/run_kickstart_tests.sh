@@ -64,8 +64,9 @@ UPDATES_IMG=""
 TESTTYPE=""
 SKIP_TESTTYPES=""
 TIMEOUT=0
+DRY_MODE=""
 
-while getopts ":i:k:t:s:u:b:p:o:rx:" opt; do
+while getopts ":i:k:t:s:u:b:p:o:rx:d" opt; do
     case $opt in
        i)
            # If this wasn't set from the environment, set it from the command line
@@ -120,6 +121,9 @@ while getopts ":i:k:t:s:u:b:p:o:rx:" opt; do
            ;;
        x)
            TIMEOUT=$OPTARG
+           ;;
+       d)
+           DRY_MODE="substitute_kickstarts"
            ;;
        *)
            echo "Usage: run_kickstart_tests.sh [-i boot.iso] [-k 0|1|2] [-t test_type_to_run] [-s test_types_to_ignore] [-u link_to_updates.img] [-b additional_boot_options] [-p platform_name] [-o ksappend_overrides] [tests]"
@@ -287,9 +291,17 @@ else
     tests=$(find_tests)
 fi
 
+# Save the names of the tests that should be executed to /var/tmp/kstest-list
+echo "Saving list of expected tests to /var/tmp/kstest-list"
+echo -n "" > /var/tmp/kstest-list
+for t in ${tests}; do
+    name=$(basename "${t/.sh/}")
+    echo "${name}" >> /var/tmp/kstest-list
+done
+
 if [[ "${tests}" == "" ]]; then
     echo "No tests provided; skipping."
-    exit 77
+    exit 0
 fi
 
 echo "Running tests: ${tests}"
@@ -333,13 +345,20 @@ for t in ${tests}; do
     done
 done
 
-# Save the names of the tests that should be executed to /var/tmp/kstest-list
-echo "Saving list of expected tests to /var/tmp/kstest-list"
-[ -e /var/tmp/kstest-list ] && rm /var/tmp/kstest-list
+# Dump the kickstarts with substitution
+substituted_dir=/var/tmp/kstest-list-substituted
+echo "Saving substituted kickstarts to ${substituted_dir}"
+rm -rf ${substituted_dir}
+mkdir ${substituted_dir}
 for t in ${tests}; do
-    name=$(basename "${t/.sh/}")
-    echo "${name}" >> /var/tmp/kstest-list
+    inclks=${t/.sh/.ks}
+    cp ${inclks} ${substituted_dir}
 done
+
+if [ -n "$DRY_MODE" ] ; then
+    echo "Running in dry run mode '${DRY_MODE}'; skipping"
+    exit 0
+fi
 
 # collect the prerequisite list for the requested tests. If there is
 # anything in the list, build it.

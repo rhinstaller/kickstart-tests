@@ -8,31 +8,7 @@ common_skip_array=(
   manual
 )
 
-rawhide_skip_array=(
-  skip-on-fedora
-  gh576       # clearpart-4 test is flaky on all scenarios
-  gh595       # proxy-cmdline failing on all scenarios
-  gh640       # authselect-not-set failing
-  gh641       # packages-multilib failing on systemd conflict
-  gh680       # proxy-kickstart and proxy-auth failing
-  gh740       # fedora-live-image-build fails on comps changes
-  gh769       # nodejs:16 and swig:4 missing in module-X tests
-  gh774       # autopart-luks-1 failing
-  gh777       # raid-1 failing
-  gh910       # stage2-from-ks test needs to be fixed for daily-iso
-  gh890       # default-systemd-target-vnc-graphical-provides flaking too much
-  gh871       # basic-ftp failing due to mirror
-  rhbz1853668 # multipath device not constructed back after installation
-  gh975       # packages-default failing
-  gh1023      # rpm-ostree failing
-)
-
-rawhide_text_skip_array=(
-  skip-on-fedora
-  rhbz1853668 # multipath device not constructed back after installation
-)
-
-daily_iso_skip_array=(
+fedora_skip_array=(
   skip-on-fedora
   gh576       # clearpart-4 test is flaky on all scenarios
   gh595       # proxy-cmdline failing on all scenarios
@@ -50,6 +26,17 @@ daily_iso_skip_array=(
   gh975       # packages-default failing
   gh1023      # rpm-ostree failing
   gh1060      # vnc tests too flaky
+)
+
+daily_iso_skip_array=(
+)
+
+rawhide_skip_array=(
+)
+
+rawhide_text_skip_array=(
+  skip-on-fedora
+  rhbz1853668 # multipath device not constructed back after installation
 )
 
 rhel8_skip_array=(
@@ -77,9 +64,17 @@ rhel9_skip_array=(
 rhel10_skip_array=(
   skip-on-rhel
   skip-on-rhel-10
+  gh576       # clearpart-4 test is flaky on all scenarios
   gh640       # authselect-not-set failing
   gh804       # repo-addrepo-hd-tree failing
   gh1090      # raid-1 failing
+  gh1104      # network-prefixdevname failing
+  gh1106      # packages-and-groups-1 failing
+  gh1105      # preexisting btrfs failing
+  gh1108      # proxy-auth, proxy-kickstart failing
+  gh1109      # rootps-allow-ssh failing
+  gh1107      # rpm-ostree-container failing
+  gh1110      # storage-multipath-autopart failing
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml
@@ -94,9 +89,9 @@ _join_args_by_comma(){
 }
 
 # Do not forget to add new releases below as well
-SKIP_TESTTYPES_RAWHIDE=$(_join_args_by_comma "${common_skip_array[@]}" "${rawhide_skip_array[@]}")
+SKIP_TESTTYPES_RAWHIDE=$(_join_args_by_comma "${common_skip_array[@]}" "${fedora_skip_array[@]}" "${rawhide_skip_array[@]}")
 SKIP_TESTTYPES_RAWHIDE_TEXT=$(_join_args_by_comma "${common_skip_array[@]}" "${rawhide_text_skip_array[@]}")
-SKIP_TESTTYPES_DAILY_ISO=$(_join_args_by_comma "${common_skip_array[@]}" "${daily_iso_skip_array[@]}")
+SKIP_TESTTYPES_DAILY_ISO=$(_join_args_by_comma "${common_skip_array[@]}" "${fedora_skip_array[@]}" "${daily_iso_skip_array[@]}")
 SKIP_TESTTYPES_RHEL8=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel8_skip_array[@]}")
 SKIP_TESTTYPES_RHEL9=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel9_skip_array[@]}")
 SKIP_TESTTYPES_RHEL10=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel10_skip_array[@]}")

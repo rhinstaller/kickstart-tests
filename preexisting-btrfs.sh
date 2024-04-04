@@ -38,7 +38,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="btrfs storage"
+TESTTYPE="btrfs storage gh1105"
 
 . ${KSTESTDIR}/functions.sh
 

@@ -66,10 +66,6 @@ copy_interesting_files_from_system() {
     done
 }
 
-get_timeout() {
-   echo "80"
-}
-
 additional_runner_args() {
    # Wait for reboot and shutdown of the VM,
    # but exit after the specified timeout.

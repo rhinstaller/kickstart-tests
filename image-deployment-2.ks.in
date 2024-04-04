@@ -23,7 +23,8 @@ shutdown
 
 # Get the activated Anaconda DBus modules.
 less /tmp/syslog | grep "Activating service name" | \
-grep "org.fedoraproject.Anaconda.Modules" | cut -d"'" -f2 \
+grep "org.fedoraproject.Anaconda.Modules" | \
+grep "python3 -m pyanaconda.modules.boss" | cut -d"'" -f2 \
 | sort > /tmp/generated.out
 
 # Generate the expected output.

@@ -28,5 +28,5 @@ TESTTYPE="packaging skip-on-rhel gh740"
 # fairly resource intensive tasks. So bump the timeout
 # to give it more time to do what's needed.
 get_timeout() {
-    echo "120"
+    echo "60"
 }

@@ -444,7 +444,7 @@ append_additional_repo_to_kernel_args() {
 }
 
 get_timeout() {
-    echo "60"
+    echo "30"
 }
 
 stage2_from_ks() {

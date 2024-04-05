@@ -24,7 +24,8 @@ TESTTYPE="packaging skip-on-rhel"
 
 . ${KSTESTDIR}/functions.sh
 
-# The test installs ~1366 packages for which 1h timeout is sometimes not enough
+# The test installs ~1366 packages for which the default timeout is sometimes
+# not enough
 get_timeout() {
-    echo "120"
+    echo "60"
 }

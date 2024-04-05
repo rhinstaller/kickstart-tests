@@ -111,8 +111,8 @@ if ! [ -e data/images/boot.iso ]; then
         echo "INFO: data/images/boot.iso does not exist, downloading daily iso..."
         $PWD/containers/runner/fetch_daily_iso.sh ${DAILY_ISO_TOKEN} data/images/boot.iso
     else
-        echo "INFO: data/images/boot.iso does not exist, downloading current Fedora Rawhide Server image..."
-        curl -L https://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Server/x86_64/os/images/boot.iso --output data/images/boot.iso
+        echo "INFO: data/images/boot.iso does not exist, downloading current Fedora Rawhide Everything image..."
+        curl -L https://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/x86_64/os/images/boot.iso --output data/images/boot.iso
     fi
 fi
 

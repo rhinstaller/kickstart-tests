@@ -18,6 +18,9 @@
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
 # Network device names are defined in the defaults (KSTEST_NETDEV<X> values)
+
+set -x
+
 if [[ -e scripts/defaults.sh ]]; then
     . scripts/defaults.sh
 fi
@@ -109,6 +112,7 @@ run_with_timeout() {
 }
 
 copy_file() {
+    set -x
     disks="$1"
     file="$2"
     dir="$3"
@@ -153,6 +157,8 @@ copy_out ${file} ${dir}
 }
 
 copy_interesting_files_from_system() {
+    set -x
+
     local disksdir="$1"
 
     # Find disks.

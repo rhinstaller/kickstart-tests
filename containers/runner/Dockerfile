@@ -1,4 +1,4 @@
-FROM fedora:38
+FROM fedora:39
 LABEL maintainer='anaconda-devel-list@redhat.com'
 
 RUN dnf -y update && \

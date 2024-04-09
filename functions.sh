@@ -106,6 +106,10 @@ run_with_timeout() {
     duration="$1"
     cmd="$2"
     timeout -k 10s ${duration} ${cmd}
+    if [[ $? == 124 ]]; then
+        echo "ERROR: run_with_timeout ${duration} ${cmd} timed out"
+        return 124
+    fi
 }
 
 copy_file() {

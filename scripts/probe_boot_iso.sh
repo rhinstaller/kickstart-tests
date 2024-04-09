@@ -73,7 +73,11 @@ unsquashfs -no-xattrs -no-progress -d "$ISO_TMP/stage2" "$ISO_TMP/install.img"
 rm "$ISO_TMP/install.img"
 
 # Extract required information from stage2
-virt-cat -a "$ISO_TMP/stage2/LiveOS/rootfs.img" /etc/os-release > "$ISO_TMP/os-release"
+timeout -k 10s 30s virt-cat -a "$ISO_TMP/stage2/LiveOS/rootfs.img" /etc/os-release > "$ISO_TMP/os-release"
+if [ $? -eq 124 ]; then
+    echo "Error: virt-cat timed out" >&2
+    exit 4
+fi
 
 # Return useful information to stdout
 echo "NAME=$(. "$ISO_TMP/os-release"; echo "$ID")"

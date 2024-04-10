@@ -22,15 +22,14 @@ shutdown
 %post --nochroot
 
 # Get the activated Anaconda DBus modules.
-less /tmp/syslog | grep "Activating service name" | \
-grep "org.fedoraproject.Anaconda.Modules" | cut -d"'" -f2 \
-| sort > /tmp/generated.out
+less /tmp/syslog | grep "Starting org.fedoraproject.Anaconda.Modules" | \
+cut -d" " -f4 | sort > /tmp/generated.out
 
 # Generate the expected output.
 cat > /tmp/expected.out <<EOF
-org.fedoraproject.Anaconda.Modules.Network
-org.fedoraproject.Anaconda.Modules.Payloads
-org.fedoraproject.Anaconda.Modules.Storage
+org.fedoraproject.Anaconda.Modules.Network.
+org.fedoraproject.Anaconda.Modules.Payloads.
+org.fedoraproject.Anaconda.Modules.Storage.
 EOF
 
 # Check the output

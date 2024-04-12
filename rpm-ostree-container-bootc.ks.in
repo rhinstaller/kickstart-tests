@@ -1,6 +1,10 @@
 #test name: rpm-ostree-container-bootc
-# for bootc/bootupd, remote and stateroot ostreecontainer options
-# depends on the referenced ostree container being bootable
+# https://github.com/rhinstaller/anaconda/pull/5399
+#
+# Test that ostree container installation works.
+# Depends on the referenced ostree container being bootable.
+# Replaces the rpm-ostree-container test which did not boot
+# into the installed system to execute the checks.
 
 # Use the default settings.
 %ksappend common/common_no_storage_and_payload.ks

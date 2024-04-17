@@ -8,6 +8,7 @@ RUN dnf -y update && \
     rsync \
     git \
     virt-install \
+    libvirt-daemon \
     guestfs-tools \
     genisoimage \
     lorax-lmc-virt \

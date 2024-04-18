@@ -31,4 +31,4 @@ jobs:
         tmt_plan_regex: "testing-farm"
         pull_request_status_name: "Testing farm"
         tf_scope: private
-        variables: "REPO_URL=${{ github.server_url }}/${{ github.repository }};REPO_NAME=${{ github.repository }};PR_NUMBER=${{ github.event.issue.number }}"
+        variables: "PR_NUMBER=${{ github.event.issue.number }}"

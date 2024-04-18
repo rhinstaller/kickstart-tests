@@ -5,9 +5,9 @@ description: |
 discover:
     how: shell
     tests:
-    - name: 'repository: $REPO_NAME'
+    - name: 'repository: kickstart-tests'
       framework: shell
-      test: cd /root/$REPO_NAME && scripts/run_travis.sh
+      test: cd /root/kickstart-tests && scripts/run_travis.sh
       duration: 6h
 
 provision:
@@ -19,13 +19,13 @@ prepare:
     - name: Update guest
       how: shell
       script: |
-        dnf distro-sync -y
+        dnf distro-sync -y && dnf install -y git
 
     - name: prepare repository
       how: shell
       script: |
-        git clone $REPO_URL /root/$REPO_NAME
-        cd /root/$REPO_NAME
+        git clone https://github.com/rhinstaller/kickstart-tests /root/kickstart-tests
+        cd /root/kickstart-tests
         git fetch origin +refs/pull/*:refs/remotes/origin/pr/*
         git checkout origin/pr/$PR_NUMBER/head
 

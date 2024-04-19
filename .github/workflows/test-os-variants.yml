@@ -1,12 +1,12 @@
-# Run kickstart tests in a PR triggered by a "/test-platforms" command from an organization member
+# Run kickstart tests in a PR triggered by a "/test-os-variants" command from an organization member
 #
-# /test-platforms - execute all tests affected by the PR or smoke tests if there is no such.
+# /test-os-variants - execute all tests affected by the PR or smoke tests if there is no such.
 # Or specify tests by combination of test names and/or options:
-# /test-platforms --testtype TESTTYPE --skip-testtypes TYPE[,TYPE..] TEST1 TEST2
+# /test-os-variants --testtype TESTTYPE --skip-testtypes TYPE[,TYPE..] TEST1 TEST2
 #
 # For dry run use:
-# /test-platforms-dry
-name: test-platforms
+# /test-os-variants-dry
+name: test-os-variants
 on:
   issue_comment:
     types: [created]
@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   pr-info:
-    if: startsWith(github.event.comment.body, '/test-platforms')
+    if: startsWith(github.event.comment.body, '/test-os-variants')
     runs-on: ubuntu-latest
     steps:
       - name: Query comment author repository permissions
@@ -52,13 +52,13 @@ jobs:
         env:
           BODY: ${{ github.event.comment.body }}
         run: |
-          # extract first line and cut out the "/test-platforms" first word
+          # extract first line and cut out the "/test-os-variants" first word
           LAUNCH_ARGS=$(echo "$BODY" | sed -n '1 s/^[^ ]* *//p' | sed 's/[[:space:]]*$//')
           echo "launch arguments are: $LAUNCH_ARGS"
           echo "launch_args=${LAUNCH_ARGS}" >> $GITHUB_OUTPUT
           # check for dry run mode
           DRY_RUN=False
-          echo "$BODY" | grep -q "/test-platforms-dry" && DRY_RUN=True
+          echo "$BODY" | grep -q "/test-os-variants-dry" && DRY_RUN=True
           echo "Dry run: ${DRY_RUN}"
           echo "dry_run=${DRY_RUN}" >> $GITHUB_OUTPUT
 
@@ -70,19 +70,19 @@ jobs:
       dry_run: ${{ steps.parse_launch_args.outputs.dry_run }}
 
 
-  platform:
+  os-variant:
     needs: pr-info
     if: needs.pr-info.outputs.allowed_user == 'true'
-    name: Run tests on the platform
+    name: Run on os variant
     runs-on: [self-hosted, kstest]
     env:
-      STATUS_NAME: test-platforms
+      STATUS_NAME: test-os-variants
       TARGET_BRANCH: ${{ needs.pr-info.outputs.base_ref }}
       TEST_JOBS: 16
       GITHUB_TOKEN: /home/github/github-token
     strategy:
       matrix:
-        platform: [daily-iso, rawhide, rhel8, rhel9, rhel10]
+        os-variant: [daily-iso, rawhide, rhel8, rhel9, rhel10]
       fail-fast: false
 
     steps:
@@ -137,30 +137,30 @@ jobs:
           CHANGED_TESTS=$(git diff --name-only $BASE_COMMIT HEAD -- *.ks.in $(find -maxdepth 1 -name '*.sh' -perm -u+x) | sed 's/\.ks\.in$//; s/\.sh$//' | sort -u | tr '\n' ' ')
           echo "changed_tests=${CHANGED_TESTS}" >> $GITHUB_OUTPUT
 
-      - name: Get skipped tests for platform ${{ matrix.platform }}
-        id: get_platform_specs
+      - name: Get skipped tests for os variant ${{ matrix.os-variant }}
+        id: get_os_variant_specs
         working-directory: ./kickstart-tests
         run: |
           set -eux
 
           source ./containers/runner/skip-testtypes
-          if [ ${{ matrix.platform }} == "daily-iso" ]; then
+          if [ ${{ matrix.os-variant }} == "daily-iso" ]; then
             echo "skip_tests=skip-on-fedora" >> $GITHUB_OUTPUT
             echo "disabled_testtypes=$SKIP_TESTTYPES_DAILY_ISO" >> $GITHUB_OUTPUT
             echo "platform=fedora_rawhide" >> $GITHUB_OUTPUT
-          elif [ ${{ matrix.platform }} == "rawhide" ]; then
+          elif [ ${{ matrix.os-variant }} == "rawhide" ]; then
             echo "skip_tests=skip-on-fedora" >> $GITHUB_OUTPUT
             echo "disabled_testtypes=$SKIP_TESTTYPES_RAWHIDE" >> $GITHUB_OUTPUT
             echo "platform=fedora_rawhide" >> $GITHUB_OUTPUT
-          elif [ ${{ matrix.platform }} == "rhel8" ]; then
+          elif [ ${{ matrix.os-variant }} == "rhel8" ]; then
             echo "skip_tests=skip-on-rhel,skip-on-rhel-8" >> $GITHUB_OUTPUT
             echo "disabled_testtypes=$SKIP_TESTTYPES_RHEL8" >> $GITHUB_OUTPUT
             echo "platform=rhel8" >> $GITHUB_OUTPUT
-          elif [ ${{ matrix.platform }} == "rhel9" ]; then
+          elif [ ${{ matrix.os-variant }} == "rhel9" ]; then
             echo "skip_tests=skip-on-rhel,skip-on-rhel-9" >> $GITHUB_OUTPUT
             echo "disabled_testtypes=$SKIP_TESTTYPES_RHEL9" >> $GITHUB_OUTPUT
             echo "platform=rhel9" >> $GITHUB_OUTPUT
-          elif [ ${{ matrix.platform }} == "rhel10" ]; then
+          elif [ ${{ matrix.os-variant }} == "rhel10" ]; then
             echo "skip_tests=skip-on-rhel,skip-on-rhel-10" >> $GITHUB_OUTPUT
             echo "disabled_testtypes=$SKIP_TESTTYPES_RHEL10" >> $GITHUB_OUTPUT
             echo "platform=rhel10" >> $GITHUB_OUTPUT
@@ -176,7 +176,7 @@ jobs:
           set -eux
 
           CHANGED_TESTS="${{ steps.get_changed_tests.outputs.changed_tests }}"
-          DISABLED_TESTTYPES="${{ steps.get_platform_specs.outputs.disabled_testtypes }}"
+          DISABLED_TESTTYPES="${{ steps.get_os_variant_specs.outputs.disabled_testtypes }}"
           LAUNCH_ARGS="${{ needs.pr-info.outputs.launch_args }}"
 
           if [ -n "${LAUNCH_ARGS}" ]; then
@@ -195,7 +195,7 @@ jobs:
           source ./containers/runner/skip-testtypes
           PERMIAN_QUERY=$(scripts/generate-permian-query.py \
              --skip-testtypes $SKIP_TESTTYPES_ANACONDA_PR \
-             --skip-testtypes ${{ steps.get_platform_specs.outputs.skip_tests }} \
+             --skip-testtypes ${{ steps.get_os_variant_specs.outputs.skip_tests }} \
              ${LAUNCH_ARGS} )
           if [ $? == 0 ]; then
             echo "launch_args=$LAUNCH_ARGS" >> $GITHUB_OUTPUT
@@ -219,40 +219,40 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Fetch boot.iso and configure its local location
-      - name: Fetch boot.iso if available for platform ${{ matrix.platform }}
-        id: boot_iso_for_platform
+      - name: Fetch boot.iso if available for os variant ${{ matrix.os-variant }}
+        id: boot_iso_for_os_variant
         run: |
           set -eux
-          BOOT_ISO_PATH="${{ github.workspace }}/${{ matrix.platform }}.boot.iso"
+          BOOT_ISO_PATH="${{ github.workspace }}/${{ matrix.os-variant }}.boot.iso"
           BOOT_ISO_URL="file://$BOOT_ISO_PATH"
-          if [ "${{ matrix.platform }}" == "daily-iso" ]; then
+          if [ "${{ matrix.os-variant }}" == "daily-iso" ]; then
             ${{ github.workspace }}/kickstart-tests/containers/runner/fetch_daily_iso.sh $GITHUB_TOKEN $BOOT_ISO_PATH
             echo "boot_iso=\"bootIso\":{\"x86_64\":\"${BOOT_ISO_URL}\"}," >> $GITHUB_OUTPUT
-          elif [ "${{ matrix.platform }}" == "rawhide" ]; then
+          elif [ "${{ matrix.os-variant }}" == "rawhide" ]; then
             curl -L https://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/x86_64/os/images/boot.iso --output $BOOT_ISO_PATH
             echo "boot_iso=\"bootIso\":{\"x86_64\":\"${BOOT_ISO_URL}\"}," >> $GITHUB_OUTPUT
           else
-            echo "Boot.iso for ${{ matrix.platform }} can't be fetched."
+            echo "Boot.iso for ${{ matrix.os-variant }} can't be fetched."
             echo "boot_iso=" >> $GITHUB_OUTPUT
           fi
 
-      # Configure location of installation repositories for the platform
+      # Configure location of installation repositories for the os variant
       # Also default boot.iso is defined by the value of urls.installation_tree
       # of kstestParams event structure.
-      - name: Set installation tree for the platform
+      - name: Set installation tree for the os variant
         id: set_installation_urls
         working-directory: ./kickstart-tests
         run: |
           set -eux
-          if [ "${{ matrix.platform }}" == "rhel8" ] || \
-             [ "${{ matrix.platform }}" == "rhel9" ] || \
-             [ "${{ matrix.platform }}" == "rhel10" ]; then
-            source ./scripts/defaults-${{ matrix.platform }}.sh
+          if [ "${{ matrix.os-variant }}" == "rhel8" ] || \
+             [ "${{ matrix.os-variant }}" == "rhel9" ] || \
+             [ "${{ matrix.os-variant }}" == "rhel10" ]; then
+            source ./scripts/defaults-${{ matrix.os-variant }}.sh
             echo "installation_tree=${KSTEST_URL}" >> $GITHUB_OUTPUT
             echo "modular_url=${KSTEST_MODULAR_URL}" >> $GITHUB_OUTPUT
           else
-            echo "Installation tree location for ${{ matrix.platform }} not configured"
-            if [ -z "${{ steps.boot_iso_for_platform.outputs.boot_iso }}" ]; then
+            echo "Installation tree location for ${{ matrix.os-variant }} not configured"
+            if [ -z "${{ steps.boot_iso_for_os_variant.outputs.boot_iso }}" ]; then
               echo "No boot.iso source is defined"
               exit 2
             fi
@@ -285,9 +285,9 @@ jobs:
                 "configurations":[{"architecture":"x86_64"}],
                 "point_person":"rvykydal@redhat.com"
               },
-              ${{ steps.boot_iso_for_platform.outputs.boot_iso }}
+              ${{ steps.boot_iso_for_os_variant.outputs.boot_iso }}
               "kstestParams":{
-                "platform":"${{ steps.get_platform_specs.outputs.platform }}",
+                "platform":"${{ steps.get_os_variant_specs.outputs.platform }}",
                 "urls":{
                   "x86_64":{
                     "installation_tree":"${{ steps.set_installation_urls.outputs.installation_tree }}",
@@ -309,7 +309,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: 'logs-${{ matrix.platform }}'
+          name: 'logs-${{ matrix.os-variant }}'
           # skip the /anaconda subdirectories, too large
           path: |
             kickstart-tests/data/logs/kstest*.log
@@ -322,17 +322,17 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: 'logs-permian-${{ matrix.platform }}'
+          name: 'logs-permian-${{ matrix.os-variant }}'
           path: |
             permian/permian.log
 
   result:
-    needs: [platform, pr-info]
+    needs: [os-variant, pr-info]
     if: ${{ always() && needs.pr-info.outputs.allowed_user == 'true' }}
     name: Set result status
     runs-on: ubuntu-latest
     env:
-      STATUS_NAME: test-platforms
+      STATUS_NAME: test-os-variants
     steps:
       - name: Show overall status
         uses: octokit/request-action@v2.x
@@ -340,7 +340,7 @@ jobs:
           route: 'POST /repos/${{ github.repository }}/statuses/${{ needs.pr-info.outputs.sha }}'
           context: '${{ env.STATUS_NAME }} ${{ needs.pr-info.outputs.launch_args }}'
           description: 'finished'
-          state: ${{ needs.platform.result }}
+          state: ${{ needs.os-variant.result }}
           target_url: 'https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

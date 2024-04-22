@@ -40,4 +40,5 @@ prepare_network() {
     echo "user"
     echo "user"
     echo "user"
+    echo "user"
 }

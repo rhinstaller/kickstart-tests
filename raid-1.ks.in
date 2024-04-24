@@ -6,7 +6,7 @@ network --bootproto=dhcp
 bootloader --timeout=1
 clearpart --all --initlabel
 
-reqpart
+%ksappend storage/raid_biosboot.ks
 part raid.01 --size=500 --ondisk=vda --asprimary
 part raid.02 --size=500 --ondisk=vdb --asprimary
 part raid.11 --size=4000 --ondisk=vda

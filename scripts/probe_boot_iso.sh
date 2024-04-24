@@ -68,15 +68,25 @@ if [ ! -s "$ISO_TMP/install.img" ]; then
     fi
 fi
 
-# Extract stage2
-unsquashfs -no-xattrs -no-progress -d "$ISO_TMP/stage2" "$ISO_TMP/install.img"
+
+# Extract files from stage2
+OS_RELEASE=/etc/os-release
+ROOTFS=/LiveOS/rootfs.img
+
+unsquashfs -no-xattrs -follow -no-progress -d "$ISO_TMP/stage2" "$ISO_TMP/install.img" $OS_RELEASE $ROOTFS
 rm "$ISO_TMP/install.img"
+chmod -R a+w $ISO_TMP
 
 # Extract required information from stage2
-timeout -k 10s 30s virt-cat -a "$ISO_TMP/stage2/LiveOS/rootfs.img" /etc/os-release > "$ISO_TMP/os-release"
-if [ $? -eq 124 ]; then
-    echo "Error: virt-cat timed out" >&2
-    exit 4
+if [ -e "$ISO_TMP/stage2$OS_RELEASE" ]; then
+    cp "$ISO_TMP/stage2$OS_RELEASE" "$ISO_TMP/os-release"
+else
+    # On RHEL-8 and RHEL-9 the filesystem is packed in ext4 image (ENGCMP-766)
+    timeout -k 10s 30s virt-cat -a "$ISO_TMP/stage2$ROOTFS" $OS_RELEASE > "$ISO_TMP/os-release"
+    if [ $? -eq 124 ]; then
+        echo "Error: virt-cat timed out" >&2
+        exit 4
+    fi
 fi
 
 # Return useful information to stdout

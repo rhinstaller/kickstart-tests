@@ -47,6 +47,7 @@ rhel8_skip_array=(
   gh774       # autopart-luks-1 failing
   gh830       # packages-weakdeps failing
   gh1018      # bridge-no-bootopts-net failing
+  gh804       # tests requiring dvd iso failing
 )
 
 rhel9_skip_array=(
@@ -57,8 +58,8 @@ rhel9_skip_array=(
   rhbz1960279 # packages-weakdeps: "gnupg2 --recommends has changed, test needs to be updated"
   gh641       # packages-multilib failing on systemd conflict
   gh774       # autopart-luks-1 failing
-  gh790       # repo-addrepo-hd-tree failing
   gh970       # selinux-contexts failing
+  gh804       # tests requiring dvd iso failing
 )
 
 rhel10_skip_array=(
@@ -66,7 +67,7 @@ rhel10_skip_array=(
   skip-on-rhel-10
   gh576       # clearpart-4 test is flaky on all scenarios
   gh640       # authselect-not-set failing
-  gh804       # repo-addrepo-hd-tree failing
+  gh804       # tests requiring dvd iso failing
   gh1090      # raid-1-reqpart failing
   gh1104      # network-prefixdevname failing
   gh1106      # packages-and-groups-1 failing

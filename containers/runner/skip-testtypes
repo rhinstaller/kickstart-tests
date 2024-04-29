@@ -45,7 +45,6 @@ rhel8_skip_array=(
   gh576       # clearpart-4 test is flaky on all scenarios
   gh595       # proxy-cmdline failing on all scenarios
   gh774       # autopart-luks-1 failing
-  gh830       # packages-weakdeps failing
   gh1018      # bridge-no-bootopts-net failing
   gh804       # tests requiring dvd iso failing
 )
@@ -55,7 +54,7 @@ rhel9_skip_array=(
   skip-on-rhel-9
   gh576       # clearpart-4 test is flaky on all scenarios
   gh595       # proxy-cmdline failing on all scenarios
-  rhbz1960279 # packages-weakdeps: "gnupg2 --recommends has changed, test needs to be updated"
+  gh604       # packages-weakdeps: "gnupg2 --recommends has changed, test needs to be updated"
   gh641       # packages-multilib failing on systemd conflict
   gh774       # autopart-luks-1 failing
   gh970       # selinux-contexts failing

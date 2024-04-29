@@ -45,7 +45,6 @@ rhel8_skip_array=(
   gh576       # clearpart-4 test is flaky on all scenarios
   gh595       # proxy-cmdline failing on all scenarios
   gh774       # autopart-luks-1 failing
-  gh830       # packages-weakdeps failing
   gh1018      # bridge-no-bootopts-net failing
   gh804       # tests requiring dvd iso failing
 )

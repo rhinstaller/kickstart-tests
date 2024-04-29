@@ -21,7 +21,7 @@
 # SourceSetupError: Nothing useful found for Hard drive ISO source at partition=/dev/sdb directory=/repo/
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="packaging skip-on-rhel"
+TESTTYPE="packaging gh804"
 
 . ${KSTESTDIR}/harddrive-install-tree.sh
 

@@ -27,8 +27,8 @@ jobs:
       with:
         compose: Fedora-39
         api_key: ${{ secrets.TF_API_KEY }}
-        git_url: "https://github.com/rhinstaller/kickstart-tests"
-        git_ref: "master"
+        git_url: "https://github.com/${{ github.repository }}"
+        git_ref: "refs/pull/${{ github.event.issue.number }}/head"
         path: "ansible"
         tmt_plan_regex: "testing-farm"
         pull_request_status_name: "Testing farm"

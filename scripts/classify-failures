@@ -29,7 +29,7 @@ ISSUES = [
         "last_anaconda_re": "<REGULAR EXPRESSION FOR PYTHON TO BE MATCHED AGAINST THE LAST LINE IN THE LOG CONTAINING 'anaconda:'>",
     },
     {
-        "description": "[675] ([1]) https://github.com/rhinstaller/kickstart-tests/issues/675 The string is also in successful installation, but there is high chance that for test which times out it will be this issue.",
+        "description": "[675] ([1]) https://github.com/rhinstaller/kickstart-tests/issues/675",
         "last_anaconda_re": ".*Configuring \\(running scriptlet for\\): rootfiles.*",
     },
 # Superseded by the last_anaconda_re check

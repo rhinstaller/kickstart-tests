@@ -2,8 +2,9 @@
 name: Testing farm tests
 
 on:
-  pull_request_target:
-    types: [opened, synchronize, reopened]
+  issue_comment:
+    types:
+      - created
 
 jobs:
   testingfarm:
@@ -31,5 +32,6 @@ jobs:
         path: "ansible"
         tmt_plan_regex: "testing-farm"
         pull_request_status_name: "Testing farm"
+        update_pull_request_status: true
         tf_scope: private
         variables: "PR_NUMBER=${{ github.event.issue.number }}"

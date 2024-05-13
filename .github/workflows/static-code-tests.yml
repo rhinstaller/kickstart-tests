@@ -1,0 +1,25 @@
+name: static-code-tests
+on: [pull_request]
+jobs:
+  static-code-tests:
+    runs-on: ubuntu-22.04
+    permissions: {}
+    timeout-minutes: 60
+    env:
+      FORCE_COLOR: 1
+      TEST_BROWSER: firefox
+      CFLAGS: '-O2'
+    steps:
+      - name: Set up dependencies
+        run: |
+          sudo snap install ruff 
+          
+      - name: Clone repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run static code tests
+        timeout-minutes: 30
+        run: |
+            ./test/static-code

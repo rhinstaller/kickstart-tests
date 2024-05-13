@@ -9,6 +9,7 @@ jobs:
   testingfarm:
     name: "Run in testing farm"
     runs-on: ubuntu-latest
+    environment: testing-farm
     if: |
       github.event.issue.pull_request
       && contains(github.event.comment.body, '[test]')

@@ -109,10 +109,6 @@ ISSUES = [
         "first_grep": "BUG: soft lockup",
     },
     {
-        "description": "[964] Validation failed and no RESULT https://github.com/rhinstaller/kickstart-tests/issues/964",
-        "first_grep": "FAILED:Validation failed with return code 1",
-    },
-    {
         "description": "[964] Validation failed and no RESULT - another string https://github.com/rhinstaller/kickstart-tests/issues/964",
         "first_grep": "/root/RESULT does not exist in VM image.",
     },

@@ -44,7 +44,7 @@ def merge_directories(source_dir, dest_dir):
         elif os.path.isdir(item_path):
             # copy all directories recursively, merge with existing folders and
             # overwrite existing files
-            for root, dirs, files in os.walk(item_path):
+            for root, _, files in os.walk(item_path):
                 # we only need the full source path to copy files to the destination,
                 # to create all necessary folders we also need the path suffix for
                 # the directory being walked and the target path based on the suffix
@@ -70,7 +70,7 @@ def apply_overrides(override_folders, runtime_folder):
     :type override_folders: list of str
     :param str runtime_folder: path to the ksappend runtime folder
     """
-    for override_folder in parser.override_folders:
+    for override_folder in override_folders:
         if os.path.exists(override_folder):
             logging.info("adding ksappend override folder %s", override_folder)
             merge_directories(override_folder, runtime_folder)

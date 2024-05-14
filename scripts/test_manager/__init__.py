@@ -60,7 +60,7 @@ class BaseFilter(ABC):
             if f.name == name:
                 return f
 
-        raise KeyError("Filter with name: {} doesn't present", name)
+        raise KeyError(f"Filter with name: {name} doesn't present")
 
     def get_filters(self):
         """Return list of all filters."""

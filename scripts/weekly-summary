@@ -91,8 +91,8 @@ def get_artifacts(token, artifact_names, start, end):
             if r.status == 403:
                 try:
                     reset = int(r.headers.get("X-RateLimit-Reset"))
-                except:
-                    raise RuntimeError("Hit GitHub rate limit. Reset header missing.")
+                except Exception as exc:
+                    raise RuntimeError("Hit GitHub rate limit. Reset header missing.") from exc
                 if retry_limit == 0 or time.time() > reset or reset - time.time() > 90:
                     raise RuntimeError("Hit GitHub rate limit. Reset is at %s" % time.ctime(reset))
 

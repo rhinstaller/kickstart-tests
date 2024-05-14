@@ -13,7 +13,7 @@
 
 command -v authselect > /dev/null 2>&1
 if [[ $? -eq 0 ]]; then
-    authselect current | egrep -q "No existing configuration detected"
+    authselect current | grep -E "No existing configuration detected"
     if [[ $? -ne 0 ]]; then
         echo "*** Failed check: authselect not installed or no existing configuration detected" >> /root/RESULT
     fi

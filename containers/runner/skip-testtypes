@@ -12,7 +12,6 @@ fedora_skip_array=(
   skip-on-fedora
   gh576       # clearpart-4 test is flaky on all scenarios
   gh595       # proxy-cmdline failing on all scenarios
-  gh640       # authselect-not-set failing
   gh641       # packages-multilib failing on systemd conflict
   gh680       # proxy-kickstart and proxy-auth failing
   gh740       # fedora-live-image-build fails on comps changes

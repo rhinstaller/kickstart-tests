@@ -15,6 +15,7 @@ RUN dnf -y update && \
     parallel \
     python3-libvirt \
     createrepo_c \
+    python3-pip \
     python3-rpmfluff \
     squid \
     make \

@@ -4,15 +4,12 @@ jobs:
   static-code-tests:
     runs-on: ubuntu-22.04
     permissions: {}
-    timeout-minutes: 60
-    env:
-      FORCE_COLOR: 1
-      TEST_BROWSER: firefox
-      CFLAGS: '-O2'
+    container:
+      image: quay.io/rhinstaller/kstest-runner
     steps:
       - name: Set up dependencies
         run: |
-          sudo snap install ruff 
+          pip install pylint==3.1.0 ruff==0.3.7
           
       - name: Clone repository
         uses: actions/checkout@v4
@@ -20,6 +17,5 @@ jobs:
           fetch-depth: 0
 
       - name: Run static code tests
-        timeout-minutes: 30
         run: |
-            ./test/static-code
+            export PATH="$HOME/.local/bin:$PATH"; ./test/static-code

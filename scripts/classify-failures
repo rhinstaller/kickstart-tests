@@ -243,6 +243,7 @@ def _find_files(args, filenames):
             "f",
         ] + filenames_args + exclude_dir_args,
         capture_output=True,
+        check=False,
         encoding="utf8",
     )
     if find.stdout:
@@ -263,6 +264,7 @@ def _get_match(issue, file_path, args):
                 "-C", str(args.show_line_context),
             ] + [file_path],
             capture_output=True,
+            check=False,
             encoding="utf8"
         )
         match = grep.stdout

@@ -55,7 +55,7 @@ def merge_directories(source_dir, dest_dir):
                     os.makedirs(root_in_dest_dir)
                 # copy files
                 for file in files:
-                   shutil.copyfile(os.path.join(root, file), os.path.join(root_in_dest_dir, file))
+                    shutil.copyfile(os.path.join(root, file), os.path.join(root_in_dest_dir, file))
 
 def apply_overrides(override_folders, runtime_folder):
     """ Apply ksappend overrides on a runtime folder.

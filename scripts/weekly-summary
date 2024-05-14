@@ -158,7 +158,7 @@ def run_curl(token, url, filename):
             c.perform()
             status = c.getinfo(pycurl.HTTP_CODE)
             ok = (status == 200, None)
-        except Exception as e:
+        except pycurl.error as e:
             print(f"ERROR: {e}", file=sys.stderr)
             sys.stderr.flush()
             ok = (False, e)

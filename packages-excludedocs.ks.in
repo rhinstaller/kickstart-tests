@@ -22,6 +22,8 @@
 # For now let's just remove these files so that the test will pass.
 rm -f /usr/share/doc/xz/COPYING
 rm -f /usr/share/doc/xz/COPYING.GPLv2
+# Similar issue for sdbus-cpp, reported as: https://bugzilla.redhat.com/show_bug.cgi?id=2280338
+rm -f /usr/share/doc/sdbus-c++/COPYING
 
 if [ ! -d /usr/share/doc ]; then
     echo SUCCESS > /root/RESULT

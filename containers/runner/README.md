@@ -27,8 +27,8 @@ variable to the name of the container to use when calling launch. eg:
 
 The `launch` script creates a `./data/` directory for passing of data between
 the container and the system (via volume).  By default it downloads the current
-Fedora Rawhide boot.iso, but to test some other image you can put it into
-`data/images/boot.iso` before running `launch`.
+Fedora Rawhide boot.iso or adequate iso file based on `--platform` option.
+To test other images they can be put into `data/images/boot.iso` before running `launch`.
 
 There is also a [daily boot.iso](.github/workflows/daily-boot-iso.yml) built
 from Rawhide and various COPRs (e.g. Anaconda and DNF) for regression testing,
@@ -41,10 +41,9 @@ The result logs get written into `./data/logs/`:
     tree -L 3 data/logs
     cat data/logs/kstest-*/anaconda/virt-install.log
 
-To run the tests on a RHEL 9 installer, download the RHEL 9 boot.iso into
-`.data/images` folder and run the test with `--platform rhel9` option. It will
-make sure the kickstart fragments for the respective platform (`rhel9`) from
-[fragments/platform](/fragments/platform) are used.
+To run tests on a different operating system (e.g. RHEL 9) use `--platform`
+option (e.g. `--platform rhel9`. It will make sure the kickstart fragments for
+the respective platform (`rhel9`) from [fragments/platform](/fragments/platform) are used.
 
 # Configuration of the test
 

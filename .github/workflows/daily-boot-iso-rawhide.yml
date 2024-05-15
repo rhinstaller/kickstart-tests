@@ -79,7 +79,7 @@ jobs:
           sudo losetup -d /dev/loop1 2> /dev/null || true
 
       - name: Upload log artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: logs
           path: |
@@ -87,7 +87,7 @@ jobs:
             /tmp/lorax-images/*.txt
 
       - name: Upload image artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: images
           path: |

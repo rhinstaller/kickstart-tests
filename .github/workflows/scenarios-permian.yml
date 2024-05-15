@@ -194,7 +194,7 @@ jobs:
 
       - name: Collect anaconda logs
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: 'logs-${{ matrix.scenario }}'
           # skip the /anaconda subdirectories, too large
@@ -207,7 +207,7 @@ jobs:
 
       - name: Collect json summary
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: 'summary-${{ matrix.scenario }}'
           path: |
@@ -215,7 +215,7 @@ jobs:
 
       - name: Collect Permian logs
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: 'logs-permian-${{ matrix.scenario }}'
           path: |
@@ -223,7 +223,7 @@ jobs:
 
       - name: Collect Permian xunit reporter results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: 'results-xunit-${{ matrix.scenario }}'
           path: |

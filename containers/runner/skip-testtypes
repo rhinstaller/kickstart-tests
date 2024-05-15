@@ -56,7 +56,6 @@ rhel9_skip_array=(
   gh604       # packages-weakdeps: "gnupg2 --recommends has changed, test needs to be updated"
   gh641       # packages-multilib failing on systemd conflict
   gh774       # autopart-luks-1 failing
-  gh970       # selinux-contexts failing
   gh804       # tests requiring dvd iso failing
 )
 

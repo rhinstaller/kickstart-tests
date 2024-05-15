@@ -3,9 +3,64 @@
 
 set -eu
 
-test_ruff() {
-    command -v ruff >/dev/null || skip 'no ruff'
-    ruff check --no-cache
+find_scripts() {
+    # Helper to find all scripts in the tree
+    (
+        # Any non-binary file which contains a given shebang
+        git grep --cached -lIz '^#!.*'"$1"
+        shift
+        # Any file matching the provided globs
+        git ls-files -z "$@"
+    ) | sort -z | uniq -z
 }
 
-test_ruff
+find_python_files() {
+    find_scripts 'python3' '*.py'
+}
+
+test_ruff() {
+    command -v ruff >/dev/null || skip 'no ruff'
+    find_python_files | xargs -r -0 ruff check --no-cache
+}
+
+test_pylint() {
+    command -v pylint >/dev/null || skip 'no pylint'
+    find_python_files | xargs -r -0 pylint
+}
+
+exit_status=0
+counter=0
+
+tests=("$(compgen -A function 'test_')")
+
+for test_function in "${tests[@]}"; do
+    path="/static-code/$(echo ${test_function} | tr '_' '-')"
+    counter=$((counter + 1))
+    fail=''
+    skip=''
+
+    # run the test, capturing its output and exit status
+    output="$(${test_function} 2>&1)" && test_status=0 || test_status=$?
+
+    if [ "${test_status}" = 77 ]; then
+        if [ -z "${tap}" ]; then
+            printf >&2 "WARNING: skipping %s: %s\n" "${path}" "${output}"
+        fi
+        skip=" # SKIP ${output}"
+        output=''
+    elif [ "${test_status}" != 0 ]; then
+        exit_status=1
+        fail=1
+    fi
+
+    # Only print output on failures
+    [ -n "${fail}" ] || continue
+
+    # excluding the plan, this is the only output that we ever generate
+    printf "%s %d %s%s\n" "${fail:+not }ok" "${counter}" "${path}" "${skip}"
+    if [ -n "${output}" ]; then
+        printf "%s\n" "${output}" | sed -e 's/^/# /'
+    fi
+done
+
+exit "${exit_status}"

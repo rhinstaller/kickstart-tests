@@ -35,7 +35,7 @@ def get_skip_testtypes(skip_file, variable):
     if not os.path.exists(skip_file):
         raise ValueError("Disabled tests file {} not found".format(skip_file))
     command = shlex.split("bash -c 'source {}; echo ${}'".format(skip_file, variable))
-    taglist = subprocess.run(command, capture_output=True, encoding="utf8")
+    taglist = subprocess.run(command, capture_output=True, check=False, encoding="utf8")
     return taglist.stdout.strip().split(',')
 
 

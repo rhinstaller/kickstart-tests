@@ -304,7 +304,7 @@ if [[ "${tests}" == "" ]]; then
     exit 0
 fi
 
-echo "Running tests: ${tests}"
+echo "Selected tests: ${tests}"
 
 if [[ -z "${sed_args}" ]]; then
     echo "No substitutions provided, tests will fail; skipping."
@@ -444,7 +444,7 @@ if [[ "$TEST_REMOTES" != "" ]]; then
 
     cd ..
 
-    echo "starting tests"
+    echo "Starting the tests"
 
     # Parallel aparently tends to import environment shell variables to the
     # remote shell run environment, which can cause issues if the host that
@@ -485,6 +485,7 @@ if [[ "$TEST_REMOTES" != "" ]]; then
         ssh kstest@${remote} rm -rf /var/tmp/kstest-\*
     done
 else
+    echo "Starting the tests"
     timeout ${TIMEOUT} parallel --no-notice --jobs ${TEST_JOBS:-4} \
         PYTHONPATH=$PYTHONPATH scripts/launcher/run_one_test.py \
                                                       -i ${IMAGE} \

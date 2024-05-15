@@ -1,0 +1,11 @@
+#!/bin/bash
+# run static code checks like ruff.
+
+set -eu
+
+test_ruff() {
+    command -v ruff >/dev/null || skip 'no ruff'
+    ruff check --no-cache
+}
+
+test_ruff

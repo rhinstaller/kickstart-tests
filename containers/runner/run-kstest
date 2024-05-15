@@ -97,12 +97,22 @@ if [ "$KSTESTS_KEEP" != "2" ]; then
     find /var/tmp/kstest-* -name "*.iso" -delete
     find /var/tmp/kstest-* -name "*.img" -delete
 fi
-cp $TEST_LOG ${LOGS_DIR}
-cp $TEST_LOG.json ${LOGS_DIR}
-cp /var/tmp/kstest-list ${LOGS_DIR}
-cp /var/tmp/kstest.virt-install.log ${LOGS_DIR} || true
+
+KSTEST_LIST_LOG=/var/tmp/kstest-list
+VIRT_INSTALL_LOG=/var/tmp/kstest.virt-install.log
+
+for f in $TEST_LOG $TEST_LOG.json $KSTEST_LIST_LOG ; do
+    cp ${f} ${LOGS_DIR}
+    chmod a+rw "${LOGS_DIR}/$(basename ${f})" || true
+done
+
+# The log can be missing
+cp ${VIRT_INSTALL_LOG} ${LOGS_DIR} || true
+chmod a+rw "${LOGS_DIR}/$(basename ${VIRT_INSTALL_LOG})" || true
+
 # Move to target logs directory; this sometimes fails on nested directory permission/ownership
 cp -pr /var/tmp/kstest-* ${LOGS_DIR} || true
+cp -r /var/tmp/kstest-list-substituted ${LOGS_DIR}
 
 # Show summary report
 ${KSTESTS_DIR}/scripts/run_report.sh < $TEST_LOG

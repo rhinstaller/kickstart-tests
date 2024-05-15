@@ -24,10 +24,15 @@ prepare:
     - name: prepare repository
       how: shell
       script: |
+        # Clone repository to where the tests are taken from
         git clone https://github.com/rhinstaller/kickstart-tests /root/kickstart-tests
         cd /root/kickstart-tests
         git fetch origin +refs/pull/*:refs/remotes/origin/pr/*
         git checkout origin/pr/$PR_NUMBER/head
+
+        # Before test execution we are doing rebase, for that we need to configure git correctly
+        git config user.name github-actions
+        git config user.email github-actions@github.com
 
 execute:
     how: tmt

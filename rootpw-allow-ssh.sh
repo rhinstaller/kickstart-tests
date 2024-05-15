@@ -19,7 +19,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="users skip-on-rhel-8 gh1109"
+TESTTYPE="users skip-on-rhel-8"
 
 . ${KSTESTDIR}/functions.sh
 

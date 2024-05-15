@@ -14,9 +14,9 @@ command -v authselect > /dev/null 2>&1
 if [[ $? -eq 0 ]]; then
     if is_rhel8 @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@ || \
        is_rhel9 @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@ ; then
-        authselect current | grep -E "No existing configuration detected"
+        authselect current | grep -vE "No existing configuration detected"
     else
-        authselect current | grep -E "Profile ID: local"
+        authselect current | grep -vE "Profile ID: local"
     fi
     if [[ $? -ne 0 ]]; then
         echo "*** Failed check: authselect not installed or no default configuration detected" >> /root/RESULT

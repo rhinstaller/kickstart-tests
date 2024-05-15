@@ -1,3 +1,27 @@
+# This is TMT plan for running our kickstart tests on PRs with TFT resources
+#
+# This plan is harder to debug locally because repository needs to be cloned into the tests
+# environment (VM). Much easier approach is to create target PR with your changes and check
+# the TMT execution website which will guide you how to rerun the tests.
+#
+# If you really need to debug this locally follow these steps:
+# 1. Create PR against rhinstaller/kickstart tests
+# 2. Run `tmt run --all -vvv -e PR_NUMBER=<Pull Request id> provision --how virtual --memory 16384  # Don't go with memory under 3072 MB
+#
+# Steps above will start local VM which will clone your PR and execute tests on that code. It means
+# that TMT plan data are taken from local but everything else is taken from the PR.
+#
+# To connect to the local VM spawned by `provision --how virtual` do:
+#
+#    ssh -p <port is printed during the provisioning step> root@127.0.0.1
+#
+# Inside the VM you can connect to virsh or podman running the tests.
+#
+# After multiple local runs I recommend you to cleanup by:
+#
+#    tmt clean
+#
+
 summary: TMT/TFT plan for running kickstart tests on Fedora system
 description: |
     Run kickstart tests on Fedora

@@ -19,7 +19,7 @@ prepare:
     - name: Update guest
       how: shell
       script: |
-        dnf distro-sync -y && dnf install -y git
+        dnf distro-sync -y && dnf install -y git podman
 
     - name: prepare repository
       how: shell

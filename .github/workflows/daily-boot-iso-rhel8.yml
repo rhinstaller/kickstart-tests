@@ -82,7 +82,7 @@ jobs:
 
       - name: Upload image build log artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: image-build-logs
           path: |
@@ -105,7 +105,7 @@ jobs:
 
       - name: Upload test logs
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: 'logs-rhel8-daily'
           # skip the /anaconda subdirectories, too large

@@ -20,7 +20,7 @@ jobs:
           fetch-depth: 0
 
       - name: Differential ShellCheck
-        uses: redhat-plumbers-in-action/differential-shellcheck@v4
+        uses: redhat-plumbers-in-action/differential-shellcheck@v5
         env:
           # The shell specification is missing in .sh test files
           SHELLCHECK_OPTS: -s bash

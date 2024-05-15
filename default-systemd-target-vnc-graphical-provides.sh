@@ -19,7 +19,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="services gh890"
+TESTTYPE="services gh890 skip-on-rhel-10"
 
 . ${KSTESTDIR}/functions.sh
 . ${KSTESTDIR}/validate-lib-services.sh

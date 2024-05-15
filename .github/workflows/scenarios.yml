@@ -32,7 +32,7 @@ jobs:
           sudo rm -rf *
 
       - name: Clone repository
-        uses: actions/checkout@v3.3.0
+        uses: actions/checkout@v4
 
       # use the latest official packages for the nightly runs
       - name: Clean up squid cache

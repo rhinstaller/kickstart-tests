@@ -1,0 +1,29 @@
+#version=DEVEL
+#test name: default-systemd-target-rdp
+#
+# Test multi-user.target should be set by default as the default systemd target
+# for remote desktop installs. While controlled remotely over RDP the installation itself runs
+# in text mode and should behave as such.
+
+%ksappend repos/default.ks
+
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+%post
+
+# the support script should run the installation in RDP mode via boot options
+cat /proc/cmdline | grep inst.rdp
+if [[ $? != 0 ]]; then
+    echo "*** inst.rdp not used to enable remote desktop mode" >> /root/RESULT
+    echo "*** /proc/cmdline:" >> /root/RESULT
+    cat /proc/cmdline >> /root/RESULT
+fi
+
+systemctl get-default | grep multi-user.target
+if [[ $? != 0 ]]; then
+    echo "*** multi-user.target should be set as the default systemd target for remote desktop (RDP) installs" >> /root/RESULT
+fi
+
+%ksappend validation/success_if_result_empty.ks
+%end

@@ -1,0 +1,36 @@
+#version=DEVEL
+#test name: default-systemd-target-rdp-graphical-provides
+#
+# Test multi-user.target is set as the default systemd target if:
+# - the installation runs in remote desktop mode
+# - the installation transaction contains a package providing service(graphical-login)
+# Text mode overrides the provides & for this RDP installation is considered to be
+# similar to textmode, as while controlled remotely over RDP, the installation run
+# itself runs in text mode.
+
+%ksappend repos/default.ks
+
+%ksappend common/common_no_payload.ks
+
+# the gdm package provides service(graphical-login)
+%packages
+gdm
+%end
+
+%post
+
+# the support script should run the installation in RDP mode via boot options
+cat /proc/cmdline | grep inst.rdp
+if [[ $? != 0 ]]; then
+    echo "*** inst.rdp not used to enable remote desktop mode" >> /root/RESULT
+    echo "*** /proc/cmdline:" >> /root/RESULT
+    cat /proc/cmdline >> /root/RESULT
+fi
+
+systemctl get-default | grep multi-user.target
+if [[ $? != 0 ]]; then
+    echo "*** multi-user.target should be set for remote desktop (RDP) installs even if package with service(graphical-login) is installed" >> /root/RESULT
+fi
+
+%ksappend validation/success_if_result_empty.ks
+%end

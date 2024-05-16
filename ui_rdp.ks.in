@@ -1,0 +1,32 @@
+#version=DEVEL
+#test name: ui_rdp
+
+# Use defaults.
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+%post --nochroot
+
+# the support script should run the installation in RDP mode via boot options
+cat /proc/cmdline | grep inst.rdp
+if [[ $? != 0 ]]; then
+    echo "*** inst.rdp not used to enable remote desktop mode" >> /mnt/sysroot/root/RESULT
+    echo "*** /proc/cmdline:" >> /mnt/sysroot/root/RESULT
+    cat /proc/cmdline >> /mnt/sysroot/root/RESULT
+fi
+
+@KSINCLUDE@ post-nochroot-lib-ui.sh
+
+# Check the installation mode.
+check_display_mode "interactive graphical mode"
+
+# Check the RDP server.
+check_rdp_server_is_running
+
+%end
+
+# this needs to be separate so that checking /root/RESULT works as
+# expected due to the main %post section using --nochroot
+%ksappend validation/success_if_result_empty_standalone.ks
+

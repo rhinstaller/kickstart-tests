@@ -12,7 +12,7 @@
 rootpw --plaintext --allow-ssh qweqwe
 
 %packages
-sshpass
+expect
 %end
 
 # Reboot the installed system.
@@ -30,8 +30,20 @@ touch /root/.hushlogin
 # Write the code to run after reboot.
 cat > /usr/libexec/kickstart-test.sh << 'EOF'
 
-# Ssh login silently
-sshpass -p qweqwe ssh -q -o strictHostKeyChecking=no root@localhost
+# Ssh login interactively
+# If the script asks for password the second time, error out
+# If the connection gets closed it means success
+expect -c "
+   set timeout 5
+   spawn ssh -o strictHostKeyChecking=no root@localhost -t \"cat /etc/os-release\"
+   expect {
+      -re \"^.*sword: \" {send \"qweqwe\r\"}
+   }
+   expect {
+      -re \"Connection to .* closed.\" {exit 0}
+      -re \"^.*sword: \" {exit 1}
+   }
+" > /dev/null
 login_result=$?
 
 if [[ ${login_result} != 0 ]]; then

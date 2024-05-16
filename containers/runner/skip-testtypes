@@ -69,7 +69,6 @@ rhel10_skip_array=(
   gh1104      # network-prefixdevname failing
   gh1105      # preexisting btrfs failing
   gh1108      # proxy-auth, proxy-kickstart failing
-  gh1109      # rootps-allow-ssh failing
   gh1107      # rpm-ostree-container failing
   gh1110      # storage-multipath-autopart failing
 )

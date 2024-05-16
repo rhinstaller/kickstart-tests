@@ -52,7 +52,7 @@ First you need to install the needed dependencies:
 
 You also need to start libvirt service to be able to use virt-install::
 
-  sudo systemctl start libvirtd
+  sudo systemctl start virtqemud
 
 Then clone the kickstart-tests repository::
 

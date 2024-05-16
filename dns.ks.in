@@ -12,8 +12,10 @@
 %post
 
 @KSINCLUDE@ post-lib-network.sh
+@KSINCLUDE@ scripts-lib.sh
+platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
 
-if [ "@KSTEST_OS_NAME@" == "rhel" ]; then
+if [ "${platform:0:4}" == "rhel" ]; then
     # rhbz#1989472
     check_resolv_conf_is_by_nm
 else

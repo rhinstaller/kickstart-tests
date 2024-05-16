@@ -24,3 +24,12 @@ function check_vnc_server_is_running() {
         echo "*** the VNC server is not running" >> ${RESULT_FILE}
     fi
 }
+
+# Check that the RDP server is running.
+function check_rdp_server_is_running() {
+    grep -q "GNOME remote desktop is now running." /tmp/anaconda.log
+
+    if [[ $? -ne 0 ]]; then
+        echo "*** the RDP server is not running" >> ${RESULT_FILE}
+    fi
+}

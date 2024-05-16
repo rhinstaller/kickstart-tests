@@ -19,7 +19,7 @@ tmux
 -tmux
 
 # (3) Test that you can add packages with a glob.
-kacst*
+google-noto*
 
 # (4) Test that you can remove packages with a glob.
 -grub2-efi*
@@ -50,10 +50,10 @@ if [[ $? == 0 ]]; then
     echo '*** tmux package should not have been installed' >> /root/RESULT
 fi
 
-# Testing #3 - kacst font stuff should be installed.
-count=$(rpm -qa kacst\* | wc -l)
+# Testing #3 - google-noto font stuff should be installed.
+count=$(rpm -qa google-noto\* | wc -l)
 if [[ $count -lt 5 ]]; then
-    echo '*** kacst* glob was not installed' >> /root/RESULT
+    echo '*** google-noto* glob was not installed' >> /root/RESULT
 fi
 
 # Testing #4 - grub2-efi stuff should not be installed.

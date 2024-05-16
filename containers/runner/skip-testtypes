@@ -67,7 +67,6 @@ rhel10_skip_array=(
   gh804       # tests requiring dvd iso failing
   gh1090      # raid-1-reqpart failing
   gh1104      # network-prefixdevname failing
-  gh1106      # packages-and-groups-1 failing
   gh1105      # preexisting btrfs failing
   gh1108      # proxy-auth, proxy-kickstart failing
   gh1109      # rootps-allow-ssh failing

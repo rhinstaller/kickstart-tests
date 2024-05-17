@@ -62,8 +62,8 @@ mkdir -p ~/.cache/virt-manager/boot
 # Expose libvirt to the outside, so that one can attach virt-viewer easily for debugging
 # Disable TLS; we don't have a certificate setup, and this is all local anyway
 mkdir -p ~/.config/libvirt
-printf 'listen_tls = 0\nlisten_tcp = 1\nauth_tcp = "none"\n' > ~/.config/libvirt/libvirtd.conf
-libvirtd --listen > ${LOGS_DIR}/libvirtd.log 2>&1 &
+printf 'listen_tls = 0\nlisten_tcp = 1\nauth_tcp = "none"\n' > ~/.config/libvirt/virtproxyd.conf
+virtproxyd -f ~/.config/libvirt/virtproxyd.conf &
 
 # this only works with a bridged network; user containers use SLIRP and only have a tun0 interface
 if MY_IP=$(ip -4 -c a show dev eth0 2>/dev/null | grep -Eo '[0-9.]+\.[0-9]+' | grep -v '\.255'); then

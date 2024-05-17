@@ -107,11 +107,11 @@ class TestConfigurator(BaseFilter):
         if not match:
             return content
 
-        include_content = self._load_file_content(match[1])
+        include_content = self._load_lib_file_content(match[1])
         return self._re_ks_include.sub(include_content, content)
 
-    def _load_file_content(self, file):
-        file_path = os.path.join(self._root, file)
+    def _load_lib_file_content(self, file):
+        file_path = os.path.join(self._root, "lib", file)
 
         if not os.path.exists(file_path):
             raise IncludeFileMissingError("KSINCLUDE file {} missing in test".format(file_path))

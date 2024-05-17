@@ -18,4 +18,4 @@ jobs:
 
       - name: Run static code tests
         run: |
-            export PATH="$HOME/.local/bin:$PATH"; ./test/static-code
+            export PATH="$HOME/.local/bin:$PATH"; ./tools/static-code

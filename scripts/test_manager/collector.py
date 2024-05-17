@@ -71,7 +71,7 @@ class TestCollector(object):
     @classmethod
     def _find_all(cls, root):
         ret = set()
-        find_pattern = os.path.join(root, "*.ks.in")
+        find_pattern = os.path.join(root, "**/*.ks.in", recursive=True)
         for f in iglob(find_pattern):
             ret.add(KickstartTest(f))
 

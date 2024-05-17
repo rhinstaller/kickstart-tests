@@ -13,7 +13,7 @@ jobs:
     environment: testing-farm
     if: |
       github.event.issue.pull_request
-      && contains(github.event.comment.body, '[test]')
+      && contains(github.event.comment.body, '/test-tmt')
       && contains(fromJson('["OWNER", "MEMBER"]'), github.event.comment.author_association)
     steps:
     - name: Checkout repo

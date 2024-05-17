@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Run a set of tests (positional command line arguments) in the runner container in podman or docker.
 # Tests are taken from the current kickstart-tests checkout
 # If data/images/boot.iso exists, that is tested, otherwise it downloads the current Fedora Rawhide version.
@@ -28,6 +28,7 @@ recommended_jobs() {
 }
 
 TEST_JOBS=${TEST_JOBS:-$(recommended_jobs)}
+PLATFORM="fedora_rawhide"
 
 if ! test -w /dev/kvm; then
     echo "FATAL: /dev/kvm not accessible" >&2
@@ -111,9 +112,12 @@ if ! [ -e data/images/boot.iso ]; then
         echo "INFO: data/images/boot.iso does not exist, downloading daily iso..."
         $PWD/containers/runner/fetch_daily_iso.sh ${DAILY_ISO_TOKEN} data/images/boot.iso
     else
-        echo "INFO: data/images/boot.iso does not exist, downloading current Fedora Rawhide Everything image..."
-        curl -L https://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/x86_64/os/images/boot.iso --output data/images/boot.iso
+        echo "INFO: data/images/boot.iso does not exist, downloading current ${PLATFORM} image..."
+        source scripts/defaults-${PLATFORM}.sh
+        curl -L  "${KSTEST_URL}/images/boot.iso" --output data/images/boot.iso
     fi
+else
+    echo "Using existing data/images/boot.iso"
 fi
 
 # support both path and URL for --updates

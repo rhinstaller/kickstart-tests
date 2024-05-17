@@ -26,9 +26,10 @@ shutdown
 # We will copy /root/RESULT to /mnt/sysimage/root/RESULT at the beginning of the %post (--nochroot) checks
 @KSINCLUDE@ post-lib-network.sh
 @KSINCLUDE@ scripts-lib.sh
+platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
 
 check_config_exists @KSTEST_NETDEV1@ no
-if is_rhel8 @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@ ; then
+if [ "${platform}" == "rhel8" ]; then
     check_config_exists @KSTEST_NETDEV2@ yes
 else
     check_config_exists @KSTEST_NETDEV2@ no
@@ -38,7 +39,7 @@ check_device_connected @KSTEST_NETDEV1@ yes
 check_device_connected @KSTEST_NETDEV2@ yes
 check_device_connected @KSTEST_NETDEV3@ yes
 
-if is_rhel8 @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@ ; then
+if [ "${platform}" == "rhel8" ]; then
     check_number_of_connections 2
 else
     # includes "lo" connection
@@ -47,7 +48,7 @@ fi
 
 check_connection_device "Wired Connection" @KSTEST_NETDEV1@
 check_connection_device "Wired Connection" @KSTEST_NETDEV2@
-if is_rhel8 @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@ ; then
+if [ "${platform}" == "rhel8" ]; then
     check_connection_device "System @KSTEST_NETDEV2@"
 fi
 check_connection_device "Wired Connection" @KSTEST_NETDEV3@
@@ -76,6 +77,7 @@ check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@
 
 @KSINCLUDE@ post-lib-network.sh
 @KSINCLUDE@ scripts-lib.sh
+platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
 
 check_device_config_value @KSTEST_NETDEV1@ ONBOOT yes connection autoconnect __NONE
 check_device_config_value @KSTEST_NETDEV2@ ONBOOT yes connection autoconnect __NONE
@@ -89,7 +91,7 @@ check_device_connected @KSTEST_NETDEV3@ yes
 check_connection_device "Wired Connection" @KSTEST_NETDEV2@
 check_connection_device @KSTEST_NETDEV2@
 
-if is_rhel8 @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@ ; then
+if [ "${platform}" == "rhel8" ]; then
     check_number_of_connections 4
 else
     # includes "lo" connection

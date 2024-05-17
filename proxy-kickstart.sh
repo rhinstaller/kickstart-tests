@@ -20,7 +20,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="method proxy gh680 gh1108"
+TESTTYPE="method proxy"
 
 . ${KSTESTDIR}/functions.sh
 . ${KSTESTDIR}/functions-proxy.sh
@@ -30,6 +30,8 @@ prepare() {
     local tmp_dir=$2
     local httpd_url=""
     local proxy_url=""
+    httpd_url=$(cat ${tmpdir}/httpd_url)
+    proxy_url=$(cat ${tmpdir}/proxy_url)
     mkdir "${tmp_dir}/http"
 
     # Create the addon repository.
@@ -52,7 +54,7 @@ prepare() {
     # Substitute variables in the kickstart file.
     sed -e  "/^repo/ s|HTTP-ADDON-REPO|${httpd_local_url}|" \
         -re "/^(repo|url)/ s|PROXY-ADDON|${proxy_url}|" \
-        -e  "/'proxy=/ s|PROXY-ADDON|${proxy_url%%/*}|" \
+        -e  "/'proxy\\\\s\?=/ s|PROXY-ADDON|${proxy_url%/*}|" \
         "${ks}" > "${tmp_dir}/ks.cfg"
 
     echo "${tmp_dir}/ks.cfg"

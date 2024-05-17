@@ -7,7 +7,15 @@ discover:
     tests:
     - name: 'repository: kickstart-tests'
       framework: shell
-      test: cd /root/kickstart-tests && scripts/run_travis.sh
+      test: |
+        set -x
+
+        trap "cp -rv data/logs/ ${TMT_TEST_DATA}/" EXIT INT QUIT PIPE
+
+        cd /root/kickstart-tests 
+        scripts/run_travis.sh
+
+
       duration: 6h
 
 provision:

@@ -22,6 +22,7 @@ provision:
     hardware:
         virtualization:
             is-supported: true
+        memory: '>= 8 GB'
 
 prepare:
     - name: Update guest

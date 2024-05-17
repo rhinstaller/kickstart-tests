@@ -374,7 +374,7 @@ tests, and PRs usually just run a few tests so that flakes are much less likely
 to ruin the result.
 
 To test a PR on all supported os versions (including rhel) there is a
-`test-os-versions`_ workflow running the tests on a comment in a PR.
+`test-os-variants`_ workflow running the tests on a comment in a PR.
 Running it requires admin repository permissions.
 
 Service jobs

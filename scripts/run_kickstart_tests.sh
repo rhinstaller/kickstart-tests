@@ -211,7 +211,7 @@ function should_skip_test() {
 # Find all tests in the . folder. These tests will be filtered by TESTTYPE parameter
 # if specified.
 function find_tests() {
-    local tests=$(find . -maxdepth 1 -name '*.sh' -a -perm -o+x)
+    local tests=$(find tests/ -maxdepth 1 -name '*.sh' -a -perm -o+x)
 
     local newtests=""
     local skipped_tests=""
@@ -246,7 +246,7 @@ if [[ $# != 0 ]]; then
     tests=""
 
     # Allow people to leave off the .sh.
-    for t in $*; do
+    for t in tests/$*; do
         if [[ "${t}" == *.sh ]]; then
             test="${t}"
         else
@@ -261,7 +261,7 @@ elif [[ "${ghprbActualCommit}" != "" ]]; then
     tests=""
 
     candidates="$(for f in ${files}; do
-        # Only accept files that are .sh or .ks.in files in this top-level directory.
+        # Only accept files that are .sh or .ks.in files in the 'tests' directory.
         # Those are the tests.  If either file for a particular test changed, we want
         # to run the test.  The first step of figuring this out is stripping off
         # the file extension.

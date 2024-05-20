@@ -414,7 +414,6 @@ echo SUCCESS > /root/RESULT
 %packages
 @^workstation-product-environment
 @anaconda-tools
-@x86-baremetal-tools
 aajohan-comfortaa-fonts
 anaconda
 anaconda-install-env-deps

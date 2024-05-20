@@ -12,7 +12,6 @@ fedora_skip_array=(
   skip-on-fedora
   gh576       # clearpart-4 test is flaky on all scenarios
   gh595       # proxy-cmdline failing on all scenarios
-  gh641       # packages-multilib failing on systemd conflict
   gh680       # proxy-kickstart and proxy-auth failing
   gh740       # fedora-live-image-build fails on comps changes
   gh774       # autopart-luks-1 failing
@@ -53,7 +52,6 @@ rhel9_skip_array=(
   gh576       # clearpart-4 test is flaky on all scenarios
   gh595       # proxy-cmdline failing on all scenarios
   gh604       # packages-weakdeps: "gnupg2 --recommends has changed, test needs to be updated"
-  gh641       # packages-multilib failing on systemd conflict
   gh774       # autopart-luks-1 failing
   gh804       # tests requiring dvd iso failing
 )

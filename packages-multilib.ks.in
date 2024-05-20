@@ -7,6 +7,7 @@
 %ksappend common/common_no_payload.ks
 
 %packages --multilib
+-fwupd
 %end
 
 %post

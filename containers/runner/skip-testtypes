@@ -69,6 +69,7 @@ rhel10_skip_array=(
   gh1108      # proxy-auth, proxy-kickstart failing
   gh1107      # rpm-ostree-container failing
   gh1110      # storage-multipath-autopart failing
+  gh1178      # tests using ext2 failing
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

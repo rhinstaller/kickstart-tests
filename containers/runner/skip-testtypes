@@ -14,7 +14,6 @@ fedora_skip_array=(
   gh595       # proxy-cmdline failing on all scenarios
   gh641       # packages-multilib failing on systemd conflict
   gh680       # proxy-kickstart and proxy-auth failing
-  gh740       # fedora-live-image-build fails on comps changes
   gh774       # autopart-luks-1 failing
   gh777       # raid-1-reqpart failing
   gh910       # stage2-from-ks test needs to be fixed for daily-iso

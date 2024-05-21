@@ -5,9 +5,28 @@
 #
 #  /test-os-variants
 #
+#
 # Alternatively it is also possible to specify tests to run explicitly:
 #
 #  /test-os-variants --testtype TESTTYPE --skip-testtypes TYPE[,TYPE..] TEST1 TEST2
+#
+# Examples:
+#
+# /test-os-variants keyboard lang
+# ... run the tests specified by names (space separated)
+#
+# /test-os-variants --skip-testtypes gh123,gh765 keyboard lang
+# ... run the tests specified by names while skipping tests with given types (comma separated)
+#
+# /test-os-variants --testtype network
+# ... run all the tests of type network
+#
+# /test-os-variants --testtype network --skip-testtypes gh123,gh765
+# ... run all the tests of type network while skipping tests with given types (comma separated)
+#
+# /test-os-variants --skip-testtypes gh123,gh765
+# ... run all the tests while skipping tests with given types (comma separated)
+#
 #
 # Lastly there is a dry-run mode, that just indicates which tests would be run
 # (useful to check test grouping and overall infra health):

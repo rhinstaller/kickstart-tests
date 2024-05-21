@@ -1,18 +1,18 @@
 # Run kickstart tests in a PR triggered by a "/test-os-variants" command from an organization member
 #
-# To run all tests affected by the PR (or just smoke tests if the PR changes no tests)
+# To run all tests changed in the PR (or just smoke tests if the PR changes no tests)
 # use this in a PR comment:
 #
 #  /test-os-variants
 #
-# Alternatively it is also possible to specify tests to run or test to be skipped:
+# Alternatively it is also possible to specify tests to run explicitly:
 #
 #  /test-os-variants --testtype TESTTYPE --skip-testtypes TYPE[,TYPE..] TEST1 TEST2
 #
 # Lastly there is a dry-run mode, that just indicates which tests would be run
 # (useful to check test grouping and overall infra health):
 #
-#  /test-os-variants-dry
+#  /test-os-variants-dry ...
 #
 #
 name: test-os-variants

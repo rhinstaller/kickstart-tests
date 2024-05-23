@@ -36,6 +36,7 @@ check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ bridge0 bridge1
 
 @KSINCLUDE@ post-lib-network.sh
 @KSINCLUDE@ scripts-lib.sh
+platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
 
 # bridge0
 
@@ -77,7 +78,7 @@ check_device_config_value bridge1 ONBOOT yes connection autoconnect __NONE
 
 check_device_config_value bridge1_slave_1 ONBOOT yes connection autoconnect __NONE
 
-if is_rhel8 @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@ ; then
+if [ "${platform}" == "rhel8" ]; then
     # RHEL-8-FAILURE: anaconda does not create default config file for enslaved device in RHEL8
     check_config_exists @KSTEST_NETDEV2@ no
 else

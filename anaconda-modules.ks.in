@@ -11,6 +11,7 @@
 %post --nochroot
 
 @KSINCLUDE@ scripts-lib.sh
+platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
 
 # Get the activated Anaconda DBus modules.
 cat /tmp/syslog | grep "Activating service name" | \
@@ -18,8 +19,7 @@ grep "org.fedoraproject.Anaconda.Modules" | cut -d"'" -f2 \
 | sort > /tmp/generated.out
 
 # Generate the expected output.
-if is_rhel8 @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@ || \
-   is_rhel9 @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@ ; then
+if [ "${platform}" == "rhel8" ] || [ "${platform}" == "rhel9" ]; then
     cat > /tmp/expected.out << EOF
 org.fedoraproject.Anaconda.Modules.Localization
 org.fedoraproject.Anaconda.Modules.Network

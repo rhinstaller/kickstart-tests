@@ -37,6 +37,8 @@ check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@ @KST
 %post
 
 @KSINCLUDE@ post-lib-network.sh
+@KSINCLUDE@ scripts-lib.sh
+platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
 
 check_device_config_value @KSTEST_NETDEV1@ DEFROUTE yes ipv4 never-default __NONE
 check_device_config_value @KSTEST_NETDEV2@ DEFROUTE no ipv4 never-default true
@@ -47,7 +49,7 @@ check_device_connected @KSTEST_NETDEV4@ yes
 check_device_config_value @KSTEST_NETDEV3@ MTU 9000 ethernet mtu 9000
 
 # It is not working on rhel yet (RHEL-30406)
-if [ "@KSTEST_OS_NAME@" == "rhel" ]; then
+if [ "${platform:0:4}" == "rhel" ]; then
     check_device_config_value @KSTEST_NETDEV4@ DHCP_VENDOR_CLASS_IDENTIFIER __NONE ipv4 dhcp-vendor-class-identifier __NONE
 else
     check_device_config_value @KSTEST_NETDEV4@ DHCP_VENDOR_CLASS_IDENTIFIER RHEL ipv4 dhcp-vendor-class-identifier RHEL

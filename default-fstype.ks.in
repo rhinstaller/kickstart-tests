@@ -29,8 +29,11 @@ cp /.buildstamp /mnt/sysroot
 
 %post
 
+@KSINCLUDE@ scripts-lib.sh
+platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
+
 expected_fstype="ext4"
-if [ "@KSTEST_OS_NAME@" == "rhel" ] || grep -qi '^variant=server' /.buildstamp; then
+if [ "${platform:0:4}" == "rhel" ] || grep -qi '^variant=server' /.buildstamp; then
     expected_fstype="xfs"
 fi
 

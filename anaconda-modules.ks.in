@@ -19,6 +19,7 @@ grep "org.fedoraproject.Anaconda.Modules" | cut -d"'" -f2 \
 | sort > /tmp/generated.out
 
 # Generate the expected output.
+# rhel8 and rhel9 don't have Runtime module
 if [ "${platform}" == "rhel8" ] || [ "${platform}" == "rhel9" ]; then
     cat > /tmp/expected.out << EOF
 org.fedoraproject.Anaconda.Modules.Localization
@@ -31,6 +32,21 @@ org.fedoraproject.Anaconda.Modules.Subscription
 org.fedoraproject.Anaconda.Modules.Timezone
 org.fedoraproject.Anaconda.Modules.Users
 EOF
+# centos has Subscription module forbidden in its conf profile
+elif [ "${platform:0:4}" == "rhel" ] && [ "@KSTEST_OS_NAME@" == "centos" ]; then
+    cat > /tmp/expected.out << EOF
+org.fedoraproject.Anaconda.Modules.Localization
+org.fedoraproject.Anaconda.Modules.Network
+org.fedoraproject.Anaconda.Modules.Payloads
+org.fedoraproject.Anaconda.Modules.Runtime
+org.fedoraproject.Anaconda.Modules.Security
+org.fedoraproject.Anaconda.Modules.Services
+org.fedoraproject.Anaconda.Modules.Storage
+org.fedoraproject.Anaconda.Modules.Timezone
+org.fedoraproject.Anaconda.Modules.Users
+EOF
+# fedora and rhel10 activate Subscription module
+# On fedora the module is allowed to fail in conf (fails on rhsm not found).
 else
     cat > /tmp/expected.out << EOF
 org.fedoraproject.Anaconda.Modules.Localization

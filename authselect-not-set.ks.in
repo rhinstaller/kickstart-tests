@@ -16,9 +16,9 @@ platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
 command -v authselect > /dev/null 2>&1
 if [[ $? -eq 0 ]]; then
     if [ "${platform}" == "rhel8" ] || [ "${platform}" == "rhel9" ]; then
-        authselect current | grep -vE "No existing configuration detected"
+        authselect current | grep -E "No existing configuration detected"
     else
-        authselect current | grep -vE "Profile ID: local"
+        authselect current | grep -E "Profile ID: local"
     fi
     if [[ $? -ne 0 ]]; then
         echo "*** Failed check: authselect not installed or no default configuration detected" >> /root/RESULT

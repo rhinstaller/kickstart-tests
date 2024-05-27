@@ -486,12 +486,15 @@ if [[ "$TEST_REMOTES" != "" ]]; then
     done
 else
     echo "Starting the tests"
+    trap 'kill -INT -$pid' INT
     timeout ${TIMEOUT} parallel --no-notice --jobs ${TEST_JOBS:-4} \
         PYTHONPATH=$PYTHONPATH scripts/launcher/run_one_test.py \
                                                       -i ${IMAGE} \
                                                       -k ${KEEPIT} \
                                                       --append-host-id \
-                                                      ${RETRY} ${UPDATES_ARG} ${BOOT_ARG} {} ::: ${tests}
+                                                      ${RETRY} ${UPDATES_ARG} ${BOOT_ARG} {} ::: ${tests} &
+    pid=$!
+    wait $pid
     rc=$?
 fi
 

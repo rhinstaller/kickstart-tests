@@ -10,10 +10,12 @@
 
 %post
 
+@KSINCLUDE@ scripts-lib.sh
+platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
+
 command -v authselect > /dev/null 2>&1
 if [[ $? -eq 0 ]]; then
-    if is_rhel8 @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@ || \
-       is_rhel9 @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@ ; then
+    if [ "${platform}" == "rhel8" ] || [ "${platform}" == "rhel9" ]; then
         authselect current | grep -vE "No existing configuration detected"
     else
         authselect current | grep -vE "Profile ID: local"

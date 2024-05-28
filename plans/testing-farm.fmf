@@ -1,0 +1,71 @@
+# This is TMT plan for running our kickstart tests on PRs with TFT resources
+#
+# This plan is harder to debug locally because repository needs to be cloned into the tests
+# environment (VM). Much easier approach is to create target PR with your changes and check
+# the TMT execution website which will guide you how to rerun the tests.
+#
+# If you really need to debug this locally follow these steps:
+# 1. Create PR against rhinstaller/kickstart tests
+# 2. Run `tmt run --all -vvv -e PR_NUMBER=<Pull Request id> provision --how virtual --memory 16384  # Don't go with memory under 3072 MB
+#
+# Steps above will start local VM which will clone your PR and execute tests on that code. It means
+# that TMT plan data are taken from local but everything else is taken from the PR.
+#
+# To connect to the local VM spawned by `provision --how virtual` do:
+#
+#    ssh -p <port is printed during the provisioning step> root@127.0.0.1
+#
+# Inside the VM you can connect to virsh or podman running the tests.
+#
+# After multiple local runs I recommend you to cleanup by:
+#
+#    tmt clean
+#
+
+summary: TMT/TFT plan for running kickstart tests on Fedora system
+description: |
+    Run kickstart tests on Fedora
+
+discover:
+    how: shell
+    tests:
+    - name: 'repository: kickstart-tests'
+      framework: shell
+      test: |
+        set -x
+
+        trap "cp -rv data/logs/ ${TMT_TEST_DATA}/" EXIT INT QUIT PIPE
+
+        cd /root/kickstart-tests 
+        scripts/run_travis.sh
+
+
+      duration: 6h
+
+provision:
+    hardware:
+        virtualization:
+            is-supported: true
+        memory: '>= 8 GB'
+
+prepare:
+    - name: Update guest
+      how: shell
+      script: |
+        dnf distro-sync -y && dnf install -y git podman
+
+    - name: prepare repository
+      how: shell
+      script: |
+        # Clone repository to where the tests are taken from
+        git clone https://github.com/rhinstaller/kickstart-tests /root/kickstart-tests
+        cd /root/kickstart-tests
+        git fetch origin +refs/pull/*:refs/remotes/origin/pr/*
+        git checkout origin/pr/$PR_NUMBER/head
+
+        # Before test execution we are doing rebase, for that we need to configure git correctly
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+
+execute:
+    how: tmt

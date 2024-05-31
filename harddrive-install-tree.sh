@@ -33,3 +33,7 @@ prepare_disks() {
 
     echo ${tmpdir}/disk-a.img ${tmpdir}/disk-b.img
 }
+
+get_timeout() {
+    echo "45"
+}

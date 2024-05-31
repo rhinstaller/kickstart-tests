@@ -30,3 +30,7 @@ prepare_disks() {
 
     echo ${tmpdir}/disk-a.img
 }
+
+get_timeout() {
+    echo "45"
+}

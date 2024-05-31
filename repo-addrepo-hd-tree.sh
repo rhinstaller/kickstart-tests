@@ -55,3 +55,7 @@ cleanup() {
     local tmp_dir="${1}"
     stop_httpd "${tmp_dir}"
 }
+
+get_timeout() {
+    echo "45"
+}

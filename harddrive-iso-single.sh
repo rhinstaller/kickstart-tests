@@ -19,7 +19,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE=${TESTTYPE:-"packaging gh804"}
+TESTTYPE=${TESTTYPE:-"packaging gh804 gh1213"}
 
 . ${KSTESTDIR}/functions.sh
 

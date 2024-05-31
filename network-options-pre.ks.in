@@ -48,8 +48,8 @@ check_device_connected @KSTEST_NETDEV3@ yes
 check_device_connected @KSTEST_NETDEV4@ yes
 check_device_config_value @KSTEST_NETDEV3@ MTU 9000 ethernet mtu 9000
 
-# It is not working on rhel yet (RHEL-30406)
-if [ "${platform:0:4}" == "rhel" ]; then
+# It is not working on rhel10 yet (RHEL-38998)
+if [ "${platform}" == "rhel10" ] || [ "${platform}" == "rhel8" ]; then
     check_device_config_value @KSTEST_NETDEV4@ DHCP_VENDOR_CLASS_IDENTIFIER __NONE ipv4 dhcp-vendor-class-identifier __NONE
 else
     check_device_config_value @KSTEST_NETDEV4@ DHCP_VENDOR_CLASS_IDENTIFIER RHEL ipv4 dhcp-vendor-class-identifier RHEL

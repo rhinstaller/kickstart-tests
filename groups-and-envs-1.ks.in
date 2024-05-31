@@ -8,15 +8,15 @@
 %packages
 @core
 @c-development
-@^web-server-environment
+@^cloud-server-environment
 %end
 
 %post
 # We don't have a way of determining if a group/env is installed or not.
 # These sentinel packages will have to do.
-rpm -q httpd
+rpm -q fedora-release-cloud
 if [[ $? != 0 ]]; then
-    echo '*** web-server-environment was not installed' > /root/RESULT
+    echo '*** cloud-server-environment was not installed' > /root/RESULT
 else
     rpm -q gcc
     if [[ $? != 0 ]]; then

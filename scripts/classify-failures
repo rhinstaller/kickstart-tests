@@ -164,6 +164,10 @@ ISSUES = [
         "description": "[1017] https://github.com/rhinstaller/kickstart-tests/issues/1017",
         "last_anaconda_re": ".*DEBUG anaconda:anaconda: ui.gui.hubs: kickstart installation, spoke Installation Source is ready.*"
     },
+    {
+        "description": "[1202] https://github.com/rhinstaller/kickstart-tests/issues/1202",
+        "first_grep": "Failed to call the 'PvCreate' method on the '/com/redhat/lvmdbus1/Manager' object: Timeout was reached",
+    },
 ]
 
 CLOSED_ISSUES = [

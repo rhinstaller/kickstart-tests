@@ -29,7 +29,7 @@ prepare_disks() {
     tmpdir=$1
 
     qemu-img create -q -f qcow2 ${tmpdir}/disk-a.img 10G
-    qemu-img create -q -f qcow2 ${tmpdir}/disk-b.img 12G
+    qemu-img create -q -f qcow2 ${tmpdir}/disk-b.img 22G
 
     echo ${tmpdir}/disk-a.img ${tmpdir}/disk-b.img
 }

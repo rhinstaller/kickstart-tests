@@ -13,7 +13,6 @@ fedora_skip_array=(
   gh576       # clearpart-4 test is flaky on all scenarios
   gh595       # proxy-cmdline failing on all scenarios
   gh641       # packages-multilib failing on systemd conflict
-  gh680       # proxy-kickstart and proxy-auth failing
   gh774       # autopart-luks-1 failing
   gh777       # raid-1-reqpart failing
   gh910       # stage2-from-ks test needs to be fixed for daily-iso
@@ -65,7 +64,6 @@ rhel10_skip_array=(
   gh804       # tests requiring dvd iso failing
   gh1090      # raid-1-reqpart failing
   gh1104      # network-prefixdevname failing
-  gh1108      # proxy-auth, proxy-kickstart failing
   gh1107      # rpm-ostree-container failing
   gh1110      # storage-multipath-autopart failing
   gh1178      # tests using ext2 failing

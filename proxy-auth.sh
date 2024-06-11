@@ -19,7 +19,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="method proxy gh680 gh1108"
+TESTTYPE="method proxy"
 
 . ${KSTESTDIR}/functions.sh
 . ${KSTESTDIR}/functions-proxy.sh
@@ -29,6 +29,8 @@ prepare() {
     local tmp_dir=$2
     local httpd_url=""
     local proxy_url=""
+    httpd_url=$(cat ${tmpdir}/httpd_url)
+    proxy_url=$(cat ${tmpdir}/proxy_url)
     mkdir "${tmp_dir}/http"
 
     # Create the addon repository.

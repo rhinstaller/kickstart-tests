@@ -28,17 +28,34 @@ if [[ ! -f /mnt/sysroot/etc/yum.repos.d/addon.repo ]]; then
 fi
 
 # Check that the proxy configuration was written to the repo file
-grep -q 'proxy=http://anaconda:qweqwe@PROXY-ADDON' /mnt/sysroot/etc/yum.repos.d/addon.repo
-if [[ $? -ne 0 ]]; then
+# The repo configuration has a different format on RHEL-10+/Fedora 40+
+os_name="@KSTEST_OS_NAME@"
+os_version="@KSTEST_OS_VERSION@"
+os_major=${os_version%%.*}
+
+if [ "${os_name}" == "rhel" ] && [ ${os_major} -lt 10 ]; then
+    grep -q 'proxy=http://anaconda:qweqwe@PROXY-ADDON' /mnt/sysroot/etc/yum.repos.d/addon.repo
+    proxy_rc=$?
+else
+    grep -qP 'proxy\s?=\s?http://PROXY-ADDON' /mnt/sysroot/etc/yum.repos.d/addon.repo && \
+    grep -qP 'proxy_username\s?=\s?anaconda' /mnt/sysroot/etc/yum.repos.d/addon.repo && \
+    grep -qP 'proxy_password\s?=\s?qweqwe' /mnt/sysroot/etc/yum.repos.d/addon.repo
+    proxy_rc=$?
+fi
+if [[ ${proxy_rc} -ne 0 ]]; then
     echo 'addon.repo does not contain proxy information' >> /mnt/sysroot/root/RESULT
+    echo "/etc/yum.repos.d/addon.repo content:" >> /mnt/sysroot/root/RESULT
+    cat /mnt/sysroot/etc/yum.repos.d/addon.repo >> /mnt/sysroot/root/RESULT
+    echo >> /mnt/sysroot/root/RESULT
+
 fi
 
 # Check that the installed repo file is usable
 # Find if this is using yum or dnf
 if [[ -f /mnt/sysroot/usr/bin/dnf ]]; then
-	BIN="dnf"
+    BIN="dnf"
 else
-	BIN="yum"
+    BIN="yum"
 fi
 
 # Clean packages to force package download
@@ -46,8 +63,8 @@ chroot /mnt/sysroot $BIN clean packages
 
 # Download package to test if the installed repository is usable
 chroot /mnt/sysroot \
-    $BIN --disablerepo=\* --enablerepo=addon --downloadonly --nogpgcheck -y \
-         reinstall mandatory-package-from-addon 2>/dev/null | \
+    $BIN reinstall --disablerepo=\* --enablerepo=addon --downloadonly --nogpgcheck -y \
+        mandatory-package-from-addon 2>/dev/null | \
         grep -q 'mandatory-package-from-addon'
 if [[ $? -ne 0 ]]; then
     echo 'unable to query addon repo' >> /mnt/sysroot/root/RESULT

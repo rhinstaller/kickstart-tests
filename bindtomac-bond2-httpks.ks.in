@@ -47,6 +47,14 @@ check_device_config_value bond1_slave_1 ONBOOT yes connection autoconnect __NONE
 check_device_config_value bond1_slave_2 ONBOOT yes connection autoconnect __NONE
 check_device_connected bond1 no
 
+# Configuration from boot options
+check_config_exists @KSTEST_NETDEV1@ yes
+# Since RHEL-38451 don't create default persistent connection for ports/slaves
+check_config_exists @KSTEST_NETDEV2@ no
+check_config_exists @KSTEST_NETDEV3@ no
+check_config_exists @KSTEST_NETDEV4@ no
+check_config_exists @KSTEST_NETDEV5@ no
+
 check_device_config_bound_to_mac bond0_slave_1
 check_device_config_bound_to_mac bond0_slave_2
 check_device_config_bound_to_mac bond1_slave_1

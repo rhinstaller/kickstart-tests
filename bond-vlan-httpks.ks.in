@@ -41,6 +41,12 @@ check_bond_has_slave bond0 @KSTEST_NETDEV1@ no
 check_device_ipv4_address bond0.222 @KSTEST_STATIC_IP@
 check_device_has_ipv4_address bond0 no
 
+# Configuration from boot options
+check_config_exists @KSTEST_NETDEV1@ yes
+# Since RHEL-38451 don't create default persistent connection for ports/slaves
+check_config_exists @KSTEST_NETDEV2@ no
+check_config_exists @KSTEST_NETDEV3@ no
+
 # No error was written to /root/RESULT file, everything is OK
 if [[ ! -e /root/RESULT ]]; then
    echo SUCCESS > /root/RESULT

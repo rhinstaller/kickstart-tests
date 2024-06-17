@@ -18,15 +18,17 @@ rootpw qweqwe
 
 shutdown
 
-# make sure Python 3 is available for the %post scriptlet
-%packages
-python3
-%end
+%ksappend payload/python_crypt_packages.ks
 
 %post --interpreter=/usr/bin/python3
 
 import sys
-import crypt
+try:
+    # Use the standalone (not deprecated) package when available
+    import crypt_r
+except ImportError:
+    # Fallback to the deprecated standard library module
+    import crypt as crypt_r  # pylint: disable=deprecated-module
 
 with open("/root/RESULT", "wt") as result:
     # Test that the root password is what we expect it to be
@@ -39,7 +41,7 @@ with open("/root/RESULT", "wt") as result:
             print("Unable to find root password", file=result)
             sys.exit(0)
 
-    if crypt.crypt("qweqwe", shadow_fields[1]) != shadow_fields[1]:
+    if crypt_r.crypt("qweqwe", shadow_fields[1]) != shadow_fields[1]:
         print("Root password is not correct: %s" % shadow_fields[1], file=result)
         sys.exit(0)
 

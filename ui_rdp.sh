@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2019  Red Hat, Inc.
+# Copyright (C) 2024  Red Hat, Inc.
 #
 # This copyrighted material is made available to anyone wishing to use,
 # modify, copy, or redistribute it subject to the terms and conditions of
@@ -15,23 +15,13 @@
 # License and may only be used or replicated with the express permission of
 # Red Hat, Inc.
 #
-# Red Hat Author(s): Martin Kolman <mkolman@redhat.com>
-
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="services gh890 skip-on-rhel-10"
+TESTTYPE="ui skip-on-fedora skip-on-rhel-8 skip-on-rhel-9"
 
 . ${KSTESTDIR}/functions.sh
-. ${KSTESTDIR}/validate-lib-services.sh
 
-validate() {
-    # check output kickstart via validation library function
-    validate_skipx_in_ks $1
-    if [[ $? != 0 ]]; then
-        cat ${1}/RESULT
-        return 1
-    fi
-
-    validate_RESULT ${disksdir}
-    return $?
+kernel_args() {
+    echo ${DEFAULT_BOOTOPTS} inst.rdp inst.rdp.username=user inst.rdp.password=12345
 }
+

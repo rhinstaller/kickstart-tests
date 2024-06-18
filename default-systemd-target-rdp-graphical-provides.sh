@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2019  Red Hat, Inc.
+# Copyright (C) 2024  Red Hat, Inc.
 #
 # This copyrighted material is made available to anyone wishing to use,
 # modify, copy, or redistribute it subject to the terms and conditions of
@@ -19,10 +19,14 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="services gh890 skip-on-rhel-10"
+TESTTYPE="services skip-on-fedora skip-on-rhel-8 skip-on-rhel-9"
 
 . ${KSTESTDIR}/functions.sh
 . ${KSTESTDIR}/validate-lib-services.sh
+
+kernel_args() {
+    echo ${DEFAULT_BOOTOPTS} inst.rdp inst.rdp.username=user inst.rdp.password=12345
+}
 
 validate() {
     # check output kickstart via validation library function

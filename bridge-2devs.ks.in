@@ -35,6 +35,8 @@ check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ bridge0 bridge1
 %post
 
 @KSINCLUDE@ post-lib-network.sh
+@KSINCLUDE@ scripts-lib.sh
+platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
 
 # bridge0
 
@@ -74,8 +76,13 @@ check_device_config_value bridge1 ONBOOT yes connection autoconnect __NONE
 
 check_device_config_value bridge1_slave_1 ONBOOT yes connection autoconnect __NONE
 
-# Since RHEL-38451 don't create default persistent connection for ports/slaves
-check_config_exists @KSTEST_NETDEV2@ no
+if [ "${platform}" == "rhel9" ] || [ "${platform}" == "rhel10" ]; then
+    check_config_exists @KSTEST_NETDEV2@ yes
+else
+    # RHEL-8-FAILURE: anaconda does not create default config file for enslaved device in RHEL8
+    # Since RHEL-38451 don't create default persistent connection for ports/slaves
+    check_config_exists @KSTEST_NETDEV2@ no
+fi
 
 # WARNING: this depends on assumption of running %post scripts in order they
 # are defined here

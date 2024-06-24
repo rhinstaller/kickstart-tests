@@ -77,12 +77,12 @@ check_device_config_value bridge1 ONBOOT yes connection autoconnect __NONE
 
 check_device_config_value bridge1_slave_1 ONBOOT yes connection autoconnect __NONE
 
-if [ "${platform}" == "rhel8" ]; then
-    # RHEL-8-FAILURE: anaconda does not create default config file for enslaved device in RHEL8
-    check_config_exists @KSTEST_NETDEV2@ no
-else
-    # anaconda does create default config file for enslaved device
+if [ "${platform}" == "rhel9" ] || [ "${platform}" == "rhel10" ]; then
     check_config_exists @KSTEST_NETDEV2@ yes
+else
+    # RHEL-8-FAILURE: anaconda does not create default config file for enslaved device in RHEL8
+    # Since RHEL-38451 don't create default persistent connection for ports/slaves
+    check_config_exists @KSTEST_NETDEV2@ no
 fi
 
 # WARNING: this depends on assumption of running %post scripts in order they

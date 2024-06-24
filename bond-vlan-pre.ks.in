@@ -32,6 +32,8 @@ check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@ bond
 %post
 
 @KSINCLUDE@ post-lib-network.sh
+@KSINCLUDE@ scripts-lib.sh
+platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
 
 check_device_config_value bond0.222 ONBOOT no connection autoconnect false
 check_device_config_value bond0 ONBOOT no connection autoconnect false
@@ -44,6 +46,18 @@ check_bond_has_slave bond0 @KSTEST_NETDEV3@ yes
 check_bond_has_slave bond0 @KSTEST_NETDEV1@ no
 check_device_ipv4_address bond0.222 @KSTEST_STATIC_IP@
 check_device_has_ipv4_address bond0 no
+
+# Configuration from boot options
+check_config_exists @KSTEST_NETDEV1@ yes
+if [ "${platform}" == "rhel9" ] || [ "${platform}" == "rhel10" ]; then
+    check_config_exists @KSTEST_NETDEV2@ yes
+    check_config_exists @KSTEST_NETDEV3@ yes
+else
+    # RHEL-8-FAILURE: anaconda does not create default config file for enslaved device in RHEL8
+    # Since RHEL-38451 don't create default persistent connection for ports/slaves
+    check_config_exists @KSTEST_NETDEV2@ no
+    check_config_exists @KSTEST_NETDEV3@ no
+fi
 
 # No error was written to /root/RESULT file, everything is OK
 if [[ ! -e /root/RESULT ]]; then

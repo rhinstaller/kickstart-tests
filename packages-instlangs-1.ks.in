@@ -7,9 +7,7 @@
 %ksappend repos/default.ks
 %ksappend common/common_no_payload.ks
 
-# Only install the en_US locale
-%packages --instLangs=en_US
-%end
+%ksappend payload/packages_instlangs_1.ks
 
 %post
 # Make sure no non-english .mo files were installed

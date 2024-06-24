@@ -7,9 +7,7 @@
 %ksappend repos/default.ks
 %ksappend common/common_no_payload.ks
 
-# Install no locales
-%packages --instLangs=
-%end
+%ksappend payload/packages_instlangs_2.ks
 
 %post
 # Make sure no .mo files were installed

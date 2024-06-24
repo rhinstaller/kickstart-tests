@@ -8,10 +8,7 @@
 %ksappend repos/default.ks
 %ksappend common/common_no_payload.ks
 
-# Install gnupg2 and make sure the packages it recommends are skipped
-%packages --excludeWeakdeps
-gnupg2
-%end
+%ksappend payload/packages_weakdeps.ks
 
 %post
 # Make sure the --recommends packages from gnupg2 are not installed

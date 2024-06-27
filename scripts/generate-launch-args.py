@@ -88,7 +88,8 @@ def parse_args():
                          help="do not skip any tests based on os variant or branch")
     _parser.add_argument("--skip-file", type=str, metavar="PATH",
                          help="file containing data about disabled tests")
-    return _parser.parse_args()
+    args, _ = _parser.parse_known_args()
+    return args
 
 
 if __name__ == "__main__":

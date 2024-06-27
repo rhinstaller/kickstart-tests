@@ -38,20 +38,6 @@ fi
 
 IMAGE="$1"
 
-# Fast path if ./discinfo is present (for Fedora); if it exists, it looks like this:
-#    1587584254.021611
-#    32
-#    x86_64
-DISCINFO_VER=$(isoinfo -R -x /.discinfo -i "$IMAGE" | sed -n '2 p')
-if [ -n "$DISCINFO_VER" ]; then
-    # make sure it looks like a Fedora version name/number
-    if [ "$DISCINFO_VER" = "Rawhide" ] || [ $(echo $DISCINFO_VER | cut -d. -f1) -gt 30 ]; then
-        echo "NAME=Fedora"
-        echo "VERSION=$DISCINFO_VER"
-        exit 0
-    fi
-fi
-
 # Probe boot.iso → install.img → stage 2 and dig out useful information from it.
 ISO_TMP=$(mktemp -d /tmp/kstest-iso.XXXXXXX)
 trap "rm -rf '$ISO_TMP'" EXIT INT QUIT PIPE
@@ -72,22 +58,42 @@ fi
 # Extract files from stage2
 OS_RELEASE=/etc/os-release
 ROOTFS=/LiveOS/rootfs.img
+LORAX_PACKAGES=/root/lorax-packages.log
 
-unsquashfs -no-xattrs -follow -no-progress -d "$ISO_TMP/stage2" "$ISO_TMP/install.img" $OS_RELEASE $ROOTFS
+unsquashfs -no-xattrs -follow -no-progress -d "$ISO_TMP/stage2" "$ISO_TMP/install.img" $OS_RELEASE $ROOTFS $LORAX_PACKAGES
 rm "$ISO_TMP/install.img"
 chmod -R a+w $ISO_TMP
 
 # Extract required information from stage2
 if [ -e "$ISO_TMP/stage2$OS_RELEASE" ]; then
     cp "$ISO_TMP/stage2$OS_RELEASE" "$ISO_TMP/os-release"
+    cp "$ISO_TMP/stage2$LORAX_PACKAGES" "$ISO_TMP/lorax-packages.log"
 else
     # On RHEL-8 and RHEL-9 the filesystem is packed in ext4 image (ENGCMP-766)
     timeout -k 10s 30s virt-cat -a "$ISO_TMP/stage2$ROOTFS" $OS_RELEASE > "$ISO_TMP/os-release"
+    timeout -k 10s 30s virt-cat -a "$ISO_TMP/stage2$ROOTFS" $LORAX_PACKAGES > "$ISO_TMP/lorax-packages.log"
     if [ $? -eq 124 ]; then
         echo "Error: virt-cat timed out" >&2
         exit 4
     fi
 fi
+
+echo "PACKAGES=$(cat $ISO_TMP/lorax-packages.log | tr '\n' ' ')"
+
+# Fast path to get version if ./discinfo is present (for Fedora); if it exists, it looks like this:
+#    1587584254.021611
+#    32
+#    x86_64
+DISCINFO_VER=$(isoinfo -R -x /.discinfo -i "$IMAGE" | sed -n '2 p')
+if [ -n "$DISCINFO_VER" ]; then
+    # make sure it looks like a Fedora version name/number
+    if [ "$DISCINFO_VER" = "Rawhide" ] || [ $(echo $DISCINFO_VER | cut -d. -f1) -gt 30 ]; then
+        echo "NAME=Fedora"
+        echo "VERSION=$DISCINFO_VER"
+        exit 0
+    fi
+fi
+
 
 # Return useful information to stdout
 echo "NAME=$(. "$ISO_TMP/os-release"; echo "$ID")"

@@ -182,7 +182,10 @@ ISO_OS_NAME=$(echo "${output}" | grep 'NAME=')
 ISO_OS_NAME="${ISO_OS_NAME##NAME=}"
 ISO_OS_VERSION=$(echo "${output}" | grep 'VERSION=')
 ISO_OS_VERSION="${ISO_OS_VERSION##VERSION=}"
-
+ISO_PACKAGES=$(echo "${output}" | grep 'PACKAGES=')
+ISO_PACKAGES="${ISO_PACKAGES##PACKAGES=}"
+echo Saving list of installer image packages to /var/tmp/kstest-image-packages.log
+echo $ISO_PACKAGES | tr ' ' '\n' | tee /var/tmp/kstest-image-packages.log
 
 # Append sed args to substitute
 sed_args=" -e s#@KSTEST_OS_NAME@#${ISO_OS_NAME}# -e s#@KSTEST_OS_VERSION@#${ISO_OS_VERSION}#"

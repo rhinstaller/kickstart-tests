@@ -35,6 +35,9 @@ url --url=EMPTY_REPO_URL
 # Where we want to download the ISO?
 DISK="/dev/vdb"
 
+# Prepare storage for the source
+format_whole_disk "${DISK}"
+
 # Download and mount the ISO.
 prepare_iso "${ISO_LOCATION}" "${DISK}"
 %end

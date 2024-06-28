@@ -36,6 +36,9 @@ harddrive --partition=/dev/vdb --dir=/repo/
 DISK="/dev/vdb"
 DIRECTORY="repo"
 
+# Prepare storage for the source
+format_whole_disk "${DISK}"
+
 # Download the content of the ISO.
 prepare_tree "${ISO_LOCATION}" "${DISK}" "${DIRECTORY}"
 %end

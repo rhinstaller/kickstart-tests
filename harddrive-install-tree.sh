@@ -21,7 +21,7 @@
 # SourceSetupError: Nothing useful found for Hard drive ISO source at partition=/dev/sdb directory=/repo/
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE=${TESTTYPE:-"packaging gh804"}
+TESTTYPE=${TESTTYPE:-"packaging harddrive gh804"}
 
 . ${KSTESTDIR}/functions.sh
 
@@ -29,7 +29,11 @@ prepare_disks() {
     tmpdir=$1
 
     qemu-img create -q -f qcow2 ${tmpdir}/disk-a.img 10G
-    qemu-img create -q -f qcow2 ${tmpdir}/disk-b.img 12G
+    qemu-img create -q -f qcow2 ${tmpdir}/disk-b.img 22G
 
     echo ${tmpdir}/disk-a.img ${tmpdir}/disk-b.img
+}
+
+get_timeout() {
+    echo "45"
 }

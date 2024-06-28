@@ -1,0 +1,38 @@
+#version=DEVEL
+#test name: harddrive-iso-single
+
+# This test is for testing the install from an harddrive ks command with ISO
+# using single disk (RHEL-35701).
+#
+# Server dvd is downloaded during the test execution. This test can be resource demanding!
+#
+%ksappend common/common_no_storage_and_payload.ks
+
+zerombr
+clearpart --all --initlabel --drives=/dev/vda
+autopart
+
+harddrive --partition=/dev/vda1 --dir=/
+
+%ksappend payload/default_packages.ks
+
+%pre
+# Include helpful functions.
+@KSINCLUDE@ pre-lib-harddrive.sh
+
+# This will add ISO_LOCATION with link to an ISO
+%ksappend section-data/server-dvd-link.ks
+
+# Where we want to download the ISO?
+DISK="/dev/vda"
+
+# Prepare storage for the source
+format_single_partition "${DISK}" 12GiB
+
+# Download and mount the ISO.
+prepare_iso "${ISO_LOCATION}" "${DISK}1"
+%end
+
+%post
+%ksappend validation/success_if_result_empty.ks
+%end

@@ -43,7 +43,7 @@ URL = "https://api.github.com/repos/rhinstaller/kickstart-tests/actions/artifact
 
 # Defaults list of artifacts
 # For now use the full log artifacts, eventually this will be the json summaries
-ARTIFACT_NAMES = ["logs-daily-iso", "logs-rhel9", "logs-rhel8", "logs-rhel10"]
+ARTIFACT_NAMES = ["logs-daily-iso", "logs-rhel9", "logs-rhel10"]
 
 # We should ignore SIGPIPE when using pycurl.NOSIGNAL - see
 # the libcurl tutorial for more info.

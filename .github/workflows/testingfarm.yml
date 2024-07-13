@@ -31,7 +31,7 @@ jobs:
         git_ref: "refs/pull/${{ github.event.issue.number }}/head"
         path: "ansible"
         tmt_plan_regex: "testing-farm"
-        pull_request_status_name: "Testing farm"
+        pull_request_status_name: "kickstart tests"
         update_pull_request_status: true
         tf_scope: private
         variables: "PR_NUMBER=${{ github.event.issue.number }}"

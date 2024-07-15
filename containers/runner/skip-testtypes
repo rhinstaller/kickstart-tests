@@ -22,7 +22,6 @@ fedora_skip_array=(
   gh975       # packages-default failing
   gh1023      # rpm-ostree failing
   gh1060      # vnc tests too flaky
-  gh1230      # rpm-ostree-conainer-{luks,bootc} failing
   gh1237      # container failing
   gh1250      # rpm-ostree-container-luks fails to boot
 )

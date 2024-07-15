@@ -168,6 +168,10 @@ ISSUES = [
         "description": "[1202] https://github.com/rhinstaller/kickstart-tests/issues/1202",
         "first_grep": "Failed to call the 'PvCreate' method on the '/com/redhat/lvmdbus1/Manager' object: Timeout was reached",
     },
+    {
+        "description": "[1235] https://github.com/rhinstaller/kickstart-tests/issues/1235",
+        "first_grep": "org.fedoraproject.Anaconda.Modules.Localization.GetCompositorSelectedLayout has failed with an exception",
+    },
 ]
 
 CLOSED_ISSUES = [

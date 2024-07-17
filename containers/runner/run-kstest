@@ -112,7 +112,7 @@ chmod a+rw "${LOGS_DIR}/$(basename ${VIRT_INSTALL_LOG})" || true
 
 # Move to target logs directory; this sometimes fails on nested directory permission/ownership
 cp -pr /var/tmp/kstest-* ${LOGS_DIR} || true
-cp -r /var/tmp/kstest-list-substituted ${LOGS_DIR}
+cp -r /var/tmp/kstest-list-substituted ${LOGS_DIR} || true
 
 # Show summary report
 ${KSTESTS_DIR}/scripts/run_report.sh < $TEST_LOG

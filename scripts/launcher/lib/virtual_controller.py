@@ -207,7 +207,13 @@ class VirtualInstall(object):
         try:
             execWithRedirect("virt-install", args, raise_err=True)
         except subprocess.CalledProcessError as e:
-            raise InstallError("Problem starting virtual install: %s" % e) from e
+            stdout = e.stdout.strip() if e.stdout else ""
+            stderr = e.stderr.strip() if e.stderr else ""
+            raise InstallError("""
+Problem starting virtual install: %s
+                          stdout: %s
+                          stderr: %s""" % (e, stdout, stderr)
+                               ) from e
 
         conn = libvirt.openReadOnly(None)
         dom = conn.lookupByName(self._virt_name)

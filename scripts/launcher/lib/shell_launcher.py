@@ -218,6 +218,9 @@ class ShellLauncher(ProcessLauncher):
     def inject_ks_to_initrd(self):
         return self._run_bool_shell_func("inject_ks_to_initrd")
 
+    def enable_uefi(self):
+        return self._run_bool_shell_func("enable_uefi")
+
     def stage2_from_ks(self):
         return self._run_bool_shell_func("stage2_from_ks")
 

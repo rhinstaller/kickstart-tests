@@ -60,7 +60,8 @@ class VirtualInstall(object):
     def __init__(self, test_name, iso, ks_paths, disk_paths, log_check,
                  kernel_args=None, vcpu_count=1, memory=1024, vnc=None,
                  virtio_host="127.0.0.1", virtio_port=6080,
-                 nics=None, boot=None, runner_args=None, stage2_from_ks=False):
+                 nics=None, boot=None, runner_args=None,
+                 stage2_from_ks=False, enable_uefi=False):
         """
         Start the installation
 
@@ -80,6 +81,7 @@ class VirtualInstall(object):
         :param str boot: virt-install --boot option (used eg for ibft)
         :param list runner_args: extra arguments to pass to the virt-install
         :param bool stage2_from_ks: use stage2 from location defined in kickstart
+        :param bool enable_uefi: enable UEFI for VM
         """
         super().__init__()
 
@@ -98,6 +100,7 @@ class VirtualInstall(object):
         self._boot = boot
         self._runner_args = runner_args or []
         self._stage2_from_ks = stage2_from_ks
+        self._enable_uefi = enable_uefi
 
         self._label = subprocess.check_output(
                 ["blkid", "-p", "--output=value", "--match-tag=LABEL", self._iso],
@@ -166,6 +169,9 @@ class VirtualInstall(object):
 
         if not self._stage2_from_ks:
             extra_args += " inst.stage2=hd:CDLABEL={0}".format(udev_escape(self._label))
+
+        if self._enable_uefi:
+            args.extend(["--boot", "uefi"])
 
         if self._boot:
             # eg booting from ipxe to emulate ibft firmware
@@ -278,7 +284,8 @@ class VirtualManager(object):
                                   nics=self._conf.networks,
                                   boot=self._conf.boot_image,
                                   runner_args=self._conf.runner_args,
-                                  stage2_from_ks=self._conf.stage2_from_ks)
+                                  stage2_from_ks=self._conf.stage2_from_ks,
+                                  enable_uefi=self._conf.enable_uefi)
 
             virt.run()
             virt.destroy(os.path.basename(self._conf.temp_dir))

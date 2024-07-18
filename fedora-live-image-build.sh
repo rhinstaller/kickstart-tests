@@ -23,6 +23,13 @@ TESTTYPE="packaging skip-on-rhel"
 
 . ${KSTESTDIR}/functions.sh
 
+prepare_disks() {
+    tmpdir=$1
+
+    qemu-img create -q -f qcow2 ${tmpdir}/disk-a.img 20G
+    echo ${tmpdir}/disk-a.img
+}
+
 # This rest effectively builds a Fedora live image, which
 # among other things installs 1600+ packages and does various
 # fairly resource intensive tasks. So bump the timeout

@@ -65,7 +65,7 @@ prepare_disks() {
 boot_args() {
     . ${tmpdir}/httpd_url
     ipxe_script_url="${httpd_url}${ipxe_script}"
-    echo "--boot kernel=${ipxe_image},kernel_args='ifconf -c dhcp net0 && chain ${ipxe_script_url}'"
+    echo "kernel=${ipxe_image},kernel_args='ifconf -c dhcp net0 && chain ${ipxe_script_url}'"
 }
 
 prepare() {

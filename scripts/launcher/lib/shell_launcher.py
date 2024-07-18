@@ -173,7 +173,7 @@ class ShellLauncher(ProcessLauncher):
     def boot_args(self):
         out = self._run_shell_func("boot_args")
         out.check_ret_code_with_exception()
-        return out.stdout_as_array
+        return out.stdout
 
     def get_timeout(self):
         """Per test timeout override.

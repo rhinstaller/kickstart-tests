@@ -56,7 +56,6 @@ rhel9_skip_array=(
   gh641       # packages-multilib failing on systemd conflict
   gh774       # autopart-luks-1 failing
   gh804       # tests requiring dvd iso failing
-  gh1250      # rpm-ostree-container-luks fails to boot
 )
 
 rhel10_skip_array=(
@@ -72,7 +71,6 @@ rhel10_skip_array=(
   gh1178      # tests using ext2 failing
   gh1207      # packages-multilib failing
   gh1213      # harddrive-iso-single failing
-  gh1250      # rpm-ostree-container-luks fails to boot
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

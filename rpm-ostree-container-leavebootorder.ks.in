@@ -1,0 +1,40 @@
+#test name: rpm-ostree-container-bootorder
+# https://github.com/rhinstaller/anaconda/pull/5399
+#
+# Test that ostree container installation works with leavebootorder.
+# In this test bootupd should be able to do dualboot. For sanity 
+# of this test just check if bootupd is invoked with the correct
+# arguments.
+#
+
+# Use the default settings.
+%ksappend common/common.ks
+
+# network
+network --bootproto=dhcp
+# l10n
+keyboard us
+lang en
+timezone America/New_York
+# user confguration
+rootpw testcase
+
+# On Fedora enforce lvm scheme (overriding btrfs default)
+%ksappend storage/ostreecontainer_autopart.ks
+
+# Test if UEFI entry is not created!
+bootloader --leavebootorder --timeout 1
+
+ostreecontainer --no-signature-verification --remote=test-remote --stateroot=test-stateroot --url=@KSTEST_OSTREECONTAINER_URL@
+
+
+%post
+# check if efibootmgr don't have entry to boot from a disk
+efibootmgr | grep "HD("
+if [ $? -eq 0 ]; then
+    echo "EFI boot entry was created with leavebootorder: $(efibootmgr)" >> /root/RESULT
+fi
+
+%ksappend validation/success_if_result_empty.ks
+
+%end

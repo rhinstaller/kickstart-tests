@@ -110,7 +110,7 @@ jobs:
       GITHUB_TOKEN: /home/github/github-token
     strategy:
       matrix:
-        os-variant: [daily-iso, rawhide, rhel8, rhel9, rhel10]
+        os-variant: [daily-iso, rawhide, rhel9, rhel10]
       fail-fast: false
 
     steps:

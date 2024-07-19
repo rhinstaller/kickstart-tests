@@ -363,6 +363,11 @@ avoid running them in self-hosted internal infrastructure (if we did, we'd need
 to restrict running the tests to avoid exfiltrating secrets from the internal
 Red Hat network).
 
+We are using `TMT`_ for PR gating. Their test result will be required on newly
+created PRs, however, only committers have privileged to execute `tmt workflow`_
+by comment ``/test-tmt`` on the PR. After a while status on PR will have a link to
+TMT run.
+
 Thus PR tests run on Travis_, which is one of the few public CI providers who
 offer ``/dev/kvm``. The entry point is `.travis.yml`_. The ``run_travis.sh``
 script checks which tests are affected by the PR, and runs the first six in
@@ -397,6 +402,8 @@ GitHub's infrastructure and can be run manually by a developer.
 .. _scenarios workflow: .github/workflows/scenarios-permian.yml
 .. _skip-testtypes file: ./containers/runner/skip-testtypes
 .. _GitHub Daily run workflows page: https://github.com/rhinstaller/kickstart-tests/actions?query=workflow%3A%22Daily+run%22
+.. _tmt workflow: ./.github/workflows/testingfarm.yml
+.. _TMT: https://docs.testing-farm.io/
 .. _Travis: https://travis-ci.com/
 .. _.travis.yml: ./.travis.yml
 .. _container-autoupdate: ./.github/workflows/container-autoupdate.yml

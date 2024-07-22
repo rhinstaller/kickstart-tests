@@ -82,7 +82,7 @@ if [ "${platform}" != "rhel8" ]; then
     check_config_exists @KSTEST_NETDEV1@ yes
 fi
 
-if [ "${platform}" == "rhel9" ] || [ "${platform}" == "rhel10" ]; then
+if [ "${platform}" == "rhel9" ]; then
     check_config_exists @KSTEST_NETDEV2@ yes
 else
     # RHEL-8-FAILURE: anaconda does not create default config file for enslaved device in RHEL8

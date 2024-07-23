@@ -1,7 +1,8 @@
 #!/bin/bash
 # Run a set of tests (positional command line arguments) in the runner container in podman or docker.
 # Tests are taken from the current kickstart-tests checkout
-# If data/images/boot.iso exists, that is tested, otherwise it downloads the current Fedora Rawhide version.
+# If data/images/boot.iso exists, that is tested, otherwise it downloads the current image for given 
+# platform and stores it in data/images/boot-<platform>.iso.
 # Runs --recommended-jobs number of parallel tests by default, which can be changed by setting $TEST_JOBS.
 
 set -eu
@@ -14,6 +15,7 @@ CONTAINER=${CONTAINER:-quay.io/rhinstaller/kstest-runner}
 PODMAN_SELINUX_FIX=
 RUN_COMMAND=/kickstart-tests/containers/runner/run-kstest
 SCENARIO=${SCENARIO:-unknown}
+BOOT_ISO="boot.iso"
 
 # Get number of jobs to be run in parallel based on number of CPUs and amount of RAM
 recommended_jobs() {
@@ -107,17 +109,24 @@ fi
 # prepare data directory
 mkdir -p data/images
 mkdir -p -m 777 data/logs
-if ! [ -e data/images/boot.iso ]; then
-    if [ -n "${DAILY_ISO_TOKEN:-}" ]; then
-        echo "INFO: data/images/boot.iso does not exist, downloading daily iso..."
-        $PWD/containers/runner/fetch_daily_iso.sh ${DAILY_ISO_TOKEN} data/images/boot.iso
+if ! [ -e "data/images/boot.iso" ]; then
+    BOOT_ISO="boot-${PLATFORM}.iso"
+    # do not download the ISO if it already exists
+    if ! [ -e "data/images/boot-${PLATFORM}.iso" ]; then
+        if [ -n "${DAILY_ISO_TOKEN:-}" ]; then
+            echo "INFO: data/images/${BOOT_ISO} does not exist, downloading daily iso..."
+            $PWD/containers/runner/fetch_daily_iso.sh ${DAILY_ISO_TOKEN} data/images/boot-${PLATFORM}.iso
+        else
+            echo "INFO: data/images/${BOOT_ISO} does not exist, downloading current ${PLATFORM} image..."
+            source scripts/defaults-${PLATFORM}.sh
+            curl -L  "${KSTEST_URL}/images/boot.iso" --output data/images/boot-${PLATFORM}.iso
+        fi
+        echo "Using downloaded data/images/${BOOT_ISO}"
     else
-        echo "INFO: data/images/boot.iso does not exist, downloading current ${PLATFORM} image..."
-        source scripts/defaults-${PLATFORM}.sh
-        curl -L  "${KSTEST_URL}/images/boot.iso" --output data/images/boot.iso
+        echo "Using existing data/images/${BOOT_ISO}"
     fi
 else
-    echo "Using existing data/images/boot.iso"
+    echo "Using existing data/images/${BOOT_ISO}"
 fi
 
 # support both path and URL for --updates
@@ -167,6 +176,10 @@ $CRUN run -it --rm --device=/dev/kvm --publish 127.0.0.1::16509 $PODMAN_SELINUX_
     --env KSTESTS_RUN_TIMEOUT="${TIMEOUT:-}" \
     --env TEST_JOBS="$TEST_JOBS" --env PLATFORM="${PLATFORM:-}" --env TEST_RETRY="${TEST_RETRY:-}" ${UPDATES_IMG_ARGS:-} ${CONTAINER_RUN_ARGS:-} \
     --env KSTESTS_KEEP=${KSTESTS_KEEP:-1} \
+    --env BOOT_ISO=${BOOT_ISO} \
     ${TEST_ENV_VARS} \
-    ${VAR_TMP:-} -v "$PWD/data:/opt/kstest/data:z" -v "$BASEDIR:/kickstart-tests:ro,z" ${DEFAULTS_SH_ARGS:-} \
+    ${VAR_TMP:-} \
+    ${DEFAULTS_SH_ARGS:-} \
+    -v "$PWD/data:/opt/kstest/data:z" \
+    -v "$BASEDIR:/kickstart-tests:ro,z" \
     $CONTAINER $RUN_COMMAND

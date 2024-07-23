@@ -57,7 +57,9 @@ Options:
  --daily-iso TOKEN_FILE               Download and use daily boot.iso instead of rawhide's
                                       (This requires a GitHub token that can read
                                        rhinstaller/kickstart-tests workflow artifacts.)
- --defaults DEFAULTS_SH_FILE          Path to file with overrides to scripts/defaults.sh
+ --defaults DEFAULTS_SH_FILE          Path to a file with custom shell script to override
+                                      defaults. The base defaults will be platform
+                                      specific (scripts/defaults*.sh).
  --run-args ARGUMENTS                 Extra $CRUN options/arguments (space separated)
  --recommended-jobs                   Print the number of jobs (--jobs option) used
                                       by default and exit. It is calulated from the number

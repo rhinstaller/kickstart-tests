@@ -26,7 +26,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="network coverage"
+TESTTYPE="network coverage testingtype"
 
 . ${KSTESTDIR}/functions.sh
 

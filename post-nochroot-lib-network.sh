@@ -41,7 +41,7 @@ function check_gui_configurations() {
     old_IFS=$IFS
     IFS=$'\n'
     # use \s so that it does not match itself in the log
-    for line in $(egrep -o "adding\sdevice configuration.*" /tmp/anaconda.log); do
+    for line in $(egrep -o "addding\sdevice configuration.*" /tmp/anaconda.log); do
         local device=$(echo $line | cut -d"'" -f4)
         local con=$(echo $line | cut -d"'" -f2)
         echo "${device}:${con}"

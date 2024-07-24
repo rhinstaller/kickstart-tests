@@ -7,14 +7,42 @@ on:
       - created
 
 jobs:
+  pr-info:
+    if: startsWith(github.event.comment.body, '/test-tmt')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Query comment author repository permissions
+        uses: octokit/request-action@v2.x
+        id: user_permission
+        with:
+          route: GET /repos/${{ github.repository }}/collaborators/${{ github.event.sender.login }}/permission
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # restrict running of tests to users with admin or write permission for the repository
+      # see https://docs.github.com/en/free-pro-team@latest/rest/reference/repos#get-repository-permissions-for-a-user
+      # store output if user is allowed in allowed_user job output so it has to be checked in downstream job
+      - name: Check if user does have correct permissions
+        if: contains('admin write', fromJson(steps.user_permission.outputs.data).permission)
+        id: check_user_perm
+        run: |
+          echo "User '${{ github.event.sender.login }}' has permission '${{ fromJson(steps.user_permission.outputs.data).permission }}' allowed values: 'admin', 'write'"
+          echo "allowed_user=true" >> $GITHUB_OUTPUT
+
+    outputs:
+      allowed: ${{ steps.check_user_perm.outputs.allowed_user }}
+
   testingfarm:
     name: "Run in testing farm"
+    needs: pr-info
     runs-on: ubuntu-latest
     environment: testing-farm
-    if: |
-      github.event.issue.pull_request
-      && contains(github.event.comment.body, '/test-tmt')
-      && contains(fromJson('["OWNER", "MEMBER"]'), github.event.comment.author_association)
+    permissions:
+      contents: read
+      statuses: write
+    if: needs.pr-info.outputs.allowed == 'true'
     steps:
     - name: Checkout repo
       uses: actions/checkout@v4

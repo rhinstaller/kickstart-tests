@@ -10,6 +10,8 @@ jobs:
   pr-info:
     if: startsWith(github.event.comment.body, '/test-tmt')
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Query comment author repository permissions
         uses: octokit/request-action@v2.x
@@ -37,6 +39,9 @@ jobs:
     needs: pr-info
     runs-on: ubuntu-latest
     environment: testing-farm
+    permissions:
+      contents: read
+      statuses: write
     if: needs.pr-info.outputs.allowed == 'true'
     steps:
     - name: Checkout repo

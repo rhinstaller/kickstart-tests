@@ -151,7 +151,8 @@ class Runner(object):
         nics_args = self._shell.prepare_network()
         boot_args = self._shell.boot_args()
 
-        target_boot_iso = os.path.join(self._tmp_dir, self._conf.boot_image_name)
+        # We've created a symlink of the boot.iso before so the name is always boot.iso
+        target_boot_iso = os.path.join(self._tmp_dir, "boot.iso")
 
         ks = []
         if self._shell.inject_ks_to_initrd():

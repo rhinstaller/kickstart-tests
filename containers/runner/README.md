@@ -27,8 +27,11 @@ variable to the name of the container to use when calling launch. eg:
 
 The `launch` script creates a `./data/` directory for passing of data between
 the container and the system (via volume).  By default it downloads the current
-Fedora Rawhide boot.iso or adequate iso file based on `--platform` option.
-To test other images they can be put into `data/images/boot.iso` before running `launch`.
+Fedora Rawhide boot.iso or adequate iso file based on `--platform` option. This
+image is then stored as `./data/images/boot-<platform>.iso` and used.
+To test other images they can be put into `./data/images/boot.iso` before running
+`launch`. The `./data/images/boot.iso` takes preference before platform specific
+image.
 
 There is also a [daily boot.iso](.github/workflows/daily-boot-iso.yml) built
 from Rawhide and various COPRs (e.g. Anaconda and DNF) for regression testing,

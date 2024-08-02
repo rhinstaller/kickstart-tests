@@ -45,7 +45,7 @@ check_device_has_ipv4_address bond0 no
 
 # Configuration from boot options
 check_config_exists @KSTEST_NETDEV1@ yes
-if [ "${platform}" == "rhel9" ] || [ "${platform}" == "rhel10" ]; then
+if [ "${platform}" == "rhel9" ]; then
     check_config_exists @KSTEST_NETDEV2@ yes
     check_config_exists @KSTEST_NETDEV3@ yes
 else

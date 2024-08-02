@@ -82,13 +82,9 @@ if [ "${platform}" != "rhel8" ]; then
     check_config_exists @KSTEST_NETDEV1@ yes
 fi
 
-if [ "${platform}" == "rhel9" ]; then
-    check_config_exists @KSTEST_NETDEV2@ yes
-else
-    # RHEL-8-FAILURE: anaconda does not create default config file for enslaved device in RHEL8
-    # Since RHEL-38451 don't create default persistent connection for ports/slaves
-    check_config_exists @KSTEST_NETDEV2@ no
-fi
+# RHEL-8-FAILURE: anaconda does not create default config file for enslaved device in RHEL8
+# Since RHEL-38451 don't create default persistent connection for ports/slaves
+check_config_exists @KSTEST_NETDEV2@ no
 
 check_device_config_bound_to_mac bridge0_slave_1
 check_device_config_bound_to_mac bridge1_slave_1

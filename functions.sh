@@ -39,6 +39,13 @@ inject_ks_to_initrd() {
     echo "true"
 }
 
+enable_uefi() {
+    # Run the VM in the UEFI mode.
+    # This will add '--boot uefi' argument to the virt-install script
+    # returns: "true" or "false"
+    echo "false"
+}
+
 EXTRA_BOOTOPTS=$(echo "${KSTEST_EXTRA_BOOTOPTS}" | tr ';' ' ')
 
 DEFAULT_BASIC_BOOTOPTS="debug=1 inst.debug ${EXTRA_BOOTOPTS}"

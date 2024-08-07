@@ -171,6 +171,7 @@ class Runner(object):
         v_conf.networks = nics_args
         v_conf.runner_args = self._shell.additional_runner_args()
         v_conf.stage2_from_ks = self._shell.stage2_from_ks()
+        v_conf.enable_uefi = self._shell.enable_uefi()
         v_conf.ram = ram
 
         return v_conf

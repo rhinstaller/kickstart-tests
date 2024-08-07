@@ -184,6 +184,7 @@ class VirtualConfiguration(BaseConfiguration):
         self._timeout = None
         self._runner_args = []
         self._stage2_from_ks = False
+        self._enable_uefi = False
 
     @property
     def test_name(self):
@@ -381,3 +382,13 @@ class VirtualConfiguration(BaseConfiguration):
     def stage2_from_ks(self, value: list):
         """Set use installer image from location defined in kickstart"""
         self._stage2_from_ks = value
+
+    @property
+    def enable_uefi(self) -> bool:
+        """Start VM with UEFI bootloader"""
+        return self._enable_uefi
+
+    @enable_uefi.setter
+    def enable_uefi(self, value: list):
+        """Set if VM should start with UEFI bootloader"""
+        self._enable_uefi = value

@@ -1,0 +1,66 @@
+#test name: rpm-ostree-container-bootc
+# https://github.com/rhinstaller/anaconda/pull/5399
+#
+# Test the UEFI entry is created correctly and the system is bootable.
+# This doesn't work so far on RHEL-9 and RHEL-10 so the test will be
+# disabled there after this is implemented:
+# * https://issues.redhat.com/browse/RHEL-40897
+# * https://issues.redhat.com/browse/RHEL-40896
+#
+# Also this test is mostly a copy of rpm-ostree-container-bootc test
+# and it could be merged when RHEL-9 and RHEL-10 is enabled.
+#
+
+# Use the default settings.
+%ksappend common/common_no_storage_and_payload.ks
+# On Fedora enforce lvm scheme (overriding btrfs default)
+%ksappend storage/ostreecontainer_autopart.ks
+
+ostreecontainer --no-signature-verification --remote=test-remote --stateroot=test-stateroot --url=@KSTEST_OSTREECONTAINER_URL@
+
+# Reboot the installed system.
+reboot
+
+# Validate on the first boot.
+%ksappend validation/success_on_first_boot.ks
+
+%post
+efibootmgr | grep "Boot0001" | grep "HD(1"
+if [ $? -ne 0 ]; then
+    echo -e "EFI boot entry wasn't created properly:\n$(efibootmgr)"  >> /root/RESULT
+fi
+
+# Checks after boot
+cat >> /var/lib/extensions/kickstart-tests/usr/libexec/kickstart-test.sh << 'EOF'
+
+# propagate any errors from %post validations
+if [ -e /root/RESULT ]; then
+    cat /root/RESULT
+fi
+
+# Check that state root 'test-stateroot' exists
+if [ ! -d /ostree/deploy/test-stateroot ]; then
+    echo "Couldn't find 'test-stateroot' stateroot"
+fi
+
+# Check that bootupd information is present
+if [ ! -e /boot/bootupd-state.json ]; then
+    echo "/boot/bootupd-state.json not found on installed system after booting"
+fi
+
+bootupctl --help &> /dev/null || echo "bootupctl command not available after booting"
+bootc --help &> /dev/null || echo "bootc command not available after booting"
+
+expected_url="@KSTEST_OSTREECONTAINER_URL@"
+remote_url="$(ostree remote show-url test-remote)"
+if [ ${?} -ne 0 ]; then
+    echo "Couldn't list remote URL for 'test-remote'" >> /root/RESULT
+fi
+
+if [ "${remote_url}" != "${expected_url}" ]; then
+    echo "Unexpected URL: ${remote_url}, expected ${expected_url}"" >> /root/RESULT
+fi
+
+
+EOF
+%end

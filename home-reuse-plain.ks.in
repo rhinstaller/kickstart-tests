@@ -1,0 +1,87 @@
+#version=DEVEL
+#test name: mountpoint-assignment-1
+
+# TODORV - reuse fragments?
+%ksappend repos/default.ks
+network --bootproto=dhcp
+bootloader --timeout=1
+
+autopart --type plain --reuse /home --remove /boot,biosboot,/
+
+keyboard us
+lang en_US.UTF-8
+timezone America/New_York --utc
+rootpw testcase
+shutdown
+
+%packages
+%end
+
+%pre
+
+DISK=/dev/vda
+
+
+# Fake previous installation (--type plain autopart)
+sgdisk --zap-all ${DISK}
+sgdisk --new=0:0:+1MiB -t 0:ef02 ${DISK}
+sgdisk --new=0:0:+1GiB ${DISK}
+sgdisk --new=0:0:+7GiB ${DISK}
+sgdisk --new=0:0:0 ${DISK}
+mkfs.ext4 ${DISK}2
+mkfs.xfs -f ${DISK}3
+mkfs.ext4 ${DISK}4
+
+mkdir /existing_root
+mount ${DISK}3 /existing_root
+mkdir /existing_root/etc
+
+# Mark existing root by a file
+touch /existing_root/old_root_file
+
+# Fake previous installation fstab
+cat > /existing_root/etc/fstab <<EOF
+${DISK}2 /boot                   ext4    defaults        1 2
+${DISK}3 /                       ext4    defaults        1 1
+${DISK}4 /home                   ext4    defaults        1 2
+EOF
+
+umount ${DISK}3
+
+# Mark existing home by a file
+mkdir /existing_home
+mount ${DISK}4 /existing_home
+
+touch /existing_home/old_home_file
+
+umount ${DISK}4
+
+%end
+
+%post
+
+# Check the partitioning (lsblk)
+# lsblk --json | jq '.blockdevices[] | select(.name=="vda").children[] | selecte(.name=="vda4").mountpoints[0]'
+
+
+@KSINCLUDE@ post-lib-storage.sh
+
+check_mount_point_fstab "/dev/vda1" ""  "" "" ""
+check_mount_point_fstab "/dev/vda2" "/boot" "ext4" "defaults" ""
+check_mount_point_fstab "/dev/vda3" "/" "ext4" "defaults" ""
+check_mount_point_fstab "/dev/vda4" "/home" "ext4" "defaults" ""
+
+# Check content of reused disks
+if [ ! -f /home/old_home_file ]; then
+    echo "/home was not reused: file old_home_file was not found in the /home folder" >>/root/RESULT
+fi
+
+if [ -f /old_root_file ]; then
+    echo "/ was not removed: file old_root_file was found in the / folder" >>/root/RESULT
+fi
+
+if [ ! -e /root/RESULT ]; then
+    echo SUCCESS >/root/RESULT
+fi
+
+%end

@@ -138,7 +138,7 @@ Before the tests are started you should see something like this.
     ************************************************************************
     You can connect to this container's libvirt with this connection string:
    
-       qemu+tcp://<IP>/session
+       virt-viewer -c qemu+tcp://<IP>/session
    
     ************************************************************************
 

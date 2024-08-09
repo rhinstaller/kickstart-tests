@@ -71,7 +71,7 @@ if MY_IP=$(ip -4 -c a show dev eth0 2>/dev/null | grep -Eo '[0-9.]+\.[0-9]+' | g
     echo "************************************************************************"
     echo "You can connect to this container's libvirt with this connection string:"
     echo
-    echo "   qemu+tcp://${MY_IP}/session"
+    echo "   virt-viewer -c qemu+tcp://${MY_IP}/session"
     echo
     echo "************************************************************************"
     set -x

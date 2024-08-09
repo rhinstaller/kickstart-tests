@@ -1,0 +1,110 @@
+#version=DEVEL
+#test name: mountpoint-assignment-1
+
+# TODORV - reuse fragments?
+%ksappend repos/default.ks
+network --bootproto=dhcp
+bootloader --timeout=1
+
+# It is not possible to remove / and recreate it by autopartitioning
+# as it is on btrfs subvolume.
+autopart --type btrfs --reuse /home --remove /boot,biosboot --erase /
+
+keyboard us
+lang en_US.UTF-8
+timezone America/New_York --utc
+rootpw testcase
+shutdown
+
+%packages
+%end
+
+%pre
+
+DISK=/dev/vda
+
+
+# Fake previous installation (--type btrfs autopart)
+sgdisk --zap-all ${DISK}
+sgdisk --new=0:0:+1MiB -t 0:ef02 ${DISK}
+sgdisk --new=0:0:+1GiB ${DISK}
+sgdisk --new=0:0:+7GiB ${DISK}
+mkfs.ext4 -F ${DISK}2
+mkfs.btrfs -f ${DISK}3
+
+TMP_MOUNT="/tmp/btrfs-mount-test"
+mkdir -p ${TMP_MOUNT}
+mount ${DISK}3 ${TMP_MOUNT}
+btrfs subvolume create ${TMP_MOUNT}/root
+btrfs subvolume create ${TMP_MOUNT}/home
+btrfs subvolume create ${TMP_MOUNT}/data
+btrfs subvolume snapshot ${TMP_MOUNT}/root ${TMP_MOUNT}/snapshot1
+umount ${TMP_MOUNT}
+rmdir ${TMP_MOUNT}
+
+
+mkdir /existing_root
+mount -o subvol=root,compress=zstd:1 ${DISK}3 /existing_root
+
+# Mark existing root by a file
+touch /existing_root/old_root_file
+
+## Fake previous installation fstab
+mkdir /existing_root/etc
+cat > /existing_root/etc/fstab <<EOF
+/dev/vda3 /                       btrfs   subvol=root,compress=zstd:1 0 0
+/dev/vda2 /boot                   ext4    defaults        1 2
+/dev/vda3 /home                   btrfs   subvol=home,compress=zstd:1 0 0
+EOF
+
+umount ${DISK}3
+
+# Mark existing home by a file
+mkdir /existing_home
+mount -o subvol=home,compress=zstd:1 ${DISK}3 /existing_home
+touch /existing_home/old_home_file
+umount ${DISK}3
+
+# Mark existing data by a file
+mkdir /existing_data
+mount -o subvol=data ${DISK}3 /existing_data
+touch /existing_data/old_data_file
+umount ${DISK}3
+
+%end
+
+
+%post
+
+DISK=/dev/vda
+
+@KSINCLUDE@ post-lib-storage.sh
+
+check_mount_point_fstab "/dev/vda1" ""  "" "" ""
+check_mount_point_fstab "/dev/vda2" "/boot" "ext4" "defaults" ""
+check_mount_point_fstab "/dev/vda3" "/" "btrfs" "subvol=root,compress=zstd:1" ""
+check_mount_point_fstab "/dev/vda3" "/home" "btrfs" "subvol=home" ""
+
+# Check content of reused disks
+if [ ! -f /home/old_home_file ]; then
+    echo "/home was not reused: file old_home_file was not found in the /home folder" >>/root/RESULT
+fi
+
+mkdir /user
+mount -o subvol=data ${DISK}3 /user
+if [ ! -f /user/old_data_file ]; then
+    echo "/user was erased: file old_user_file was not found in the /user folder" >>/root/RESULT
+fi
+umount ${DISK}3
+
+if [ -f /old_root_file ]; then
+    echo "/ was not removed: file old_root_file was found in the / folder" >>/root/RESULT
+fi
+
+if [ ! -e /root/RESULT ]; then
+    echo SUCCESS >/root/RESULT
+fi
+
+%end
+
+

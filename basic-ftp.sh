@@ -20,6 +20,6 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="method gh871"
+TESTTYPE="method"
 
 . ${KSTESTDIR}/functions.sh

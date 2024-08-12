@@ -38,7 +38,7 @@ function check_proxy_settings() {
         fi
     elif [ "$httpdir" ]; then
         # check for .treeinfo request
-        grep -q '\.treeinfo$' $tmpdir/proxy/access.log
+        grep -q '\.treeinfo[[:space:]]' $tmpdir/proxy/access.log
         if [[ $? -ne 0 ]]; then
             echo '.treeinfo request to repository server was not proxied' >> $tmpdir/RESULT
         fi

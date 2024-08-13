@@ -87,16 +87,8 @@ validate() {
         fi
     fi
 
-    result=$(cat ${tmpdir}/RESULT)
-    if [[ $? != 0 ]]; then
-        echo '*** /root/RESULT does not exist in VM image.'
-        return 1
-    elif [[ "${result}" != SUCCESS* ]]; then
-        echo "${result}"
-        return 1
-    else
-        return 0
-    fi
+    check_result_file "${tmpdir}"
+    return $?
 }
 
 cleanup() {

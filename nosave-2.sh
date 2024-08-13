@@ -50,7 +50,7 @@ validate() {
     if [[ $? != 0 ]]; then
         status=1
         echo '*** /root/RESULT does not exist in VM image.'
-    elif [[ "${result}" != SUCCESS* ]]; then
+    elif [[ "${result%% *}" != SUCCESS ]]; then
         status=1
         echo "${result}"
     else

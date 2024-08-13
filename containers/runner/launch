@@ -176,7 +176,7 @@ $CRUN run -it --rm --device=/dev/kvm --publish 127.0.0.1::16509 $PODMAN_SELINUX_
     --env DRY_RUN="${DRY_RUN:-}" \
     --env KSTESTS_TEST="$KSTESTS_TEST" --env TESTTYPE="${TESTTYPE:-}" --env SKIP_TESTTYPES="${SKIP_TESTTYPES:-}" \
     --env KSTESTS_RUN_TIMEOUT="${TIMEOUT:-}" \
-    --env TEST_JOBS="$TEST_JOBS" --env PLATFORM="${PLATFORM:-}" --env TEST_RETRY="${TEST_RETRY:-}" ${UPDATES_IMG_ARGS:-} ${CONTAINER_RUN_ARGS:-} \
+    --env TEST_JOBS="$TEST_JOBS" --env PLATFORM_NAME="${PLATFORM:-}" --env TEST_RETRY="${TEST_RETRY:-}" ${UPDATES_IMG_ARGS:-} ${CONTAINER_RUN_ARGS:-} \
     --env KSTESTS_KEEP=${KSTESTS_KEEP:-1} \
     --env BOOT_ISO=${BOOT_ISO} \
     ${TEST_ENV_VARS} \

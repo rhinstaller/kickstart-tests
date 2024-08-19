@@ -35,11 +35,11 @@ check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@ team
 check_device_config_value team0 ONBOOT yes connection autoconnect __NONE
 check_device_config_value @KSTEST_NETDEV2@ ONBOOT yes connection autoconnect __NONE
 check_device_config_value @KSTEST_NETDEV3@ ONBOOT yes connection autoconnect __NONE
-# connection.master is identified by connection uuid so check __ANY
-check_device_config_value @KSTEST_NETDEV2@ TEAM_MASTER team0 connection master __ANY
-check_device_config_value @KSTEST_NETDEV2@ TEAM_MASTER team0 connection slave-type team
-check_device_config_value @KSTEST_NETDEV3@ TEAM_MASTER team0 connection master __ANY
-check_device_config_value @KSTEST_NETDEV3@ TEAM_MASTER team0 connection slave-type team
+# connection.controller is identified by connection uuid so check __ANY
+check_device_config_value @KSTEST_NETDEV2@ TEAM_MASTER team0 connection controller __ANY
+check_device_config_value @KSTEST_NETDEV2@ TEAM_MASTER team0 connection port-type team
+check_device_config_value @KSTEST_NETDEV3@ TEAM_MASTER team0 connection controller __ANY
+check_device_config_value @KSTEST_NETDEV3@ TEAM_MASTER team0 connection port-type team
 check_device_connected team0 yes
 
 

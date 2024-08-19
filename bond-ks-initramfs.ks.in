@@ -65,15 +65,15 @@ platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
 check_device_config_value bond0 ONBOOT yes connection autoconnect __NONE
 if [ "${platform}" == "rhel8" ]; then
     check_device_config_value bond0_slave_1 ONBOOT yes connection autoconnect __NONE
-    check_device_config_value bond0_slave_1 SLAVE yes connection slave-type bond
+    check_device_config_value bond0_slave_1 SLAVE yes connection port-type bond
     check_device_config_value bond0_slave_2 ONBOOT yes connection autoconnect __NONE
-    check_device_config_value bond0_slave_2 SLAVE yes connection slave-type bond
+    check_device_config_value bond0_slave_2 SLAVE yes connection port-type bond
 else
     # config files are not named bond0_slave_1 as opposed to kickstart config
     check_device_config_value @KSTEST_NETDEV1@ ONBOOT yes connection autoconnect __NONE
-    check_device_config_value @KSTEST_NETDEV1@ SLAVE yes connection slave-type bond
+    check_device_config_value @KSTEST_NETDEV1@ SLAVE yes connection port-type bond
     check_device_config_value @KSTEST_NETDEV2@ ONBOOT yes connection autoconnect __NONE
-    check_device_config_value @KSTEST_NETDEV2@ SLAVE yes connection slave-type bond
+    check_device_config_value @KSTEST_NETDEV2@ SLAVE yes connection port-type bond
 fi
 
 check_device_connected bond0 yes

@@ -53,10 +53,10 @@ check_device_config_value team0 ONBOOT no connection autoconnect false
 
 check_device_config_value team0_slave_1 ONBOOT no connection autoconnect false
 check_device_config_value team0_slave_2 ONBOOT no connection autoconnect false
-check_device_config_value team0_slave_1 TEAM_MASTER team0 connection master team0
-check_device_config_value team0_slave_1 TEAM_MASTER team0 connection slave-type team
-check_device_config_value team0_slave_2 TEAM_MASTER team0 connection master team0
-check_device_config_value team0_slave_2 TEAM_MASTER team0 connection slave-type team
+check_device_config_value team0_slave_1 TEAM_MASTER team0 connection controller team0
+check_device_config_value team0_slave_1 TEAM_MASTER team0 connection port-type team
+check_device_config_value team0_slave_2 TEAM_MASTER team0 connection controller team0
+check_device_config_value team0_slave_2 TEAM_MASTER team0 connection port-type team
 
 check_device_connected team0 yes
 check_team_has_slave team0 kstest2 yes

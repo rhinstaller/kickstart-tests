@@ -38,9 +38,9 @@ check_device_connected bridge0 yes
 check_device_connected @KSTEST_NETDEV1@ yes
 
 # The bridge is created in initramfs so the slave connection is named @KSTEST_NETDEV1@
-# connection.master is identified by connection uuid so check __ANY
-check_device_config_value @KSTEST_NETDEV1@ BRIDGE bridge0 connection master __ANY
-check_device_config_value @KSTEST_NETDEV1@ BRIDGE bridge0 connection slave-type bridge
+# connection.controller is identified by connection uuid so check __ANY
+check_device_config_value @KSTEST_NETDEV1@ BRIDGE bridge0 connection controller __ANY
+check_device_config_value @KSTEST_NETDEV1@ BRIDGE bridge0 connection port-type bridge
 
 check_device_has_ipv4_address bridge0 yes
 check_device_has_ipv4_address @KSTEST_NETDEV1@ no

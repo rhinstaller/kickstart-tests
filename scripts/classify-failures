@@ -172,6 +172,10 @@ ISSUES = [
         "description": "[1235] https://github.com/rhinstaller/kickstart-tests/issues/1235",
         "first_grep": "org.fedoraproject.Anaconda.Modules.Localization.GetCompositorSelectedLayout has failed with an exception",
     },
+    {
+        "description": "[1261] https://github.com/rhinstaller/kickstart-tests/issues/1261",
+        "first_grep": "anaconda:anaconda: display: Wayland startup failed: systemd exited with status 1",
+    },
 ]
 
 CLOSED_ISSUES = [

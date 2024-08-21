@@ -172,13 +172,21 @@ ISSUES = [
         "description": "[1235] https://github.com/rhinstaller/kickstart-tests/issues/1235",
         "first_grep": "org.fedoraproject.Anaconda.Modules.Localization.GetCompositorSelectedLayout has failed with an exception",
     },
-]
-
-CLOSED_ISSUES = [
+    {
+        "description": "[1261] https://github.com/rhinstaller/kickstart-tests/issues/1261",
+        "first_grep": "anaconda:anaconda: display: Wayland startup failed: systemd exited with status 1",
+    },
+    {
+        "description": "[TODO] https://github.com/rhinstaller/kickstart-tests/issues/1261",
+        "first_grep": "anaconda:anaconda: display: Wayland startup failed: /usr/libexec/anaconda/run-in-new-session exited with status 1",
+    },
     {
         "description": "[11] https://github.com/rhinstaller/kickstart-tests/issues/795",
         "first_grep": "ERR.*Timeout trying to start Xorg",
     },
+]
+
+CLOSED_ISSUES = [
     {
         "description": "[9] RHSM https://github.com/rhinstaller/kickstart-tests/issues/707",
         "first_grep": "DBusError: {\"exception\": \"NoSectionError\", \"severity\": \"error\", \"message\": \"No section: 'logging'\"}",

@@ -7,6 +7,3 @@ export KSTEST_URL='http://download.devel.redhat.com/rhel-10/nightly/RHEL-10-Publ
 export KSTEST_MODULAR_URL='http://download.devel.redhat.com/rhel-10/nightly/RHEL-10-Public-Beta/latest-RHEL-10.0/compose/AppStream/x86_64/os/'
 export KSTEST_FTP_URL='ftp://download.devel.redhat.com/mnt/redhat/rhel-10/nightly/RHEL-10-Public-Beta/latest-RHEL-10.0/compose/BaseOS/x86_64/os/'
 export KSTEST_OSTREECONTAINER_URL='quay.io/centos-bootc/centos-bootc:stream10'
-
-# FIXME: This is a temporary workaround until https://issues.redhat.com/browse/RHEL-55728 is fixed.
-export KSTEST_EXTRA_BOOTOPS='net.naming_scheme=v255'

@@ -9,4 +9,4 @@ export KSTEST_FTP_URL='ftp://download.devel.redhat.com/mnt/redhat/rhel-10/nightl
 export KSTEST_OSTREECONTAINER_URL='quay.io/centos-bootc/centos-bootc:stream10'
 
 # FIXME: This is a temporary workaround until https://issues.redhat.com/browse/RHEL-55728 is fixed.
-export KSTEST_EXTRA_BOOTOPS='net.naming_scheme=v255'
+export KSTEST_EXTRA_BOOTOPTS='net.naming_scheme=v255'

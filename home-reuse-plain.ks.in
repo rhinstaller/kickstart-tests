@@ -6,7 +6,7 @@
 network --bootproto=dhcp
 bootloader --timeout=1
 
-autopart --type plain --reuse /home --remove /boot,biosboot,/
+autopart --type plain --reuse /home --remove /boot,/
 
 keyboard us
 lang en_US.UTF-8

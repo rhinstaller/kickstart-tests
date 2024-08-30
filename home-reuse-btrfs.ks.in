@@ -8,7 +8,7 @@ bootloader --timeout=1
 
 # It is not possible to remove / and recreate it by autopartitioning
 # as it is on btrfs subvolume.
-autopart --type btrfs --reuse /home --remove /boot --erase /
+autopart --type btrfs --reuse /home --remove /boot,bootloader --erase /
 
 keyboard us
 lang en_US.UTF-8

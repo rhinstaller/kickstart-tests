@@ -184,6 +184,10 @@ ISSUES = [
         "description": "[11] https://github.com/rhinstaller/kickstart-tests/issues/795",
         "first_grep": "ERR.*Timeout trying to start Xorg",
     },
+    {
+        "description": "[1296] https://github.com/rhinstaller/kickstart-tests/issues/1296",
+        "first_grep": "ERR anaconda:Exception ignored in atexit callback:",
+    },
 ]
 
 CLOSED_ISSUES = [

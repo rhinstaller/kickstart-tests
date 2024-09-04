@@ -23,6 +23,7 @@ fedora_skip_array=(
   gh1060      # vnc tests too flaky
   gh1237      # container failing
   gh1250      # rpm-ostree-container-luks fails to boot
+  gh1298      # rpm-ostree-container-uefi fails to create EFI entry
 )
 
 daily_iso_skip_array=(

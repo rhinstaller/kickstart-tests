@@ -25,7 +25,8 @@ reboot
 %ksappend validation/success_on_first_boot.ks
 
 %post
-efibootmgr | grep "Boot0001" | grep "HD(1"
+# We need to use tr because sometimes there is newline inside of the efibootmgr entry line :(
+efibootmgr | tr -s '\n' ' ' | grep -E 'Boot0001\* Fedora\s+HD\(1'
 if [ $? -ne 0 ]; then
     echo -e "EFI boot entry wasn't created properly:\n$(efibootmgr)"  >> /root/RESULT
 fi

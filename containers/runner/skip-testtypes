@@ -22,7 +22,6 @@ fedora_skip_array=(
   gh1023      # rpm-ostree failing
   gh1060      # vnc tests too flaky
   gh1237      # container failing
-  gh1250      # rpm-ostree-container-luks fails to boot
 )
 
 daily_iso_skip_array=(
@@ -70,7 +69,6 @@ rhel10_skip_array=(
   gh1207      # packages-multilib failing
   gh1213      # harddrive-iso-single failing
   gh1270      # selinux-contexts failing
-  gh1293      # rpm-ostree-container-luks failing
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

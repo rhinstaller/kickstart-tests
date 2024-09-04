@@ -18,12 +18,12 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="payload ostree bootc luks reboot skip-on-rhel-8 gh1250 gh1293"
+TESTTYPE="payload ostree bootc luks reboot skip-on-rhel-8"
 
 . ${KSTESTDIR}/functions.sh
 
 copy_interesting_files_from_system() {
-    local disksdir args luks_partition root_lv 
+    local disksdir args luks_partition root_lv
     disksdir="${1}"
 
     # Find disks.

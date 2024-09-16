@@ -87,7 +87,7 @@ validate() {
         fi
 
         # Finally, check that the repoquery used the proxy
-        tail -1 $tmpdir/proxy/access.log | grep -q repodata
+        grep -q 'repodata/repomd.xml' $tmpdir/proxy/access.log
         if [[ $? -ne 0 ]]; then
             echo 'repoquery on installed system was not proxied' >> $tmpdir/RESULT
         fi

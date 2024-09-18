@@ -1,0 +1,20 @@
+#test name: pre_erroronfail_test
+
+%ksappend repos/default.ks
+
+# Pre-install script with intentional error and --erroronfail
+%pre --erroronfail
+echo "SUCCESS"
+
+echo "Pre-install script started"
+
+shutdown +1
+
+# raise error
+exit 1
+%end
+
+%pre
+# Write error because this code is unreachable
+echo "ERROR: Pre-install script did not fail as expected."
+%end

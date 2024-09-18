@@ -1,0 +1,32 @@
+# Test name: post_install_with_logging_test
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+# System configuration for automatic installation
+text
+
+# Post-install script (nochroot)
+%post --nochroot --log=/mnt/sysroot/root/post-nochroot.log
+# Log to the nochroot log file
+echo "Post-install (nochroot) script started"
+# Write 'SUCCESS' to the RESULT file
+echo "SUCCESS" > /mnt/sysroot/root/RESULT
+# Log completion
+echo "Post-install (nochroot) script finished"
+%end
+
+# Post-install script (chroot)
+%post --log=/root/post-chroot.log
+# Log to the chroot log file
+echo "Post-install (chroot) script started"
+# Check if the RESULT file contains 'SUCCESS'
+if grep -q "SUCCESS" /root/RESULT; then
+    echo "SUCCESS found in /root/RESULT, everything is good!"
+else
+    echo "ERROR: SUCCESS not found in /root/RESULT" > /root/RESULT
+    echo "ERROR: SUCCESS not found in /root/RESULT"
+fi
+# Log completion
+echo "Post-install (chroot) script finished"
+%end

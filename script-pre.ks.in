@@ -1,0 +1,19 @@
+#test name: pre_install_interpreter_test
+
+%ksappend repos/default.ks
+
+# Pre-install script using Bash interpreter
+%pre --interpreter=/bin/bash
+echo "SUCCESS from Bash"
+%end
+
+# Pre-install script using Python interpreter
+%pre --interpreter=/usr/bin/python3
+print("SUCCESS from Python")
+%end
+
+# Pre script just for confirmation
+%pre
+echo "SUCCESS Pre"
+poweroff
+%end

@@ -177,7 +177,7 @@ ISSUES = [
         "first_grep": "anaconda:anaconda: display: Wayland startup failed: systemd exited with status 1",
     },
     {
-        "description": "[TODO] https://github.com/rhinstaller/kickstart-tests/issues/1261",
+        "description": "[1261] https://github.com/rhinstaller/kickstart-tests/issues/1261",
         "first_grep": "anaconda:anaconda: display: Wayland startup failed: /usr/libexec/anaconda/run-in-new-session exited with status 1",
     },
     {
@@ -187,6 +187,10 @@ ISSUES = [
     {
         "description": "[1296] https://github.com/rhinstaller/kickstart-tests/issues/1296",
         "first_grep": "ERR anaconda:Exception ignored in atexit callback:",
+    },
+    {
+        "description": "[1303] https://github.com/rhinstaller/kickstart-tests/issues/1303",
+        "first_grep": "WARNING gnome-kiosk:Lost or failed to acquire name org.gnome.Mutter.ServiceChannel",
     },
 ]
 

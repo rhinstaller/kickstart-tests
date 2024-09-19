@@ -68,7 +68,6 @@ rhel10_skip_array=(
   gh1110      # storage-multipath-autopart failing
   gh1207      # packages-multilib failing
   gh1213      # harddrive-iso-single failing
-  gh1270      # selinux-contexts failing
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

@@ -19,6 +19,6 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="packaging modularity knownfailure"
+TESTTYPE="packaging payload modularity knownfailure"
 
 . ${KSTESTDIR}/functions.sh

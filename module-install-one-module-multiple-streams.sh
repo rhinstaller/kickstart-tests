@@ -19,6 +19,6 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="knownfailure packaging modularity skip-on-rhel"
+TESTTYPE="knownfailure packaging payload modularity skip-on-rhel"
 
 . ${KSTESTDIR}/functions.sh

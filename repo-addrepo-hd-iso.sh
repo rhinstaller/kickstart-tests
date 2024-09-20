@@ -18,7 +18,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="packaging repo harddrive gh804"
+TESTTYPE="packaging payload repo harddrive gh804"
 
 . ${KSTESTDIR}/functions.sh
 

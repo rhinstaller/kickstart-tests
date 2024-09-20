@@ -18,7 +18,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="packaging repo skip-on-rhel"
+TESTTYPE="packaging payload repo skip-on-rhel"
 
 . ${KSTESTDIR}/functions.sh
 

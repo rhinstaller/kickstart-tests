@@ -20,6 +20,6 @@
 # requires special setup (NFS server) which we don't have in our test environments
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="method packaging knownfailure"
+TESTTYPE="packaging payload knownfailure"
 
 . ${KSTESTDIR}/functions.sh

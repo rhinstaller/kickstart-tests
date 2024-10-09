@@ -19,6 +19,6 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE=${TESTTYPE:-"packaging harddrive gh804"}
+TESTTYPE=${TESTTYPE:-"packaging payload harddrive gh804"}
 
 . ${KSTESTDIR}/harddrive-install-tree.sh

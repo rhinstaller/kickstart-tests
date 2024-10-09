@@ -17,10 +17,9 @@
 #
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 
-#TESTTYPE="method"
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="knownfailure"
+TESTTYPE="payload knownfailure"
 
 . ${KSTESTDIR}/functions.sh
 

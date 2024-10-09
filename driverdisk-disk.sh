@@ -16,8 +16,10 @@
 # Author: Will Woods <wwoods@redhat.com>
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
+# The payload group is here because dud is creating repository during
+# installation and adding the DUD to the installed system this way
 # shellcheck disable=SC2034
-TESTTYPE="driverdisk"
+TESTTYPE="driverdisk payload"
 
 . ${KSTESTDIR}/functions.sh
 

@@ -19,6 +19,6 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="keyboard i18n coverage"
+TESTTYPE="keyboard i18n coverage smoke"
 
 . ${KSTESTDIR}/functions.sh

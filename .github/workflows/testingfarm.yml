@@ -1,4 +1,8 @@
 ---
+# Run TMT test plans in the Testing Farm machines
+#
+# This could be also started locally if needed. Take a look into the plans directory.
+#
 name: Testing farm tests
 
 on:

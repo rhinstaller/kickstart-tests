@@ -6,7 +6,7 @@
 #
 # If you really need to debug this locally follow these steps:
 # 1. Create PR against rhinstaller/kickstart tests
-# 2. Run `tmt run --all -vvv -e PR_NUMBER=<Pull Request id> provision --how virtual --memory 16384  # Don't go with memory under 3072 MB
+# 2. Run `tmt run --all -vvv -e PR_NUMBER=<Pull Request id> provision --how virtual --hardware 'cpu.processors=8' --memory 16384  # Don't go with memory under 3072 MB
 #
 # Steps above will start local VM which will clone your PR and execute tests on that code. It means
 # that TMT plan data are taken from local but everything else is taken from the PR.
@@ -36,7 +36,7 @@ discover:
 
         trap "cp -rv data/logs/ ${TMT_TEST_DATA}/" EXIT INT QUIT PIPE
 
-        cd /root/kickstart-tests 
+        cd /root/kickstart-tests
         scripts/run_travis.sh
 
 

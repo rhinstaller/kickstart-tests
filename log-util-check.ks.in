@@ -1,0 +1,23 @@
+#version=DEVEL
+#test name: efi-log
+%ksappend repos/default.ks
+
+%ksappend common/common_no_payload.ks
+
+%packages
+@core
+%end
+
+%post --nochroot
+
+@KSINCLUDE@ log-util-tests.sh
+
+check_log_util_exist
+check_log_util_runs
+check_log_util_produces_log_archive
+
+%end
+
+# No error was written to /root/RESULT file, everything is OK
+%ksappend validation/success_if_result_empty_standalone.ks
+

@@ -137,10 +137,6 @@ ISSUES = [
         "first_grep": "CRIT.*gnome-kiosk exited with status 1",
     },
     {
-        "description": "[869] https://github.com/rhinstaller/kickstart-tests/issues/869",
-        "first_grep": "CRIT.*Failed to call the 'Snapshot' method on the '/com/redhat/lvmdbus1/Lv/1' object: Timeout was reached"
-    },
-    {
         "description": "[1035] https://github.com/rhinstaller/kickstart-tests/issues/1035",
         "first_grep": "CRIT.*UnavailableValueError: The kernel version list is not available.",
     },
@@ -165,10 +161,6 @@ ISSUES = [
         "last_anaconda_re": ".*DEBUG anaconda:anaconda: ui.gui.hubs: kickstart installation, spoke Installation Source is ready.*"
     },
     {
-        "description": "[1202] https://github.com/rhinstaller/kickstart-tests/issues/1202",
-        "first_grep": "Failed to call the 'PvCreate' method on the '/com/redhat/lvmdbus1/Manager' object: Timeout was reached",
-    },
-    {
         "description": "[1235] https://github.com/rhinstaller/kickstart-tests/issues/1235",
         "first_grep": "org.fedoraproject.Anaconda.Modules.Localization.GetCompositorSelectedLayout has failed with an exception",
     },
@@ -186,15 +178,49 @@ ISSUES = [
     },
     {
         "description": "[1296] https://github.com/rhinstaller/kickstart-tests/issues/1296",
-        "first_grep": "ERR anaconda:Exception ignored in atexit callback:",
+        "first_grep": "ERR anaconda:Exception ignored in atexit callback",
     },
     {
         "description": "[1303] https://github.com/rhinstaller/kickstart-tests/issues/1303",
         "first_grep": "WARNING gnome-kiosk:Lost or failed to acquire name org.gnome.Mutter.ServiceChannel",
     },
+    {
+        "description": "[886] https://github.com/rhinstaller/kickstart-tests/issues/886",
+        "first_grep": "/dev/vda4 shouldn't be mounted at",
+    },
+    {
+        "description": "[1311] https://github.com/rhinstaller/kickstart-tests/issues/1311",
+        "first_grep": "LVMError.*'/com/redhat/lvmdbus1/.*object: Timeout was reached",
+    },
+    {
+        "description": "[1312] https://github.com/rhinstaller/kickstart-tests/issues/1312",
+        "first_grep": "org.fedoraproject.Anaconda.Modules.Storage:gi.overrides.BlockDev.MpathError: Process reported exit code 1",
+    },
+    {
+        "description": "[1313] https://github.com/rhinstaller/kickstart-tests/issues/1313",
+        "first_grep": "ERR anaconda:    display.setup_display(anaconda, opts)",
+    },
+    {
+        "description": "[1314] https://github.com/rhinstaller/kickstart-tests/issues/1314",
+        "first_grep": "CRIT kernel:virtio_net virtio1 enp1s0: NETDEV WATCHDOG: CPU: 0: transmit queue 0 timed out",
+    },
+    {
+        "description": "[1318] https://github.com/rhinstaller/kickstart-tests/issues/1318",
+        "first_grep": "anaconda:anaconda: display: X or window manager startup failed: systemd exited with status 1",
+    },
 ]
 
 CLOSED_ISSUES = [
+    # Tracked in [1311]
+    {
+        "description": "[1202] https://github.com/rhinstaller/kickstart-tests/issues/1202",
+        "first_grep": "Failed to call the 'PvCreate' method on the '/com/redhat/lvmdbus1/Manager' object: Timeout was reached",
+    },
+    # Tracked in [1311]
+    {
+        "description": "[869] https://github.com/rhinstaller/kickstart-tests/issues/869",
+        "first_grep": "CRIT.*Failed to call the 'Snapshot' method on the '/com/redhat/lvmdbus1/Lv/1' object: Timeout was reached"
+    },
     {
         "description": "[9] RHSM https://github.com/rhinstaller/kickstart-tests/issues/707",
         "first_grep": "DBusError: {\"exception\": \"NoSectionError\", \"severity\": \"error\", \"message\": \"No section: 'logging'\"}",

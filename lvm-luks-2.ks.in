@@ -15,7 +15,7 @@ part pv.1 --fstype="lvmpv" --size=8915
 
 volgroup fedora pv.1
 
-logvol / --name=root --vgname=fedora --fstype="ext4" --grow --size=1024 --encrypted --passphrase="passphrase" --luks-version=luks2
+logvol / --name=root --vgname=fedora --fstype="ext4" --grow --size=1 --encrypted --passphrase="passphrase" --luks-version=luks2
 logvol swap --name=swap --vgname=fedora --fstype="swap" --size=1023
 
 keyboard us

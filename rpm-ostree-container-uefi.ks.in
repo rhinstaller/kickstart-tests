@@ -59,9 +59,15 @@ if [ ${?} -ne 0 ]; then
 fi
 
 if [ "${remote_url}" != "${expected_url}" ]; then
-    echo "Unexpected URL: ${remote_url}, expected ${expected_url}"" >> /root/RESULT
+    echo "Unexpected URL: ${remote_url}, expected ${expected_url}" >> /root/RESULT
 fi
 
+# Test for vconsole kernel argument (specific to ostree installations)
+# https://bugzilla.redhat.com/show_bug.cgi?id=1890085
+journalctl | grep -q "vconsole.keymap=us"
+if [ $? -ne 0 ]; then
+    echo "Kernel argument 'vconsole.keymap' is not used in the installed system!" >> /root/RESULT
+fi
 
 EOF
 %end

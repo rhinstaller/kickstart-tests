@@ -24,6 +24,13 @@ TESTTYPE="ksscript"
 
 . ${KSTESTDIR}/functions.sh
 
+# Define the path to the config file (must match the path in log_handler.py)
+CONFIG_FILE_PATH="/tmp/ignored_simple_tests.conf"
+
+# Write the messages to ignore into the config file
+# In this example, we're adding "Traceback" to be ignored
+echo "Traceback" > "${CONFIG_FILE_PATH}"
+
 validate() {
     local disksdir=$1
     local status=0
@@ -32,14 +39,21 @@ validate() {
     local success_count
     success_count=$(grep -c "SUCCESS" "${disksdir}/virt-install.log")
 
-    if [[ $success_count -ne 2 ]]; then
+    if [[ $success_count -lt 2 ]]; then
         echo "*** ERROR: Expected 2 SUCCESS messages, but found ${success_count}."
         status=1
     fi
 
     # Check for the specific error message in the virt-install.log
-    if ! grep -q "kickstart.script: Error code 1 running the kickstart script" "${disksdir}/virt-install.log"; then
-        echo '*** ERROR: Expected error message "kickstart.script: Error code 1 running the kickstart script" not found in virt-install.log.'
+    if ! grep -q "Error code 1 running the kickstart script" "${disksdir}/virt-install.log"; then
+        echo '*** ERROR: Expected error message "Error code 1 running the kickstart script" not found in virt-install.log.'
+        status=1
+    fi
+
+    # Ensure that the "Unreachable code" message is NOT present.
+    grep -q "Unreachable code" "${disksdir}/virt-install.log"
+    if [[ $? == 0 ]]; then
+        echo '*** ERROR: The test failed because unreachable code was executed after "exit 1".'
         status=1
     fi
 

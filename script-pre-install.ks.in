@@ -12,10 +12,17 @@ with open("/mnt/sysroot/root/preinstall_python.log", "a") as log_file:
 %end
 
 # Second pre-install script with intentional error
-%pre-install --log=/mnt/sysroot/root/preinstall_error.log
+%pre-install --erroronfail --log=/mnt/sysroot/root/preinstall_error.log
 echo "SUCCESS"
 echo "Logging from bash pre-install script" >> /mnt/sysroot/root/preinstall_error.log
+# fixup this workaround after non-interactive mode is fixed
+shutdown +1
 exit 1
 %end
 
-text
+# Pre-install script that should be unreachable
+%pre-install
+echo "Unreachable code"
+%end
+
+text --non-interactive

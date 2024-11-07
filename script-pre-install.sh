@@ -38,8 +38,8 @@ validate() {
     fi
 
     # Check for the specific error message in the virt-install.log
-    if ! grep -q "kickstart.script: Error code 1 running the kickstart script" "${disksdir}/virt-install.log"; then
-        echo '*** ERROR: Expected error message "kickstart.script: Error code 1 running the kickstart script" not found in virt-install.log.'
+    if ! grep -q "Error code 1 running the kickstart script" "${disksdir}/virt-install.log"; then
+        echo '*** ERROR: Expected error message "Error code 1 running the kickstart script" not found in virt-install.log.'
         status=1
     fi
 

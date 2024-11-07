@@ -37,9 +37,10 @@ validate() {
         status=1
     fi
 
-    # Check for the specific error message in the virt-install.log
-    if ! grep -q "kickstart.script: Error code 1 running the kickstart script" "${disksdir}/virt-install.log"; then
-        echo '*** ERROR: Expected error message "kickstart.script: Error code 1 running the kickstart script" not found in virt-install.log.'
+    # Ensure that the "Unreachable code" message is NOT present.
+    grep -q "Unreachable code" "${disksdir}/virt-install.log"
+    if [[ $? == 0 ]]; then
+        echo '*** ERROR: The test failed because unreachable code was executed after "exit 1".'
         status=1
     fi
 

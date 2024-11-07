@@ -24,6 +24,13 @@ TESTTYPE="ksscript"
 
 . ${KSTESTDIR}/functions.sh
 
+# Define the path to the config file (must match the path in log_handler.py)
+CONFIG_FILE_PATH="/tmp/ignored_simple_tests.conf"
+
+# Write the messages to ignore into the config file
+# In this example, we're adding "Traceback" to be ignored
+echo "Traceback" > "${CONFIG_FILE_PATH}"
+
 validate() {
     local disksdir=$1
     local status=0

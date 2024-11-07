@@ -17,6 +17,8 @@
 #
 # Red Hat Author(s): Vendula Poncova <vponcova@redhat.com>
 #
+import os
+
 from pylorax.monitor import LogRequestHandler
 
 
@@ -41,6 +43,18 @@ class VirtualLogRequestHandler(LogRequestHandler):
         # https://github.com/rhinstaller/kickstart-tests/issues/768
         "Call Trace:"
     ]
+
+    # Path to the config file
+    CONFIG_FILE_PATH = '/tmp/ignored_simple_tests.conf'
+
+    if os.path.isfile(CONFIG_FILE_PATH):
+        with open(CONFIG_FILE_PATH, 'r') as config_file:
+            extra_ignored_tests = [line.strip() for line in config_file if line.strip()]
+            # Extend the ignored_simple_tests list
+            ignored_simple_tests.extend(extra_ignored_tests)
+
+        # Remove the config file after reading
+        os.remove(CONFIG_FILE_PATH)
 
     # Specify error lines you want to add on top
     # of the default ones contained in Lorax

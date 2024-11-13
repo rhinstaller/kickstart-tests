@@ -36,6 +36,10 @@ class VirtualLogRequestHandler(LogRequestHandler):
         # Ignore deprecated kernel drivers
         "CRIT kernel:Warning: Deprecated Driver is detected: ",
 
+        # Ignore known Gdk errors in RDP
+        # TODO: Remove when https://issues.redhat.com/browse/RHEL-40884 is fixed
+        "Gdk-#033[1;35mCRITICAL#033",
+
         # Ignore a call trace during debugging.
         # Ignoring permanently for gh768.
         # https://github.com/rhinstaller/kickstart-tests/issues/768

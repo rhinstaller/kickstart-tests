@@ -17,7 +17,7 @@
 #
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="ui skip-on-fedora skip-on-rhel-8 skip-on-rhel-9"
+TESTTYPE="ui skip-on-rhel-8 skip-on-rhel-9"
 
 . ${KSTESTDIR}/functions.sh
 

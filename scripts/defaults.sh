@@ -11,5 +11,5 @@ export KSTEST_URL='http://dl.fedoraproject.org/pub/fedora/linux/development/rawh
 export KSTEST_METALINK='https://mirrors.fedoraproject.org/metalink?repo=fedora-$releasever&arch=x86_64'
 export KSTEST_MIRRORLIST='https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=x86_64'
 export KSTEST_MODULAR_URL='http://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Modular/x86_64/os/'
-export KSTEST_FTP_URL='ftp://ftp.tu-chemnitz.de/pub/linux/fedora/linux/development/rawhide/Everything/x86_64/os/'
+export KSTEST_FTP_URL='ftp://ftp.halifax.rwth-aachen.de/fedora/linux/development/rawhide/Everything/x86_64/os/'
 export KSTEST_OSTREECONTAINER_URL='quay.io/fedora/fedora-bootc:rawhide'

@@ -1,4 +1,3 @@
-#test name: vlan-httpks
 %ksappend repos/default.ks
 
 # Parent configured and activated in initramfs

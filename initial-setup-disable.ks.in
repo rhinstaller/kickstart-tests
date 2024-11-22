@@ -1,4 +1,3 @@
-#test name: initial-setup-disable
 #
 # Check that Initial Setup is correctly disabled if specified in kickstart.
 %ksappend repos/default.ks

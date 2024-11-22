@@ -1,4 +1,3 @@
-#test name: autopart-luks-3
 
 %ksappend repos/default.ks
 network --bootproto=dhcp

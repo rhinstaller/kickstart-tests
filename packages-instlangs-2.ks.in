@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: packages-instlangs-2
 #
 # Check that no locales get installed for
 # %packages --instlangs=.

@@ -1,4 +1,3 @@
-#test name: network-static-2-pre
 #various combinations of activation in initramfs and stage 2
 %ksappend repos/default.ks
 

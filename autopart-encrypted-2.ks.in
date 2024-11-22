@@ -1,4 +1,3 @@
-#test name: autopart-encrypted-2
 
 %ksappend repos/default.ks
 network --bootproto=dhcp

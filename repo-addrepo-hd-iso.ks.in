@@ -1,4 +1,3 @@
-#test name: repo-addrepo-hd-iso
 
 ## Test the inst.addrepo boot option with an ISO on a hard drive.
 # The test is based on the harddrive-iso test.

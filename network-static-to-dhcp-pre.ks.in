@@ -1,4 +1,3 @@
-#test name: network-static-to-dhcp-pre
 # rhbz#1433891
 # rhbz#1432886
 %ksappend repos/default.ks

@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: ui_rdp
 
 # Use defaults.
 %ksappend repos/default.ks

@@ -1,4 +1,3 @@
-#test name: network-device-default-ksdevice
 #NOTE: as this test is a "-httpks" the kickstart should be really applied
 #      in initrafs (config files created by parse-kickstart). The code actually
 #      ignores the command without --device specified (and no ksdevice set),

@@ -1,4 +1,3 @@
-#test name: initial-setup-gui
 #
 # Check that the initial-setup-gui package is correctly installed
 # when specified in the %packages section.

@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: packages-weakdeps
 #
 # Check the --excludeWeakdeps flag works correctly.
 # Using this flag should effectively turn off weak

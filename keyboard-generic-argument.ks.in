@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: keyboard-generic-argument
 # Test handling of keyboard command generid argument (conversion to vc keymap
 # and x layouts)
 %ksappend repos/default.ks

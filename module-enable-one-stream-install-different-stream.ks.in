@@ -1,4 +1,3 @@
-#test name: module-enable-one-stream-install-different-stream
 #
 # - enable one module with a stream
 # - install the same module with a different stream

@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: default-systemd-target-tui
 #
 # Test multi-user.target should be set by default as the default systemd target when:
 # - the installation runs in text mode

@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: keyboard-bootopt-only
 # Test setting keyboard from boot options (no kickstart command)
 %ksappend repos/default.ks
 network --bootproto=dhcp

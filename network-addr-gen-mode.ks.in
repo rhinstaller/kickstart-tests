@@ -1,4 +1,3 @@
-#test name: network-addr-gen-mode
 # Test ipv6.addr-gen-mode default (rhbz#1873021) for
 # - device configured by ip=<IFACE>:dhcp boot option
 # - device unconfigured

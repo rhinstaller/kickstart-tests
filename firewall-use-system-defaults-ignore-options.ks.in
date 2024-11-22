@@ -1,6 +1,5 @@
 
 #version=DEVEL
-#test name: firewall-use-system-defaults-ignore-options
 #
 # Test that firewall can be properly configured to use
 # system defaults. This basically means avoiding any

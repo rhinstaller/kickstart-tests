@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: raid-1-reqpart
 #
 # This is raid-1 test using reqpart command which is broken for raid: RHBZ 2277150
 

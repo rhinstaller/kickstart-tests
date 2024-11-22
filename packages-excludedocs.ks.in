@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: packages-excludedocs
 #
 # Check that the %packages section --excludedocs options
 # correctly excludes all docs.

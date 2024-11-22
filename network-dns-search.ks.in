@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: network-dns-search
 # Test domain name search properties set from kickstart
 
 # Use defaults.

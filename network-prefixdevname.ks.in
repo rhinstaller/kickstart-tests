@@ -1,4 +1,3 @@
-#test name: network-prefixdevname
 # Tests the prefixdevname feature (rhbz#2267227)
 %ksappend repos/default.ks
 

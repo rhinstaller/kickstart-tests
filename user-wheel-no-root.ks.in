@@ -1,4 +1,3 @@
-#test name: user-wheel-no-root
 #
 # Check that we can install a system without specifying the root account
 # (this should lock the root account) but with a user that is an admin.

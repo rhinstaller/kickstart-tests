@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: encrypt-swap
 %ksappend repos/default.ks
 network --bootproto=dhcp
 

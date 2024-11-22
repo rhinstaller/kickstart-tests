@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: raid-ddf
 # This test covers https://bugzilla.redhat.com/show_bug.cgi?id=2063791
 
 %ksappend repos/default.ks

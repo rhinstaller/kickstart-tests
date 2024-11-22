@@ -1,4 +1,3 @@
-#test name: bond2-pre
 #NOTE: this test is a variant of bond2 test, it is sharing its .sh file (setup of NICs and network boot configuration) so beware of changing it independently of bond2 test
 %ksappend repos/default.ks
 

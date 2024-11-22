@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: default-desktop
 #
 # Test default desktop configuration via the xconfig command.
 %ksappend repos/default.ks

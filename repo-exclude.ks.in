@@ -1,4 +1,3 @@
-#test name: repo-exclude
 
 ## Test for repo --cost and --excludepkgs.
 

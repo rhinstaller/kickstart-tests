@@ -1,4 +1,3 @@
-#test name: disklabel-gpt
 
 # Use defaults.
 %ksappend repos/default.ks

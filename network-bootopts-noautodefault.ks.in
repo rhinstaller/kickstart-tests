@@ -1,4 +1,3 @@
-#test name: network-bootopts-noautodefault
 #Test option to disable default autoconnections
 
 # Use defaults, but no network that could activate the other device

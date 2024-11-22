@@ -1,4 +1,3 @@
-#test name: bindtomac-onboot-bootopts-pre
 %ksappend repos/default.ks
 
 %include /tmp/ksinclude

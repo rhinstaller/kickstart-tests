@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: deprecated-logging-level
 %ksappend repos/default.ks
 network --bootproto=dhcp
 

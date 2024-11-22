@@ -1,4 +1,3 @@
-#test name: rpm-ostree-container-bootc
 # https://github.com/rhinstaller/anaconda/pull/5399
 #
 # Test the UEFI entry is created correctly and the system is bootable.

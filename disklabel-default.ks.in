@@ -1,4 +1,3 @@
-#test name: disklabel-default
 
 # Use defaults.
 %ksappend repos/default.ks

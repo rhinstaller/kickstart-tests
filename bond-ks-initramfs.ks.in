@@ -1,4 +1,3 @@
-#test name: bond-ks-intiramfs
 # Test bond configured via kickstart in initramfs
 # Because kickstart is obtained (injected in initramfs) without activating
 # network (which would be done from boot options network configuration),

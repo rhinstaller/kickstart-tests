@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: packages-and-groups-ignoremissing
 #
 # what we are testing there:
 # - that multiple missing packages & groups (at the same time) are ignored

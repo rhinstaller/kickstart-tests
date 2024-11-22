@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: dns
 # Test domain name resolution:
 # - origin of /etc/resolv.conf (rhbz#2018913, rhbz#1989472)
 # - dns resolution in %post scripts (RHEL-26651)

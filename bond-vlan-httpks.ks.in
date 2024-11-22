@@ -1,4 +1,3 @@
-#test name: bond-vlan
 %ksappend repos/default.ks
 
 network --device bond0 --bootproto static --ip @KSTEST_STATIC_IP@ --netmask @KSTEST_STATIC_NETMASK@ --gateway @KSTEST_STATIC_GATEWAY@ --bondslaves=@KSTEST_NETDEV2@,@KSTEST_NETDEV3@ --bondopts=mode=active-backup,miimon=100,primary=@KSTEST_NETDEV2@ --activate --vlanid=222 --activate --onboot=no

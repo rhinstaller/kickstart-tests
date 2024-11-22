@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: lvm-2
 %ksappend repos/default.ks
 network --bootproto=dhcp
 

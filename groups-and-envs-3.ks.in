@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: groups-and-envs-3
 #
 # Check that default environment is installed correctly.
 

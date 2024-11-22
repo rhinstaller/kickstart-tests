@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: reqpart
 %ksappend repos/default.ks
 network --bootproto=dhcp
 

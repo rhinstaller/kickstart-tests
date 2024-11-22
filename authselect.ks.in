@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: authselect
 %ksappend repos/default.ks
 
 %ksappend common/common_no_payload.ks

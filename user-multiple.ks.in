@@ -1,4 +1,3 @@
-#test name: user-multiple
 #
 # Test that we can correctly create multiple users via kickstart.
 # This also includes checking that we ignore any errors in the

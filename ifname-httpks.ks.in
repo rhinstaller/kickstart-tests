@@ -1,4 +1,3 @@
-#test name: ifname
 %ksappend repos/default.ks
 
 network --bootproto=dhcp --device=ifname0 --ipv6=2001:cafe:cafe::2/64

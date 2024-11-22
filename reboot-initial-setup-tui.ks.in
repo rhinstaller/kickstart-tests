@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: reboot-initial-setup-tui
 
 # Make sure that there is nothing else to configure.
 %ksappend users/user.ks

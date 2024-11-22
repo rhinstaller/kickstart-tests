@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: reboot-uefi
 
 # Use defaults.
 %ksappend repos/default.ks

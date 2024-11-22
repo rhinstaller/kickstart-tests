@@ -1,4 +1,3 @@
-#test name: network-autoconnection-dhcpall-httpks
 # Test assumptions about connections and config files created in initramfs (by NM)
 # Also test consolidating of the connections by anaconda.
 # Variant for ip=dhcp option (which is currently equivalent to no boot options)

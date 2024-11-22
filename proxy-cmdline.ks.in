@@ -1,4 +1,3 @@
-#test name: proxy-cmdline
 %ksappend repos/default.ks
 network --bootproto=dhcp
 

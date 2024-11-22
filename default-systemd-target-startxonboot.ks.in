@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: default-systemd-target-startxonboot
 #
 # Test default systemd target configuration via the xconfig --startxonboot command.
 %ksappend repos/default.ks

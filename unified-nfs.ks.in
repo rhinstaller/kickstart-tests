@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: unified-nfs
 
 # This test is for testing the install from an unified repository.
 #

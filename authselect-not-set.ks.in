@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: authselect-not-set
 #Test that authselect default configuration if authselect is not set in kickstart
 %ksappend repos/default.ks
 

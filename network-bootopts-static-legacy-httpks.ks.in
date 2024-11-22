@@ -1,4 +1,3 @@
-#test name: network-static-to-dhcp-pre
 # Testing legacy boot options (rhel6). Works on RHEL 7, doesn't work on Fedora 26
 %ksappend repos/default.ks
 

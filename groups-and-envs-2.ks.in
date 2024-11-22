@@ -1,4 +1,3 @@
-#test name: groups-and-envs-2
 # what we are testing there:
 # - that we can exclude groups which are a part of an environment
 # - that we can exclude groups we have specified in ourselves

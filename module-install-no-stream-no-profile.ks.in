@@ -1,4 +1,3 @@
-#test name: module-enable-many
 #
 # test installing many modules without stream & profile specififcation
 # NOTE: this is not really testable on Rawhide right now as there are

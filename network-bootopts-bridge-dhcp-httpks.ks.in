@@ -1,4 +1,3 @@
-#test name: network-bootopts-bond-dhcp-httpks
 # Test bridge configured via boot options
 
 %ksappend repos/default.ks

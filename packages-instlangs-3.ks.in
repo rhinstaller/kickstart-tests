@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: packages-instlangs-3
 #
 # Check --instlangs with multiple languages, using the lang command
 # and glibc langpack installation.

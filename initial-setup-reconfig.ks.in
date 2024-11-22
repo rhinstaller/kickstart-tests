@@ -1,4 +1,3 @@
-#test name: initial-setup-reconfig
 #
 # Check that Initial Setup is correctly configured in reconfig mode if specified in kickstart.
 %ksappend repos/default.ks

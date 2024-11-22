@@ -1,4 +1,3 @@
-#test name: network-addr-gen-mode-dhcpall
 # Test ipv6.addr-gen-mode default (rhbz#1873021) for ip=dhcp (or missing ip=) boot option
 %ksappend repos/default.ks
 

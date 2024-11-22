@@ -1,4 +1,3 @@
-#test name: network-missing-ifcfg
 #creating missing config files (devices not activated in initramfs and not configured in kickstart)
 %ksappend repos/default.ks
 

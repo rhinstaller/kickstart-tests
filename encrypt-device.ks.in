@@ -1,4 +1,3 @@
-#test name: encrypt-device
 %ksappend repos/default.ks
 network --bootproto=dhcp
 

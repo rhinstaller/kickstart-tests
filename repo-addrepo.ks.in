@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: repo-addrepo
 
 # This test will check the installation with addrepo kernel parameter functionality.
 # The inst.addrepo boot option will add additional software repository,

@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: packages-ignoremissing
 #
 # what we are testing there:
 # - that missing packages are ignored if --ignoremissing is used

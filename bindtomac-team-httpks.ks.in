@@ -1,4 +1,3 @@
-#test name: bindtomac-team
 %ksappend repos/default.ks
 
 network --device team0 --bootproto dhcp --teamslaves="@KSTEST_NETDEV2@'{\"prio\": -10, \"sticky\": true}',@KSTEST_NETDEV3@'{\"prio\": 100}'" --teamconfig="{\"runner\": {\"name\": \"activebackup\"}}" --activate --onboot=no --bindto=mac

@@ -1,4 +1,3 @@
-#test name: network-bootopts-static-unspec-single
 # No interface specified in ip= static configuration and there is only single device available
 # (eg others can have no carrier but in this test there is just a single interface).
 # See rhbz#1915493

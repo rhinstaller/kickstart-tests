@@ -1,4 +1,3 @@
-#test name: lvm-luks-4
 
 %ksappend repos/default.ks
 network --bootproto=dhcp

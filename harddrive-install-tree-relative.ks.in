@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: harddrive-install-tree-relative
 
 # This test is for testing the install from an harddrive ks command
 # with extracted installation tree.

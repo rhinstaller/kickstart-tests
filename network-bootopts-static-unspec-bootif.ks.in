@@ -1,4 +1,3 @@
-#test name: network-bootopts-static-unspec-bootif
 # Multiple interfaces, no interface specified in ip= static configuration, BOOTIF is used to choose the device
 # See rhbz#1910438, rhbz#1915493
 %ksappend repos/default.ks

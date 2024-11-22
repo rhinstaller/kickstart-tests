@@ -1,4 +1,3 @@
-#test name: vlan-pre
 # variant with commands run in %pre section
 %ksappend repos/default.ks
 

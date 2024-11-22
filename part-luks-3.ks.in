@@ -1,4 +1,3 @@
-#test name: part-luks-3
 
 %ksappend repos/default.ks
 network --bootproto=dhcp

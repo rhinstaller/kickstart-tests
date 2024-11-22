@@ -1,4 +1,3 @@
-#test name: bindtomac-team-pre
 #NOTE: this test is a variant of team test, it is sharing its .sh file (setup of NICs and network boot configuration) so beware of changing it independently of team test
 %ksappend repos/default.ks
 

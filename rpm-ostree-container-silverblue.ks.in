@@ -1,4 +1,3 @@
-#test name: rpm-ostree-container-silverblue
 # https://github.com/rhinstaller/anaconda/pull/4617
 
 # Test that ostreecontainer ks command works on Silverblue.

@@ -1,4 +1,3 @@
-#test name: ibft
 
 %ksappend repos/default.ks
 

@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: anaconda-modules
 
 # Verify that only the enabled Anaconda DBus modules are started.
 

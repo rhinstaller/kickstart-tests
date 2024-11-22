@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: ntp-without-chrony
 %ksappend repos/default.ks
 network --bootproto=dhcp
 

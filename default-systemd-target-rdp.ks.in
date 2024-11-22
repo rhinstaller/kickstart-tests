@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: default-systemd-target-rdp
 #
 # Test multi-user.target should be set by default as the default systemd target
 # for remote desktop installs. While controlled remotely over RDP the installation itself runs

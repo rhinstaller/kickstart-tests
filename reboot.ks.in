@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: reboot
 
 # Use defaults.
 %ksappend repos/default.ks

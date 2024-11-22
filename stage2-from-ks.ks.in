@@ -1,4 +1,3 @@
-#test name: stage2-from-ks
 #
 # Test configuration of stage2 location via kickstart url command
 # and activation of network in initramfs from kickstart configuration.

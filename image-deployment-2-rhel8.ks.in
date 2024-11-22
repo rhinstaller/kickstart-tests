@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: image-deployment-2-rhel8
 
 # Test that we can disable modules and installation tasks
 # that are not suitable for the image deployment. Use the

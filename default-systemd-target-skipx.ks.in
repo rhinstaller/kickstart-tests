@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: default-systemd-target-skipx
 #
 # Test default systemd target is correctly set via the skipx command.
 %ksappend repos/default.ks

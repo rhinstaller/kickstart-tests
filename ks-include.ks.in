@@ -1,4 +1,3 @@
-#test name: ks-include
 %ksappend repos/default.ks
 network --bootproto=dhcp
 

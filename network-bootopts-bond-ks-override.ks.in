@@ -1,4 +1,3 @@
-#test name: network-bootopts-bond-ks-override
 # Test bond configured via boot options in a way that it does not have wired
 # setting (by leaving out ip=bond0:dhcp option) and is attempted to be
 # reconfigured via kickstart network command which would trigger #1963834.

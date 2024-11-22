@@ -1,4 +1,3 @@
-#test name: onboot-activate-httpks
 %ksappend repos/default.ks
 network --device=@KSTEST_NETDEV2@ --bootproto=dhcp --no-activate --onboot=yes
 network --device=@KSTEST_NETDEV1@ --bootproto=dhcp --onboot=no

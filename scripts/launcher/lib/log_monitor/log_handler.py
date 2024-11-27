@@ -39,6 +39,7 @@ class VirtualLogRequestHandler(LogRequestHandler):
         # Ignore known Gdk errors in RDP
         # TODO: Remove when https://issues.redhat.com/browse/RHEL-40884 is fixed
         "Gdk-#033[1;35mCRITICAL#033",
+        "Gtk-#033[1;35mCRITICAL#033",
 
         # Ignore a call trace during debugging.
         # Ignoring permanently for gh768.

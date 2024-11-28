@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: default-systemd-target-gui
 #
 # Test multi-user.target should be set by default as the default systemd target
 # when installation runs in GUI mode but not package with service(graphical-login)

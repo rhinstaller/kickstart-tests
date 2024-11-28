@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: https-repo
 #
 # Test that https:// repositories work as expected. Most tests run with http to
 # be able to squid-cache the downloads.

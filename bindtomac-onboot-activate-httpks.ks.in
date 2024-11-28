@@ -1,4 +1,3 @@
-#test name: bindtomac-onboot-activate-httpks
 %ksappend repos/default.ks
 network --device=@KSTEST_NETDEV2@ --bootproto=dhcp --no-activate --onboot=yes --bindto=mac
 network --device=@KSTEST_NETDEV1@ --bootproto=dhcp --onboot=no --bindto=mac

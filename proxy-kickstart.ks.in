@@ -1,4 +1,3 @@
-#test name: proxy-kickstart
 url --url=@KSTEST_URL@ --proxy=PROXY-ADDON
 repo --name=addon --baseurl=HTTP-ADDON-REPO --proxy=PROXY-ADDON --install
 

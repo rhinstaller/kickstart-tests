@@ -1,4 +1,3 @@
-#test name: geolocation-off-by-default-with-ks
 #
 # Check that geolocation is not done during a regular kickstart installation.
 %ksappend repos/default.ks

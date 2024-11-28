@@ -1,4 +1,3 @@
-#test name: nosave-1
 %ksappend repos/default.ks
 network --bootproto=dhcp
 

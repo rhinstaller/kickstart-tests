@@ -1,4 +1,3 @@
-#test name: onboot-options-pre
 # Test network command options defined in %pre section
 # --nodefroute
 # --mtu

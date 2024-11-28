@@ -1,4 +1,3 @@
-#test name: tmpfs-fixed_size
 %ksappend repos/default.ks
 network --bootproto=dhcp
 

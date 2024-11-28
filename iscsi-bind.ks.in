@@ -1,4 +1,3 @@
-#test name: iscsi-bind
 
 %ksappend repos/default.ks
 

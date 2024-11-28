@@ -1,4 +1,3 @@
-#test name: nfs
 nfs --server=@KSTEST_NFS_SERVER@ --dir=@KSTEST_NFS_PATH@
 network --bootproto=dhcp
 

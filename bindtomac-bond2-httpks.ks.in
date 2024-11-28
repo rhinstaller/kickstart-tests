@@ -1,4 +1,3 @@
-#test name: bindtomac-bond2
 %ksappend repos/default.ks
 
 network --device bond0 --bootproto dhcp --bondslaves=@KSTEST_NETDEV2@,@KSTEST_NETDEV3@ --bondopts=mode=active-backup,primary=@KSTEST_NETDEV2@ --activate --onboot=no --bindto=mac

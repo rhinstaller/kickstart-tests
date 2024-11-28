@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: groups-ignoremissing
 #
 # what we are testing there:
 # - that missing groups are ignored if --ignoremissing is used

@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: preexisting-btrfs
 
 # Use defaults.
 %ksappend repos/default.ks

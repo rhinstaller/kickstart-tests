@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: packages-default
 #
 # Check the %packages --default flag works.
 

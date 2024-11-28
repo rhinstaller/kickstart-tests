@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: selinux-permissive
 %ksappend repos/default.ks
 network --bootproto=dhcp
 

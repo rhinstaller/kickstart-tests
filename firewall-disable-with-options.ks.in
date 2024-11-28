@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: firewall-disable-with-options
 #
 # Test that firewall can be properly disabled & all the
 # firewall options are still set correctly on the target system.

@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: firewall-disable
 #
 # Test that firewall can be properly disabled.
 %ksappend repos/default.ks

@@ -1,4 +1,3 @@
-#test name: module-install
 #
 # specify one module in packages section twice with different streams
 #

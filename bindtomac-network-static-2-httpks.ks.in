@@ -1,4 +1,3 @@
-#test name: bindtomac-network-static-2
 #various combinations of activation in initramfs and stage 2
 %ksappend repos/default.ks
 # activated in initramfs with dhcp, reactivated in stage 2

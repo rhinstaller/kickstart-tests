@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: default-systemd-target-gui-graphical-login-provides
 #
 # Test graphical.target is set as the default systemd target if:
 # - the installation runs in GUI mode

@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: default-systemd-target-rdp-graphical-provides
 #
 # Test multi-user.target is set as the default systemd target if:
 # - the installation runs in remote desktop mode

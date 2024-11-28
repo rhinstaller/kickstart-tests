@@ -1,4 +1,3 @@
-#test name bindtomac-bridged-bond
 %ksappend repos/default.ks
 
 network --device=@KSTEST_NETDEV1@ --bootproto=dhcp --onboot=yes --activate

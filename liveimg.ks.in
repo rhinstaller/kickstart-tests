@@ -1,4 +1,3 @@
-#test name: liveimg
 liveimg --url=@KSTEST_LIVEIMG_URL@ --checksum=@KSTEST_LIVEIMG_CHECKSUM@
 
 network --bootproto=dhcp

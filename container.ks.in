@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: container
 #
 # Test that a very minimal installation,
 # generally targetting constainer base images,

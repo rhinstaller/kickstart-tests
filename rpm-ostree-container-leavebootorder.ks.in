@@ -1,4 +1,3 @@
-#test name: rpm-ostree-container-bootorder
 # https://github.com/rhinstaller/anaconda/pull/5399
 #
 # Test that ostree container installation works with leavebootorder.

@@ -1,4 +1,3 @@
-#test name: network-bootopts-bootif-httpks
 # Test that only device specified by BOOTIF is activated in initramfs
 
 %ksappend repos/default.ks

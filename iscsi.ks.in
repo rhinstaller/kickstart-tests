@@ -1,4 +1,3 @@
-#test name: iscsi-root
 
 %ksappend repos/default.ks
 

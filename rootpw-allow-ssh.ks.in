@@ -1,4 +1,3 @@
-#test name: rootpw-allow-ssh
 #
 # Test that root ssh login with password is working.
 

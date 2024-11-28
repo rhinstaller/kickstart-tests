@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: hmc
 
 # This test is for testing the install method hmc.
 #

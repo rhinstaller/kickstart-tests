@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: harddrive-iso-single
 
 # This test is for testing the install from an harddrive ks command with ISO
 # using single disk (RHEL-35701).

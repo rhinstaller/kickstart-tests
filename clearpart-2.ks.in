@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: ignoredisk
 %ksappend repos/default.ks
 network --bootproto=dhcp
 

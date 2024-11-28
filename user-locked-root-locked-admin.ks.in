@@ -1,4 +1,3 @@
-#test name: user-locked-root-locked-admin
 #
 # Check that we can install a system with locked root account
 # and the only user admin account being locked as well.

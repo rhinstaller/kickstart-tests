@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: timezone-noncommon
 # Test that timezones that are in pytz.all_timezones but not in
 # pytz.common_timezones can be used in kickstart
 # (jira#RHEL-13150, jira#RHEL-13151, rhbz#1452873)

@@ -1,4 +1,3 @@
-#test name: repo-addrepo-hd-tree
 
 ## Test the inst.addrepo boot option with a installation tree on a hard drive.
 # The test is based on the harddrive-install-tree test.

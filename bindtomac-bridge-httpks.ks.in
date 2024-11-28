@@ -1,4 +1,3 @@
-#test name bindtomac-bridge
 %ksappend repos/default.ks
 
 # --onboot=no doesn't make much sense as a use case but we want to test that it works in this test

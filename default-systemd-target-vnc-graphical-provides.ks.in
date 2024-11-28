@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: default-systemd-target-vnc-graphical-provides
 #
 # Test multi-user.target is set as the default systemd target if:
 # - the installation runs in VNC mode

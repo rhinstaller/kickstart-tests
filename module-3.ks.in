@@ -1,4 +1,3 @@
-#test name: module-3
 #
 # Specify one module in packages section twice with same stream
 # but different profiles. Check both profiles are installed.

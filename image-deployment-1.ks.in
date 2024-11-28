@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: image-deployment-1
 
 # Compare files on the installed system with the content
 # of the deployed image and check files that were changed

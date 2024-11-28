@@ -1,4 +1,3 @@
-#test name: rootpw-crypted
 %ksappend repos/default.ks
 
 

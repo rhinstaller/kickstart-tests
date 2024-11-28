@@ -1,4 +1,3 @@
-#test name bridge-2devs-pre
 # One bridge with slave activated in dracut,
 # the other one with slave activated only with the bridge
 %ksappend repos/default.ks

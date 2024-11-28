@@ -1,4 +1,3 @@
-#test name: network-bootopts-bond-bootif
 # Test bond configured via boot options with BOOTIF present.
 # The slave ifaces configuration files are correct slave files.
 # rhbz#2175664, RHEL-4766

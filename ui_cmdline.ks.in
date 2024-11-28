@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: ui_cmdline
 
 # Use defaults.
 %ksappend repos/default.ks

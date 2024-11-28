@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: default-systemd-target-vnc
 #
 # Test multi-user.target should be set by default as the default systemd target
 # for VNC installs. While controlled remotely over VNC the installation itslef runs

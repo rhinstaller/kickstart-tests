@@ -1,4 +1,3 @@
-#test name: btrfs-2
 %ksappend repos/default.ks
 network --bootproto=dhcp
 

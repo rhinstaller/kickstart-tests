@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: packages-ignorebroken
 #
 # what we are testing there:
 # - that packages with dependency solving problems are ignored if --ignorebroken is used

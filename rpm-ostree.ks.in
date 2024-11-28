@@ -1,4 +1,3 @@
-#test name: rpm-ostree
 
 # Use the default settings.
 %ksappend common/common_no_payload.ks

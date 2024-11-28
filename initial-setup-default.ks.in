@@ -1,4 +1,3 @@
-#test name: initial-setup-default
 #
 # Check that Initial Setup is configured correctly if the firstboot command
 # is not present in the installation kickstart.

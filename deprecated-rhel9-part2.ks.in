@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: deprecated-timezone-ntpservers
 %ksappend repos/default.ks
 network --bootproto=dhcp
 

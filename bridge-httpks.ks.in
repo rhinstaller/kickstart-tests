@@ -1,4 +1,3 @@
-#test name bridge
 # This test differs from bridge-2devs in using ip=dhcp (no dev specification)
 %ksappend repos/default.ks
 

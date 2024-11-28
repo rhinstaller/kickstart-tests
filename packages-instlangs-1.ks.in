@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: packages-instlangs-1
 #
 # Check that only english locales are installed for
 # %packages --instlangs=en_US.

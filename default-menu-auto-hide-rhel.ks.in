@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: default-menu-auto-hide
 %ksappend repos/default.ks
 
 %ksappend common/common_no_payload.ks

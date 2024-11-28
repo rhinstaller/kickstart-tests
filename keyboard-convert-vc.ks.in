@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: keyboard-convert-vc
 # Test that conversion from --vckeymap option to x layouts is performed correctly
 %ksappend repos/default.ks
 network --bootproto=dhcp

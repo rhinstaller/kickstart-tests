@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: ui_vnc
 
 # Use defaults.
 %ksappend repos/default.ks

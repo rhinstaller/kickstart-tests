@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: ntp-pools
 %ksappend repos/default.ks
 network --bootproto=dhcp
 

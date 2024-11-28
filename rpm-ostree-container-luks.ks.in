@@ -1,4 +1,3 @@
-#test name: rpm-ostree-container-luks
 # for bootc/bootupd, remote and stateroot ostreecontainer options
 # depends on the referenced ostree container being bootable
 

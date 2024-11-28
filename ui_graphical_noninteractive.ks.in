@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: ui_graphical_noninteractive
 
 # Use defaults.
 %ksappend repos/default.ks

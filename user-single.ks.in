@@ -1,4 +1,3 @@
-#test name: user-single
 %ksappend repos/default.ks
 
 

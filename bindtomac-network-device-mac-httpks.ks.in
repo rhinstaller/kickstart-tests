@@ -1,4 +1,3 @@
-#test name: bindtomac-network-device-mac
 %ksappend repos/default.ks
 
 network --bootproto=dhcp --device=52:54:00:12:34:51 --bindto=mac

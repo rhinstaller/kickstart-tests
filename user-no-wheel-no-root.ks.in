@@ -1,4 +1,3 @@
-#test name: user-no-wheel-no-root
 #
 # Test that we can install if no root is specified and no users
 # with admin priviledges are specified.

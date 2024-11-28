@@ -1,4 +1,3 @@
-#test name: disklabel-mbr
 
 # Use defaults.
 %ksappend repos/default.ks

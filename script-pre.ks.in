@@ -1,4 +1,3 @@
-#test name: pre_install_interpreter_test
 
 %ksappend repos/default.ks
 

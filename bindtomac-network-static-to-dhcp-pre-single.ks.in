@@ -1,4 +1,3 @@
-#test name: bindtomac-network-static-to-dhcp-pre-single
 # rhbz#1432886
 %ksappend repos/default.ks
 %include /tmp/ksinclude

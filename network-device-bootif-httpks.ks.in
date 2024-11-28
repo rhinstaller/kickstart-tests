@@ -1,4 +1,3 @@
-#test name: network-device-bootif
 %ksappend repos/default.ks
 
 network --device=bootif --bootproto=dhcp --ipv6=2001:cafe:cafe::1/64

@@ -1,4 +1,3 @@
-#test name: pre-install
 %ksappend repos/default.ks
 
 

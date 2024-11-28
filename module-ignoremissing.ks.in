@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: module-ignoremissing
 #
 # what we are testing there:
 # - that missing modules are ignored if --ignoremissing is used

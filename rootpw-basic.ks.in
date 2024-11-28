@@ -1,4 +1,3 @@
-#test name: rootpw-basic
 %ksappend repos/default.ks
 
 

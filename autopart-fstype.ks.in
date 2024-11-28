@@ -1,4 +1,3 @@
-#test name: autopart-fstype
 %ksappend repos/default.ks
 network --bootproto=dhcp
 

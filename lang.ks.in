@@ -1,5 +1,4 @@
 #version=DEVEL
-#test name: lang
 %ksappend repos/default.ks
 network --bootproto=dhcp
 

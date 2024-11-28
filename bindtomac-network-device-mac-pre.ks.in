@@ -1,4 +1,3 @@
-#test name: bindtomac-network-device-mac-pre
 %ksappend repos/default.ks
 
 %include /tmp/ksinclude

@@ -37,7 +37,7 @@ discover:
         trap "cp -rv data/logs/ ${TMT_TEST_DATA}/" EXIT INT QUIT PIPE
 
         cd /root/kickstart-tests
-        scripts/run_travis.sh
+        scripts/run-ci.sh
 
 
       duration: 6h

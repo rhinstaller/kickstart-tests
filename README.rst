@@ -368,12 +368,6 @@ created PRs, however, only committers have privileged to execute `tmt workflow`_
 by comment ``/test-tmt`` on the PR. After a while status on PR will have a link to
 TMT run.
 
-Thus PR tests run on Travis_, which is one of the few public CI providers who
-offer ``/dev/kvm``. The entry point is `.travis.yml`_. The ``run_travis.sh``
-script checks which tests are affected by the PR, and runs the first six in
-the runner container's launch script. Travis jobs are limited to 50 minutes, so
-we cannot currently run more; but that should suffice in most cases.
-
 PR runs do *not* auto-retry test failures. This avoids introducing unstable
 tests, and PRs usually just run a few tests so that flakes are much less likely
 to ruin the result.

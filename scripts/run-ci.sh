@@ -12,7 +12,6 @@ CHANGED_TESTS=$(git diff --name-only upstream/master..HEAD -- *.ks.in $(find -ma
 TESTS=$CHANGED_TESTS
 
 # if the PR changes anything in the test runner, or does not touch any tests, pick a few representative tests
-# FIXME: Once the runner container can run groups properly, replace with a TESTTYPE="travis" group
 if [ -z "$TESTS" ] || [ -n "$(git diff --name-only upstream/master..HEAD -- containers scripts)" ]; then
     TESTS="$TESTS
 bindtomac-network-device-default-httpks
@@ -35,6 +34,7 @@ sudo -n chmod 666 /dev/kvm
 
 sudo -n containers/squid.sh start
 
+# FIXME: Maybe it's not needed with testing farm
 # With parallel jobs, each test takes a little longer than 10 minutes, which makes Travis abort
 # <https://docs.travis-ci.com/user/common-build-problems/#build-times-out-because-no-output-was-received>
 # Avoid this by printing a keep-alive '.' line every minute

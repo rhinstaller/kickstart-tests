@@ -1,6 +1,8 @@
 #version=DEVEL
 %ksappend repos/default.ks
 
+# just running the test to see if the containers on the runners are ok
+
 %ksappend common/common_no_payload.ks
 %ksappend payload/default_packages.ks
 

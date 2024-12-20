@@ -22,7 +22,7 @@ OS_VARIANT_TO_DISABLED = {
     'rhel10': 'SKIP_TESTTYPES_RHEL10',
 }
 
-RE_MASTER = re.compile('^master$')
+RE_MASTER = re.compile('^main$')
 RE_FEDORA = re.compile('fedora-[0-9]+$')
 RE_RHEL8 = re.compile('rhel-8(.[0-9]+)?$')
 RE_RHEL9 = re.compile('rhel-9(.[0-9]+)?$')

@@ -23,23 +23,15 @@ import re
 
 
 ISSUES = [
-    {
-        "description": "<ISSUE DESCRIPTION PREFERABLY WITH GITHUB ISSUE REFERENCE>",
-        "first_grep": "<REGULAR EXPRESSION FOR GREP TO BE LOOKED FOR>",
-        "last_anaconda_re": "<REGULAR EXPRESSION FOR PYTHON TO BE MATCHED AGAINST THE LAST LINE IN THE LOG CONTAINING 'anaconda:'>",
-    },
+#    {
+#        "description": "<ISSUE DESCRIPTION PREFERABLY WITH GITHUB ISSUE REFERENCE>",
+#        "first_grep": "<REGULAR EXPRESSION FOR GREP TO BE LOOKED FOR>",
+#        "last_matching_re": ("<REGULAR EXPRESSION FOR GREP TO FIND THE LAST MATCHING LINE>", "<REGULAR EXPRESSION FOR PYTHON TO MATCH AGAINST THE FOUND LINE>"),
+#    },
     {
         "description": "[675] ([1]) https://github.com/rhinstaller/kickstart-tests/issues/675",
-        "last_anaconda_re": ".*Configuring \\(running scriptlet for\\): rootfiles.*",
+        "last_matching_re": ("anaconda:", ".*Configuring \\(running scriptlet for\\): rootfiles.*"),
     },
-# Superseded by the last_anaconda_re check
-#    {
-#        # The detection may be improved, not sure if just with grep.
-#        "description": "[675] ([1]) https://github.com/rhinstaller/kickstart-tests/issues/675 The string is also in successful installation, but there is high chance that for test which times out it will be this issue.",
-#        "first_grep": "Failed to start man-db-cache-update.service: Unit man-db-cache-update.service not found.",
-#        # Context of this line can be useful as well
-#        # "INFO anaconda:dnf: Running transaction check",
-#    },
     {
         "description": "[TODO] https://github.com/rhinstaller/kickstart-tests/issues/TODO",
         "first_grep": "^[^E]*ERR anaconda:dnf: Error in POSTIN scriptlet in rpm package coreutils-common"
@@ -158,7 +150,7 @@ ISSUES = [
     },
     {
         "description": "[1017] https://github.com/rhinstaller/kickstart-tests/issues/1017",
-        "last_anaconda_re": ".*DEBUG anaconda:anaconda: ui.gui.hubs: kickstart installation, spoke Installation Source is ready.*"
+        "last_matching_re": ("anaconda:", ".*DEBUG anaconda:anaconda: ui.gui.hubs: kickstart installation, spoke Installation Source is ready.*"),
     },
     {
         "description": "[1235] https://github.com/rhinstaller/kickstart-tests/issues/1235",
@@ -207,6 +199,10 @@ ISSUES = [
     {
         "description": "[1318] https://github.com/rhinstaller/kickstart-tests/issues/1318",
         "first_grep": "anaconda:anaconda: display: X or window manager startup failed: systemd exited with status 1",
+    },
+    {
+        "description": "[1346] https://github.com/rhinstaller/kickstart-tests/issues/1346",
+        "last_matching_re": (".*org.fedoraproject.Anaconda.Modules.*", ".*grub2-mkconfig.*")
     },
 ]
 
@@ -315,14 +311,17 @@ def _get_match(issue, file_path, args):
         )
         match = grep.stdout
 
-    if "last_anaconda_re" in issue:
-        last_anaconda = subprocess.check_output(
-            "grep anaconda: {} | tail -n 1".format(file_path),
+    if "last_matching_re" in issue:
+        line_match_re, line_check_re = issue["last_matching_re"]
+        last_matching_line = subprocess.check_output(
+            "grep {} {} | tail -n 1".format(line_match_re, file_path),
             shell=True,
             encoding="utf8",
         )
-        if re.match(issue["last_anaconda_re"], last_anaconda):
-            match = last_anaconda
+        if last_matching_line:
+            if re.match(line_check_re, last_matching_line):
+                match = last_matching_line
+
     return match
 
 

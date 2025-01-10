@@ -17,9 +17,17 @@ platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
 if [ "${platform:0:4}" == "rhel" ]; then
     # rhbz#1989472
     check_resolv_conf_is_by_nm
+    # check systemd-resolved is not installed rhbz#2304080
+    if rpm -q systemd-resolved; then
+        echo '*** systemd-resolved package should not have been installed' >> /root/RESULT
+    fi
 else
     # rhbz#2018913
     check_resolv_conf_is_by_resolved
+    # check systemd-resolved is installed rhbz#2304080
+    if ! rpm -q systemd-resolved; then
+        echo '*** systemd-resolved package should have been installed' >> /root/RESULT
+    fi
 fi
 
 curl fedoraproject.org

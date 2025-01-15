@@ -27,7 +27,15 @@ check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@
 
 @KSINCLUDE@ post-lib-network.sh
 
-check_device_config_value @KSTEST_NETDEV2@ IPADDR @KSTEST_STATIC_IP@ ipv4 address1 @KSTEST_STATIC_IP@/24,@KSTEST_STATIC_GATEWAY@
+@KSINCLUDE@ scripts-lib.sh
+platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
+if [ "${platform}" == "rhel10" ]; then
+    check_device_config_value @KSTEST_NETDEV2@ IPADDR @KSTEST_STATIC_IP@ ipv4 address1 @KSTEST_STATIC_IP@/24
+    check_device_config_value @KSTEST_NETDEV2@ GATEWAY @KSTEST_STATIC_GATEWAY@ ipv4 gateway @KSTEST_STATIC_GATEWAY@
+else
+    check_device_config_value @KSTEST_NETDEV2@ IPADDR @KSTEST_STATIC_IP@ ipv4 address1 @KSTEST_STATIC_IP@/24,@KSTEST_STATIC_GATEWAY@
+fi
+
 check_device_config_value @KSTEST_NETDEV2@ ONBOOT no connection autoconnect false
 check_device_connected @KSTEST_NETDEV1@ yes
 check_device_connected @KSTEST_NETDEV2@ yes

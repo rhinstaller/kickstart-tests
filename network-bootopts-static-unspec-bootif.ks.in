@@ -45,7 +45,7 @@ check_device_config_value @KSTEST_NETDEV1@ IPADDR __NONE ipv4 method auto
 
 @KSINCLUDE@ scripts-lib.sh
 platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
-if [ "${platform}" == "rhel10" ]; then
+if [ "${platform}" == "rhel10" ] || [ "${platform}" == "rhel9" ]; then
     check_device_config_value @KSTEST_NETDEV2@ IPADDR @KSTEST_STATIC_IP@ ipv4 address1 @KSTEST_STATIC_IP@/@KSTEST_STATIC_PREFIX@
     check_device_config_value @KSTEST_NETDEV2@ PREFIX @KSTEST_STATIC_PREFIX@ ipv4 address1 @KSTEST_STATIC_IP@/@KSTEST_STATIC_PREFIX@
     check_device_config_value @KSTEST_NETDEV2@ GATEWAY @KSTEST_STATIC_GATEWAY@ ipv4 gateway @KSTEST_STATIC_GATEWAY@

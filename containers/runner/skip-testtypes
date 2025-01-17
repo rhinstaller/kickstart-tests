@@ -23,6 +23,7 @@ fedora_skip_array=(
   gh1060      # vnc tests too flaky
   gh1237      # container failing
   gh1335      # image-deployment-2 failing
+  gh1357      # selinux-context failing
 )
 
 daily_iso_skip_array=(

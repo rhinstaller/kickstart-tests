@@ -4,7 +4,8 @@
 %ksappend common/common_no_payload.ks
 %ksappend payload/default_packages.ks
 
-# Dumping to read-only filesystem in initramfs - nonfatal failure
+# Dumping to read-only filesystem in initramfs (rhel10, fedora)
+# The failure should not break the parsing.
 %certificate --filename=rvtest-readonly.pem --dir=/usr/share/pki/ca-trust-source/anchors
 -----BEGIN CERTIFICATE-----
 MIIBjTCCATOgAwIBAgIUWR5HO3v/0I80Ne0jQWVZFODuWLEwCgYIKoZIzj0EAwIw
@@ -87,11 +88,6 @@ if [ -f ${TRANSFER_PATH}/etc/pki/pre/rvtest2-pre.pem ]; then
     echo "*** rvtest2-pre.pem found in /etc/pki/pre in transfer from initramfs" >> /root/RESULT
 fi
 
-# Not imported in initranmfs because of read-only filesystem
-if [ -f ${TRANSFER_PATH}/usr/share/pki/ca-trust-source/anchors/rvtest-readonly.pem ]; then
-    echo "*** rvtest-readonly.pem found in /usr/share/pki/ca-trust-source/anchors in transfer from initramfs" >> /root/RESULT
-fi
-
 if [ ! -f ${TRANSFER_PATH}/etc/pki/nonexisting_subdir/rvtest.pem ]; then
     echo "*** rvtest.pem not found in /etc/pki/nonexisting_subdir in transfer from initramfs" >> /root/RESULT
 fi
@@ -105,10 +101,6 @@ fi
 
 if [ -f /etc/pki/pre/rvtest2-pre.pem ]; then
     echo "*** rvtest2-pre.pem found in /etc/pki/pre in installer environment in %pre" >> /root/RESULT
-fi
-
-if [ -f /usr/share/pki/ca-trust-source/anchors/rvtest-readonly.pem ]; then
-    echo "*** rvtest-readonly.pem found in /usr/share/pki/ca-trust-source/anchors in installer environment in %pre" >> /root/RESULT
 fi
 
 if [ ! -f /etc/pki/nonexisting_subdir/rvtest.pem ]; then

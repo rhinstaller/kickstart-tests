@@ -1,0 +1,36 @@
+# The goal is to test options and configuration passing to installed system
+# not the functionality of the name resolution.
+
+# Use defaults, but no network
+%ksappend common/common.ks
+%ksappend repos/default.ks
+%ksappend l10n/default.ks
+%ksappend users/default.ks
+%ksappend storage/default.ks
+%ksappend payload/default_packages.ks
+
+%post
+
+# Check the arguments are passed to the installed system
+grep "^GRUB_CMDLINE_LINUX=" /etc/default/grub | grep "rd.net.dns=dns+tls://8.8.8.8#dns.google"
+if [[ $? -ne 0 ]]; then
+    echo '*** Failed check: rd.net.dns option is missing' >> /root/RESULT
+fi
+grep "^GRUB_CMDLINE_LINUX=" /etc/default/grub | grep "rd.net.dns-resolve-mode=backup"
+if [[ $? -ne 0 ]]; then
+    echo '*** Failed check: rd.net.dns-resolve-mode option is missing' >> /root/RESULT
+fi
+
+grep "^GRUB_CMDLINE_LINUX=" /etc/default/grub | grep "rd.net.dns-backend=dnsconfd"
+if [[ $? -ne 0 ]]; then
+    echo '*** Failed check: rd.net.dns-backend option is missing' >> /root/RESULT
+fi
+
+# Check the NM runtime global config file is passed to the installed system
+if [[ ! -e /etc/NetworkManager/conf.d/16-global-dns.conf ]]; then
+    echo '*** Failed check: NetworkManger global dns configuration file is missing' >> /root/RESULT
+fi
+
+%ksappend validation/success_if_result_empty.ks
+
+%end

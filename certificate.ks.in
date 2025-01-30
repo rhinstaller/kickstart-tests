@@ -1,0 +1,162 @@
+#version=DEVEL
+%ksappend repos/default.ks
+
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+# Dumping to read-only filesystem in initramfs (rhel10, fedora)
+# The failure should not break the parsing.
+%certificate --filename=rvtest-readonly.pem --dir=/usr/share/pki/ca-trust-source/anchors
+-----BEGIN CERTIFICATE-----
+MIIBjTCCATOgAwIBAgIUWR5HO3v/0I80Ne0jQWVZFODuWLEwCgYIKoZIzj0EAwIw
+FDESMBAGA1UEAwwJUlZURVNUIENBMB4XDTI0MTEyMDEzNTk1N1oXDTM0MTExODEz
+NTk1N1owFDESMBAGA1UEAwwJUlZURVNUIENBMFkwEwYHKoZIzj0CAQYIKoZIzj0D
+AQcDQgAELghFKGEgS8+5/2nx50W0xOqTrKc2Jz/rD/jfL0m4z4fkeAslCOkIKv74
+0wfBXMngxi+OF/b3Vh8FmokuNBQO5qNjMGEwHQYDVR0OBBYEFOJarl9Xkd13sLzI
+mHqv6aESlvuCMB8GA1UdIwQYMBaAFOJarl9Xkd13sLzImHqv6aESlvuCMA8GA1Ud
+EwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQDAgEGMAoGCCqGSM49BAMCA0gAMEUCIAet
+7nyre42ReoRKoyHWLDsQmQDzoyU3FQdC0cViqOtrAiEAxYIL+XTTp7Xy9RNE4Xg7
+yNWXfdraC/AfMM8fqsxlVJM=
+-----END CERTIFICATE-----
+%end
+
+# Dumping to non-existing directory - directory is crested
+%certificate --filename=rvtest.pem --dir=/etc/pki/nonexisting_subdir
+-----BEGIN CERTIFICATE-----
+MIIBjTCCATOgAwIBAgIUWR5HO3v/0I80Ne0jQWVZFODuWLEwCgYIKoZIzj0EAwIw
+FDESMBAGA1UEAwwJUlZURVNUIENBMB4XDTI0MTEyMDEzNTk1N1oXDTM0MTExODEz
+NTk1N1owFDESMBAGA1UEAwwJUlZURVNUIENBMFkwEwYHKoZIzj0CAQYIKoZIzj0D
+AQcDQgAELghFKGEgS8+5/2nx50W0xOqTrKc2Jz/rD/jfL0m4z4fkeAslCOkIKv74
+0wfBXMngxi+OF/b3Vh8FmokuNBQO5qNjMGEwHQYDVR0OBBYEFOJarl9Xkd13sLzI
+mHqv6aESlvuCMB8GA1UdIwQYMBaAFOJarl9Xkd13sLzImHqv6aESlvuCMA8GA1Ud
+EwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQDAgEGMAoGCCqGSM49BAMCA0gAMEUCIAet
+7nyre42ReoRKoyHWLDsQmQDzoyU3FQdC0cViqOtrAiEAxYIL+XTTp7Xy9RNE4Xg7
+yNWXfdraC/AfMM8fqsxlVJM=
+-----END CERTIFICATE-----
+%end
+
+# Dumping to existing directory
+%certificate --filename=rvtest2.pem --dir=/etc/pki/ca-trust/extracted/pem
+-----BEGIN CERTIFICATE-----
+MIIBkTCCATegAwIBAgIUN6r4TjFJqP/TS6U25iOGL2Wt/6kwCgYIKoZIzj0EAwIw
+FjEUMBIGA1UEAwwLUlZURVNUIDIgQ0EwHhcNMjQxMTIwMTQwMzIxWhcNMzQxMTE4
+MTQwMzIxWjAWMRQwEgYDVQQDDAtSVlRFU1QgMiBDQTBZMBMGByqGSM49AgEGCCqG
+SM49AwEHA0IABOtXBMEhtcH43dIDHkelODXrSWQQ8PW7oo8lQUEYTNAL1rpWJJDD
+1u+bpLe62Z0kzYK0CpeKuXFfwGrzx7eA6vajYzBhMB0GA1UdDgQWBBStV+z7SZSi
+YXlamkx+xjm/W1sMSTAfBgNVHSMEGDAWgBStV+z7SZSiYXlamkx+xjm/W1sMSTAP
+BgNVHRMBAf8EBTADAQH/MA4GA1UdDwEB/wQEAwIBBjAKBggqhkjOPQQDAgNIADBF
+AiEAkQjETC3Yx2xOkA+R0/YR+R+QqpR8p1fd/cGKWFUYxSoCIEuDJcfvPJfFYdzn
+CFOCLuymezWz+1rdIXLU1+XStLuB
+-----END CERTIFICATE-----
+%end
+
+# Test certificate snippet created in %pre section
+%include /tmp/ksinclude
+
+%pre
+
+cat > /tmp/ksinclude <<EOF
+?certificate --filename=rvtest2-pre.pem --dir=/etc/pki/pre
+-----BEGIN CERTIFICATE-----
+MIIBkTCCATegAwIBAgIUN6r4TjFJqP/TS6U25iOGL2Wt/6kwCgYIKoZIzj0EAwIw
+FjEUMBIGA1UEAwwLUlZURVNUIDIgQ0EwHhcNMjQxMTIwMTQwMzIxWhcNMzQxMTE4
+MTQwMzIxWjAWMRQwEgYDVQQDDAtSVlRFU1QgMiBDQTBZMBMGByqGSM49AgEGCCqG
+SM49AwEHA0IABOtXBMEhtcH43dIDHkelODXrSWQQ8PW7oo8lQUEYTNAL1rpWJJDD
+1u+bpLe62Z0kzYK0CpeKuXFfwGrzx7eA6vajYzBhMB0GA1UdDgQWBBStV+z7SZSi
+YXlamkx+xjm/W1sMSTAfBgNVHSMEGDAWgBStV+z7SZSiYXlamkx+xjm/W1sMSTAP
+BgNVHRMBAf8EBTADAQH/MA4GA1UdDwEB/wQEAwIBBjAKBggqhkjOPQQDAgNIADBF
+AiEAkQjETC3Yx2xOkA+R0/YR+R+QqpR8p1fd/cGKWFUYxSoCIEuDJcfvPJfFYdzn
+CFOCLuymezWz+1rdIXLU1+XStLuB
+-----END CERTIFICATE-----
+?end
+EOF
+sed -i s/^?/%/g /tmp/ksinclude
+
+%end
+
+############################## Checks
+
+%pre
+
+TRANSFER_PATH=/run/install/certificates/path
+
+### Check the certificate was imported in initramfs
+# We are able to tell only by the transfer files
+
+# Not imported in intramfs because generated in %pre
+if [ -f ${TRANSFER_PATH}/etc/pki/pre/rvtest2-pre.pem ]; then
+    echo "*** rvtest2-pre.pem found in /etc/pki/pre in transfer from initramfs" >> /root/RESULT
+fi
+
+if [ ! -f ${TRANSFER_PATH}/etc/pki/nonexisting_subdir/rvtest.pem ]; then
+    echo "*** rvtest.pem not found in /etc/pki/nonexisting_subdir in transfer from initramfs" >> /root/RESULT
+fi
+
+if [ ! -f ${TRANSFER_PATH}/etc/pki/ca-trust/extracted/pem/rvtest2.pem ]; then
+    echo "*** rvtest2.pem not found in /etc/pki/ca-trust/extracted/pem in transfer from initramfs" >> /root/RESULT
+fi
+
+
+### Check the presence in installer environment
+
+if [ -f /etc/pki/pre/rvtest2-pre.pem ]; then
+    echo "*** rvtest2-pre.pem found in /etc/pki/pre in installer environment in %pre" >> /root/RESULT
+fi
+
+if [ ! -f /etc/pki/nonexisting_subdir/rvtest.pem ]; then
+    echo "*** rvtest.pem not found in /etc/pki/nonexisting_subdir in installer environment in %pre" >> /root/RESULT
+fi
+
+if [ ! -f /etc/pki/ca-trust/extracted/pem/rvtest2.pem ]; then
+    echo "*** rvtest2.pem not found in /etc/pki/ca-trust/extracted/pem in installer environment in %pre" >> /root/RESULT
+fi
+
+%end
+
+
+%pre-install
+
+# Check the presence in installer environment
+if [ ! -f /etc/pki/pre/rvtest2-pre.pem ]; then
+    echo "*** rvtest2-pre.pem not found in /etc/pki/pre in installer environment in %pre-install" >> /root/RESULT
+fi
+
+if [ ! -f /usr/share/pki/ca-trust-source/anchors/rvtest-readonly.pem ]; then
+    echo "*** rvtest-readonly.pem not found in /usr/share/pki/ca-trust-source/anchors in installer environment in %pre-install" >> /root/RESULT
+fi
+
+%end
+
+
+%post --nochroot
+
+# Pass result to chroot / installed system
+@KSINCLUDE@ post-nochroot-lib-network.sh
+copy_pre_stage_result
+
+%end
+
+
+%post
+
+# Check the presence on installed system
+if [ ! -f /etc/pki/pre/rvtest2-pre.pem ]; then
+    echo "*** rvtest2-pre.pem not found in /etc/pki/pre on installed system" >> /root/RESULT
+fi
+
+if [ ! -f /usr/share/pki/ca-trust-source/anchors/rvtest-readonly.pem ]; then
+    echo "*** rvtest-readonly.pem not found in /usr/share/pki/ca-trust-source/anchors on installed system" >> /root/RESULT
+fi
+
+if [ ! -f /etc/pki/nonexisting_subdir/rvtest.pem ]; then
+    echo "*** rvtest.pem not found in /etc/pki/nonexisting_subdir on installed system" >> /root/RESULT
+fi
+
+if [ ! -f /etc/pki/ca-trust/extracted/pem/rvtest2.pem ]; then
+    echo "*** rvtest2.pem not found in /etc/pki/ca-trust/extracted/pem on installaed system" >> /root/RESULT
+fi
+
+if [[ ! -e /root/RESULT ]]; then
+    echo SUCCESS > /root/RESULT
+fi
+%end

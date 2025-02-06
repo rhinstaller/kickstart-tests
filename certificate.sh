@@ -19,6 +19,6 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="security rhel61430"
+TESTTYPE="security"
 
 . ${KSTESTDIR}/functions.sh

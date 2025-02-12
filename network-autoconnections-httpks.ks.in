@@ -129,6 +129,20 @@ else
     check_connection_device @KSTEST_NETDEV3@ @KSTEST_NETDEV3@
 fi
 
+# Test per-platform autoconnection configuration
+# It is configured by anaconda-nm-disable-autocons-rhel.service
+if [ "${platform:0:4}" == "rhel" ]; then
+    if [ $nm_has_autoconnections_off -ne 0 ]; then
+        echo '*** autoconnections are on on platform ${platform}' >> /root/RESULT
+    fi
+else
+    if [ $nm_has_autoconnections_off -eq 0 ]; then
+        echo '*** autoconnections are off on platform ${platform}' >> /root/RESULT
+    fi
+fi
+
+
+
 # No error was written to /root/RESULT file, everything is OK
 if [[ ! -e /root/RESULT ]]; then
    echo SUCCESS > /root/RESULT

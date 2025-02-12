@@ -43,6 +43,8 @@ journalctl | grep -q "Starting Initial Setup TUI" \
 journalctl | grep -q "Initial Setup finished successfully" \
 || echo "Initial Setup has failed."
 
+journalctl
+
 journalctl -u initial-setup -g "Traceback" --quiet
 
 EOF

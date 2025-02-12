@@ -1,6 +1,6 @@
 # Test assumptions about connections and config files created in initramfs (by NM)
 # Also test consolidating of the connections by anaconda.
-# Variant for ip=dhcp option (which is currently equivalent to no boot options)
+# And test autoconnection configuration per platform.
 %ksappend repos/default.ks
 
 # Use nameserver as a difference from default autoconnection for checking

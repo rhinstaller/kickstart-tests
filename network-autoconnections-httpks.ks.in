@@ -1,6 +1,6 @@
 # Test assumptions about connections and config files created in initramfs (by NM)
 # Also test consolidating of the connections by anaconda.
-# Variant for ip=dhcp option (which is currently equivalent to no boot options)
+# And test autoconnection configuration per platform.
 %ksappend repos/default.ks
 
 # Use nameserver as a difference from default autoconnection for checking
@@ -128,6 +128,20 @@ else
     check_connection_device "Wired connection 1" @KSTEST_NETDEV2@
     check_connection_device @KSTEST_NETDEV3@ @KSTEST_NETDEV3@
 fi
+
+# Test per-platform autoconnection configuration
+# It is configured by anaconda-nm-disable-autocons-rhel.service
+if [ "${platform:0:4}" == "rhel" ]; then
+    if [ $nm_has_autoconnections_off -ne 0 ]; then
+        echo '*** autoconnections are on on platform ${platform}' >> /root/RESULT
+    fi
+else
+    if [ $nm_has_autoconnections_off -eq 0 ]; then
+        echo '*** autoconnections are off on platform ${platform}' >> /root/RESULT
+    fi
+fi
+
+
 
 # No error was written to /root/RESULT file, everything is OK
 if [[ ! -e /root/RESULT ]]; then

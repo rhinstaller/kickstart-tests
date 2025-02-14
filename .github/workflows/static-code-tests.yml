@@ -2,7 +2,7 @@ name: static-code-tests
 on: [pull_request]
 jobs:
   static-code-tests:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     permissions: {}
     container:
       image: quay.io/rhinstaller/kstest-runner

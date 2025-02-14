@@ -4,7 +4,7 @@
 #
 # You have to have unified ISO as a source mounted on the NFS server.
 # To create unified ISO for Fedora you can use this tool:
-# https://github.com/rhinstaller/devel-tools/tree/master/create_unified_iso
+# https://github.com/rhinstaller/devel-tools/tree/main/create_unified_iso
 #
 
 %ksappend common/common_no_payload.ks

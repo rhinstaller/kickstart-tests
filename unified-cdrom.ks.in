@@ -4,7 +4,7 @@
 #
 # You have to have unified ISO as a source mounted on the HTTP server.
 # To create unified ISO for Fedora you can use this tool:
-# https://github.com/rhinstaller/devel-tools/tree/main/create_unified_iso
+# https://github.com/rhinstaller/devel-tools/tree/main/modify_install_iso
 #
 
 #

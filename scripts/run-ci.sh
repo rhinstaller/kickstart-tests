@@ -1,18 +1,18 @@
 #!/bin/bash
 set -eu
 
-# rebase on current upstream master, so that we run current tests
+# rebase on current upstream main, so that we run current tests
 git remote get-url upstream >/dev/null 2>&1 || git remote add upstream https://github.com/rhinstaller/kickstart-tests
 git fetch upstream
-git rebase upstream/master
+git rebase upstream/main
 
 # list of tests that are changed by the current PR; ignore non-executable *.sh as these are helpers, not tests
-CHANGED_TESTS=$(git diff --name-only upstream/master..HEAD -- *.ks.in $(find -maxdepth 1 -name '*.sh' -perm -u+x) | sed 's/\.ks\.in$//; s/\.sh$//' | sort -u)
+CHANGED_TESTS=$(git diff --name-only upstream/main..HEAD -- *.ks.in $(find -maxdepth 1 -name '*.sh' -perm -u+x) | sed 's/\.ks\.in$//; s/\.sh$//' | sort -u)
 
 TESTS=$CHANGED_TESTS
 
 # if the PR changes anything in the test runner, or does not touch any tests, pick a few representative tests
-if [ -z "$TESTS" ] || [ -n "$(git diff --name-only upstream/master..HEAD -- containers scripts)" ]; then
+if [ -z "$TESTS" ] || [ -n "$(git diff --name-only upstream/main..HEAD -- containers scripts)" ]; then
     TESTS="$TESTS
 bindtomac-network-device-default-httpks
 container

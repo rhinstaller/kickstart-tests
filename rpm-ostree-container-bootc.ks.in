@@ -20,6 +20,15 @@ reboot
 
 %post
 
+curl fedoraproject.org
+if [[ $? != 0 ]]; then
+    echo '*** curl fedoraproject.org failed' >> /root/RESULT
+fi
+
+%end
+
+%post
+
 # Checks after boot
 cat >> /var/lib/extensions/kickstart-tests/usr/libexec/kickstart-test.sh << 'EOF'
 

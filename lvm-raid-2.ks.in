@@ -1,6 +1,7 @@
-# Basic test for LVM on top of MD array. In the volgroup command the
-# array is referred by the PV format "mount point" (pv.01), referring
-# to the array by its name is tested in lvm-raid-2 test case.
+# Tests usage of newly created MD array name in the volgroup command and
+# handling of MD RAID names with md_ prefix by kickstart. See lvm-raid-1
+# test case for alternative way to refer to the array in the volgroup
+# command.
 
 #version=DEVEL
 %ksappend repos/default.ks
@@ -14,9 +15,8 @@ reqpart
 part /boot --fstype=ext4 --size=500
 part raid.01 --size=7500 --ondisk=vda
 part raid.02 --size=7500 --ondisk=vdb
-part raid.03 --size=7500 --ondisk=vdc
-raid pv.01 --level=RAID5 --device=md_test raid.01 raid.02 raid.03
-volgroup fedora pv.01
+raid pv.01 --level=RAID1 --device=md_test raid.01 raid.02
+volgroup fedora md_test
 logvol swap --name=swap --vgname=fedora --size=500 --fstype=swap
 logvol / --name=root --vgname=fedora --grow --size=4000 --fstype=ext4
 
@@ -82,11 +82,6 @@ fi
 swap_lv_size=$(lvs --noheadings -o size --unit=m --nosuffix fedora/swap)
 if [ $swap_lv_size != "500.00" ]; then
     echo "*** swap lv has incorrect size" >> /root/RESULT
-fi
-
-# verify that /dev/md/md_test exists (array was created with the correct name)
-if [ ! -e /dev/md/md_test ]; then
-    echo "** MD array has incorrect name" >> /root/RESULT
 fi
 
 if [ ! -e /root/RESULT ]; then

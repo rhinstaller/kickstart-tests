@@ -34,6 +34,11 @@ if [[ ! -e /etc/NetworkManager/conf.d/16-dns-backend.conf ]]; then
     echo '*** Failed check: NetworkManger global dns configuration file 16-dns-backend.conf is passed to installed system' >> /root/RESULT
 fi
 
+# Check that dnsconfd service is enabled on installed system
+systemctl is-enabled dnsconfd
+if [[ $? -ne 0 ]]; then
+    echo '*** Failed check: dnsconfd service is enabled on installed system' >> /root/RESULT
+fi
 
 %ksappend validation/success_if_result_empty.ks
 

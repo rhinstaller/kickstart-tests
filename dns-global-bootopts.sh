@@ -25,5 +25,5 @@ TESTTYPE=${TESTTYPE:-"network dns"}
 
 kernel_args() {
     # ip=dhcp does not work
-    echo ${DEFAULT_BOOTOPTS} rd.net.dns=10.0.2.3 rd.net.dns-backend=dnsconfd rd.net.dns-resolve-mode=exclusive ip=10.0.2.200::10.0.2.2:255.255.255.0::${KSTEST_NETDEV1}:none
+    echo ${DEFAULT_BOOTOPTS} rd.net.dns=10.0.2.3 rd.net.dns-backend=dnsconfd rd.net.dns-resolve-mode=exclusive ip=10.0.2.200::10.0.2.2:255.255.255.0:::none
 }

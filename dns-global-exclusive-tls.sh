@@ -24,7 +24,7 @@ TESTTYPE=${TESTTYPE:-"network dns"}
 . ${KSTESTDIR}/functions.sh
 
 kernel_args() {
-    echo ${DEFAULT_BOOTOPTS} rd.net.dns=dns+tls://10.0.196.143#edns-idmops.psi.redhat.com rd.net.dns-resolve-mode=exclusive rd.net.dns-backend=dnsconfd ip=10.0.2.200::10.0.2.2:255.255.255.0::${KSTEST_NETDEV1}:none
+    echo ${DEFAULT_BOOTOPTS} rd.net.dns=dns+tls://10.0.196.143#edns-idmops.psi.redhat.com rd.net.dns-resolve-mode=exclusive rd.net.dns-backend=dnsconfd ip=10.0.2.200::10.0.2.2:255.255.255.0:::none
 }
 
 additional_runner_args() {

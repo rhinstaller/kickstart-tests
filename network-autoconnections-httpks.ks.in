@@ -133,11 +133,11 @@ fi
 # It is configured by anaconda-nm-disable-autocons-rhel.service
 if [ "${platform:0:4}" == "rhel" ]; then
     if [ $nm_has_autoconnections_off -ne 0 ]; then
-        echo '*** autoconnections are on on platform ${platform}' >> /root/RESULT
+        echo "*** autoconnections are on on platform ${platform}" >> /root/RESULT
     fi
 else
     if [ $nm_has_autoconnections_off -eq 0 ]; then
-        echo '*** autoconnections are off on platform ${platform}' >> /root/RESULT
+        echo "*** autoconnections are off on platform ${platform}" >> /root/RESULT
     fi
 fi
 

@@ -57,6 +57,7 @@ rhel9_skip_array=(
   gh641       # packages-multilib failing on systemd conflict
   gh774       # autopart-luks-1 failing
   gh804       # tests requiring dvd iso failing
+  gh1378      # dns-global-exclusive* features not in yet
 )
 
 rhel10_skip_array=(

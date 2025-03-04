@@ -24,6 +24,7 @@ fedora_skip_array=(
   gh1237      # container failing
   gh1335      # image-deployment-2 failing
   gh1357      # selinux-context failing
+  gh1380      # dns-global-exclusive* features not in yet
 )
 
 daily_iso_skip_array=(
@@ -56,6 +57,7 @@ rhel9_skip_array=(
   gh641       # packages-multilib failing on systemd conflict
   gh774       # autopart-luks-1 failing
   gh804       # tests requiring dvd iso failing
+  gh1378      # dns-global-exclusive* features not in yet
 )
 
 rhel10_skip_array=(
@@ -70,6 +72,7 @@ rhel10_skip_array=(
   gh1110      # storage-multipath-autopart failing
   gh1207      # packages-multilib failing
   gh1213      # harddrive-iso-single failing
+  gh1379      # dns-global-exclusive* features not in yet
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

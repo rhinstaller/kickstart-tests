@@ -32,12 +32,12 @@ dd if=/dev/vdb bs=512 count=1 of=/tmp/current_mbr_vdb.bin
 # Check the MBR. The boot drive is defined by --boot-drive.
 cmp /tmp/pre_install_mbr_vda.bin /tmp/current_mbr_vda.bin
 if [[ $? -ne 0 ]]; then
-    echo '*** Failed check: MBR should be the same on vda' >> /mnt/sysroot/root/RESULT
+    echo '*** Failed check: MBR was not changed on vda' >> /mnt/sysroot/root/RESULT
 fi
 
 cmp /tmp/pre_install_mbr_vdb.bin /tmp/current_mbr_vdb.bin
 if [[ $? -ne 1 ]]; then
-    echo '*** Failed check: MBR should be changed on vdb' >> /mnt/sysroot/root/RESULT
+    echo '*** Failed check: MBR was changed on vdb' >> /mnt/sysroot/root/RESULT
 fi
 
 # The test was successful.

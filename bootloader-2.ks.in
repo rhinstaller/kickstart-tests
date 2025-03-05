@@ -30,7 +30,7 @@ dd if=/dev/vda bs=512 count=1 of=/tmp/current_mbr_content.bin
 # Check the MBR.
 cmp /tmp/pre_install_mbr_content.bin /tmp/current_mbr_content.bin
 if [[ $? -ne 1 ]]; then
-    echo '*** Failed check: MBR should be changed' >> /mnt/sysroot/root/RESULT
+    echo '*** Failed check: MBR was changed' >> /mnt/sysroot/root/RESULT
 else
     echo SUCCESS > /mnt/sysroot/root/RESULT
 fi

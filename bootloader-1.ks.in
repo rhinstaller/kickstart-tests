@@ -21,19 +21,19 @@ shutdown
 # Check the timeout.
 grep "^GRUB_TIMEOUT=13$" /etc/default/grub
 if [[ $? -ne 0 ]]; then
-    echo '*** Failed check: the timeout check failed' >> /root/RESULT
+    echo '*** Failed check: the timeout check' >> /root/RESULT
 fi
 
 # Check the extra args.
 grep "^GRUB_CMDLINE_LINUX=" /etc/default/grub | grep "anaconda_testing_option=1"
 if [[ $? -ne 0 ]]; then
-    echo '*** Failed check: the extra options check failed' >> /root/RESULT
+    echo '*** Failed check: the extra options check' >> /root/RESULT
 fi
 
 # Check the password.
 grep "^GRUB2_PASSWORD=grub.pbkdf2.12345$" /boot/grub2/user.cfg
 if [[ $? -ne 0 ]]; then
-    echo '*** Failed check: the password check failed' >> /root/RESULT
+    echo '*** Failed check: the password check' >> /root/RESULT
 fi
 
 # The test was successful.

@@ -46,7 +46,7 @@ expect -c "
 login_result=$?
 
 if [[ ${login_result} != 0 ]]; then
-    echo "*** Failed check: Ssh login failed with exit code ${login_result}"
+    echo "*** ssh login failed with exit code ${login_result}"
 fi
 
 

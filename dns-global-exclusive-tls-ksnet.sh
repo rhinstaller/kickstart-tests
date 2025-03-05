@@ -27,6 +27,15 @@ kernel_args() {
     echo ${DEFAULT_BOOTOPTS} rd.net.dns=dns+tls://10.0.196.143#edns-idmops.psi.redhat.com rd.net.dns-resolve-mode=exclusive rd.net.dns-backend=dnsconfd
 }
 
+prepare() {
+    local ks=$1
+
+    # This is a private slirp network, so we can pick any config we like
+    sed -i -e 's#@KSTEST_STATIC_IP@#10.0.2.200#g' -e 's#@KSTEST_STATIC_NETMASK@#255.255.255.0#g' -e 's#@KSTEST_STATIC_GATEWAY@#10.0.2.2#g' ${ks}
+
+    echo ${ks}
+}
+
 additional_runner_args() {
     # Wait for reboot and shutdown of the VM,
     # but exit after the specified timeout.

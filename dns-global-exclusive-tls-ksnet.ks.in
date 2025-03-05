@@ -3,10 +3,15 @@
 # Partial tests of reqiured features are in 'certificate' and 'dns-global-bootopts'
 # tests.
 
-# Use defaults.
+# Use defaults, but no network
+%ksappend common/common.ks
 %ksappend repos/default.ks
-%ksappend common/common_no_payload.ks
+%ksappend l10n/default.ks
+%ksappend users/default.ks
+%ksappend storage/default.ks
 %ksappend payload/default_packages.ks
+
+network --bootproto static --ip @KSTEST_STATIC_IP@ --netmask @KSTEST_STATIC_NETMASK@ --gateway @KSTEST_STATIC_GATEWAY@
 
 %certificate --filename tls-ca-bundle.pem --dir /etc/pki/dns/extracted/pem
 %ksappend data/edns-idmops.psi.redhat.com.crt

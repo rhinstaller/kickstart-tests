@@ -25,13 +25,13 @@ reboot
 
 # Check the presence in installer environment in %pre
 if [ ! -f /etc/pki/dns/extracted/pem/tls-ca-bundle.pem ]; then
-    echo "*** tls-ca-bundle.pem not found in /etc/pki/dns/extracted/pem in installer environment in %pre" >> /root/RESULT
+    echo "*** Failed check: tls-ca-bundle.pem found in /etc/pki/dns/extracted/pem in installer environment in %pre" >> /root/RESULT
 fi
 
 HOSTNAME=fedoraproject.org
 nslookup ${HOSTNAME}
 if [[ $? -ne 0 ]]; then
-    echo "*** Failed check: name resolution on ${HOSTNAME} failed in %pre" >> /root/RESULT
+    echo "*** Failed check: name resolution on ${HOSTNAME} in %pre" >> /root/RESULT
 fi
 
 %end
@@ -44,13 +44,13 @@ copy_pre_stage_result
 
 # Check the presence in installer environment during %post
 if [ ! -f /etc/pki/dns/extracted/pem/tls-ca-bundle.pem ]; then
-    echo "*** tls-ca-bundle.pem not found in /etc/pki/dns/extracted/pem in installer environment %post --nochroot" >> /mnt/sysroot/root/RESULT
+    echo "*** Failed check: tls-ca-bundle.pem found in /etc/pki/dns/extracted/pem in installer environment %post --nochroot" >> /mnt/sysroot/root/RESULT
 fi
 
 HOSTNAME=fedoraproject.org
 nslookup ${HOSTNAME}
 if [[ $? -ne 0 ]]; then
-    echo "*** Failed check: name resolution on ${HOSTNAME} failed in %post --nochroot" >> /mnt/sysroot/root/RESULT
+    echo "*** Failed check: name resolution on ${HOSTNAME} in %post --nochroot" >> /mnt/sysroot/root/RESULT
 fi
 
 %end
@@ -59,13 +59,13 @@ fi
 
 # Check the presence on installed system
 if [ ! -f /etc/pki/dns/extracted/pem/tls-ca-bundle.pem ]; then
-    echo "*** tls-ca-bundle.pem not found in /etc/pki/dns/extracted/pem on installed system" >> /root/RESULT
+    echo "*** Failed check: tls-ca-bundle.pem found in /etc/pki/dns/extracted/pem on installed system" >> /root/RESULT
 fi
 
 HOSTNAME=fedoraproject.org
 getent hosts ${HOSTNAME}
 if [[ $? -ne 0 ]]; then
-    echo "*** Failed check: name resolution on ${HOSTNAME} in %post script failed" >> /root/RESULT
+    echo "*** Failed check: name resolution on ${HOSTNAME} in %post script" >> /root/RESULT
 fi
 
 %ksappend validation/success_if_result_empty.ks
@@ -94,7 +94,7 @@ do
 done
 
 if [ ${succeeded} != "yes" ]; then
-    echo "*** Failed check: name resolution on ${HOSTNAME} on installed system failed"
+    echo "*** Failed check: name resolution on ${HOSTNAME}"
 fi
 
 EOF

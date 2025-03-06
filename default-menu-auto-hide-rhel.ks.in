@@ -10,7 +10,7 @@ cat /boot/grub2/grubenv
 
 # check the menu_auto_hide is correctly set
 grep -q "menu_auto_hide=1" /boot/grub2/grubenv || \
-     echo "*** Failed check: The menu_auto_hide is not part of the /boot/grub2/grubenv by default" >> /root/RESULT
+     echo "*** Failed check: The menu_auto_hide is set to 1 in /boot/grub2/grubenv by default" >> /root/RESULT
 
 %ksappend validation/success_if_result_empty.ks
 

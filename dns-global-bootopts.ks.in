@@ -1,0 +1,45 @@
+# The goal is to test options and configuration passing to installed system
+# not the functionality of the name resolution.
+
+# Use defaults, but no network
+%ksappend common/common.ks
+%ksappend repos/default.ks
+%ksappend l10n/default.ks
+%ksappend users/default.ks
+%ksappend storage/default.ks
+%ksappend payload/default_packages.ks
+
+%post
+
+# Check the arguments are passed to the installed system
+grep "^GRUB_CMDLINE_LINUX=" /etc/default/grub | grep "rd.net.dns=10.0.2.3"
+if [[ $? -ne 0 ]]; then
+    echo '*** Failed check: rd.net.dns option is passed to installed system' >> /root/RESULT
+fi
+grep "^GRUB_CMDLINE_LINUX=" /etc/default/grub | grep "rd.net.dns-resolve-mode=exclusive"
+if [[ $? -ne 0 ]]; then
+    echo '*** Failed check: rd.net.dns-resolve-mode option is passed to installed system' >> /root/RESULT
+fi
+
+grep "^GRUB_CMDLINE_LINUX=" /etc/default/grub | grep "rd.net.dns-backend=dnsconfd"
+if [[ $? -ne 0 ]]; then
+    echo '*** Failed check: rd.net.dns-backend option is passed to installed system' >> /root/RESULT
+fi
+
+# Check the NM runtime global config file is passed to the installed system
+if [[ ! -e /etc/NetworkManager/conf.d/16-global-dns.conf ]]; then
+    echo '*** Failed check: NetworkManger global dns configuration file 16-global-dns.conf is passed to installed system' >> /root/RESULT
+fi
+if [[ ! -e /etc/NetworkManager/conf.d/16-dns-backend.conf ]]; then
+    echo '*** Failed check: NetworkManger global dns configuration file 16-dns-backend.conf is passed to installed system' >> /root/RESULT
+fi
+
+# Check that dnsconfd service is enabled on installed system
+systemctl is-enabled dnsconfd
+if [[ $? -ne 0 ]]; then
+    echo '*** Failed check: dnsconfd service is enabled on installed system' >> /root/RESULT
+fi
+
+%ksappend validation/success_if_result_empty.ks
+
+%end

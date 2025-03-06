@@ -1,0 +1,105 @@
+# Test the e2e functionality of global exclusive encrypted DNS functionality
+# This variant provides everything except global dns configuration via kickstart.
+# Partial tests of reqiured features are in 'certificate' and 'dns-global-bootopts'
+# tests.
+
+# Use defaults, but no network
+%ksappend common/common.ks
+%ksappend repos/default.ks
+%ksappend l10n/default.ks
+%ksappend users/default.ks
+%ksappend storage/default.ks
+%ksappend payload/default_packages.ks
+
+network --bootproto static --ip @KSTEST_STATIC_IP@ --netmask @KSTEST_STATIC_NETMASK@ --gateway @KSTEST_STATIC_GATEWAY@
+
+%certificate --filename tls-ca-bundle.pem --dir /etc/pki/dns/extracted/pem
+%ksappend data/edns-idmops.psi.redhat.com.crt
+%end
+
+# Reboot the installed system.
+reboot
+
+# Validate on the first boot.
+%ksappend validation/success_on_first_boot.ks
+
+
+%pre
+
+# Check the presence in installer environment in %pre
+if [ ! -f /etc/pki/dns/extracted/pem/tls-ca-bundle.pem ]; then
+    echo "*** Failed check: tls-ca-bundle.pem found in /etc/pki/dns/extracted/pem in installer environment in %pre" >> /root/RESULT
+fi
+
+HOSTNAME=fedoraproject.org
+nslookup ${HOSTNAME}
+if [[ $? -ne 0 ]]; then
+    echo "*** Failed check: name resolution on ${HOSTNAME}in %pre" >> /root/RESULT
+fi
+
+%end
+
+%post --nochroot
+
+@KSINCLUDE@ post-nochroot-lib-network.sh
+# First copy result from %pre stage to chroot
+copy_pre_stage_result
+
+# Check the presence in installer environment during %post
+if [ ! -f /etc/pki/dns/extracted/pem/tls-ca-bundle.pem ]; then
+    echo "*** Failed check: tls-ca-bundle.pem found in /etc/pki/dns/extracted/pem in installer environment %post --nochroot" >> /mnt/sysroot/root/RESULT
+fi
+
+HOSTNAME=fedoraproject.org
+nslookup ${HOSTNAME}
+if [[ $? -ne 0 ]]; then
+    echo "*** Failed check: name resolution on ${HOSTNAME} in %post --nochroot" >> /mnt/sysroot/root/RESULT
+fi
+
+%end
+
+%post
+
+# Check the presence on installed system
+if [ ! -f /etc/pki/dns/extracted/pem/tls-ca-bundle.pem ]; then
+    echo "*** Failed check: tls-ca-bundle.pem found in /etc/pki/dns/extracted/pem on installed system" >> /root/RESULT
+fi
+
+HOSTNAME=fedoraproject.org
+getent hosts ${HOSTNAME}
+if [[ $? -ne 0 ]]; then
+    echo "*** Failed check: name resolution on ${HOSTNAME} in %post script" >> /root/RESULT
+fi
+
+%ksappend validation/success_if_result_empty.ks
+
+%end
+
+# Set up the actual test.
+%post
+
+# Write the code to run after reboot.
+cat > /usr/libexec/kickstart-test.sh << 'EOF'
+
+HOSTNAME=fedoraproject.org
+succeeded="no"
+i=0
+# The anaconda service running this test is not waiting for network-online
+# targe so let's give it some time here.
+while [ $i -le 15 ] && [ ${succeeded} != "yes" ];
+do
+    getent hosts ${HOSTNAME} &> /dev/null
+    if [[ $? -eq 0 ]]; then
+        succeeded=yes
+    fi
+    sleep 1
+    (( i++ ))
+done
+
+if [ ${succeeded} != "yes" ]; then
+    echo "*** Failed check: name resolution on ${HOSTNAME}"
+fi
+
+EOF
+
+%end

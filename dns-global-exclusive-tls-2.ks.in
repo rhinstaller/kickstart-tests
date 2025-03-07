@@ -1,0 +1,83 @@
+# Test the e2e functionality of global exclusive encrypted DNS functionality
+# This test is using DNS server with known certificate
+# FIXME: ideally it should require name resolution to fetch kickstart but
+# we are not able to achieve that currently
+
+# Use defaults, but no network
+%ksappend common/common.ks
+%ksappend repos/default.ks
+%ksappend l10n/default.ks
+%ksappend users/default.ks
+%ksappend storage/default.ks
+%ksappend payload/default_packages.ks
+
+# Reboot the installed system.
+reboot
+
+# Validate on the first boot.
+%ksappend validation/success_on_first_boot.ks
+
+%pre
+
+HOSTNAME=fedoraproject.org
+nslookup ${HOSTNAME}
+if [[ $? -ne 0 ]]; then
+    echo "*** Failed check: name resolution on ${HOSTNAME} in %pre" >> /root/RESULT
+fi
+
+%end
+
+%post --nochroot
+
+@KSINCLUDE@ post-nochroot-lib-network.sh
+# First copy result from %pre stage to chroot
+copy_pre_stage_result
+
+HOSTNAME=fedoraproject.org
+nslookup ${HOSTNAME}
+if [[ $? -ne 0 ]]; then
+    echo "*** Failed check: name resolution on ${HOSTNAME} in %post --nochroot" >> /mnt/sysroot/root/RESULT
+fi
+
+%end
+
+%post
+
+HOSTNAME=fedoraproject.org
+getent hosts ${HOSTNAME}
+if [[ $? -ne 0 ]]; then
+    echo "*** Failed check: name resolution on ${HOSTNAME} in %post script" >> /root/RESULT
+fi
+
+%ksappend validation/success_if_result_empty.ks
+
+%end
+
+# Set up the actual test.
+%post
+
+# Write the code to run after reboot.
+cat > /usr/libexec/kickstart-test.sh << 'EOF'
+
+HOSTNAME=fedoraproject.org
+succeeded="no"
+i=0
+# The anaconda service running this test is not waiting for network-online
+# targe so let's give it some time here.
+while [ $i -le 15 ] && [ ${succeeded} != "yes" ];
+do
+    getent hosts ${HOSTNAME} &> /dev/null
+    if [[ $? -eq 0 ]]; then
+        succeeded=yes
+    fi
+    sleep 1
+    (( i++ ))
+done
+
+if [ ${succeeded} != "yes" ]; then
+    echo "*** Failed check: name resolution on ${HOSTNAME}"
+fi
+
+EOF
+
+%end

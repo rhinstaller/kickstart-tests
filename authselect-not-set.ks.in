@@ -20,8 +20,10 @@ if [[ $? -eq 0 ]]; then
         authselect current | grep -E "Profile ID: local"
     fi
     if [[ $? -ne 0 ]]; then
-        echo "*** Failed check: authselect not installed or no default configuration detected" >> /root/RESULT
+        echo "*** Failed check: default authselect configuration is detected" >> /root/RESULT
     fi
+else
+    echo "*** Failed check: authselect is installed" >> /root/RESULT
 fi
 
 if [[ ! -e /root/RESULT ]]; then

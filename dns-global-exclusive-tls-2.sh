@@ -24,7 +24,7 @@ TESTTYPE=${TESTTYPE:-"network dns skip-on-rhel gh1380"}
 . ${KSTESTDIR}/functions.sh
 
 kernel_args() {
-    echo ${DEFAULT_BOOTOPTS} rd.net.dns=dns+tls://1.1.1.1 rd.net.dns-resolve-mode=exclusive rd.net.dns-backend=dnsconfd ip=10.0.2.200::10.0.2.2:255.255.255.0:::none
+    echo ${DEFAULT_BOOTOPTS} rd.net.dns=dns+tls://1.1.1.1#one.one.one.one rd.net.dns-resolve-mode=exclusive rd.net.dns-backend=dnsconfd ip=10.0.2.200::10.0.2.2:255.255.255.0:::none
 }
 
 additional_runner_args() {

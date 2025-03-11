@@ -30,5 +30,5 @@ stage2_from_ks() {
 
 # The test needs more RAM because installer image is downloaded from network
 get_required_ram() {
-    echo "2750"
+    echo "2900"
 }

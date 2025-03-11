@@ -204,6 +204,10 @@ ISSUES = [
         "description": "[1346] https://github.com/rhinstaller/kickstart-tests/issues/1346",
         "last_matching_re": (".*org.fedoraproject.Anaconda.Modules.*", ".*grub2-mkconfig.*")
     },
+    {
+        "description": "[1388] https://github.com/rhinstaller/kickstart-tests/issues/1388",
+        "first_grep": "gi.repository.GLib.GError: g-io-error-quark: Timeout was reached (24)",
+    },
 ]
 
 CLOSED_ISSUES = [

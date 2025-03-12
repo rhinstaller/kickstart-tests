@@ -17,7 +17,7 @@ function check_log_util_runs() {
     /usr/libexec/anaconda/log-capture
     ret_code=$?
 
-    if [[ $? -ne ${exit_code} ]]; then
+    if [[ ${ret_code} -ne ${exit_code} ]]; then
         echo "*** log-capture util failed with code: ${ret_code}" >> ${RESULT_FILE}
     fi
 }

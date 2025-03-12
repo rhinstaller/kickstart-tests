@@ -68,6 +68,11 @@ if [[ $? -ne 0 ]]; then
     echo "*** Failed check: name resolution on ${HOSTNAME} in %post script" >> /root/RESULT
 fi
 
+# Check that the certificate is in installed system initramfs
+if ! lsinitrd | grep -q " etc/pki/dns/extracted/pem/tls-ca-bundle.pem"; then
+    echo "*** Failed check: certificate found in installed system intimrafs" >> /root/RESULT
+fi
+
 %ksappend validation/success_if_result_empty.ks
 
 %end

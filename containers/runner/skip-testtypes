@@ -71,7 +71,6 @@ rhel10_skip_array=(
   gh1110      # storage-multipath-autopart failing
   gh1207      # packages-multilib failing
   gh1213      # harddrive-iso-single failing
-  gh1379      # dns-global-exclusive* features not in yet
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

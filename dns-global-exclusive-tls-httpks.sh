@@ -19,7 +19,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE=${TESTTYPE:-"network dns gh1380"}
+TESTTYPE=${TESTTYPE:-"network dns"}
 KICKSTART_NAME=dns-global-exclusive-tls
 
 . ${KSTESTDIR}/functions.sh

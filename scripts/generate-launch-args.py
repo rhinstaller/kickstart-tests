@@ -88,6 +88,8 @@ def parse_args():
                          help="do not skip any tests based on os variant or branch")
     _parser.add_argument("--skip-file", type=str, metavar="PATH",
                          help="file containing data about disabled tests")
+    _parser.add_argument("--anaconda-pr", "-p", action="store_true",
+                         help="skip tests not working on anaconda PR")
     return _parser.parse_args()
 
 
@@ -111,6 +113,9 @@ if __name__ == "__main__":
         platform, disabled_testtypes = get_arguments_for_branch(args.branch, skip_file)
         if not platform:
             raise ValueError("Platform for branch {} is not defined".format(args.branch))
+
+    if args.anaconda_pr:
+        disabled_testtypes.extend(get_skip_testtypes(skip_file, "SKIP_TESTTYPES_ANACONDA_PR"))
 
     if platform:
         platform_args = ["--platform", platform]

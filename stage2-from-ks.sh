@@ -19,7 +19,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="network gh910"
+TESTTYPE="network gh910 stage2-from-compose"
 
 . ${KSTESTDIR}/functions.sh
 

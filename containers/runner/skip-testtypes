@@ -78,6 +78,10 @@ rhel8_daily_skip_array=(
   skip-on-rhel-8
 )
 
+anaconda_pr_skip_array=(
+  stage2-from-compose
+)
+
 _join_args_by_comma(){
   local IFS=","
   echo "$*"
@@ -92,4 +96,4 @@ SKIP_TESTTYPES_RHEL9=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel9_sk
 SKIP_TESTTYPES_RHEL10=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel10_skip_array[@]}")
 SKIP_TESTTYPES_RHEL8_DAILY=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel8_daily_skip_array[@]}")
 # Tests run on an anaconda pull request by comment
-SKIP_TESTTYPES_ANACONDA_PR=$(_join_args_by_comma "${common_skip_array[@]}")
+SKIP_TESTTYPES_ANACONDA_PR=$(_join_args_by_comma "${common_skip_array[@]}" "${anaconda_pr_skip_array[@]}")

@@ -30,9 +30,10 @@ else
     fi
 fi
 
-curl fedoraproject.org
-if [[ $? != 0 ]]; then
-    echo '*** curl fedoraproject.org failed' >> /root/RESULT
+HOSTNAME=fedoraproject.org
+getent hosts ${HOSTNAME}
+if [[ $? -ne 0 ]]; then
+    echo "*** Failed check: name resolution on ${HOSTNAME} in %post script" >> /root/RESULT
 fi
 
 # No error was written to /root/RESULT file, everything is OK

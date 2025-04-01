@@ -36,6 +36,14 @@ if [[ "$result" != "2" ]] ; then
     exit 1
 fi
 
+# Check if the 'allow-discards' flag is set.
+result=$(cryptsetup luksDump ${crypted} | grep "Flags" | cut -d: -f2 | tr -d "\t\n ")
+
+if [[ "$result" != "allow-discards" ]] ; then
+    echo "*** unexpected flags set for ${crypted}: ${result}" > /root/RESULT
+    exit 1
+fi
+
 # Try to use the passphrase.
 echo "passphrase" | cryptsetup luksOpen --test-passphrase "${crypted}"
 

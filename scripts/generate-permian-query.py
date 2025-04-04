@@ -6,7 +6,7 @@ import itertools
 
 def parse_args():
     _parser = argparse.ArgumentParser(
-        description="Generate tclib testcase query from kickstart tests launcher "
+        description="Generate tplib testcase query from kickstart tests launcher "
                     "options --skip-testtypes, --testtype and a list of tests."
     )
     _parser.add_argument("--skip-testtypes", "-s", type=str, metavar="TYPE[,TYPE..]",

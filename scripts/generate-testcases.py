@@ -26,7 +26,7 @@ from jinja2 import Template
 
 
 def parse_args():
-    _parser = argparse.ArgumentParser(description="Generate tclib testcases from kickstart tests")
+    _parser = argparse.ArgumentParser(description="Generate tplib testcases from kickstart tests")
     _parser.add_argument("kickstart_tests_dir", metavar="KSTESTS_DIR",
                          help="Directory with kickstart tests.")
     _parser.add_argument("--output-dir", "-o", type=str,

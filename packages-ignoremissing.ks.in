@@ -7,7 +7,7 @@
 %ksappend repos/default.ks
 %ksappend common/common_no_payload.ks
 
-%packages --ignoremissing
+%packages
 fake-package-name
 %end
 

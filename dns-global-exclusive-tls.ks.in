@@ -69,7 +69,13 @@ if [[ $? -ne 0 ]]; then
 fi
 
 # Check that the certificate is in installed system initramfs
-if ! lsinitrd | grep -q " etc/pki/dns/extracted/pem/tls-ca-bundle.pem"; then
+
+# We need to specify the file name if repository and installer image kernel
+# version differs, for example when generating image in anaconda PR CI
+if ! lsinitrd -m >/dev/null 2>&1; then
+    initrd_name=/boot/$(ls /boot | grep initramfs | grep -v rescue)
+fi
+if ! lsinitrd ${initrd_name} | grep -q " etc/pki/dns/extracted/pem/tls-ca-bundle.pem"; then
     echo "*** Failed check: certificate found in installed system intimrafs" >> /root/RESULT
 fi
 

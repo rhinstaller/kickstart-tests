@@ -29,9 +29,7 @@ prepare_disks() {
     # make sure the first disk have some extra space for /boot
     qemu-img create -q -f qcow2 ${tmpdir}/disk-a.img 9G
     qemu-img create -q -f qcow2 ${tmpdir}/disk-b.img 8G
-    qemu-img create -q -f qcow2 ${tmpdir}/disk-c.img 8G
 
     echo ${tmpdir}/disk-a.img
     echo ${tmpdir}/disk-b.img
-    echo ${tmpdir}/disk-c.img
 }

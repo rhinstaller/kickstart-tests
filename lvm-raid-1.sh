@@ -19,7 +19,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="lvm storage"
+TESTTYPE="lvm storage rhel75659 rhel80086"
 
 . ${KSTESTDIR}/functions.sh
 

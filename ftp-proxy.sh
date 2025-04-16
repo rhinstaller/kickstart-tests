@@ -15,11 +15,46 @@
 # source code or documentation are not subject to the GNU General Public
 # License and may only be used or replicated with the express permission of
 # Red Hat, Inc.
-#
-# Red Hat Author(s): David Shea <dshea@redhat.com>
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="payload ftp"
+TESTTYPE="method ftp proxy"
 
 . ${KSTESTDIR}/functions.sh
+
+kernel_args() {
+    proxy_url="$(cat ${tmpdir}/proxy_url)"
+    echo ${DEFAULT_BOOTOPTS} inst.proxy=${proxy_url}
+}
+
+prepare() {
+    ks=$1
+    tmpdir=$2
+
+    # Start a proxy server
+    start_proxy ${tmpdir}/proxy
+
+    cp ${ks} ${tmpdir}/kickstart.ks
+    echo ${tmpdir}/kickstart.ks
+}
+
+validate() {
+    tmpdir=$1
+    validate_RESULT $tmpdir
+    if [ ! -f $tmpdir/RESULT ]; then
+        return 1
+    fi
+
+    grep -q "$KSTEST_FTP_URL" $tmpdir/proxy/access.log
+    if [[ $? -ne 0 ]]; then
+        echo 'FTP URL server request was not proxied' >> $tmpdir/RESULT
+    fi
+
+    # check for .treeinfo request
+    grep -q '\.treeinfo[[:space:]]' $tmpdir/proxy/access.log
+    if [[ $? -ne 0 ]]; then
+        echo '.treeinfo request to repository server was not proxied' >> $tmpdir/RESULT
+    fi
+
+    check_result_file "$tmpdir"
+}

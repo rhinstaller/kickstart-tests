@@ -65,7 +65,6 @@ rhel10_skip_array=(
   gh640       # authselect-not-set failing
   gh804       # tests requiring dvd iso failing
   gh1090      # raid-1-reqpart failing
-  gh1104      # network-prefixdevname failing
   gh1107      # rpm-ostree-container failing
   gh1110      # storage-multipath-autopart failing
   gh1207      # packages-multilib failing

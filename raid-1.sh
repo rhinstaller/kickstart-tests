@@ -21,6 +21,7 @@
 # shellcheck disable=SC2034
 TESTTYPE=${TESTTYPE:-"raid storage coverage smoke"}
 
+# check
 . ${KSTESTDIR}/functions.sh
 
 prepare_disks() {

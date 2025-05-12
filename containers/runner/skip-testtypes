@@ -24,7 +24,6 @@ fedora_skip_array=(
   gh1237      # container failing
   gh1335      # image-deployment-2 failing
   gh1357      # selinux-context failing
-  gh1414      # raid tests failing rhbz2362273
 )
 
 daily_iso_skip_array=(

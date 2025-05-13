@@ -20,6 +20,12 @@ reboot
 
 %post
 
+HOSTNAME=fedoraproject.org
+getent hosts ${HOSTNAME}
+if [[ $? -ne 0 ]]; then
+    echo "*** Failed check: name resolution on ${HOSTNAME} in %post script" >> /root/RESULT
+fi
+
 # Checks after boot
 cat >> /var/lib/extensions/kickstart-tests/usr/libexec/kickstart-test.sh << 'EOF'
 

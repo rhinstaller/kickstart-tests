@@ -71,6 +71,7 @@ rhel10_skip_array=(
   gh1207      # packages-multilib failing
   gh1213      # harddrive-iso-single failing
   rhel80086   # pykickstart removes md_ prefix from new MD devices
+  rhel84110   # rpm-container-ostree-bootc fix waiting for merge in RHEL 10.1
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

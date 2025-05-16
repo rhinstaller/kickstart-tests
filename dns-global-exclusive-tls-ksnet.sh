@@ -20,6 +20,7 @@
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
 TESTTYPE=${TESTTYPE:-"network dns stage2-from-compose"}
+# trigger the test in CI
 
 . ${KSTESTDIR}/functions.sh
 

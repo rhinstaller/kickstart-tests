@@ -1,0 +1,22 @@
+#
+# Check flatpak preinstall.d support in Anaconda.
+
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
+
+# Install RPM package which is marking firefox in Flatpak for installation.
+# To make the Flatpak installation working, the installation source URL need to point to place
+# where is the ./Flatpaks directory.
+%packages
+redhat-flatpak-preinstall-firefox
+%end
+
+%post
+# Check if Firefox flatpak was successfully installed
+flatpak list | grep -q org.mozilla.firefox
+if [[ $? != 0 ]]; then
+    echo '*** the Firefox flatpak was not installed' > /root/RESULT
+else
+    echo SUCCESS > /root/RESULT
+fi
+%end

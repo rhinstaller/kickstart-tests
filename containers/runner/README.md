@@ -127,19 +127,23 @@ stored one first!
 It's essential to know how to connect to the running tests to see why they are failing. For these
 situations you should follow this guide.
 
-Run tests as **root** to have bridging instead of using SLIRP and having IP address for the
+You can run tests as **root** to have bridging instead of using SLIRP and having IP address for the
 container so we know where to connect.
 
     sudo containers/runner/launch keyboard
+
+However, it is also possible to run tests as user which will share a host IP for the container, so
+you can connect to 127.0.0.1 localhost. The virt-viewer comment (below) should be correct in
+this situation.
 
 
 Before the tests are started you should see something like this.
 
     ************************************************************************
     You can connect to this container's libvirt with this connection string:
-   
+
        virt-viewer -c qemu+tcp://<IP>/session
-   
+
     ************************************************************************
 
 Then you can copy the hypervisor connection URI (`qemu+tcp://<IP>/session`) and display
@@ -156,7 +160,7 @@ Sometimes it could be helpful to run the test in the container manually to be ab
 container after the run. To do that:
 
 1. Run `containers/runner/launch` with `-c` argument in addition to other arguments. This will
-open shell of the container where you can do what you want to before starting the test. 
+open shell of the container where you can do what you want to before starting the test.
 2. Start the test(s) execution with `/kickstart-tests/containers/runner/run-kstest`.
 
 ## Debugging test failures

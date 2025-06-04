@@ -1,7 +1,7 @@
 #!/bin/bash
 # Run a set of tests (positional command line arguments) in the runner container in podman or docker.
 # Tests are taken from the current kickstart-tests checkout
-# If data/images/boot.iso exists, that is tested, otherwise it downloads the current image for given 
+# If data/images/boot.iso exists, that is tested, otherwise it downloads the current image for given
 # platform and stores it in data/images/boot-<platform>.iso.
 # Runs --recommended-jobs number of parallel tests by default, which can be changed by setting $TEST_JOBS.
 
@@ -13,6 +13,11 @@ CONTAINER=${CONTAINER:-quay.io/rhinstaller/kstest-runner}
 # Podman in rootless mode does not have access to /dev/kvm socket https://bugzilla.redhat.com/show_bug.cgi?id=1901462
 # disable selinux container separation when podman is executed as user
 PODMAN_SELINUX_FIX=
+# The virt-viewer can be used to connect to the installation even when not started under root
+# but it needs to have --network set to 'host'. This will also allow you to easily share VPN
+# connection with the container. This will net be used when started under sudo as the bridging
+# is expected to be used.
+USE_HOST_NETWORKING="--network=host"
 RUN_COMMAND=/kickstart-tests/containers/runner/run-kstest
 SCENARIO=${SCENARIO:-unknown}
 BOOT_ISO="boot.iso"
@@ -157,6 +162,11 @@ if [ "${CRUN%podman*}" != "$CRUN" ] && [ $(id -u) -ne 0 ]; then
     PODMAN_SELINUX_FIX="--security-opt label=disable"
 fi
 
+# Do not use 'host' networking when started under root
+if [ "$(id -u)" -eq 0 ]; then
+    USE_HOST_NETWORKING=""
+fi
+
 # Build up a list of KSTEST_* environment variables to be passed into the container
 TEST_ENV_VARS=$(printenv | while read line; do
     key="$(echo $line | cut -d'=' -f1)"
@@ -179,6 +189,7 @@ $CRUN run -it --rm --device=/dev/kvm --publish 127.0.0.1::16509 $PODMAN_SELINUX_
     --env TEST_JOBS="$TEST_JOBS" --env PLATFORM_NAME="${PLATFORM:-}" --env TEST_RETRY="${TEST_RETRY:-}" ${UPDATES_IMG_ARGS:-} ${CONTAINER_RUN_ARGS:-} \
     --env KSTESTS_KEEP=${KSTESTS_KEEP:-1} \
     --env BOOT_ISO=${BOOT_ISO} \
+    ${USE_HOST_NETWORKING:-} ${USE_HOST_NETWORKING:+--env USE_HOST_NETWORKING=true}\
     ${TEST_ENV_VARS} \
     ${VAR_TMP:-} \
     ${DEFAULTS_SH_ARGS:-} \

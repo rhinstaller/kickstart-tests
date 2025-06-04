@@ -224,6 +224,10 @@ The following environment variables are currently supported:
   mirror in Texas, USA in scripts/defaults.sh. This is potentially slow and
   you may want to point it at a local mirror.
 
+- KSTEST_FTP_APPSTREAM_URL - This variable is used by FTP tests on RHEL +
+  CentOS Stream. It is not used by Fedora and it is using the same mirrors as
+  KSTEST_FTP_URL.
+
 - KSTEST_URL - This variable is used by all tests that don't test installation
   method and instead just use the default.  It is set to the Fedora mirrors in
   scripts/defaults.sh.  This is potentially slow if you are running a lot of

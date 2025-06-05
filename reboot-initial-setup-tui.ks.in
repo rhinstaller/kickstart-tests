@@ -37,6 +37,8 @@ EOF
 # Print errors to stdout.
 cat > /usr/libexec/kickstart-test.sh << EOF
 
+%ksappend validation/check_rebooted_anaconda_version.ks
+
 journalctl | grep -q "Starting Initial Setup TUI" \
 || echo "Failed to start Initial Setup TUI."
 

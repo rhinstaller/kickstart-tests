@@ -443,6 +443,9 @@ export_additional_repo() {
         # Store the server address in file so that it can be sourced later
         # (eq. in kernel_args() and similar).
         echo addrepo_url=${httpd_url} > ${tmpdir}/addrepo_url
+    else
+        >&2 echo "ERROR: Additional repository expected in data/additional_repo is missing"
+        exit 2
     fi
 }
 

@@ -45,6 +45,8 @@ journalctl | grep -q "Initial Setup finished successfully" \
 
 journalctl -u initial-setup -g "Traceback" --quiet
 
+journalctl -a
+
 EOF
 
 %end

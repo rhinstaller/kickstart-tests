@@ -65,16 +65,23 @@ mkdir -p ~/.config/libvirt
 printf 'listen_tls = 0\nlisten_tcp = 1\nauth_tcp = "none"\n' > ~/.config/libvirt/virtproxyd.conf
 virtproxyd -f ~/.config/libvirt/virtproxyd.conf &
 
-# this only works with a bridged network; user containers use SLIRP and only have a tun0 interface
-if MY_IP=$(ip -4 -c a show dev eth0 2>/dev/null | grep -Eo '[0-9.]+\.[0-9]+' | grep -v '\.255'); then
+print_viewer_help() {
+    IP="$1"
     set +x
     echo "************************************************************************"
     echo "You can connect to this container's libvirt with this connection string:"
     echo
-    echo "   virt-viewer -c qemu+tcp://${MY_IP}/session"
+    echo "   virt-viewer -c qemu+tcp://${IP}/session"
     echo
     echo "************************************************************************"
     set -x
+}
+
+if test -n "$USE_HOST_NETWORKING"; then
+    print_viewer_help "127.0.0.1"
+# this only works with a bridged network; user containers use SLIRP and only have a tun0 interface
+elif MY_IP=$(ip -4 -c a show dev eth0 2>/dev/null | grep -Eo '[0-9.]+\.[0-9]+' | grep -v '\.255'); then
+    print_viewer_help $MY_IP
 fi
 
 # Run the test, capture the output for run_report.sh

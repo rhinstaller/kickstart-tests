@@ -19,6 +19,8 @@
 # shellcheck disable=SC2034
 TESTTYPE="reboot initial-setup smoke skip-on-rhel-10"
 
+# trigger test-os-variants
+
 . ${KSTESTDIR}/functions.sh
 
 additional_runner_args() {

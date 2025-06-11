@@ -22,6 +22,8 @@ TESTTYPE="reboot initial-setup smoke skip-on-rhel-8 skip-on-rhel-10"
 
 . ${KSTESTDIR}/functions.sh
 
+# trigger test-os-variants
+
 additional_runner_args() {
     # Wait for reboot and shutdown of the VM,
     # but exit after the specified timeout.

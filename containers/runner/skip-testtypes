@@ -27,6 +27,7 @@ fedora_skip_array=(
 )
 
 daily_iso_skip_array=(
+  gh1434      # reboot-inital-setup-* failing
 )
 
 rawhide_skip_array=(

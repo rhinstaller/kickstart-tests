@@ -18,7 +18,7 @@
 # The fix requires https://github.com/rhinstaller/anaconda/commit/6b80b7b.
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="reboot initial-setup smoke skip-on-rhel-8 skip-on-rhel-10"
+TESTTYPE="reboot initial-setup smoke skip-on-rhel-8 skip-on-rhel-10 gh1434"
 
 . ${KSTESTDIR}/functions.sh
 

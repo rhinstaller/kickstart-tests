@@ -204,6 +204,10 @@ ISSUES = [
         "description": "[1346] https://github.com/rhinstaller/kickstart-tests/issues/1346",
         "last_matching_re": (".*org.fedoraproject.Anaconda.Modules.*", ".*grub2-mkconfig.*")
     },
+    {
+        "description": "[1438] https://github.com/rhinstaller/kickstart-tests/issues/1438",
+        "first_grep": "blivet.errors.DependencyError: device type btrfs volume requires unavailable_dependencies: libblockdev btrfs plugin:",
+    },
 ]
 
 CLOSED_ISSUES = [

@@ -50,13 +50,12 @@ bootc --help &> /dev/null || echo "bootc command not available after booting"
 expected_url="@KSTEST_OSTREECONTAINER_URL@"
 remote_url="$(ostree remote show-url test-remote)"
 if [ ${?} -ne 0 ]; then
-    echo "Couldn't list remote URL for 'test-remote'" >> /root/RESULT
+    echo "Couldn't list remote URL for 'test-remote'"
 fi
 
 if [ "${remote_url}" != "${expected_url}" ]; then
-    echo "Unexpected URL: ${remote_url}, expected ${expected_url}"" >> /root/RESULT
+    echo "Unexpected URL: ${remote_url}, expected ${expected_url}"
 fi
-
 
 EOF
 %end

@@ -66,6 +66,10 @@ copy_interesting_files_from_system() {
     done
 }
 
+kernel_args() {
+    echo "${DEFAULT_BOOTOPTS} console=ttyS7"
+}
+
 additional_runner_args() {
    # Wait for reboot and shutdown of the VM,
    # but exit after the specified timeout.

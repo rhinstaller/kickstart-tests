@@ -57,5 +57,11 @@ if [ "${remote_url}" != "${expected_url}" ]; then
     echo "Unexpected URL: ${remote_url}, expected ${expected_url}"
 fi
 
+# Check if console argument is passed to the installed system
+rpm-ostree kargs | grep -q console=ttyS7 > /dev/null
+if [ ${?} -ne 0 ]; then
+    echo "The console kernel parameter was not preserved, current list: $(rpm-ostree kargs)"
+fi
+
 EOF
 %end

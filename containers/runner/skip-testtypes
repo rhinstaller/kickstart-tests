@@ -20,7 +20,6 @@ fedora_skip_array=(
   rhbz1853668 # multipath device not constructed back after installation
   gh975       # packages-default failing
   gh1023      # rpm-ostree failing
-  gh1060      # vnc tests too flaky
   gh1237      # container failing
   gh1335      # image-deployment-2 failing
   gh1357      # selinux-context failing

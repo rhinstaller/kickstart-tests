@@ -7,4 +7,4 @@ export KSTEST_URL='http://download.devel.redhat.com/rhel-10/nightly/RHEL-10/late
 export KSTEST_MODULAR_URL='http://download.devel.redhat.com/rhel-10/nightly/RHEL-10/latest-RHEL-10.1/compose/AppStream/x86_64/os/'
 export KSTEST_FTP_URL='ftp://download.devel.redhat.com/mnt/redhat/rhel-10/nightly/RHEL-10/latest-RHEL-10.1/compose/BaseOS/x86_64/os/'
 export KSTEST_FTP_APPSTREAM_URL='ftp://download.devel.redhat.com/mnt/redhat/rhel-10/nightly/RHEL-10/latest-RHEL-10.1/compose/AppStream/x86_64/os/'
-export KSTEST_OSTREECONTAINER_URL='quay.io/centos-bootc/centos-bootc:stream10'
+export KSTEST_OSTREECONTAINER_URL='images.paas.redhat.com/bootc/rhel-bootc:latest-10.1'

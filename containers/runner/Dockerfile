@@ -20,6 +20,7 @@ RUN dnf -y update && \
     python3-rpmfluff \
     python3-rpm \
     squid \
+    strace \
     make \
     openssh-clients && \
     dnf -y clean all

@@ -162,7 +162,7 @@ jobs:
           set -eux
 
           BASE_COMMIT=$(git merge-base ${{ needs.pr-info.outputs.sha }} origin/${{ env.TARGET_BRANCH }})
-          CHANGED_TESTS=$(git diff --name-only $BASE_COMMIT HEAD -- *.ks.in $(find -maxdepth 1 -name '*.sh' -perm -u+x) | sed 's/\.ks\.in$//; s/\.sh$//' | sort -u | tr '\n' ' ')
+          CHANGED_TESTS=$(scripts/get-changed-tests.py $BASE_COMMIT HEAD)
           echo "changed_tests=${CHANGED_TESTS}" >> $GITHUB_OUTPUT
 
       - name: Generate test selection for os variant ${{ matrix.os-variant }}

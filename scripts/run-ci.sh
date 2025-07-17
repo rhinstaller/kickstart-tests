@@ -7,7 +7,7 @@ git fetch upstream
 git rebase upstream/main
 
 # list of tests that are changed by the current PR; ignore non-executable *.sh as these are helpers, not tests
-CHANGED_TESTS=$(git diff --name-only upstream/main..HEAD -- *.ks.in $(find -maxdepth 1 -name '*.sh' -perm -u+x) | sed 's/\.ks\.in$//; s/\.sh$//' | sort -u)
+CHANGED_TESTS=$(scripts/get-changed-tests.py upstream/main HEAD)
 
 TESTS=$CHANGED_TESTS
 

@@ -32,7 +32,7 @@ fi
 @KSINCLUDE@ scripts-lib.sh
 platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
 
-if [ "${platform}" == "rhel8" ] || [ "${platform}" == "rhel9" ]; then
+if [ "${platform}" == "rhel8" ] || [ "${platform}" == "rhel9" ] || [ "${platform}" == "centos9" ]; then
     grep -q 'proxy=http://anaconda:qweqwe@PROXY-ADDON' /mnt/sysroot/etc/yum.repos.d/addon.repo
     proxy_rc=$?
 else

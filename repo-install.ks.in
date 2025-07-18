@@ -17,7 +17,7 @@ repo --name=test05 --baseurl=EMPTY_REPO_URL --includepkgs=p1,p2 --excludepkgs=p3
 platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
 
 # Define patterns for repo options.
-if [ "${platform}" == "rhel8" ] || [ "${platform}" == "rhel9" ]; then
+if [ "${platform}" == "rhel8" ] || [ "${platform}" == "rhel9" ] || [ "${platform}" == "centos9" ]; then
     cost='^cost=25$'
     sslverify='^sslverify=0$'
     includepkgs='^includepkgs=p1,p2$'

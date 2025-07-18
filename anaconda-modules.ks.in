@@ -32,7 +32,7 @@ org.fedoraproject.Anaconda.Modules.Timezone
 org.fedoraproject.Anaconda.Modules.Users
 EOF
 # centos has Subscription module forbidden in its conf profile
-elif [ "${platform:0:4}" == "rhel" ] && [ "@KSTEST_OS_NAME@" == "centos" ]; then
+elif [ "${platform:0:6}" == "centos" ]; then
     cat > /tmp/expected.out << EOF
 org.fedoraproject.Anaconda.Modules.Localization
 org.fedoraproject.Anaconda.Modules.Network

@@ -14,7 +14,7 @@
 @KSINCLUDE@ scripts-lib.sh
 platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
 
-if [ "${platform:0:4}" == "rhel" ]; then
+if [ "${platform:0:4}" == "rhel" ] || [ "${platform:0:6}" == "centos" ]; then
     # rhbz#1989472
     check_resolv_conf_is_by_nm
     # check systemd-resolved is not installed rhbz#2304080

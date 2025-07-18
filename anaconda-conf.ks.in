@@ -23,7 +23,7 @@ fi
 @KSINCLUDE@ scripts-lib.sh
 platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
 
-if [ "${platform}" == "rhel8" ] || [ "${platform}" == "rhel9" ]; then
+if [ "${platform}" == "rhel8" ] || [ "${platform}" == "rhel9" ] || [ "${platform}" == "centos9" ]; then
     LOG_MSG="Writing a temporary configuration loaded from"
 else
     LOG_MSG="Configuration loaded from:"

@@ -208,6 +208,10 @@ ISSUES = [
         "description": "[1438] https://github.com/rhinstaller/kickstart-tests/issues/1438",
         "first_grep": "blivet.errors.DependencyError: device type btrfs volume requires unavailable_dependencies: libblockdev btrfs plugin:",
     },
+    {
+        "description": "[1453] https://github.com/rhinstaller/kickstart-tests/issues/1453",
+        "first_grep": "*** ERROR: Expected 2 SUCCESS messages, but found 2.",
+    },
 ]
 
 CLOSED_ISSUES = [

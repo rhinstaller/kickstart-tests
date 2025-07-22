@@ -7,7 +7,7 @@ git fetch upstream
 git rebase upstream/main
 
 # list of tests that are changed by the current PR; ignore non-executable *.sh as these are helpers, not tests
-CHANGED_TESTS=$(scripts/get-changed-tests.py upstream/main HEAD)
+CHANGED_TESTS=$(scripts/get-changed-tests.py upstream/main HEAD | tr ' ' '\n')
 
 TESTS=$CHANGED_TESTS
 

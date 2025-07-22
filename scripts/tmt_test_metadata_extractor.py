@@ -5,6 +5,7 @@ from glob import glob
 from subprocess import check_output
 import yaml
 from pprint import pprint
+import os
 
 KSTESTDIR_ENV="KSTESTDIR"
 MAX_DEPTH = 2
@@ -13,7 +14,9 @@ class RawTMTMetadata:
     tmt_file = "main.fmf"
     tmt_tag = "tag"
     tmt_test = "test"
-    tmt_test_prefix = "mkdir -p data/{images,logs}; chmod -R a+rwx data; ./containers/runner/launch --platform rhel10 "
+    launch_data_var = "--data /var/tmp/ks_data"
+    platform_var = "--platform rhel10"
+    tmt_test_prefix = f"./containers/runner/launch {launch_data_var} {platform_var} "
     tmt_base_test_structure_list = ["tests"]
     tmt_stuff_item = ["x"]
 
@@ -77,7 +80,8 @@ class RawTMTMetadata:
         self.store_tmt_file()
 
 def list_files(path: str, pattern: str) -> list:
-    return glob(f"{path}/{pattern}")
+    files = glob(f"{path}/{pattern}")
+    return [f for f in files if os.access(f, os.X_OK)]
 
 
 

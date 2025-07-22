@@ -7,7 +7,8 @@
 
 set -eu
 
-BASEDIR=$(dirname $(dirname $(dirname $(realpath $0))))
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+BASEDIR="$(dirname $(dirname $SCRIPT_DIR ))"
 CRUN=${CRUN:-$(which podman docker 2>/dev/null | head -n1)}
 CONTAINER=${CONTAINER:-quay.io/rhinstaller/kstest-runner}
 # Podman in rootless mode does not have access to /dev/kvm socket https://bugzilla.redhat.com/show_bug.cgi?id=1901462
@@ -16,6 +17,7 @@ PODMAN_SELINUX_FIX=
 RUN_COMMAND=/kickstart-tests/containers/runner/run-kstest
 SCENARIO=${SCENARIO:-unknown}
 BOOT_ISO="boot.iso"
+IMAGES_DIR=$BASEDIR/data/images
 
 # Get number of jobs to be run in parallel based on number of CPUs and amount of RAM
 recommended_jobs() {
@@ -69,12 +71,13 @@ Options:
  --scenario NAME                      Name of the tests being run, used to group results in json
                                       logs.
  --dry-run                            Do not run the tests, only process kickstarts
+ --data DIR                           Use DIR as the data directory for images and logs (default: BASEDIR/data)
  -h, --help                           Show this help
 EOF
 }
 
 # parse options
-eval set -- "$(getopt -o j:p:t:s:u:rch --long jobs:,platform:,testtype:,skip-testtypes:,updates:,retry,connect-shell,daily-iso:,defaults:,run-args:,recommended-jobs,scenario:,timeout:,dry-run,help -- "$@")"
+eval set -- "$(getopt -o j:p:t:s:u:rch --long jobs:,platform:,testtype:,skip-testtypes:,updates:,retry,connect-shell,daily-iso:,defaults:,run-args:,recommended-jobs,scenario:,timeout:,dry-run,data:,help -- "$@")"
 
 while true; do
     case "${1:-}" in
@@ -92,6 +95,7 @@ while true; do
         --timeout) shift; TIMEOUT="$1" ;;
         --scenario) shift; SCENARIO="$1" ;;
         --dry-run) DRY_RUN=1 ;;
+        --data) shift; DATA_DIR="$1" ;;
         -h|--help) usage; exit 0 ;;
         --) shift; break ;;
     esac
@@ -108,27 +112,35 @@ else
     KSTESTS_TEST="$*"
 fi
 
+
+DATA_DIR="${DATA_DIR:-$BASEDIR/data}"
+IMAGES_DIR="$DATA_DIR/images"
+LOGS_DIR="$DATA_DIR/logs"
+
+
 # prepare data directory
-mkdir -p data/images
-mkdir -p -m 777 data/logs
-if ! [ -e "data/images/boot.iso" ]; then
+mkdir -p "$IMAGES_DIR"
+mkdir -p "$LOGS_DIR"
+chmod -R a+rwx "$LOGS_DIR" || true # ignore errors when running as non-root
+
+if ! [ -e "$IMAGES_DIR/boot.iso" ]; then
     BOOT_ISO="boot-${PLATFORM}.iso"
     # do not download the ISO if it already exists
-    if ! [ -e "data/images/boot-${PLATFORM}.iso" ]; then
+    if ! [ -e "$IMAGES_DIR/boot-${PLATFORM}.iso" ]; then
         if [ -n "${DAILY_ISO_TOKEN:-}" ]; then
-            echo "INFO: data/images/${BOOT_ISO} does not exist, downloading daily iso..."
-            $PWD/containers/runner/fetch_daily_iso.sh ${DAILY_ISO_TOKEN} data/images/boot-${PLATFORM}.iso
+            echo "INFO: $IMAGES_DIR/${BOOT_ISO} does not exist, downloading daily iso..."
+            $BASEDIR/containers/runner/fetch_daily_iso.sh ${DAILY_ISO_TOKEN} $IMAGES_DIR/boot-${PLATFORM}.iso
         else
-            echo "INFO: data/images/${BOOT_ISO} does not exist, downloading current ${PLATFORM} image..."
+            echo "INFO: $IMAGES_DIR/${BOOT_ISO} does not exist, downloading current ${PLATFORM} image..."
             source scripts/defaults-${PLATFORM}.sh
-            curl -L  "${KSTEST_URL}/images/boot.iso" --output data/images/boot-${PLATFORM}.iso
+            curl -L  "${KSTEST_URL}/images/boot.iso" --output $IMAGES_DIR/boot-${PLATFORM}.iso
         fi
-        echo "Using downloaded data/images/${BOOT_ISO}"
+        echo "Using downloaded $IMAGES_DIR/${BOOT_ISO}"
     else
-        echo "Using existing data/images/${BOOT_ISO}"
+        echo "Using existing $IMAGES_DIR/${BOOT_ISO}"
     fi
 else
-    echo "Using existing data/images/${BOOT_ISO}"
+    echo "Using existing $IMAGES_DIR/${BOOT_ISO}"
 fi
 
 # support both path and URL for --updates
@@ -182,6 +194,6 @@ $CRUN run -it --rm --device=/dev/kvm --publish 127.0.0.1::16509 $PODMAN_SELINUX_
     ${TEST_ENV_VARS} \
     ${VAR_TMP:-} \
     ${DEFAULTS_SH_ARGS:-} \
-    -v "$PWD/data:/opt/kstest/data:z" \
+    -v "$DATA_DIR:/opt/kstest/data:z" \
     -v "$BASEDIR:/kickstart-tests:ro,z" \
     $CONTAINER $RUN_COMMAND

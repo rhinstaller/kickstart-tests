@@ -335,14 +335,6 @@
         tag:
         - security
         test+: certificate.sh
-  /check_for_disabled_modules:
-    /x:
-      /x:
-        tag:
-        - ui
-        - anaconda
-        - addons
-        test+: check_for_disabled_modules.sh
   /clearpart:
     /1:
       /x:
@@ -611,15 +603,22 @@
         - firewall
         - coverage
         test+: firewall.sh
-  /functions:
-    /proxy:
+  /flatpak:
+    /preinstall:
+      /ftp:
+        tag:
+        - packaging
+        - payload
+        - skip-on-fedora
+        - skip-on-rhel-9
+        test+: flatpak-preinstall-ftp.sh
       /x:
-        tag: []
-        test+: functions-proxy.sh
-    /x:
-      /x:
-        tag: []
-        test+: functions.sh
+        tag:
+        - packaging
+        - payload
+        - skip-on-fedora
+        - skip-on-rhel-9
+        test+: flatpak-preinstall.sh
   /geolocation:
     /off:
       /by-default-with-ks:
@@ -865,9 +864,6 @@
         tag:
         - logs
         test+: log-util-check.sh
-      /tests:
-        tag: []
-        test+: log-util-tests.sh
   /lvm:
     /1:
       /x:
@@ -1392,34 +1388,12 @@
         - partition
         - luks
         test+: part-luks-4.sh
-  /post:
-    /lib:
-      /keyboard:
-        tag: []
-        test+: post-lib-keyboard.sh
-      /network:
-        tag: []
-        test+: post-lib-network.sh
-    /nochroot:
-      /lib-keyboard:
-        tag: []
-        test+: post-nochroot-lib-keyboard.sh
-      /lib-network:
-        tag: []
-        test+: post-nochroot-lib-network.sh
-      /lib-ui:
-        tag: []
-        test+: post-nochroot-lib-ui.sh
   /pre:
     /install:
       /x:
         tag:
         - kickstart
         test+: pre-install.sh
-    /lib:
-      /harddrive:
-        tag: []
-        test+: pre-lib-harddrive.sh
   /preexisting:
     /btrfs:
       /x:
@@ -1704,11 +1678,6 @@
         tag:
         - ksscript
         test+: script-pre.sh
-  /scripts:
-    /lib:
-      /x:
-        tag: []
-        test+: scripts-lib.sh
   /selinux:
     /contexts:
       /x:
@@ -1960,14 +1929,6 @@
         tag:
         - users
         test+: user-wheel-no-root.sh
-  /validate:
-    /lib:
-      /initial-setup:
-        tag: []
-        test+: validate-lib-initial-setup.sh
-      /services:
-        tag: []
-        test+: validate-lib-services.sh
   /vlan:
     /httpks:
       /x:
@@ -1980,4 +1941,4 @@
         - network
         test+: vlan-pre.sh
 duration: 50m
-test: 'mkdir -p data/{images,logs}; chmod -R a+rwx data; ./containers/runner/launch --platform rhel10 '
+test: './containers/runner/launch --data /var/tmp/ks_data --platform rhel10 '

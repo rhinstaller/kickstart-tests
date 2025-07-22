@@ -6,16 +6,16 @@ provision:
       memory: '>= 8 GB'
   how: connect
   user: root
-  guest: 10.0.185.156
-  #key: /home/jscotka/git/cockpit-project/tests/cockpit-tests/.ssh/id_rsa
+  guest: 10.0.185.8
   key: /usr/share/qa-tools/1minutetip/1minutetip-ecdsa
 
 discover:
     - how: fmf
-      filter: tag:keyboard
+      filter: "tag: -knownfailure"
 
 execute:
     how: tmt
+
 
 prepare:
     - how: install
@@ -24,8 +24,6 @@ prepare:
         - qemu-kvm
         - libvirt
         - git
-    - how: shell
+#    - how: shell
 #      script:
-#        - mkdir -p data/{images,logs}
-#        - chmod -R a+rwx data
 #        - curl --insecure -o ./data/images/boot-rhel10.iso http://ftp.sh.cvut.cz/centos-stream/10-stream/BaseOS/x86_64/iso/CentOS-Stream-10-20250707.0-x86_64-boot.iso

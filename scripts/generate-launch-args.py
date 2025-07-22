@@ -12,6 +12,7 @@ OS_VARIANT_TO_PLATFORM = {
     'rhel8': 'rhel8',
     'rhel9': 'rhel9',
     'rhel10': 'rhel10',
+    'centos10': 'centos10',
 }
 
 OS_VARIANT_TO_DISABLED = {

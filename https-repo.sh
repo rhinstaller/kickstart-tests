@@ -21,6 +21,6 @@
 # once there is a solution, create fragments/platform/rhel8/repos/https.ks
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="payload skip-on-rhel"
+TESTTYPE="payload skip-on-rhel skip-on-centos"
 
 . ${KSTESTDIR}/functions.sh

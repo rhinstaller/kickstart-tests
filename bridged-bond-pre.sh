@@ -20,7 +20,7 @@
 # Upstream support was added in https://github.com/rhinstaller/anaconda/pull/2861
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="network skip-on-rhel"
+TESTTYPE="network skip-on-rhel skip-on-centos"
 
 . ${KSTESTDIR}/functions.sh
 

@@ -1,16 +1,5 @@
-url --url=@KSTEST_FTP_URL@
-network --bootproto=dhcp
-
-bootloader --timeout=1
-zerombr
-clearpart --all
-autopart
-
-keyboard us
-lang en
-timezone America/New_York
-rootpw qweqwe
-shutdown
+%ksappend repos/default-ftp.ks
+%ksappend common/common_no_payload.ks
 
 %packages
 %end

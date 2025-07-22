@@ -21,6 +21,7 @@ OS_VARIANT_TO_DISABLED = {
     'rhel8': 'SKIP_TESTTYPES_RHEL8',
     'rhel9': 'SKIP_TESTTYPES_RHEL9',
     'rhel10': 'SKIP_TESTTYPES_RHEL10',
+    'centos10': 'SKIP_TESTTYPES_CENTOS10',
 }
 
 RE_MASTER = re.compile('^main$')

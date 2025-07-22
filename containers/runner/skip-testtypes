@@ -59,9 +59,7 @@ rhel9_skip_array=(
   rhel75659   # pykickstart removes md_ prefix from new MD devices
 )
 
-rhel10_skip_array=(
-  skip-on-rhel
-  skip-on-rhel-10
+rhel10_centos10_skip_array=(
   gh576       # clearpart-4 test is flaky on all scenarios
   gh640       # authselect-not-set failing
   gh804       # tests requiring dvd iso failing
@@ -71,6 +69,16 @@ rhel10_skip_array=(
   gh1207      # packages-multilib failing
   gh1213      # harddrive-iso-single failing
   rhel80086   # pykickstart removes md_ prefix from new MD devices
+)
+
+rhel10_skip_array=(
+  skip-on-rhel
+  skip-on-rhel-10
+)
+
+centos10_skip_array=(
+  skip-on-centos
+  skip-on-centos-10
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml
@@ -94,7 +102,8 @@ SKIP_TESTTYPES_RAWHIDE_TEXT=$(_join_args_by_comma "${common_skip_array[@]}" "${r
 SKIP_TESTTYPES_DAILY_ISO=$(_join_args_by_comma "${common_skip_array[@]}" "${fedora_skip_array[@]}" "${daily_iso_skip_array[@]}")
 SKIP_TESTTYPES_RHEL8=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel8_skip_array[@]}")
 SKIP_TESTTYPES_RHEL9=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel9_skip_array[@]}")
-SKIP_TESTTYPES_RHEL10=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel10_skip_array[@]}")
+SKIP_TESTTYPES_RHEL10=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel10_centos10_skip_array[@]}" "${rhel10_skip_array[@]}")
+SKIP_TESTTYPES_CENTOS10=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel10_centos10_skip_array[@]}" "${centos10_skip_array[@]}")
 SKIP_TESTTYPES_RHEL8_DAILY=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel8_daily_skip_array[@]}")
 # Tests run on an anaconda pull request by comment
 SKIP_TESTTYPES_ANACONDA_PR=$(_join_args_by_comma "${common_skip_array[@]}" "${anaconda_pr_skip_array[@]}")

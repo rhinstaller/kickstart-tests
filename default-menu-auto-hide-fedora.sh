@@ -21,7 +21,7 @@
 # option on Fedora to be able to test the functionality also there.
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="bootloader skip-on-rhel"
+TESTTYPE="bootloader skip-on-rhel skip-on-centos"
 
 . ${KSTESTDIR}/functions.sh
 

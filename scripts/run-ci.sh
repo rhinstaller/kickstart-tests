@@ -6,7 +6,7 @@ git remote get-url upstream >/dev/null 2>&1 || git remote add upstream https://g
 git fetch upstream
 git rebase upstream/main
 
-# list of tests that are changed by the current PR; ignore non-executable *.sh as these are helpers, not tests
+# list of tests that are changed by the current PR
 CHANGED_TESTS=$(scripts/get-changed-tests.py upstream/main HEAD | tr ' ' '\n')
 
 TESTS=$CHANGED_TESTS

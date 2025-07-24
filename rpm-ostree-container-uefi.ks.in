@@ -25,7 +25,7 @@ reboot
 
 %post
 # We need to use tr because sometimes there is newline inside of the efibootmgr entry line :(
-efibootmgr | tr -s '\n' ' ' | grep -E 'Boot0001\* Fedora\s+HD\(1'
+efibootmgr | tr -s '\n' ' ' | grep -E 'Boot0001\* (Fedora|Red Hat Enterprise Linux)\s+'
 if [ $? -ne 0 ]; then
     echo -e "EFI boot entry wasn't created properly:\n$(efibootmgr)"  >> /root/RESULT
 fi

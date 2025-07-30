@@ -21,4 +21,6 @@
 # shellcheck disable=SC2034
 TESTTYPE="security"
 
+# Test modification to trigger the CI
+
 . ${KSTESTDIR}/functions.sh

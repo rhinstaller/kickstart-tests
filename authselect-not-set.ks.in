@@ -14,7 +14,7 @@ platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
 
 command -v authselect > /dev/null 2>&1
 if [[ $? -eq 0 ]]; then
-    if [ "${platform}" == "rhel8" ] || [ "${platform}" == "rhel9" ]; then
+    if [ "${platform}" == "rhel8" ] || [ "${platform}" == "rhel9" ] || [ "${platform}" == "centos9" ]; then
         authselect current | grep -E "No existing configuration detected"
     else
         authselect current | grep -E "Profile ID: local"

@@ -15,7 +15,7 @@ jobs:
     runs-on: [self-hosted, kstest]
     strategy:
       matrix:
-        scenario: [daily-iso, rhel9, rhel10]
+        scenario: [daily-iso, rhel9, rhel10, centos10]
       fail-fast: false
 
     # these settings depend on the infrastructure; on upshift ocp-master-xxl they take about 4 hours
@@ -59,6 +59,8 @@ jobs:
             VARIABLE="SKIP_TESTTYPES_RHEL9"
           elif [ "${{ matrix.scenario }}" == "rhel10" ]; then
             VARIABLE="SKIP_TESTTYPES_RHEL10"
+          elif [ "${{ matrix.scenario }}" == "centos10" ]; then
+            VARIABLE="SKIP_TESTTYPES_CENTOS10"
           fi
           if [ -e ${TEMPLATE} ] && [ -n ${VARIABLE} ]; then
             scripts/generate-testplan.py \
@@ -104,6 +106,8 @@ jobs:
             echo "platform=rhel9" >> $GITHUB_OUTPUT
           elif [ "${{ matrix.scenario }}" == "rhel10" ]; then
             echo "platform=rhel10" >> $GITHUB_OUTPUT
+          elif [ "${{ matrix.scenario }}" == "centos10" ]; then
+            echo "platform=centos10" >> $GITHUB_OUTPUT
           else
             echo "Scenario ${{ matrix.scenario }} can't be mapped to platform"
             exit 1
@@ -134,7 +138,8 @@ jobs:
           set -eux
           if [ "${{ matrix.scenario }}" == "rhel8" ] || \
              [ "${{ matrix.scenario }}" == "rhel9" ] || \
-             [ "${{ matrix.scenario }}" == "rhel10" ]; then
+             [ "${{ matrix.scenario }}" == "rhel10" ] || \
+             [ "${{ matrix.scenario }}" == "centos10" ]; then
             source ./scripts/defaults-${{ matrix.scenario }}.sh
             echo "installation_tree=${KSTEST_URL}" >> $GITHUB_OUTPUT
             echo "modular_url=${KSTEST_MODULAR_URL}" >> $GITHUB_OUTPUT

@@ -23,3 +23,6 @@ prepare:
 #    - how: shell
 #      script:
 #        - curl --insecure -o ./data/images/boot-rhel10.iso http://ftp.sh.cvut.cz/centos-stream/10-stream/BaseOS/x86_64/iso/CentOS-Stream-10-20250707.0-x86_64-boot.iso
+
+report:
+    how: html

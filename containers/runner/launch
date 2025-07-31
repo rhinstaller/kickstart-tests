@@ -182,6 +182,8 @@ TEST_ENV_VARS=$(printenv | while read line; do
 # Run container against the local repository, to test changes easily
 # Expose the container's libvirt to the host; check "podman ps" for the port, and use e.g.:
 # virsh -c qemu+tcp://localhost:<port>/session list
+# do not exit on error, so that we can store logs to TMT_TEST_DATA directory in executed via TMT tests
+set +eu
 set -x
 $CRUN run -it --rm --device=/dev/kvm --publish 127.0.0.1::16509 $PODMAN_SELINUX_FIX \
     --env SCENARIO="${SCENARIO:-unknown}" \
@@ -197,3 +199,28 @@ $CRUN run -it --rm --device=/dev/kvm --publish 127.0.0.1::16509 $PODMAN_SELINUX_
     -v "$DATA_DIR:/opt/kstest/data:z" \
     -v "$BASEDIR:/kickstart-tests:ro,z" \
     $CONTAINER $RUN_COMMAND
+set +x
+# Store the exit status of the CRUN command
+CRUN_EXIT_STATUS=$?
+
+# If executed via TMT, store results and logs to proper TMT dir
+# Store logs to TMT_TEST_DATA directory if set
+if [ -n "${TMT_TEST_DATA:-}" ]; then
+    echo "Storing logs to TMT_TEST_DATA directory: ${TMT_TEST_DATA}"
+    
+    # Create TMT_TEST_DATA directory if it doesn't exist
+    mkdir -p "${TMT_TEST_DATA}"
+    
+    # Move logs from LOGS_DIR to TMT_TEST_DATA
+    if [ -d "$LOGS_DIR" ]; then
+        mv "$LOGS_DIR"/* "${TMT_TEST_DATA}/" 2>/dev/null || true
+        echo "Logs moved to ${TMT_TEST_DATA}"
+    fi
+    
+    # Store the exit status in a file
+    echo "$CRUN_EXIT_STATUS" > "${TMT_TEST_DATA}/exit_status"
+    echo "Exit status ($CRUN_EXIT_STATUS) stored in ${TMT_TEST_DATA}/exit_status"
+fi
+
+# Exit with the same status as the CRUN command
+exit $CRUN_EXIT_STATUS

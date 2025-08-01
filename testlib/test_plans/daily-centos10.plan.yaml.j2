@@ -1,0 +1,15 @@
+name: daily centos10
+description: Daily run on a CentOS 10 compose
+point_person: rvykydal@redhat.com
+artifact_type: github.scheduled.daily.kstest.centos10
+verified_by:
+  test_cases:
+    query: '
+{% for tag in skiptags %}
+            "{{ tag }}" not in tc.tags and
+{% endfor %}
+            True'
+configurations:
+  - architecture: x86_64
+reporting:
+  - type: xunit

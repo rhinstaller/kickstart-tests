@@ -18,6 +18,6 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="packaging payload skip-on-fedora skip-on-rhel-9"
+TESTTYPE="packaging payload skip-on-fedora skip-on-rhel-9 gh1467"
 
 . ${KSTESTDIR}/functions.sh

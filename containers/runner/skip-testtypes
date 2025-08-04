@@ -64,7 +64,6 @@ rhel10_centos10_skip_array=(
   gh804       # tests requiring dvd iso failing
   gh1090      # raid-1-reqpart failing
   gh1107      # rpm-ostree-container failing
-  gh1110      # storage-multipath-autopart failing
   gh1207      # packages-multilib failing
   gh1213      # harddrive-iso-single failing
   rhel80086   # pykickstart removes md_ prefix from new MD devices

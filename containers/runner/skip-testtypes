@@ -55,7 +55,6 @@ rhel9_skip_array=(
   gh641       # packages-multilib failing on systemd conflict
   gh774       # autopart-luks-1 failing
   gh804       # tests requiring dvd iso failing
-  rhel75659   # pykickstart removes md_ prefix from new MD devices
 )
 
 rhel10_centos10_skip_array=(
@@ -66,7 +65,6 @@ rhel10_centos10_skip_array=(
   gh1107      # rpm-ostree-container failing
   gh1207      # packages-multilib failing
   gh1213      # harddrive-iso-single failing
-  rhel80086   # pykickstart removes md_ prefix from new MD devices
 )
 
 rhel10_skip_array=(

@@ -20,7 +20,7 @@
 # On RHEL, boot option is not enough for unattended installation
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="keyboard i18n skip-on-rhel skip-on-centos"
+TESTTYPE="keyboard i18n"
 
 . ${KSTESTDIR}/functions.sh
 

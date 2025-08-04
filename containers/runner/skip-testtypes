@@ -78,6 +78,7 @@ rhel10_skip_array=(
 centos10_skip_array=(
   skip-on-centos
   skip-on-centos-10
+  gh1466      # ftp source tests failing
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

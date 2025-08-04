@@ -59,10 +59,8 @@ rhel9_skip_array=(
 
 rhel10_centos10_skip_array=(
   gh576       # clearpart-4 test is flaky on all scenarios
-  gh640       # authselect-not-set failing
   gh804       # tests requiring dvd iso failing
   gh1090      # raid-1-reqpart failing
-  gh1107      # rpm-ostree-container failing
   gh1207      # packages-multilib failing
   gh1213      # harddrive-iso-single failing
 )

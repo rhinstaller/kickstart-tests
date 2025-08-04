@@ -131,7 +131,7 @@ fi
 
 # Test per-platform autoconnection configuration
 # It is configured by anaconda-nm-disable-autocons-rhel.service
-if [ "${platform:0:4}" == "rhel" ]; then
+if [ "${platform:0:4}" == "rhel" ] || [ "${platform:0:6}" == "centos" ]; then
     if [ $nm_has_autoconnections_off -ne 0 ]; then
         echo "*** autoconnections are on on platform ${platform}" >> /root/RESULT
     fi

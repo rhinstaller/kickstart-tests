@@ -6,4 +6,5 @@ source ./network-device-names.cfg
 export KSTEST_URL='https://mirror.stream.centos.org/10-stream/BaseOS/x86_64/os/'
 export KSTEST_MODULAR_URL='https://mirror.stream.centos.org/10-stream/AppStream/x86_64/os/'
 export KSTEST_FTP_URL='ftp://download.stream.rdu2.redhat.com/stream-10/production/latest-CentOS-Stream/compose/BaseOS/x86_64/os/'
+export KSTEST_FTP_APPSTREAM_URL='ftp://download.stream.rdu2.redhat.com/stream-10/production/latest-CentOS-Stream/compose/AppStream/x86_64/os/'
 export KSTEST_OSTREECONTAINER_URL='quay.io/centos-bootc/centos-bootc:stream10'

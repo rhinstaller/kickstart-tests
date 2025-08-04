@@ -76,6 +76,10 @@ rhel10_skip_array=(
 )
 
 centos10_skip_array=(
+  skip-on-centos
+  skip-on-centos-10
+  gh1466      # ftp source tests failing
+  gh1467      # flatpak-preinstall failing
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml
@@ -100,7 +104,7 @@ SKIP_TESTTYPES_DAILY_ISO=$(_join_args_by_comma "${common_skip_array[@]}" "${fedo
 SKIP_TESTTYPES_RHEL8=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel8_skip_array[@]}")
 SKIP_TESTTYPES_RHEL9=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel9_skip_array[@]}")
 SKIP_TESTTYPES_RHEL10=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel10_centos10_skip_array[@]}" "${rhel10_skip_array[@]}")
-SKIP_TESTTYPES_CENTOS10=$(_join_args_by_comma "${common_skip_array[@]}" "${centos10_skip_array[@]}")
+SKIP_TESTTYPES_CENTOS10=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel10_centos10_skip_array[@]}" "${centos10_skip_array[@]}")
 SKIP_TESTTYPES_RHEL8_DAILY=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel8_daily_skip_array[@]}")
 # Tests run on an anaconda pull request by comment
 SKIP_TESTTYPES_ANACONDA_PR=$(_join_args_by_comma "${common_skip_array[@]}" "${anaconda_pr_skip_array[@]}")

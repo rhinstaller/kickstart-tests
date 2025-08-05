@@ -17,11 +17,6 @@
 #
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
-# This is a variation of onboot-activate test.
-# In this case, kickstart is fetched via http instead of injecting in initrd.
-# The latter is causing that kickstart network commands are not applied (ifcfg
-# files created) in initramfs.
-
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
 TESTTYPE="network skip-on-rhel skip-on-centos"

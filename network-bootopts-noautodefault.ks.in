@@ -1,4 +1,8 @@
-#Test option to disable default autoconnections
+# Test option to disable default autoconnections
+#
+# On RHEL and CentOS the autoconnetions are turned off for kickstart
+# installation so to test the option we'd need to test interactive
+# installation.
 
 # Use defaults, but no network that could activate the other device
 # because of device --link

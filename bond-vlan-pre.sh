@@ -17,9 +17,8 @@
 #
 # Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
 
-# Upstream support was added in https://bugzilla.redhat.com/show_bug.cgi?id=1879480
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="network skip-on-rhel skip-on-centos"
+TESTTYPE="network"
 
 . ${KSTESTDIR}/bond-vlan-httpks.sh

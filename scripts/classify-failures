@@ -22,6 +22,7 @@ import sys
 import re
 import yaml
 import os
+from collections.abc import Sequence
 
 
 FILTER_FILENAMES = ["kstest.log", "virt-install.log"]
@@ -81,12 +82,10 @@ def _get_match(issue, file_path, args):
 
     if "last_matching_re" in issue:
         last_matching_re = issue["last_matching_re"]
-        if isinstance(last_matching_re, list) and len(last_matching_re) >= 2:
+        if isinstance(last_matching_re, Sequence) and len(last_matching_re) >= 2:
             line_match_re, line_check_re = last_matching_re[0], last_matching_re[1]
         else:
-            print(f"Error: unexpected structure of 'last_matching_re' data: {last_matching_re}",
-                  file=sys.stderr)
-            sys.exit(1)
+            raise ValueError(f"unexpected structure of 'last_matching_re' data: {last_matching_re}")
         last_matching_line = subprocess.check_output(
             "grep {} {} | tail -n 1".format(line_match_re, file_path),
             shell=True,
@@ -107,16 +106,9 @@ def load_issues_from_yaml(patterns_file=None):
         script_dir = os.path.dirname(os.path.abspath(__file__))
         yaml_file = os.path.join(script_dir, "classify-failures.yml")
 
-    try:
-        with open(yaml_file, 'r') as f:
-            data = yaml.safe_load(f)
-        return data.get('issues', [])
-    except FileNotFoundError:
-        print(f"Error: patterns file {yaml_file} not found", file=sys.stderr)
-        sys.exit(1)
-    except yaml.YAMLError as e:
-        print(f"Error parsing patterns file {yaml_file}: {e}", file=sys.stderr)
-        sys.exit(1)
+    with open(yaml_file, 'r') as f:
+        data = yaml.safe_load(f)
+    return data.get('issues', [])
 
 
 def classify(args, filenames):
@@ -190,7 +182,17 @@ EXAMPLES:
 
     filenames = args.filter_filenames or FILTER_FILENAMES
 
-    classify(args, filenames)
+    try:
+        classify(args, filenames)
+    except FileNotFoundError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+    except yaml.YAMLError as e:
+        print(f"Error parsing patterns file: {e}", file=sys.stderr)
+        sys.exit(1)
+    except ValueError as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

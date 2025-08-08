@@ -1,0 +1,1943 @@
+/anabot:
+  /1:
+    /_:
+      tag:
+      - ui
+      - anabot
+      - skip-on-rhel-8
+      - knownfailure
+      test+: anabot-1.sh
+/anaconda:
+  /conf:
+    /_:
+      tag:
+      - anaconda
+      test+: anaconda-conf.sh
+  /modules:
+    /_:
+      tag:
+      - anaconda
+      test+: anaconda-modules.sh
+/authconfig:
+  /_:
+    /_:
+      tag:
+      - security
+      - skip-on-fedora
+      - skip-on-rhel-10
+      test+: authconfig.sh
+/authselect:
+  /_:
+    /_:
+      tag:
+      - security
+      test+: authselect.sh
+  /not:
+    /set:
+      tag:
+      - security
+      test+: authselect-not-set.sh
+/autopart:
+  /encrypted:
+    /1:
+      tag:
+      - autopart
+      - storage
+      - coverage
+      - smoke
+      test+: autopart-encrypted-1.sh
+    /2:
+      tag:
+      - autopart
+      - storage
+      test+: autopart-encrypted-2.sh
+    /3:
+      tag:
+      - autopart
+      - storage
+      test+: autopart-encrypted-3.sh
+  /fstype:
+    /_:
+      tag:
+      - autopart
+      - storage
+      test+: autopart-fstype.sh
+  /hibernation:
+    /_:
+      tag:
+      - autopart
+      - storage
+      - skip-on-rhel-8
+      - skip-on-rhel-9
+      test+: autopart-hibernation.sh
+  /luks:
+    /1:
+      tag:
+      - autopart
+      - storage
+      - luks
+      - gh774
+      test+: autopart-luks-1.sh
+    /2:
+      tag:
+      - autopart
+      - storage
+      - luks
+      test+: autopart-luks-2.sh
+    /3:
+      tag:
+      - autopart
+      - storage
+      - luks
+      test+: autopart-luks-3.sh
+    /4:
+      tag:
+      - autopart
+      - storage
+      - luks
+      test+: autopart-luks-4.sh
+    /5:
+      tag:
+      - autopart
+      - storage
+      - luks
+      test+: autopart-luks-5.sh
+  /nohome:
+    /_:
+      tag:
+      - autopart
+      - storage
+      test+: autopart-nohome.sh
+/basic:
+  /ftp:
+    /_:
+      tag:
+      - payload
+      test+: basic-ftp.sh
+  /ostree:
+    /_:
+      tag:
+      - knownfailure
+      - payload
+      test+: basic-ostree.sh
+/bindtomac:
+  /bond:
+    /vlan-httpks:
+      tag:
+      - network
+      test+: bindtomac-bond-vlan-httpks.sh
+  /bond2:
+    /httpks:
+      tag:
+      - network
+      - coverage
+      - smoke
+      test+: bindtomac-bond2-httpks.sh
+    /pre:
+      tag:
+      - network
+      - coverage
+      test+: bindtomac-bond2-pre.sh
+  /bridge:
+    /2devs-httpks:
+      tag:
+      - network
+      test+: bindtomac-bridge-2devs-httpks.sh
+    /2devs-pre:
+      tag:
+      - network
+      test+: bindtomac-bridge-2devs-pre.sh
+    /httpks:
+      tag:
+      - network
+      test+: bindtomac-bridge-httpks.sh
+    /no-bootopts-net:
+      tag:
+      - knownfailure
+      - network
+      test+: bindtomac-bridge-no-bootopts-net.sh
+  /bridged:
+    /bond-httpks:
+      tag:
+      - network
+      - skip-on-rhel-8
+      test+: bindtomac-bridged-bond-httpks.sh
+  /ifname:
+    /httpks:
+      tag:
+      - network
+      test+: bindtomac-ifname-httpks.sh
+  /network:
+    /device-default-httpks:
+      tag:
+      - network
+      test+: bindtomac-network-device-default-httpks.sh
+    /device-mac:
+      tag:
+      - network
+      test+: bindtomac-network-device-mac.sh
+    /device-mac-httpks:
+      tag:
+      - network
+      test+: bindtomac-network-device-mac-httpks.sh
+    /device-mac-pre:
+      tag:
+      - network
+      test+: bindtomac-network-device-mac-pre.sh
+    /static-2-httpks:
+      tag:
+      - network
+      - coverage
+      - smoke
+      test+: bindtomac-network-static-2-httpks.sh
+    /static-to-dhcp-pre-single:
+      tag:
+      - network
+      test+: bindtomac-network-static-to-dhcp-pre-single.sh
+  /onboot:
+    /activate-httpks:
+      tag:
+      - network
+      test+: bindtomac-onboot-activate-httpks.sh
+    /bootopts-pre:
+      tag:
+      - network
+      test+: bindtomac-onboot-bootopts-pre.sh
+  /team:
+    /httpks:
+      tag:
+      - network
+      - skip-on-rhel-10
+      test+: bindtomac-team-httpks.sh
+    /pre:
+      tag:
+      - network
+      - skip-on-rhel-10
+      test+: bindtomac-team-pre.sh
+/bond:
+  /ks:
+    /initramfs:
+      tag:
+      - network
+      test+: bond-ks-initramfs.sh
+  /vlan:
+    /httpks:
+      tag:
+      - network
+      test+: bond-vlan-httpks.sh
+    /pre:
+      tag:
+      - network
+      - skip-on-rhel
+      test+: bond-vlan-pre.sh
+/bond2:
+  /httpks:
+    /_:
+      tag:
+      - network
+      - coverage
+      - smoke
+      test+: bond2-httpks.sh
+  /pre:
+    /_:
+      tag:
+      - network
+      - coverage
+      test+: bond2-pre.sh
+/bootloader:
+  /1:
+    /_:
+      tag:
+      - bootloader
+      - storage
+      - coverage
+      test+: bootloader-1.sh
+  /2:
+    /_:
+      tag:
+      - bootloader
+      - storage
+      test+: bootloader-2.sh
+  /3:
+    /_:
+      tag:
+      - bootloader
+      - storage
+      test+: bootloader-3.sh
+  /4:
+    /_:
+      tag:
+      - bootloader
+      - storage
+      test+: bootloader-4.sh
+  /5:
+    /_:
+      tag:
+      - bootloader
+      - storage
+      test+: bootloader-5.sh
+/bridge:
+  /2devs:
+    /_:
+      tag:
+      - network
+      test+: bridge-2devs.sh
+    /httpks:
+      tag:
+      - network
+      test+: bridge-2devs-httpks.sh
+    /pre:
+      tag:
+      - network
+      test+: bridge-2devs-pre.sh
+  /httpks:
+    /_:
+      tag:
+      - network
+      test+: bridge-httpks.sh
+  /no:
+    /bootopts-net:
+      tag:
+      - network
+      - gh1018
+      test+: bridge-no-bootopts-net.sh
+/bridged:
+  /bond:
+    /httpks:
+      tag:
+      - network
+      - skip-on-rhel-8
+      test+: bridged-bond-httpks.sh
+    /pre:
+      tag:
+      - network
+      - skip-on-rhel
+      test+: bridged-bond-pre.sh
+/btrfs:
+  /1:
+    /_:
+      tag:
+      - btrfs
+      - storage
+      - skip-on-rhel
+      test+: btrfs-1.sh
+  /2:
+    /_:
+      tag:
+      - btrfs
+      - storage
+      - skip-on-rhel
+      test+: btrfs-2.sh
+/certificate:
+  /_:
+    /_:
+      tag:
+      - security
+      test+: certificate.sh
+/clearpart:
+  /1:
+    /_:
+      tag:
+      - clearpart
+      - storage
+      test+: clearpart-1.sh
+  /2:
+    /_:
+      tag:
+      - clearpart
+      - storage
+      test+: clearpart-2.sh
+  /3:
+    /_:
+      tag:
+      - clearpart
+      - storage
+      - coverage
+      test+: clearpart-3.sh
+  /4:
+    /_:
+      tag:
+      - clearpart
+      - storage
+      - gh576
+      test+: clearpart-4.sh
+/container:
+  /_:
+    /_:
+      tag:
+      - bootloader
+      - packaging
+      - payload
+      - coverage
+      - skip-on-rhel
+      - gh1237
+      test+: container.sh
+/default:
+  /desktop:
+    /_:
+      tag:
+      - services
+      - coverage
+      test+: default-desktop.sh
+  /fstype:
+    /_:
+      tag:
+      - storage
+      test+: default-fstype.sh
+  /menu:
+    /auto-hide-fedora:
+      tag:
+      - bootloader
+      - skip-on-rhel
+      test+: default-menu-auto-hide-fedora.sh
+    /auto-hide-rhel:
+      tag:
+      - bootloader
+      - skip-on-rhel-8
+      - skip-on-fedora
+      test+: default-menu-auto-hide-rhel.sh
+  /systemd:
+    /target-gui:
+      tag:
+      - services
+      test+: default-systemd-target-gui.sh
+    /target-gui-graphical-provides:
+      tag:
+      - services
+      test+: default-systemd-target-gui-graphical-provides.sh
+    /target-rdp:
+      tag:
+      - services
+      - skip-on-fedora
+      - skip-on-rhel-8
+      - skip-on-rhel-9
+      test+: default-systemd-target-rdp.sh
+    /target-rdp-graphical-provides:
+      tag:
+      - services
+      - skip-on-fedora
+      - skip-on-rhel-8
+      - skip-on-rhel-9
+      test+: default-systemd-target-rdp-graphical-provides.sh
+    /target-skipx:
+      tag:
+      - services
+      test+: default-systemd-target-skipx.sh
+    /target-startxonboot:
+      tag:
+      - services
+      test+: default-systemd-target-startxonboot.sh
+    /target-tui:
+      tag:
+      - services
+      - coverage
+      test+: default-systemd-target-tui.sh
+    /target-tui-graphical-provides:
+      tag:
+      - services
+      test+: default-systemd-target-tui-graphical-provides.sh
+    /target-vnc:
+      tag:
+      - services
+      - skip-on-fedora
+      - skip-on-rhel-10
+      test+: default-systemd-target-vnc.sh
+    /target-vnc-graphical-provides:
+      tag:
+      - services
+      - skip-on-fedora
+      - skip-on-rhel-10
+      test+: default-systemd-target-vnc-graphical-provides.sh
+/deprecated:
+  /rhel9:
+    /part1:
+      tag:
+      - deprecated
+      - skip-on-rhel-8
+      - skip-on-fedora
+      - skip-on-rhel-10
+      test+: deprecated-rhel9-part1.sh
+    /part2:
+      tag:
+      - deprecated
+      - skip-on-rhel-8
+      - skip-on-fedora
+      - skip-on-rhel-10
+      test+: deprecated-rhel9-part2.sh
+/disklabel:
+  /default:
+    /_:
+      tag:
+      - storage
+      - disklabel
+      - skip-on-rhel-8
+      - skip-on-rhel-9
+      test+: disklabel-default.sh
+  /gpt:
+    /_:
+      tag:
+      - storage
+      - disklabel
+      - skip-on-rhel-8
+      - skip-on-rhel-9
+      test+: disklabel-gpt.sh
+  /mbr:
+    /_:
+      tag:
+      - storage
+      - disklabel
+      - skip-on-rhel-8
+      - skip-on-rhel-9
+      test+: disklabel-mbr.sh
+/dns:
+  /_:
+    /_:
+      tag:
+      - network
+      - dns
+      test+: dns.sh
+  /global:
+    /bootopts:
+      tag:
+      - network
+      - dns
+      test+: dns-global-bootopts.sh
+    /exclusive-tls:
+      tag:
+      - network
+      - dns
+      test+: dns-global-exclusive-tls.sh
+    /exclusive-tls-2:
+      tag:
+      - network
+      - dns
+      - skip-on-rhel
+      test+: dns-global-exclusive-tls-2.sh
+    /exclusive-tls-httpks:
+      tag:
+      - network
+      - dns
+      test+: dns-global-exclusive-tls-httpks.sh
+    /exclusive-tls-httpks-2:
+      tag:
+      - network
+      - dns
+      - skip-on-rhel
+      test+: dns-global-exclusive-tls-httpks-2.sh
+    /exclusive-tls-initramfs:
+      tag:
+      - network
+      - dns
+      - stage2-from-compose
+      test+: dns-global-exclusive-tls-initramfs.sh
+    /exclusive-tls-ksnet:
+      tag:
+      - network
+      - dns
+      - stage2-from-compose
+      test+: dns-global-exclusive-tls-ksnet.sh
+/driverdisk:
+  /disk:
+    /_:
+      tag:
+      - driverdisk
+      - payload
+      test+: driverdisk-disk.sh
+    /kargs:
+      tag:
+      - driverdisk
+      test+: driverdisk-disk-kargs.sh
+/encrypt:
+  /device:
+    /_:
+      tag:
+      - storage
+      test+: encrypt-device.sh
+  /swap:
+    /_:
+      tag:
+      - storage
+      test+: encrypt-swap.sh
+/escrow:
+  /cert:
+    /_:
+      tag:
+      - storage
+      test+: escrow-cert.sh
+/fedora:
+  /live:
+    /image-build:
+      tag:
+      - packaging
+      - skip-on-rhel
+      - payload
+      test+: fedora-live-image-build.sh
+/firewall:
+  /_:
+    /_:
+      tag:
+      - network
+      - firewall
+      - coverage
+      test+: firewall.sh
+  /disable:
+    /_:
+      tag:
+      - network
+      - firewall
+      test+: firewall-disable.sh
+    /with-options:
+      tag:
+      - network
+      - firewall
+      test+: firewall-disable-with-options.sh
+  /use:
+    /system-defaults:
+      tag:
+      - network
+      - firewall
+      test+: firewall-use-system-defaults.sh
+    /system-defaults-ignore-options:
+      tag:
+      - network
+      - firewall
+      test+: firewall-use-system-defaults-ignore-options.sh
+/flatpak:
+  /preinstall:
+    /_:
+      tag:
+      - packaging
+      - payload
+      - skip-on-fedora
+      - skip-on-rhel-9
+      test+: flatpak-preinstall.sh
+    /ftp:
+      tag:
+      - packaging
+      - payload
+      - skip-on-fedora
+      - skip-on-rhel-9
+      test+: flatpak-preinstall-ftp.sh
+/geolocation:
+  /off:
+    /by-default-with-ks:
+      tag:
+      - network
+      - logs
+      test+: geolocation-off-by-default-with-ks.sh
+/groups:
+  /and:
+    /envs-1:
+      tag:
+      - packaging
+      - payload
+      - skip-on-rhel
+      test+: groups-and-envs-1.sh
+    /envs-2:
+      tag:
+      - packaging
+      - payload
+      - skip-on-rhel
+      test+: groups-and-envs-2.sh
+    /envs-3:
+      tag:
+      - packaging
+      - payload
+      - skip-on-rhel
+      test+: groups-and-envs-3.sh
+  /ignoremissing:
+    /_:
+      tag:
+      - packaging
+      - payload
+      test+: groups-ignoremissing.sh
+/harddrive:
+  /install:
+    /tree:
+      tag:
+      - packaging
+      - payload
+      - harddrive
+      - gh804
+      test+: harddrive-install-tree.sh
+    /tree-relative:
+      tag:
+      - packaging
+      - payload
+      - harddrive
+      - gh804
+      test+: harddrive-install-tree-relative.sh
+  /iso:
+    /_:
+      tag:
+      - packaging
+      - payload
+      - harddrive
+      - gh804
+      test+: harddrive-iso.sh
+    /single:
+      tag:
+      - packaging
+      - payload
+      - harddrive
+      - gh804
+      - gh1213
+      test+: harddrive-iso-single.sh
+/hello:
+  /world:
+    /_:
+      tag:
+      - addon
+      - coverage
+      - skip-on-rhel
+      test+: hello-world.sh
+/hmc:
+  /_:
+    /_:
+      tag:
+      - manual
+      - payload
+      test+: hmc.sh
+/hostname:
+  /_:
+    /_:
+      tag:
+      - network
+      - coverage
+      test+: hostname.sh
+  /bootopts:
+    /_:
+      tag:
+      - network
+      test+: hostname-bootopts.sh
+/https:
+  /repo:
+    /_:
+      tag:
+      - payload
+      - skip-on-rhel
+      test+: https-repo.sh
+/ibft:
+  /_:
+    /_:
+      tag:
+      - knownfailure
+      - iscsi
+      test+: ibft.sh
+/ifname:
+  /httpks:
+    /_:
+      tag:
+      - network
+      test+: ifname-httpks.sh
+/ignoredisk:
+  /1:
+    /_:
+      tag:
+      - ignoredisk
+      - storage
+      test+: ignoredisk-1.sh
+  /2:
+    /_:
+      tag:
+      - ignoredisk
+      - storage
+      test+: ignoredisk-2.sh
+/image:
+  /deployment:
+    /1:
+      tag:
+      - manual
+      - image-deployment
+      test+: image-deployment-1.sh
+    /2:
+      tag:
+      - image-deployment
+      - skip-on-rhel-8
+      - gh1335
+      test+: image-deployment-2.sh
+    /2-rhel8:
+      tag:
+      - image-deployment
+      - skip-on-fedora
+      - skip-on-rhel-9
+      - skip-on-rhel-10
+      test+: image-deployment-2-rhel8.sh
+/initial:
+  /setup:
+    /default:
+      tag:
+      - initial-setup
+      - coverage
+      test+: initial-setup-default.sh
+    /disable:
+      tag:
+      - initial-setup
+      - skip-on-rhel-10
+      test+: initial-setup-disable.sh
+    /enable:
+      tag:
+      - initial-setup
+      - skip-on-rhel-10
+      test+: initial-setup-enable.sh
+    /gui:
+      tag:
+      - initial-setup
+      - skip-on-rhel-10
+      test+: initial-setup-gui.sh
+    /reconfig:
+      tag:
+      - initial-setup
+      - skip-on-rhel-10
+      test+: initial-setup-reconfig.sh
+/iscsi:
+  /_:
+    /_:
+      tag:
+      - knownfailure
+      - iscsi
+      test+: iscsi.sh
+  /bind:
+    /_:
+      tag:
+      - knownfailure
+      - iscsi
+      test+: iscsi-bind.sh
+/keyboard:
+  /_:
+    /_:
+      tag:
+      - keyboard
+      - i18n
+      - coverage
+      - smoke
+      test+: keyboard.sh
+  /bootopt:
+    /only:
+      tag:
+      - keyboard
+      - i18n
+      - skip-on-rhel
+      test+: keyboard-bootopt-only.sh
+  /convert:
+    /vc:
+      tag:
+      - keyboard
+      - i18n
+      test+: keyboard-convert-vc.sh
+    /x-override-bootopt:
+      tag:
+      - keyboard
+      - i18n
+      test+: keyboard-convert-x-override-bootopt.sh
+  /generic:
+    /argument:
+      tag:
+      - keyboard
+      - i18n
+      test+: keyboard-generic-argument.sh
+/ks:
+  /include:
+    /_:
+      tag:
+      - kickstart
+      test+: ks-include.sh
+/lang:
+  /_:
+    /_:
+      tag:
+      - language
+      - i18n
+      - coverage
+      test+: lang.sh
+/liveimg:
+  /_:
+    /_:
+      tag:
+      - payload
+      - knownfailure
+      test+: liveimg.sh
+/log:
+  /util:
+    /check:
+      tag:
+      - logs
+      test+: log-util-check.sh
+/lvm:
+  /1:
+    /_:
+      tag:
+      - lvm
+      - storage
+      - coverage
+      test+: lvm-1.sh
+  /2:
+    /_:
+      tag:
+      - lvm
+      - storage
+      test+: lvm-2.sh
+  /cache:
+    /1:
+      tag:
+      - lvm
+      - storage
+      - gh1437
+      test+: lvm-cache-1.sh
+    /2:
+      tag:
+      - lvm
+      - storage
+      - gh1437
+      test+: lvm-cache-2.sh
+  /luks:
+    /1:
+      tag:
+      - storage
+      - lvm
+      - luks
+      test+: lvm-luks-1.sh
+    /2:
+      tag:
+      - storage
+      - lvm
+      - luks
+      test+: lvm-luks-2.sh
+    /3:
+      tag:
+      - storage
+      - lvm
+      - luks
+      test+: lvm-luks-3.sh
+    /4:
+      tag:
+      - storage
+      - lvm
+      - luks
+      test+: lvm-luks-4.sh
+  /raid:
+    /1:
+      tag:
+      - lvm
+      - storage
+      - rhel75659
+      - rhel80086
+      test+: lvm-raid-1.sh
+    /2:
+      tag:
+      - lvm
+      - storage
+      - gh1414
+      - rhel75659
+      - rhel80086
+      test+: lvm-raid-2.sh
+  /thinp:
+    /1:
+      tag:
+      - lvm
+      - storage
+      - coverage
+      - smoke
+      test+: lvm-thinp-1.sh
+    /2:
+      tag:
+      - lvm
+      - storage
+      test+: lvm-thinp-2.sh
+/module:
+  /1:
+    /_:
+      tag:
+      - packaging
+      - payload
+      - modularity
+      - skip-on-rhel
+      - skip-on-fedora
+      test+: module-1.sh
+  /2:
+    /_:
+      tag:
+      - packaging
+      - payload
+      - modularity
+      - skip-on-rhel
+      - skip-on-fedora
+      test+: module-2.sh
+  /3:
+    /_:
+      tag:
+      - packaging
+      - payload
+      - modularity
+      - skip-on-rhel
+      - skip-on-fedora
+      test+: module-3.sh
+  /4:
+    /_:
+      tag:
+      - packaging
+      - payload
+      - modularity
+      - skip-on-rhel
+      - skip-on-fedora
+      test+: module-4.sh
+  /enable:
+    /one-module-multiple-streams:
+      tag:
+      - knownfailure
+      - packaging
+      - payload
+      - modularity
+      - skip-on-rhel
+      test+: module-enable-one-module-multiple-streams.sh
+    /one-stream-install-different-stream:
+      tag:
+      - packaging
+      - payload
+      - modularity
+      - knownfailure
+      test+: module-enable-one-stream-install-different-stream.sh
+  /ignoremissing:
+    /_:
+      tag:
+      - packaging
+      - payload
+      - modularity
+      test+: module-ignoremissing.sh
+  /install:
+    /no-stream-no-profile:
+      tag:
+      - knownfailure
+      - packaging
+      - payload
+      - modularity
+      - skip-on-rhel
+      test+: module-install-no-stream-no-profile.sh
+    /one-module-multiple-streams:
+      tag:
+      - knownfailure
+      - packaging
+      - payload
+      - modularity
+      - skip-on-rhel
+      test+: module-install-one-module-multiple-streams.sh
+    /one-module-multiple-streams-and-profiles:
+      tag:
+      - knownfailure
+      - packaging
+      - payload
+      - modularity
+      - skip-on-rhel
+      test+: module-install-one-module-multiple-streams-and-profiles.sh
+/mountpoint:
+  /assignment:
+    /1:
+      tag:
+      - mount
+      - storage
+      - coverage
+      test+: mountpoint-assignment-1.sh
+    /2:
+      tag:
+      - mount
+      - storage
+      test+: mountpoint-assignment-2.sh
+/network:
+  /addr:
+    /gen-mode:
+      tag:
+      - network
+      test+: network-addr-gen-mode.sh
+    /gen-mode-dhcpall:
+      tag:
+      - network
+      test+: network-addr-gen-mode-dhcpall.sh
+  /autoconnections:
+    /dhcpall-httpks:
+      tag:
+      - network
+      test+: network-autoconnections-dhcpall-httpks.sh
+    /httpks:
+      tag:
+      - network
+      test+: network-autoconnections-httpks.sh
+  /bootopts:
+    /bond-bootif:
+      tag:
+      - network
+      - skip-on-rhel-8
+      test+: network-bootopts-bond-bootif.sh
+    /bond-dhcp-httpks:
+      tag:
+      - network
+      test+: network-bootopts-bond-dhcp-httpks.sh
+    /bond-ks-override:
+      tag:
+      - network
+      test+: network-bootopts-bond-ks-override.sh
+    /bootif-httpks:
+      tag:
+      - network
+      test+: network-bootopts-bootif-httpks.sh
+    /bridge-dhcp-httpks:
+      tag:
+      - network
+      test+: network-bootopts-bridge-dhcp-httpks.sh
+    /noautodefault:
+      tag:
+      - network
+      - skip-on-rhel
+      test+: network-bootopts-noautodefault.sh
+    /static:
+      tag:
+      - network
+      test+: network-bootopts-static.sh
+    /static-legacy-httpks:
+      tag:
+      - knownfailure
+      - network
+      test+: network-bootopts-static-legacy-httpks.sh
+    /static-mac:
+      tag:
+      - network
+      test+: network-bootopts-static-mac.sh
+    /static-unspec-bootif:
+      tag:
+      - network
+      test+: network-bootopts-static-unspec-bootif.sh
+    /static-unspec-single:
+      tag:
+      - network
+      test+: network-bootopts-static-unspec-single.sh
+    /team-dhcp-httpks:
+      tag:
+      - network
+      - skip-on-rhel-10
+      test+: network-bootopts-team-dhcp-httpks.sh
+    /vlan-static-httpks:
+      tag:
+      - network
+      test+: network-bootopts-vlan-static-httpks.sh
+  /device:
+    /bootif-httpks:
+      tag:
+      - network
+      test+: network-device-bootif-httpks.sh
+    /default:
+      tag:
+      - network
+      test+: network-device-default.sh
+    /default-httpks:
+      tag:
+      - network
+      test+: network-device-default-httpks.sh
+    /default-ksdevice-httpks:
+      tag:
+      - network
+      test+: network-device-default-ksdevice-httpks.sh
+    /default-ksdevice-pre:
+      tag:
+      - network
+      test+: network-device-default-ksdevice-pre.sh
+    /default-pre-hostname:
+      tag:
+      - network
+      test+: network-device-default-pre-hostname.sh
+    /mac:
+      tag:
+      - network
+      test+: network-device-mac.sh
+    /mac-httpks:
+      tag:
+      - network
+      test+: network-device-mac-httpks.sh
+    /mac-pre:
+      tag:
+      - network
+      test+: network-device-mac-pre.sh
+  /dns:
+    /search:
+      tag:
+      - network
+      - dns
+      test+: network-dns-search.sh
+  /missing:
+    /ifcfg-httpks:
+      tag:
+      - network
+      test+: network-missing-ifcfg-httpks.sh
+  /noipv4:
+    /httpks:
+      tag:
+      - network
+      test+: network-noipv4-httpks.sh
+    /pre:
+      tag:
+      - network
+      test+: network-noipv4-pre.sh
+  /options:
+    /pre:
+      tag:
+      - network
+      test+: network-options-pre.sh
+  /prefixdevname:
+    /_:
+      tag:
+      - network
+      test+: network-prefixdevname.sh
+  /static:
+    /2-httpks:
+      tag:
+      - network
+      - coverage
+      - smoke
+      test+: network-static-2-httpks.sh
+    /2-pre:
+      tag:
+      - network
+      test+: network-static-2-pre.sh
+    /_:
+      tag:
+      - network
+      test+: network-static.sh
+    /httpks:
+      tag:
+      - network
+      test+: network-static-httpks.sh
+    /to-dhcp-pre:
+      tag:
+      - network
+      test+: network-static-to-dhcp-pre.sh
+    /to-dhcp-pre-single:
+      tag:
+      - network
+      test+: network-static-to-dhcp-pre-single.sh
+/nfs:
+  /_:
+    /_:
+      tag:
+      - packaging
+      - payload
+      - knownfailure
+      test+: nfs.sh
+/nosave:
+  /1:
+    /_:
+      tag:
+      - logs
+      - coverage
+      test+: nosave-1.sh
+  /2:
+    /_:
+      tag:
+      - logs
+      test+: nosave-2.sh
+  /3:
+    /_:
+      tag:
+      - logs
+      test+: nosave-3.sh
+/ntp:
+  /nontp:
+    /without-chrony:
+      tag:
+      - time
+      test+: ntp-nontp-without-chrony.sh
+    /without-chrony-gui:
+      tag:
+      - time
+      test+: ntp-nontp-without-chrony-gui.sh
+  /pools:
+    /_:
+      tag:
+      - time
+      - coverage
+      - skip-on-rhel-8
+      test+: ntp-pools.sh
+  /with:
+    /nontp:
+      tag:
+      - time
+      test+: ntp-with-nontp.sh
+    /nontp-gui:
+      tag:
+      - time
+      test+: ntp-with-nontp-gui.sh
+  /without:
+    /chrony:
+      tag:
+      - time
+      test+: ntp-without-chrony.sh
+    /chrony-gui:
+      tag:
+      - time
+      test+: ntp-without-chrony-gui.sh
+/onboot:
+  /activate:
+    /_:
+      tag:
+      - network
+      - coverage
+      test+: onboot-activate.sh
+    /httpks:
+      tag:
+      - network
+      test+: onboot-activate-httpks.sh
+  /bootopts:
+    /pre:
+      tag:
+      - network
+      test+: onboot-bootopts-pre.sh
+/packages:
+  /and:
+    /groups-1:
+      tag:
+      - packaging
+      - payload
+      test+: packages-and-groups-1.sh
+    /groups-ignoremissing:
+      tag:
+      - packaging
+      - payload
+      - coverage
+      - smoke
+      test+: packages-and-groups-ignoremissing.sh
+  /default:
+    /_:
+      tag:
+      - packaging
+      - payload
+      - skip-on-rhel
+      - gh975
+      test+: packages-default.sh
+  /excludedocs:
+    /_:
+      tag:
+      - packaging
+      - payload
+      test+: packages-excludedocs.sh
+  /ignorebroken:
+    /_:
+      tag:
+      - packaging
+      - payload
+      - skip-on-rhel
+      test+: packages-ignorebroken.sh
+  /ignoremissing:
+    /_:
+      tag:
+      - packaging
+      - payload
+      test+: packages-ignoremissing.sh
+  /instlangs:
+    /1:
+      tag:
+      - packaging
+      - payload
+      test+: packages-instlangs-1.sh
+    /2:
+      tag:
+      - packaging
+      - payload
+      test+: packages-instlangs-2.sh
+    /3:
+      tag:
+      - packaging
+      - payload
+      test+: packages-instlangs-3.sh
+  /multilib:
+    /_:
+      tag:
+      - packaging
+      - payload
+      - skip-on-rhel-8
+      - gh641
+      - gh1207
+      test+: packages-multilib.sh
+  /weakdeps:
+    /_:
+      tag:
+      - packaging
+      - payload
+      - gh604
+      test+: packages-weakdeps.sh
+/part:
+  /luks:
+    /1:
+      tag:
+      - storage
+      - partition
+      - luks
+      test+: part-luks-1.sh
+    /2:
+      tag:
+      - storage
+      - partition
+      - luks
+      test+: part-luks-2.sh
+    /3:
+      tag:
+      - storage
+      - partition
+      - luks
+      test+: part-luks-3.sh
+    /4:
+      tag:
+      - storage
+      - partition
+      - luks
+      test+: part-luks-4.sh
+/pre:
+  /install:
+    /_:
+      tag:
+      - kickstart
+      test+: pre-install.sh
+/preexisting:
+  /btrfs:
+    /_:
+      tag:
+      - btrfs
+      - storage
+      test+: preexisting-btrfs.sh
+/proxy:
+  /auth:
+    /_:
+      tag:
+      - payload
+      - proxy
+      test+: proxy-auth.sh
+  /cmdline:
+    /_:
+      tag:
+      - payload
+      - proxy
+      test+: proxy-cmdline.sh
+  /kickstart:
+    /_:
+      tag:
+      - payload
+      - proxy
+      test+: proxy-kickstart.sh
+/raid:
+  /1:
+    /_:
+      tag:
+      - raid
+      - storage
+      - coverage
+      - smoke
+      test+: raid-1.sh
+    /reqpart:
+      tag:
+      - raid
+      - storage
+      - gh777
+      - gh1090
+      test+: raid-1-reqpart.sh
+  /ddf:
+    /_:
+      tag:
+      - raid
+      - storage
+      test+: raid-ddf.sh
+  /luks:
+    /1:
+      tag:
+      - storage
+      - raid
+      - luks
+      test+: raid-luks-1.sh
+    /2:
+      tag:
+      - storage
+      - raid
+      - luks
+      test+: raid-luks-2.sh
+    /3:
+      tag:
+      - storage
+      - raid
+      - luks
+      test+: raid-luks-3.sh
+    /4:
+      tag:
+      - storage
+      - raid
+      - luks
+      test+: raid-luks-4.sh
+/reboot:
+  /_:
+    /_:
+      tag:
+      - reboot
+      test+: reboot.sh
+  /initial:
+    /setup-gui:
+      tag:
+      - reboot
+      - initial-setup
+      - smoke
+      - skip-on-rhel-10
+      - gh1434
+      test+: reboot-initial-setup-gui.sh
+    /setup-tui:
+      tag:
+      - reboot
+      - initial-setup
+      - smoke
+      - skip-on-rhel-8
+      - skip-on-rhel-10
+      - gh1434
+      test+: reboot-initial-setup-tui.sh
+  /uefi:
+    /_:
+      tag:
+      - reboot
+      - uefi
+      - coverage
+      - smoke
+      test+: reboot-uefi.sh
+/repo:
+  /addrepo:
+    /_:
+      tag:
+      - packaging
+      - payload
+      - repo
+      test+: repo-addrepo.sh
+    /hd-iso:
+      tag:
+      - packaging
+      - payload
+      - repo
+      - harddrive
+      - gh804
+      test+: repo-addrepo-hd-iso.sh
+    /hd-tree:
+      tag:
+      - packaging
+      - payload
+      - repo
+      - harddrive
+      - gh804
+      test+: repo-addrepo-hd-tree.sh
+  /baseurl:
+    /_:
+      tag:
+      - packaging
+      - payload
+      - repo
+      test+: repo-baseurl.sh
+  /enable:
+    /_:
+      tag:
+      - packaging
+      - payload
+      - repo
+      test+: repo-enable.sh
+  /exclude:
+    /_:
+      tag:
+      - packaging
+      - payload
+      - repo
+      test+: repo-exclude.sh
+  /include:
+    /_:
+      tag:
+      - packaging
+      - payload
+      - repo
+      test+: repo-include.sh
+  /install:
+    /_:
+      tag:
+      - packaging
+      - payload
+      - repo
+      test+: repo-install.sh
+  /metalink:
+    /_:
+      tag:
+      - packaging
+      - payload
+      - repo
+      - skip-on-rhel
+      test+: repo-metalink.sh
+  /mirrorlist:
+    /_:
+      tag:
+      - packaging
+      - payload
+      - repo
+      - skip-on-rhel
+      test+: repo-mirrorlist.sh
+/reqpart:
+  /_:
+    /_:
+      tag:
+      - storage
+      - coverage
+      test+: reqpart.sh
+/rootpw:
+  /allow:
+    /ssh:
+      tag:
+      - users
+      - skip-on-rhel-8
+      test+: rootpw-allow-ssh.sh
+  /basic:
+    /_:
+      tag:
+      - users
+      - coverage
+      test+: rootpw-basic.sh
+  /crypted:
+    /_:
+      tag:
+      - users
+      test+: rootpw-crypted.sh
+  /lock:
+    /_:
+      tag:
+      - users
+      - coverage
+      test+: rootpw-lock.sh
+    /no-password:
+      tag:
+      - users
+      test+: rootpw-lock-no-password.sh
+/rpm:
+  /ostree:
+    /_:
+      tag:
+      - payload
+      - ostree
+      - skip-on-rhel
+      - gh1023
+      test+: rpm-ostree.sh
+    /container-bootc:
+      tag:
+      - payload
+      - ostree
+      - bootc
+      - coverage
+      - reboot
+      - skip-on-rhel-8
+      test+: rpm-ostree-container-bootc.sh
+    /container-leavebootorder:
+      tag:
+      - payload
+      - uefi
+      - ostree
+      - bootc
+      - reboot
+      - skip-on-rhel-8
+      test+: rpm-ostree-container-leavebootorder.sh
+    /container-luks:
+      tag:
+      - payload
+      - ostree
+      - bootc
+      - luks
+      - reboot
+      - skip-on-rhel-8
+      test+: rpm-ostree-container-luks.sh
+    /container-silverblue:
+      tag:
+      - payload
+      - ostree
+      - skip-on-rhel
+      test+: rpm-ostree-container-silverblue.sh
+    /container-uefi:
+      tag:
+      - payload
+      - uefi
+      - ostree
+      - bootc
+      - keyboard
+      - reboot
+      - skip-on-rhel-8
+      - skip-on-rhel-9
+      - skip-on-rhel-10
+      test+: rpm-ostree-container-uefi.sh
+/script:
+  /post:
+    /_:
+      tag:
+      - ksscript
+      test+: script-post.sh
+  /pre:
+    /_:
+      tag:
+      - ksscript
+      test+: script-pre.sh
+    /install:
+      tag:
+      - ksscript
+      test+: script-pre-install.sh
+/selinux:
+  /contexts:
+    /_:
+      tag:
+      - security
+      - selinux
+      - gh1357
+      test+: selinux-contexts.sh
+  /disabled:
+    /_:
+      tag:
+      - selinux
+      test+: selinux-disabled.sh
+  /enforcing:
+    /_:
+      tag:
+      - selinux
+      - coverage
+      test+: selinux-enforcing.sh
+  /permissive:
+    /_:
+      tag:
+      - selinux
+      test+: selinux-permissive.sh
+/services:
+  /_:
+    /_:
+      tag:
+      - services
+      - coverage
+      test+: services.sh
+/snapshot:
+  /post:
+    /_:
+      tag:
+      - snapshot
+      - lvm
+      - storage
+      - coverage
+      - knownfailure
+      test+: snapshot-post.sh
+  /pre:
+    /_:
+      tag:
+      - snapshot
+      - lvm
+      - storage
+      test+: snapshot-pre.sh
+/stage2:
+  /from:
+    /ks:
+      tag:
+      - network
+      - gh910
+      - stage2-from-compose
+      test+: stage2-from-ks.sh
+/storage:
+  /multipath:
+    /autopart:
+      tag:
+      - autopart
+      - storage
+      - rhbz1853668
+      - gh1110
+      test+: storage-multipath-autopart.sh
+/team:
+  /_:
+    /_:
+      tag:
+      - network
+      - skip-on-rhel-10
+      test+: team.sh
+  /httpks:
+    /_:
+      tag:
+      - network
+      - skip-on-rhel-10
+      test+: team-httpks.sh
+  /pre:
+    /_:
+      tag:
+      - network
+      - skip-on-rhel-10
+      test+: team-pre.sh
+/timezone:
+  /noncommon:
+    /_:
+      tag:
+      - time
+      test+: timezone-noncommon.sh
+/timezoneLOCAL:
+  /_:
+    /_:
+      tag:
+      - time
+      test+: timezoneLOCAL.sh
+/timezoneUTC:
+  /_:
+    /_:
+      tag:
+      - time
+      test+: timezoneUTC.sh
+/tmpfs:
+  /fixed_size:
+    /_:
+      tag:
+      - storage
+      test+: tmpfs-fixed_size.sh
+/ui_cmdline:
+  /_:
+    /_:
+      tag:
+      - ui
+      test+: ui_cmdline.sh
+/ui_graphical_interactive:
+  /_:
+    /_:
+      tag:
+      - ui
+      - smoke
+      test+: ui_graphical_interactive.sh
+/ui_graphical_noninteractive:
+  /_:
+    /_:
+      tag:
+      - ui
+      - knownfailure
+      test+: ui_graphical_noninteractive.sh
+/ui_rdp:
+  /_:
+    /_:
+      tag:
+      - ui
+      - skip-on-rhel-8
+      - skip-on-rhel-9
+      test+: ui_rdp.sh
+/ui_text_interactive:
+  /_:
+    /_:
+      tag:
+      - ui
+      - smoke
+      test+: ui_text_interactive.sh
+/ui_text_noninteractive:
+  /_:
+    /_:
+      tag:
+      - ui
+      test+: ui_text_noninteractive.sh
+/ui_vnc:
+  /_:
+    /_:
+      tag:
+      - ui
+      - skip-on-fedora
+      - skip-on-rhel-10
+      test+: ui_vnc.sh
+/unified:
+  /_:
+    /_:
+      tag:
+      - packaging
+      - payload
+      - skip-on-fedora
+      - manual
+      test+: unified.sh
+  /cdrom:
+    /_:
+      tag:
+      - skip-on-fedora
+      - payload
+      - manual
+      test+: unified-cdrom.sh
+  /cmdline:
+    /_:
+      tag:
+      - skip-on-fedora
+      - payload
+      - manual
+      test+: unified-cmdline.sh
+  /harddrive:
+    /_:
+      tag:
+      - skip-on-fedora
+      - payload
+      - manual
+      test+: unified-harddrive.sh
+  /nfs:
+    /_:
+      tag:
+      - skip-on-fedora
+      - payload
+      - manual
+      test+: unified-nfs.sh
+/url:
+  /baseurl:
+    /_:
+      tag:
+      - packaging
+      - payload
+      - url
+      test+: url-baseurl.sh
+  /metalink:
+    /_:
+      tag:
+      - packaging
+      - payload
+      - url
+      - skip-on-rhel
+      test+: url-metalink.sh
+  /mirrorlist:
+    /_:
+      tag:
+      - packaging
+      - payload
+      - url
+      - skip-on-rhel
+      test+: url-mirrorlist.sh
+/user:
+  /locked:
+    /root-locked-admin:
+      tag:
+      - users
+      test+: user-locked-root-locked-admin.sh
+  /multiple:
+    /_:
+      tag:
+      - users
+      - coverage
+      - smoke
+      test+: user-multiple.sh
+    /wheel-no-root:
+      tag:
+      - users
+      test+: user-multiple-wheel-no-root.sh
+  /no:
+    /wheel-no-root:
+      tag:
+      - users
+      - knownfailure
+      test+: user-no-wheel-no-root.sh
+  /single:
+    /_:
+      tag:
+      - users
+      test+: user-single.sh
+  /wheel:
+    /no-root:
+      tag:
+      - users
+      test+: user-wheel-no-root.sh
+/vlan:
+  /httpks:
+    /_:
+      tag:
+      - network
+      test+: vlan-httpks.sh
+  /pre:
+    /_:
+      tag:
+      - network
+      test+: vlan-pre.sh
+duration: 50m
+test: './containers/runner/launch --data /var/tmp/ks_data --platform rhel10 '

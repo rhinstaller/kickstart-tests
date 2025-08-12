@@ -62,8 +62,10 @@ Examples:
   $0 --help                      # Show this help
 
 Options:
-  --list-root    List all tests currently in root directory
-  --help         Show this help message
+  --list-root               List all tests currently in root directory
+  --analyze-dependencies    Analyze shared dependencies for all tests
+  --check-test TEST         Show dependency analysis for a specific test
+  --help                    Show this help message
 EOF
 }
 
@@ -132,7 +134,8 @@ find_dependencies() {
         while IFS= read -r line; do
             if [[ "$line" =~ @KSINCLUDE@[[:space:]]+([^[:space:]]+) ]]; then
                 local dep_file="${BASH_REMATCH[1]}"
-                if [[ -f "$ROOT_DIR/$dep_file" ]]; then
+                # Check if dependency exists in root directory or tests directory
+                if [[ -f "$ROOT_DIR/$dep_file" || -f "$TESTS_DIR/$dep_file" ]]; then
                     dependencies+=("$dep_file")
                 fi
             fi
@@ -140,6 +143,49 @@ find_dependencies() {
     fi
     
     printf '%s\n' "${dependencies[@]}"
+}
+
+# Find all tests that use a specific dependency file
+find_tests_using_dependency() {
+    local dep_file="$1"
+    local using_tests=()
+    
+    # Search in root directory .ks.in files
+    for ks_file in "$ROOT_DIR"/*.ks.in; do
+        if [[ -f "$ks_file" ]] && grep -q "@KSINCLUDE@[[:space:]]*${dep_file}" "$ks_file"; then
+            local test_name=$(basename "$ks_file" .ks.in)
+            using_tests+=("$test_name")
+        fi
+    done
+    
+    # Search in tests directory .ks.in files
+    if [[ -d "$TESTS_DIR" ]]; then
+        for ks_file in "$TESTS_DIR"/*.ks.in; do
+            if [[ -f "$ks_file" ]] && grep -q "@KSINCLUDE@[[:space:]]*${dep_file}" "$ks_file"; then
+                local test_name=$(basename "$ks_file" .ks.in)
+                using_tests+=("tests/$test_name")
+            fi
+        done
+    fi
+    
+    printf '%s\n' "${using_tests[@]}"
+}
+
+# Check if dependency is shared by multiple tests
+check_dependency_usage() {
+    local dep_file="$1"
+    local current_test="$2"
+    local using_tests=($(find_tests_using_dependency "$dep_file"))
+    local root_tests=()
+    
+    # Find tests still in root directory that use this dependency
+    for test in "${using_tests[@]}"; do
+        if [[ "$test" != "tests/"* && "$test" != "$current_test" ]]; then
+            root_tests+=("$test")
+        fi
+    done
+    
+    echo "${#root_tests[@]}:${root_tests[*]}"
 }
 
 # Move a single file with validation
@@ -165,6 +211,77 @@ move_file() {
     
     mv "$src" "$dst"
     print_success "Moved $file_type: $(basename "$src")"
+}
+
+# Handle shared dependency migration
+handle_shared_dependency() {
+    local dep_file="$1"
+    local test_name="$2"
+    local usage_info=$(check_dependency_usage "$dep_file" "$test_name")
+    local count="${usage_info%%:*}"
+    local other_tests="${usage_info#*:}"
+    
+    if [[ $count -eq 0 ]]; then
+        # No other tests use this dependency - safe to move
+        return 0
+    fi
+    
+    print_warning "Shared dependency detected: $dep_file"
+    print_info "This dependency is used by $count other test(s) in root directory:"
+    
+    for other_test in $other_tests; do
+        echo "    - $other_test"
+    done
+    
+    echo
+    echo "Options:"
+    echo "  1) Move all tests that use this dependency together"
+    echo "  2) Copy dependency (keep original in root for other tests)"
+    echo "  3) Skip this dependency (may break migrated test)"
+    echo "  4) Cancel migration"
+    
+    read -p "Choose option [1-4]: " -n 1 -r
+    echo
+    
+    case $REPLY in
+        1)
+            print_info "Will migrate all tests using $dep_file together..."
+            echo "$other_tests"
+            return 1  # Signal to migrate all related tests
+            ;;
+        2)
+            print_info "Will copy dependency instead of moving it"
+            return 2  # Signal to copy instead of move
+            ;;
+        3)
+            print_warning "Skipping dependency - migrated test may not work properly"
+            return 3  # Signal to skip dependency
+            ;;
+        *)
+            print_info "Canceling migration"
+            return 4  # Signal to cancel
+            ;;
+    esac
+}
+
+# Copy a file instead of moving it
+copy_file() {
+    local src="$1"
+    local dst="$2"
+    local file_type="$3"
+    
+    if [[ ! -f "$src" ]]; then
+        print_error "Source file does not exist: $src"
+        return 1
+    fi
+    
+    if [[ -f "$dst" ]]; then
+        print_info "Destination file already exists: $dst"
+        return 0
+    fi
+    
+    cp "$src" "$dst"
+    print_success "Copied $file_type: $(basename "$src")"
 }
 
 # Migrate a single test
@@ -197,11 +314,57 @@ migrate_test() {
     
     # Find dependencies
     local dependencies=($(find_dependencies "$ks_file"))
+    local additional_tests=()
+    local copy_deps=()
+    local skip_deps=()
     
-    if [[ ${#dependencies[@]} -gt 0 ]]; then
-        print_info "Found dependencies for $test_name:"
-        for dep in "${dependencies[@]}"; do
-            echo "    - $dep"
+    # Check each dependency for shared usage
+    for dep in "${dependencies[@]}"; do
+        local result
+        if ! result=$(handle_shared_dependency "$dep" "$test_name"); then
+            case $? in
+                1)  # Move all related tests together
+                    local usage_info=$(check_dependency_usage "$dep" "$test_name")
+                    local other_tests="${usage_info#*:}"
+                    for other_test in $other_tests; do
+                        if [[ ! " ${additional_tests[@]} " =~ " ${other_test} " ]]; then
+                            additional_tests+=("$other_test")
+                        fi
+                    done
+                    ;;
+                2)  # Copy dependency
+                    copy_deps+=("$dep")
+                    ;;
+                3)  # Skip dependency
+                    skip_deps+=("$dep")
+                    ;;
+                4)  # Cancel migration
+                    print_info "Migration canceled by user"
+                    return 1
+                    ;;
+            esac
+        fi
+    done
+    
+    # If we need to migrate additional tests, do that first
+    if [[ ${#additional_tests[@]} -gt 0 ]]; then
+        print_info "Migrating additional tests due to shared dependencies:"
+        for additional_test in "${additional_tests[@]}"; do
+            echo "    - $additional_test"
+        done
+        echo
+        
+        read -p "Proceed with migrating ${#additional_tests[@]} additional tests? [y/N]: " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            print_info "Migration canceled - cannot migrate test with shared dependencies"
+            return 1
+        fi
+        
+        # Migrate additional tests first (without dependency checks to avoid recursion)
+        for additional_test in "${additional_tests[@]}"; do
+            print_info "Migrating related test: $additional_test"
+            migrate_test_simple "$additional_test"
         done
     fi
     
@@ -216,14 +379,21 @@ migrate_test() {
         ((success++))
     fi
     
-    # Move dependencies
+    # Handle dependencies based on user choices
     for dep in "${dependencies[@]}"; do
         local src_dep="$ROOT_DIR/$dep"
         local dst_dep="$TESTS_DIR/$dep"
         
         if [[ -f "$dst_dep" ]]; then
             print_info "Dependency already exists in tests/: $dep"
+        elif [[ " ${skip_deps[@]} " =~ " ${dep} " ]]; then
+            print_warning "Skipping dependency as requested: $dep"
+        elif [[ " ${copy_deps[@]} " =~ " ${dep} " ]]; then
+            if copy_file "$src_dep" "$dst_dep" "dependency"; then
+                ((success++))
+            fi
         else
+            # Normal move (no conflicts)
             if move_file "$src_dep" "$dst_dep" "dependency"; then
                 ((success++))
             fi
@@ -243,6 +413,156 @@ migrate_test() {
     fi
 }
 
+# Simple migration without dependency conflict checking (for batch operations)
+migrate_test_simple() {
+    local test_name="$1"
+    local sh_file="$ROOT_DIR/${test_name}.sh"
+    local ks_file="$ROOT_DIR/${test_name}.ks.in"
+    
+    if ! test_exists_in_root "$test_name"; then
+        print_warning "Test '$test_name' not found in root directory - skipping"
+        return 1
+    fi
+    
+    if test_exists_in_tests "$test_name"; then
+        print_info "Test '$test_name' already in tests/ directory - skipping"
+        return 0
+    fi
+    
+    mkdir -p "$TESTS_DIR"
+    
+    local success=0
+    
+    if move_file "$sh_file" "$TESTS_DIR/$(basename "$sh_file")" "shell script"; then
+        ((success++))
+    fi
+    
+    if move_file "$ks_file" "$TESTS_DIR/$(basename "$ks_file")" "kickstart template"; then
+        ((success++))
+    fi
+    
+    if [[ $success -gt 0 ]]; then
+        chmod +x "$TESTS_DIR/${test_name}.sh" 2>/dev/null || true
+        return 0
+    fi
+    
+    return 1
+}
+
+# Analyze dependencies for a specific test
+analyze_test_dependencies() {
+    local test_name="$1"
+    local ks_file="$ROOT_DIR/${test_name}.ks.in"
+    
+    if ! test_exists_in_root "$test_name"; then
+        print_error "Test '$test_name' not found in root directory"
+        return 1
+    fi
+    
+    print_info "Dependency analysis for test: $test_name"
+    
+    local dependencies=($(find_dependencies "$ks_file"))
+    
+    if [[ ${#dependencies[@]} -eq 0 ]]; then
+        print_success "No dependencies found - safe to migrate"
+        return 0
+    fi
+    
+    print_info "Dependencies found:"
+    
+    local has_conflicts=false
+    for dep in "${dependencies[@]}"; do
+        local usage_info=$(check_dependency_usage "$dep" "$test_name")
+        local count="${usage_info%%:*}"
+        local other_tests="${usage_info#*:}"
+        
+        if [[ $count -eq 0 ]]; then
+            echo "    ✅ $dep (no conflicts)"
+        else
+            echo "    ⚠️  $dep (shared with $count other test(s))"
+            for other_test in $other_tests; do
+                echo "        - $other_test"
+            done
+            has_conflicts=true
+        fi
+    done
+    
+    echo
+    if [[ $has_conflicts == true ]]; then
+        print_warning "Migration will require handling shared dependencies"
+    else
+        print_success "All dependencies are safe to migrate"
+    fi
+}
+
+# Analyze all shared dependencies in the repository
+analyze_all_dependencies() {
+    print_info "Analyzing shared dependencies across all tests..."
+    
+    declare -A dep_usage
+    declare -A dep_tests
+    
+    # Build dependency usage map
+    for ks_file in "$ROOT_DIR"/*.ks.in; do
+        if [[ -f "$ks_file" ]]; then
+            local test_name=$(basename "$ks_file" .ks.in)
+            local dependencies=($(find_dependencies "$ks_file"))
+            
+            for dep in "${dependencies[@]}"; do
+                if [[ -z "${dep_usage[$dep]}" ]]; then
+                    dep_usage[$dep]=0
+                    dep_tests[$dep]=""
+                fi
+                
+                dep_usage[$dep]=$((dep_usage[$dep] + 1))
+                if [[ -n "${dep_tests[$dep]}" ]]; then
+                    dep_tests[$dep]="${dep_tests[$dep]} $test_name"
+                else
+                    dep_tests[$dep]="$test_name"
+                fi
+            done
+        fi
+    done
+    
+    # Display results
+    local shared_count=0
+    local total_deps=0
+    
+    print_info "Dependency usage summary:"
+    
+    for dep in "${!dep_usage[@]}"; do
+        local count=${dep_usage[$dep]}
+        total_deps=$((total_deps + 1))
+        
+        if [[ $count -gt 1 ]]; then
+            shared_count=$((shared_count + 1))
+            echo "  ⚠️  $dep: used by $count tests"
+            
+            # Show first few tests
+            local tests_array=(${dep_tests[$dep]})
+            local display_tests="${tests_array[@]:0:5}"
+            if [[ ${#tests_array[@]} -gt 5 ]]; then
+                display_tests="$display_tests ..."
+            fi
+            echo "      Tests: $display_tests"
+        else
+            echo "  ✅ $dep: used by 1 test (${dep_tests[$dep]})"
+        fi
+    done
+    
+    echo
+    print_info "Summary:"
+    echo "  Total dependencies: $total_deps"
+    echo "  Shared dependencies: $shared_count"
+    echo "  Unique dependencies: $((total_deps - shared_count))"
+    
+    if [[ $shared_count -gt 0 ]]; then
+        echo
+        print_warning "Consider migrating tests with shared dependencies together"
+        print_info "Use --check-test <testname> to analyze specific tests"
+    fi
+}
+
 # Main script
 main() {
     cd "$ROOT_DIR"
@@ -255,6 +575,20 @@ main() {
             ;;
         --list-root)
             list_root_tests
+            exit 0
+            ;;
+        --analyze-dependencies)
+            analyze_all_dependencies
+            exit 0
+            ;;
+        --check-test)
+            if [[ -z "${2:-}" ]]; then
+                print_error "Test name required for --check-test option"
+                echo
+                usage
+                exit 1
+            fi
+            analyze_test_dependencies "$2"
             exit 0
             ;;
         "")

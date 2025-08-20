@@ -21,18 +21,11 @@ issues:
   - description: "[694] ([4]) https://github.com/rhinstaller/kickstart-tests/issues/694"
     first_grep: "Nothing useful found for Hard drive ISO"
 
-
-
   - description: "[767] ([758]) https://github.com/rhinstaller/kickstart-tests/issues/767"
     first_grep: "Payload error.*Failed to download metadata for repo"
 
-
   - description: "[786] https://github.com/rhinstaller/kickstart-tests/issues/786"
     first_grep: "Traceback.*Failed to activate swap on /dev/md/test-raid-ddf_0p2: No such file or directory"
-
-
-
-
 
   - description: "[857] resource to create this format lvmpv is unavailable https://github.com/rhinstaller/kickstart-tests/issues/857"
     first_grep: "ERROR.*resource to create this format lvmpv is unavailable"
@@ -52,10 +45,6 @@ issues:
   - description: "[964] Validation failed and no RESULT - another string https://github.com/rhinstaller/kickstart-tests/issues/964"
     first_grep: "/root/RESULT does not exist in VM image."
 
-
-
-
-
   - description: "[993] https://github.com/rhinstaller/kickstart-tests/issues/993"
     first_grep: "WARNING.*nothing provides.*getent"
 
@@ -71,7 +60,6 @@ issues:
   - description: "[996] https://github.com/rhinstaller/kickstart-tests/issues/996"
     first_grep: "CRIT.*dasbus.error.DBusError: Process reported exit code 2: mdadm: /dev/vda3 is busy - skipping"
 
-
   - description: "[907] https://github.com/rhinstaller/kickstart-tests/issues/907"
     first_grep: "ERROR:anaconda.modules.storage.partitioning.base_partitioning:Storage configuration has failed: No usable disks."
 
@@ -83,12 +71,8 @@ issues:
   - description: "[1235] https://github.com/rhinstaller/kickstart-tests/issues/1235"
     first_grep: "org.fedoraproject.Anaconda.Modules.Localization.GetCompositorSelectedLayout has failed with an exception"
 
-
-
-
   - description: "[1303] https://github.com/rhinstaller/kickstart-tests/issues/1303"
     first_grep: "WARNING gnome-kiosk:Lost or failed to acquire name org.gnome.Mutter.ServiceChannel"
-
 
   - description: "[1311] https://github.com/rhinstaller/kickstart-tests/issues/1311"
     first_grep: "LVMError.*'/com/redhat/lvmdbus1/.*object: Timeout was reached"

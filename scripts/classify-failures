@@ -22,7 +22,6 @@ import sys
 import re
 import yaml
 import os
-from collections.abc import Sequence
 
 
 FILTER_FILENAMES = ["kstest.log", "virt-install.log"]
@@ -82,10 +81,10 @@ def _get_match(issue, file_path, args):
 
     if "last_matching_re" in issue:
         last_matching_re = issue["last_matching_re"]
-        if isinstance(last_matching_re, Sequence) and len(last_matching_re) >= 2:
+        try:
             line_match_re, line_check_re = last_matching_re[0], last_matching_re[1]
-        else:
-            raise ValueError(f"unexpected structure of 'last_matching_re' data: {last_matching_re}")
+        except (IndexError, TypeError) as e:
+            raise ValueError(f"unexpected structure of 'last_matching_re' data: {last_matching_re}: {e}") from e
         last_matching_line = subprocess.check_output(
             "grep {} {} | tail -n 1".format(line_match_re, file_path),
             shell=True,

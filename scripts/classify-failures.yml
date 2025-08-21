@@ -1,0 +1,189 @@
+issues:
+#  - description: "<ISSUE DESCRIPTION PREFERABLY WITH GITHUB ISSUE REFERENCE>"
+#    last_matching_re:
+#      - "<REGULAR EXPRESSION FOR GREP TO FIND THE LAST MATCHING LINE>"
+#      - "<REGULAR EXPRESSION FOR PYTHON TO MATCH AGAINST THE FOUND LINE>"
+#
+#  - description: "<ISSUE DESCRIPTION PREFERABLY WITH GITHUB ISSUE REFERENCE>"
+#    first_grep: "<REGULAR EXPRESSION FOR GREP TO BE LOOKED FOR>"
+
+  - description: "[675] ([1]) https://github.com/rhinstaller/kickstart-tests/issues/675"
+    last_matching_re:
+      - "anaconda:"
+      - ".*Configuring \\(running scriptlet for\\): rootfiles.*"
+
+  - description: "[TODO] https://github.com/rhinstaller/kickstart-tests/issues/TODO"
+    first_grep: "^[^E]*ERR anaconda:dnf: Error in POSTIN scriptlet in rpm package coreutils-common"
+
+  - description: "[6] - for rebooting tests it can be rather [675] or something else, so check. Look at kstest.log, libvirt log."
+    first_grep: "RESULT.*Problem starting virtual install"
+
+  - description: "[694] ([4]) https://github.com/rhinstaller/kickstart-tests/issues/694"
+    first_grep: "Nothing useful found for Hard drive ISO"
+
+  - description: "[767] ([758]) https://github.com/rhinstaller/kickstart-tests/issues/767"
+    first_grep: "Payload error.*Failed to download metadata for repo"
+
+  - description: "[786] https://github.com/rhinstaller/kickstart-tests/issues/786"
+    first_grep: "Traceback.*Failed to activate swap on /dev/md/test-raid-ddf_0p2: No such file or directory"
+
+  - description: "[857] resource to create this format lvmpv is unavailable https://github.com/rhinstaller/kickstart-tests/issues/857"
+    first_grep: "ERROR.*resource to create this format lvmpv is unavailable"
+
+  - description: "[894] rpm-ostree https://github.com/rhinstaller/kickstart-tests/issues/894"
+    first_grep: "PayloadInstallationError: Failed to pull from repository.*Timeout was reached"
+
+  - description: "[TODO1] The DNF payload failed https://github.com/rhinstaller/kickstart-tests/issues/"
+    first_grep: "The DNF payload failed"
+
+  - description: "[949] infrastructure https://github.com/rhinstaller/kickstart-tests/issues/949"
+    first_grep: "Failed to add the 'anaconda' repository"
+
+  - description: "[962] https://github.com/rhinstaller/kickstart-tests/issues/962"
+    first_grep: "BUG: soft lockup"
+
+  - description: "[964] Validation failed and no RESULT - another string https://github.com/rhinstaller/kickstart-tests/issues/964"
+    first_grep: "/root/RESULT does not exist in VM image."
+
+  - description: "[993] https://github.com/rhinstaller/kickstart-tests/issues/993"
+    first_grep: "WARNING.*nothing provides.*getent"
+
+  - description: "[997] https://github.com/rhinstaller/kickstart-tests/issues/997"
+    first_grep: "CRIT.*gnome-kiosk exited with status 1"
+
+  - description: "[1035] https://github.com/rhinstaller/kickstart-tests/issues/1035"
+    first_grep: "CRIT.*UnavailableValueError: The kernel version list is not available."
+
+  - description: "[1039] https://github.com/rhinstaller/kickstart-tests/issues/1039"
+    first_grep: "WARNING.*requires /usr/bin/readlink, but none of the providers can be installed"
+
+  - description: "[996] https://github.com/rhinstaller/kickstart-tests/issues/996"
+    first_grep: "CRIT.*dasbus.error.DBusError: Process reported exit code 2: mdadm: /dev/vda3 is busy - skipping"
+
+  - description: "[907] https://github.com/rhinstaller/kickstart-tests/issues/907"
+    first_grep: "ERROR:anaconda.modules.storage.partitioning.base_partitioning:Storage configuration has failed: No usable disks."
+
+  - description: "[1017] https://github.com/rhinstaller/kickstart-tests/issues/1017"
+    last_matching_re:
+      - "anaconda:"
+      - ".*DEBUG anaconda:anaconda: ui.gui.hubs: kickstart installation, spoke Installation Source is ready.*"
+
+  - description: "[1235] https://github.com/rhinstaller/kickstart-tests/issues/1235"
+    first_grep: "org.fedoraproject.Anaconda.Modules.Localization.GetCompositorSelectedLayout has failed with an exception"
+
+  - description: "[1303] https://github.com/rhinstaller/kickstart-tests/issues/1303"
+    first_grep: "WARNING gnome-kiosk:Lost or failed to acquire name org.gnome.Mutter.ServiceChannel"
+
+  - description: "[1311] https://github.com/rhinstaller/kickstart-tests/issues/1311"
+    first_grep: "LVMError.*'/com/redhat/lvmdbus1/.*object: Timeout was reached"
+
+  - description: "[1312] https://github.com/rhinstaller/kickstart-tests/issues/1312"
+    first_grep: "org.fedoraproject.Anaconda.Modules.Storage:gi.overrides.BlockDev.MpathError: Process reported exit code 1"
+
+  - description: "[1313] https://github.com/rhinstaller/kickstart-tests/issues/1313"
+    first_grep: "ERR anaconda:    display.setup_display(anaconda, opts)"
+
+  - description: "[1314] https://github.com/rhinstaller/kickstart-tests/issues/1314"
+    first_grep: "CRIT kernel:virtio_net virtio1 enp1s0: NETDEV WATCHDOG: CPU: 0: transmit queue 0 timed out"
+
+  - description: "[1318] https://github.com/rhinstaller/kickstart-tests/issues/1318"
+    first_grep: "anaconda:anaconda: display: X or window manager startup failed: systemd exited with status 1"
+
+  - description: "[1346] https://github.com/rhinstaller/kickstart-tests/issues/1346"
+    last_matching_re:
+      - ".*org.fedoraproject.Anaconda.Modules.*"
+      - ".*grub2-mkconfig.*"
+
+  - description: "[1438] https://github.com/rhinstaller/kickstart-tests/issues/1438"
+    first_grep: "blivet.errors.DependencyError: device type btrfs volume requires unavailable_dependencies: libblockdev btrfs plugin:"
+
+  - description: "[1453] https://github.com/rhinstaller/kickstart-tests/issues/1453"
+    first_grep: "*** ERROR: Expected 2 SUCCESS messages, but found 2."
+
+closed_issues:
+  # Tracked in [1311]
+  - description: "[1202] https://github.com/rhinstaller/kickstart-tests/issues/1202"
+    first_grep: "Failed to call the 'PvCreate' method on the '/com/redhat/lvmdbus1/Manager' object: Timeout was reached"
+
+  # Tracked in [1311]
+  - description: "[869] https://github.com/rhinstaller/kickstart-tests/issues/869"
+    first_grep: "CRIT.*Failed to call the 'Snapshot' method on the '/com/redhat/lvmdbus1/Lv/1' object: Timeout was reached"
+
+  - description: "[9] RHSM https://github.com/rhinstaller/kickstart-tests/issues/707"
+    first_grep: "DBusError: {\"exception\": \"NoSectionError\", \"severity\": \"error\", \"message\": \"No section: 'logging'\"}"
+
+  - description: "[780] RHSM https://github.com/rhinstaller/kickstart-tests/issues/780"
+    first_grep: "rhsm-service:ERROR.*argument of type 'Undefined' is not iterable"
+
+  - description: "[779] RHSM https://github.com/rhinstaller/kickstart-tests/issues/779"
+    first_grep: "rhsm-service:ERROR.*'Undefined' object is not iterable"
+
+  - description: "[5] https://bugzilla.redhat.com/show_bug.cgi?id=1931389"
+    first_grep: "Network:.*Fatal.*Segmentation fault"
+
+  - description: "[24] package download failure, may be infra hiccup?"
+    first_grep: "Failed to download.*Curl error"
+
+  - description: "[759] https://github.com/rhinstaller/kickstart-tests/issues/759"
+    first_grep: "Validation.*Your BIOS-based system"
+
+  - description: "[879] https://github.com/rhinstaller/kickstart-tests/issues/879"
+    first_grep: "INFO:program:/usr/sbin/grub2-probe: error: ../grub-core/kern/disk.c:236"
+
+  - description: "[882] blivet DMTech https://github.com/rhinstaller/kickstart-tests/issues/882"
+    first_grep: "AttributeError: type object 'DMTech' has no attribute 'MAP'"
+
+  - description: "[980] https://github.com/rhinstaller/kickstart-tests/issues/980"
+    first_grep: "Payloads:  - nothing provides libperl"
+
+  # Issues moved from open to closed based on current GitHub status
+  - description: "[992] https://github.com/rhinstaller/kickstart-tests/issues/992 - or it can some more recent issue, the string is pretty generic."
+    first_grep: "Started Process Core Dump"
+
+  - description: "[846] on rhel8 ([26]) https://github.com/rhinstaller/kickstart-tests/issues/846"
+    first_grep: "raise.*Failed to activate service 'org.freedesktop.hostname1'"
+
+  - description: "[846] on rhel8 ([26]) https://github.com/rhinstaller/kickstart-tests/issues/846"
+    first_grep: "Network.*Failed to activate service 'org.freedesktop.hostname1'"
+
+  - description: "[859] https://github.com/rhinstaller/kickstart-tests/issues/859"
+    first_grep: "Failed to activate filesystems: invalid device specification"
+
+  - description: "[845] https://github.com/rhinstaller/kickstart-tests/issues/845"
+    first_grep: "INFO lvmdbusd:KeyError: 'pv_uuid'"
+
+  - description: "[889] raid-ddf https://github.com/rhinstaller/kickstart-tests/issues/889"
+    first_grep: "SwapError: Failed to open the device '/dev/md/test-raid-ddf_0p2'"
+
+  - description: "[890] default-systemd-target-vnc-graphical https://github.com/rhinstaller/kickstart-tests/issues/890"
+    first_grep: "gnome-kiosk exited on signal 11"
+
+  - description: "[930] [939] [794] [782] https://github.com/rhinstaller/kickstart-tests/issues/930"
+    first_grep: "lvmdbusd:json.decoder.JSONDecodeError:"
+
+  - description: "[985] https://github.com/rhinstaller/kickstart-tests/issues/985"
+    first_grep: "WARNING.*Problem 1.*python3-dnf"
+
+  - description: "[984] https://github.com/rhinstaller/kickstart-tests/issues/984"
+    first_grep: "RESULT.*CRIT.*Anaconda crashed on signal 11"
+
+  - description: "[983] https://github.com/rhinstaller/kickstart-tests/issues/983"
+    first_grep: "CRIT.*argument of type 'NoneType' is not iterable"
+
+  - description: "[1060] https://github.com/rhinstaller/kickstart-tests/issues/1060"
+    first_grep: "CRIT.*pyanaconda.ui.gui.xkl_wrapper.XklWrapperError: Failed to initialize layouts"
+
+  - description: "[1261] https://github.com/rhinstaller/kickstart-tests/issues/1261"
+    first_grep: "anaconda:anaconda: display: Wayland startup failed: systemd exited with status 1"
+
+  - description: "[1261] https://github.com/rhinstaller/kickstart-tests/issues/1261"
+    first_grep: "anaconda:anaconda: display: Wayland startup failed: /usr/libexec/anaconda/run-in-new-session exited with status 1"
+
+  - description: "[11] https://github.com/rhinstaller/kickstart-tests/issues/795"
+    first_grep: "ERR.*Timeout trying to start Xorg"
+
+  - description: "[1296] https://github.com/rhinstaller/kickstart-tests/issues/1296"
+    first_grep: "ERR anaconda:Exception ignored in atexit callback"
+
+  - description: "[886] https://github.com/rhinstaller/kickstart-tests/issues/886"
+    first_grep: "/dev/vda4 shouldn't be mounted at"

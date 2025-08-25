@@ -211,14 +211,24 @@ function should_skip_test() {
     return 1
 }
 
-# Find all tests in the . folder. These tests will be filtered by TESTTYPE parameter
-# if specified.
+# Find all tests in both the root folder and tests/ subfolder for backward compatibility.
+# These tests will be filtered by TESTTYPE parameter if specified.
 function find_tests() {
-    local tests=$(find . -maxdepth 1 -name '*.sh' -a -perm -o+x)
+    # Search in both root directory and tests/ subdirectory
+    local tests_root=$(find . -maxdepth 1 -name '*.sh' -a -perm -o+x)
+    local tests_subdir=""
+    if [[ -d tests ]]; then
+        tests_subdir=$(find tests -maxdepth 1 -name '*.sh' -a -perm -o+x)
+    fi
+    
+    local tests="${tests_root} ${tests_subdir}"
 
     local newtests=""
     local skipped_tests=""
     for f in ${tests}; do
+        # Skip empty entries from string concatenation
+        [[ -z "${f}" ]] && continue
+        
         if should_skip_test ${f}; then
             skipped_tests+="${f}"
         elif [[ "$TESTTYPE" != "" && "$(grep TESTTYPE= ${f})" =~ "${TESTTYPE}" ]]; then
@@ -255,8 +265,19 @@ if [[ $# != 0 ]]; then
         else
             test="${t}.sh"
         fi
-        if ! should_skip_test ${test}; then
-            tests+="${test} "
+        
+        # Check for test in current directory first (backward compatibility)
+        if [[ -f "${test}" ]]; then
+            if ! should_skip_test ${test}; then
+                tests+="${test} "
+            fi
+        # Check for test in tests/ subdirectory
+        elif [[ -f "tests/${test}" ]]; then
+            if ! should_skip_test "tests/${test}"; then
+                tests+="tests/${test} "
+            fi
+        else
+            echo "Warning: Test ${test} not found in root directory or tests/ subdirectory"
         fi
     done
 elif [[ "${ghprbActualCommit}" != "" ]]; then
@@ -264,25 +285,31 @@ elif [[ "${ghprbActualCommit}" != "" ]]; then
     tests=""
 
     candidates="$(for f in ${files}; do
-        # Only accept files that are .sh or .ks.in files in this top-level directory.
+        # Accept files that are .sh or .ks.in files in either the top-level directory or tests/ subdirectory.
         # Those are the tests.  If either file for a particular test changed, we want
         # to run the test.  The first step of figuring this out is stripping off
-        # the file extension.
-        if [[ ! "${f}" == */* && ("${f}" == *sh || "${f}" == *ks.in) ]]; then
-            echo "${f%%.*} "
+        # the file extension and directory path.
+        if [[ ! "${f}" == */*/* && ("${f}" == *sh || "${f}" == *ks.in) ]]; then
+            if [[ "${f}" == tests/* ]]; then
+                # Extract test name from tests/testname.ext
+                echo "${f#tests/}" | sed 's/\.[^.]*$//' | tr '\n' ' '
+            else
+                # Extract test name from testname.ext in root directory
+                echo "${f%%.*} "
+            fi
         fi
      done | uniq)"
 
     # And then add the .sh suffix back on to everything in $candidates.  That will
     # give us the list of tests to be run.
     for c in ${candidates}; do
-
-        # Skip files that are not executable.
-        if [[ ! -x "${c}.sh" ]]; then
-            continue
+        # Check for test in current directory first (backward compatibility)
+        if [[ -x "${c}.sh" ]]; then
+            tests+="${c}.sh "
+        # Check for test in tests/ subdirectory
+        elif [[ -x "tests/${c}.sh" ]]; then
+            tests+="tests/${c}.sh "
         fi
-
-        tests+="${c}.sh "
     done
 
     # Nothing find, find all tests and use TESTTYPE if specified.

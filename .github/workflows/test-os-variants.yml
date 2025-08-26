@@ -123,7 +123,7 @@ jobs:
           sudo rm -rf * .git
 
       - name: Check out kickstart-tests
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: rhinstaller/kickstart-tests
           ref: ${{ needs.pr-info.outputs.sha }}
@@ -135,14 +135,14 @@ jobs:
         run: scripts/generate-testcases.py -t ./testlib/test_cases/kstest-template.tc.yaml.j2 . -o ./testlib/test_cases
 
       - name: Clone Permian repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: rhinstaller/permian
           path: permian
           ref: main
 
       - name: Clone tplib repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: rhinstaller/tplib
           path: tplib

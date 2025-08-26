@@ -100,6 +100,15 @@ issues:
   - description: "[1453] https://github.com/rhinstaller/kickstart-tests/issues/1453"
     first_grep: "*** ERROR: Expected 2 SUCCESS messages, but found 2."
 
+  - description: "[1489] https://github.com/rhinstaller/kickstart-tests/issues/1489"
+    first_grep: "PayloadInstallationError: Failed to download the following packages: Cannot set CURLOPT_MAX_RECV_SPEED_LARGE option"
+
+  - description: "[1399] https://github.com/rhinstaller/kickstart-tests/issues/1399"
+    first_grep: "ERROR.*CRIT kernel:Warning: Unmaintained driver is detected"
+
+  - description: "[1402] https://github.com/rhinstaller/kickstart-tests/issues/1402"
+    first_grep: "^[0-9][0-9]:.*Thread AnaTaskThread-RunInstallationTask-1 has failed: Traceback.*IsRunning"
+
 closed_issues:
   # Tracked in [1311]
   - description: "[1202] https://github.com/rhinstaller/kickstart-tests/issues/1202"

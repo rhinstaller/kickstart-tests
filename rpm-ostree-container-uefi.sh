@@ -18,7 +18,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="payload uefi ostree bootc keyboard reboot skip-on-rhel-8 skip-on-rhel-9 skip-on-rhel-10 skip-on-centos-10"
+TESTTYPE="payload uefi ostree bootc keyboard reboot skip-on-rhel-8"
 
 . ${KSTESTDIR}/functions.sh
 

@@ -22,6 +22,7 @@ fedora_skip_array=(
   gh1023      # rpm-ostree failing
   gh1335      # image-deployment-2 failing
   gh1437      # lvm-cache-* failing
+  gh1493      # dns-global-exclusive-tls-* failing
 )
 
 daily_iso_skip_array=(

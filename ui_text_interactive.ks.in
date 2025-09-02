@@ -8,7 +8,19 @@
 # Run the installation in the text mode.
 text
 
+%pre
+
+level=$(cat /proc/sys/kernel/printk | cut -f 1)
+if [ $level != 1 ]; then
+    echo "Unexpected kernel messages log level ${level}" >> /root/RESULT
+fi
+
+%end
+
 %post --nochroot
+@KSINCLUDE@ post-nochroot-lib-network.sh
+copy_pre_stage_result
+
 @KSINCLUDE@ post-nochroot-lib-ui.sh
 
 # Check the installation mode.

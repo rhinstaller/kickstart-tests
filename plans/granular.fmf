@@ -1,0 +1,28 @@
+summary: Run anaconda tests granurally on CentOS stream images
+provision:
+  hardware:
+      virtualization:
+          is-supported: true
+      memory: '>= 8 GB'
+
+discover:
+    - how: fmf
+      filter: "tag: -knownfailure & tag: -manual & tag:-skip-on-rhel"
+
+execute:
+    how: tmt
+
+
+prepare:
+    - how: install
+      package:
+        - podman
+        - qemu-kvm
+        - libvirt
+        - git
+#    - how: shell
+#      script:
+#        - curl --insecure -o ./data/images/boot-rhel10.iso http://ftp.sh.cvut.cz/centos-stream/10-stream/BaseOS/x86_64/iso/CentOS-Stream-10-20250707.0-x86_64-boot.iso
+
+report:
+    how: html

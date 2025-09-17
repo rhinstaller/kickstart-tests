@@ -18,6 +18,8 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
+# modification to trigger CI
+
 TESTTYPE="payload uefi ostree bootc reboot skip-on-rhel-8"
 
 . ${KSTESTDIR}/functions.sh

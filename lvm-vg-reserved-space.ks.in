@@ -1,0 +1,46 @@
+# Check whether volume groups are created with a requested amount of free space
+# (absolute amount and percentage).
+
+%ksappend repos/default.ks
+%ksappend common/common_no_storage_and_payload.ks
+%ksappend payload/default_packages.ks
+
+zerombr
+clearpart --all --initlabel
+
+reqpart --add-boot
+part pv.01 --size=6000
+part pv.02 --size=2000
+volgroup vg1 pv.01 --reserved-percent=10
+volgroup vg2 pv.02 --reserved-space=100
+logvol swap --fstype=swap --name=swap --vgname=vg1 --size=1000
+logvol / --name=root --vgname=vg1 --size=4000 --grow
+logvol /home --name=home --vgname=vg2 --size=1000 --grow
+
+%packages
+python3
+%end
+
+%post
+# verify sizes of reserved space/percentage in VGs
+vg1_free_expected_pct=10 # 10 %
+vg2_free_expected=100    # 100 MiB
+vg1_size=6000
+vg2_size=2000
+
+vg1_free=$(vgs --noheadings -o free --unit=m --nosuffix vg1)
+vg2_free=$(vgs --noheadings -o free --unit=m --nosuffix vg2)
+vg1_free_pct=$(python3 -c "print(int(round((${vg1_free}*100)/${vg1_size})))")
+
+if (( vg1_free_pct != vg1_free_expected_pct )); then
+    echo "*** Free space on vg1 is incorrect (${vg1_free} MiB -> ${vg1_free_pct} %, expected ${vg1_free_expected_pct} %)." >> /root/RESULT
+fi
+
+if (( ${vg2_free%.*} != vg2_free_expected )); then
+    echo "*** Free space on vg2 is incorrect (${vg2_free} MiB, expected ${vg2_free_expected} MiB)." >> /root/RESULT
+fi
+
+if [ ! -e /root/RESULT ]; then
+    echo SUCCESS > /root/RESULT
+fi
+%end

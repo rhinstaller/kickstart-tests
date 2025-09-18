@@ -65,17 +65,21 @@ check_mount_point() {
     fi
 
     found_options="$( findmnt --fstab $device -o OPTIONS --noheadings )"
+    record_found=$?
 
-    if [ "$options" != "$found_options" ]; then
-        echo "${device} shouldn't have options ${found_options}" >>/root/RESULT
+    if [ $record_found -ne 0 ]; then
+        echo "*** ${device} not found in fstab." >>/root/RESULT
+    else
+        if [ "$options" != "$found_options" ]; then
+            echo "${device} shouldn't have options ${found_options}" >>/root/RESULT
+        fi
     fi
-
 }
 
 check_mount_point "/dev/vda1" "/boot"  "ext2" "defaults" ""
 check_mount_point "/dev/vda2" "/"      "ext4" "defaults" "root-test-label"
 check_mount_point "/dev/vda3" "/home"  "ext4" "nofail"   ""
-check_mount_point "/dev/vda4" "[SWAP]" "swap" ""         ""
+check_mount_point "/dev/vda4" "[SWAP]" "swap" "defaults" ""
 
 if [ ! -e /root/RESULT ]; then
     echo SUCCESS >/root/RESULT

@@ -7,6 +7,7 @@ bootloader --timeout=1
 mount /dev/vda2 /boot
 mount /dev/vda3 / --reformat=ext4 --mkfsoptions="-L root-test-label"
 mount /dev/vda4 /home --mountoptions="nofail"
+# RHEL-61460
 # Do not reuse one of the swap partitions
 # mount /dev/vda5 none
 mount /dev/vda6 none
@@ -92,11 +93,31 @@ check_not_in_fstab() {
     fi
 }
 
+check_swap_activated() {
+    local device="$1"
+    swapon -s | grep "${device}"
+    if [[ $? -ne 0 ]]; then
+        echo "*** Swap on ${device} should be activated" >> /root/RESULT
+    fi
+}
+
+check_swap_not_activated() {
+    local device="$1"
+    swapon -s | grep "${device}"
+    if [[ $? -eq 0 ]]; then
+        echo "*** Swap on ${device} should not be activated" >> /root/RESULT
+    fi
+}
+
 check_mount_point "/dev/vda2" "/boot"  "ext4" "defaults" ""
 check_mount_point "/dev/vda3" "/"      "ext4" "defaults" "root-test-label"
 check_mount_point "/dev/vda4" "/home"  "ext4" "nofail"   ""
 check_not_in_fstab "/dev/vda5"
 check_mount_point "/dev/vda6" "[SWAP]" "swap" "defaults" ""
+
+check_swap_activated "/dev/vda6"
+# RHEL-61460
+check_swap_not_activated "/dev/vda5"
 
 if [ ! -e /root/RESULT ]; then
     echo SUCCESS >/root/RESULT

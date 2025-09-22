@@ -4,10 +4,12 @@
 network --bootproto=dhcp
 bootloader --timeout=1
 
-mount /dev/vda1 /boot
-mount /dev/vda2 / --reformat=ext4 --mkfsoptions="-L root-test-label"
-mount /dev/vda3 /home --mountoptions="nofail"
-mount /dev/vda4 none
+mount /dev/vda2 /boot
+mount /dev/vda3 / --reformat=ext4 --mkfsoptions="-L root-test-label"
+mount /dev/vda4 /home --mountoptions="nofail"
+# Do not reuse one of the swap partitions
+# mount /dev/vda5 none
+mount /dev/vda6 none
 
 keyboard us
 lang en_US.UTF-8
@@ -20,28 +22,32 @@ shutdown
 
 %pre
 
-# Do the partitioning here.
-parted /dev/vda mklabel msdos
-sleep 1
+DISK=/dev/vda
 
-parted --align=none /dev/vda mkpart primary 512K 1.5G
-sleep 1
-mkfs.ext2 /dev/vda1
+wipefs -a ${DISK}
+sfdisk ${DISK} <<'EOF'
+label: gpt
+size=1MiB,type="BIOS boot"
+size=1024MiB,type="Linux filesystem"
+size=4096MiB,type="Linux filesystem"
+size=1024MiB,type="Linux filesystem"
+size=1024MiB,type="Linux filesystem"
+size=1024MiB,type="Linux filesystem"
+EOF
 
-parted --align=none /dev/vda mkpart primary 1.5G 8G
-sleep 1
-mkfs.ext2 /dev/vda2
+udevadm settle
+udevadm settle
 
-parted --align=none /dev/vda mkpart primary 8G 9G
-sleep 1
-mkfs.ext4 /dev/vda3
+mkfs.ext4 ${DISK}2
+mkfs.ext4 ${DISK}3
+mkfs.ext4 ${DISK}4
+mkswap ${DISK}5
+mkswap ${DISK}6
 
-parted --align=none /dev/vda mkpart primary 9G 10G
-sleep 1
-mkswap /dev/vda4
 %end
 
 %post
+
 # Check the existence of mount points.
 check_mount_point() {
     local device="$1" mount_point="$2" fstype="$3" options="$4" label="$5"
@@ -76,10 +82,21 @@ check_mount_point() {
     fi
 }
 
-check_mount_point "/dev/vda1" "/boot"  "ext2" "defaults" ""
-check_mount_point "/dev/vda2" "/"      "ext4" "defaults" "root-test-label"
-check_mount_point "/dev/vda3" "/home"  "ext4" "nofail"   ""
-check_mount_point "/dev/vda4" "[SWAP]" "swap" "defaults" ""
+check_not_in_fstab() {
+    local device=$1
+
+    fstab_record="$( findmnt --fstab $device --noheadings )"
+    record_found=$?
+    if [ $record_found -eq 0 ]; then
+        echo "*** ${device} should not be in fstab." >>/root/RESULT
+    fi
+}
+
+check_mount_point "/dev/vda2" "/boot"  "ext4" "defaults" ""
+check_mount_point "/dev/vda3" "/"      "ext4" "defaults" "root-test-label"
+check_mount_point "/dev/vda4" "/home"  "ext4" "nofail"   ""
+check_not_in_fstab "/dev/vda5"
+check_mount_point "/dev/vda6" "[SWAP]" "swap" "defaults" ""
 
 if [ ! -e /root/RESULT ]; then
     echo SUCCESS >/root/RESULT

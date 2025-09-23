@@ -62,11 +62,12 @@ KEEPIT=${KEEPIT:-0}
 UPDATES_IMG=""
 
 TESTTYPE=""
+MULTI_TESTTYPES=""
 SKIP_TESTTYPES=""
 TIMEOUT=0
 DRY_MODE=""
 
-while getopts ":i:k:t:s:u:b:p:o:rx:d" opt; do
+while getopts ":i:k:t:T:s:u:b:p:o:rx:d" opt; do
     case $opt in
        i)
            # If this wasn't set from the environment, set it from the command line
@@ -84,6 +85,12 @@ while getopts ":i:k:t:s:u:b:p:o:rx:d" opt; do
            # Only run tests that have TESTTYPE=<this value> in them.  Tests can have
            # more than one type.  We'll do a pretty stupid test for it.
            TESTTYPE=$OPTARG
+           ;;
+       T)
+           # Only run tests that have TESTTYPE matching any of the comma-delimited values.
+           # Multiple test types can be specified as a comma delimited string:
+           # -T "network,storage"
+           MULTI_TESTTYPES=$OPTARG
            ;;
        s)
            # Exclude tests of the given test types. Multiple test types can be specified
@@ -126,7 +133,7 @@ while getopts ":i:k:t:s:u:b:p:o:rx:d" opt; do
            DRY_MODE="substitute_kickstarts"
            ;;
        *)
-           echo "Usage: run_kickstart_tests.sh [-i boot.iso] [-k 0|1|2] [-t test_type_to_run] [-s test_types_to_ignore] [-u link_to_updates.img] [-b additional_boot_options] [-p platform_name] [-o ksappend_overrides] [tests]"
+           echo "Usage: run_kickstart_tests.sh [-i boot.iso] [-k 0|1|2] [-t test_type_to_run] [-T test_types_to_run] [-s test_types_to_ignore] [-u link_to_updates.img] [-b additional_boot_options] [-p platform_name] [-o ksappend_overrides] [tests]"
            exit 1
            ;;
     esac
@@ -223,7 +230,21 @@ function find_tests() {
             skipped_tests+="${f}"
         elif [[ "$TESTTYPE" != "" && "$(grep TESTTYPE= ${f})" =~ "${TESTTYPE}" ]]; then
             newtests+="${f} "
-        elif [[ "$TESTTYPE" == "" && ! "$(grep TESTTYPE= ${f})" =~ knownfailure ]]; then
+        elif [[ "$TESTTYPE" == "" && "$MULTI_TESTTYPES" != "" ]]; then
+            # Handle -T option with multiple comma-delimited test types
+            # -t option takes precedence over -T option
+            local test_types_in_file="$(grep TESTTYPE= ${f})"
+            local match_found=false
+            for testtype in $(echo "${MULTI_TESTTYPES}" | tr ',' ' '); do
+                if [[ "${test_types_in_file}" =~ "${testtype}" ]]; then
+                    match_found=true
+                    break
+                fi
+            done
+            if [[ "${match_found}" == true ]]; then
+                newtests+="${f} "
+            fi
+        elif [[ "$TESTTYPE" == "" && "$MULTI_TESTTYPES" == "" && ! "$(grep TESTTYPE= ${f})" =~ knownfailure ]]; then
             # Skip any test with the type "knownfailure".  If you want to run these (to
             # see if they are still failing, for instance) you can add "-t knownfailure"
             # on the command line.

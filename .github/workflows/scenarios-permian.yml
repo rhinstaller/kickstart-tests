@@ -51,22 +51,12 @@ jobs:
           set -eux
           TESTPLAN="./testlib/test_plans/daily-${{ matrix.scenario }}.plan.yaml"
           TEMPLATE="${TESTPLAN}.j2"
-          if [ "${{ matrix.scenario }}" == "daily-iso" ]; then
-            VARIABLE="SKIP_TESTTYPES_DAILY_ISO"
-          elif [ "${{ matrix.scenario }}" == "rhel8" ]; then
-            VARIABLE="SKIP_TESTTYPES_RHEL8"
-          elif [ "${{ matrix.scenario }}" == "rhel9" ]; then
-            VARIABLE="SKIP_TESTTYPES_RHEL9"
-          elif [ "${{ matrix.scenario }}" == "rhel10" ]; then
-            VARIABLE="SKIP_TESTTYPES_RHEL10"
-          elif [ "${{ matrix.scenario }}" == "centos10" ]; then
-            VARIABLE="SKIP_TESTTYPES_CENTOS10"
-          fi
-          if [ -e ${TEMPLATE} ] && [ -n ${VARIABLE} ]; then
+          OS_VARIANT="${{ matrix.scenario }}"
+          if [ -e ${TEMPLATE} ] && [ -n ${OS_VARIANT} ]; then
             scripts/generate-testplan.py \
               -t ${TEMPLATE} \
               -f ./containers/runner/skip-testtypes \
-              -s ${VARIABLE} \
+              -r ${OS_VARIANT} \
               -o ${TESTPLAN} \
               --verbose
           fi

@@ -10,6 +10,9 @@ common_skip_array=(
 
 fedora_skip_array=(
   skip-on-fedora
+)
+
+fedora_disabled_array=(
   gh576       # clearpart-4 test is flaky on all scenarios
   gh595       # proxy-cmdline failing on all scenarios
   gh641       # packages-multilib failing on systemd conflict
@@ -25,21 +28,23 @@ fedora_skip_array=(
   gh1493      # dns-global-exclusive-tls-* failing
 )
 
-daily_iso_skip_array=(
+daily_iso_disabled_array=(
   gh1434      # reboot-inital-setup-* failing
 )
 
-rawhide_skip_array=(
+rawhide_disabled_array=(
 )
 
-rawhide_text_skip_array=(
-  skip-on-fedora
+rawhide_text_disabled_array=(
   rhbz1853668 # multipath device not constructed back after installation
 )
 
 rhel8_skip_array=(
   skip-on-rhel
   skip-on-rhel-8
+)
+
+rhel8_disabled_array=(
   gh576       # clearpart-4 test is flaky on all scenarios
   gh595       # proxy-cmdline failing on all scenarios
   gh774       # autopart-luks-1 failing
@@ -50,6 +55,9 @@ rhel8_skip_array=(
 rhel9_skip_array=(
   skip-on-rhel
   skip-on-rhel-9
+)
+
+rhel9_disabled_array=(
   gh576       # clearpart-4 test is flaky on all scenarios
   gh595       # proxy-cmdline failing on all scenarios
   gh604       # packages-weakdeps: "gnupg2 --recommends has changed, test needs to be updated"
@@ -58,7 +66,7 @@ rhel9_skip_array=(
   gh804       # tests requiring dvd iso failing
 )
 
-rhel10_centos10_skip_array=(
+rhel10_centos10_disabled_array=(
   gh576       # clearpart-4 test is flaky on all scenarios
   gh804       # tests requiring dvd iso failing
   gh1090      # raid-1-reqpart failing
@@ -74,6 +82,9 @@ rhel10_skip_array=(
 centos10_skip_array=(
   skip-on-centos
   skip-on-centos-10
+)
+
+centos10_disabled_array=(
   gh1466      # ftp source tests failing
   gh1474      # proxy-cmdline failing
 )
@@ -94,13 +105,23 @@ _join_args_by_comma(){
 }
 
 # Do not forget to add new releases below as well
-SKIP_TESTTYPES_RAWHIDE=$(_join_args_by_comma "${common_skip_array[@]}" "${fedora_skip_array[@]}" "${rawhide_skip_array[@]}")
-SKIP_TESTTYPES_RAWHIDE_TEXT=$(_join_args_by_comma "${common_skip_array[@]}" "${rawhide_text_skip_array[@]}")
-SKIP_TESTTYPES_DAILY_ISO=$(_join_args_by_comma "${common_skip_array[@]}" "${fedora_skip_array[@]}" "${daily_iso_skip_array[@]}")
-SKIP_TESTTYPES_RHEL8=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel8_skip_array[@]}")
-SKIP_TESTTYPES_RHEL9=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel9_skip_array[@]}")
-SKIP_TESTTYPES_RHEL10=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel10_centos10_skip_array[@]}" "${rhel10_skip_array[@]}")
-SKIP_TESTTYPES_CENTOS10=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel10_centos10_skip_array[@]}" "${centos10_skip_array[@]}")
-SKIP_TESTTYPES_RHEL8_DAILY=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel8_daily_skip_array[@]}")
+SKIPPED_TESTTYPES_RAWHIDE=$(_join_args_by_comma "${common_skip_array[@]}" "${fedora_skip_array[@]}")
+SKIPPED_TESTTYPES_RAWHIDE_TEXT=$(_join_args_by_comma "${common_skip_array[@]}" "${fedora_skip_array[@]}")
+SKIPPED_TESTTYPES_DAILY_ISO=$(_join_args_by_comma "${common_skip_array[@]}" "${fedora_skip_array[@]}")
+SKIPPED_TESTTYPES_RHEL8=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel8_skip_array[@]}")
+SKIPPED_TESTTYPES_RHEL9=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel9_skip_array[@]}")
+SKIPPED_TESTTYPES_RHEL10=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel10_skip_array[@]}")
+SKIPPED_TESTTYPES_CENTOS10=$(_join_args_by_comma "${common_skip_array[@]}" "${centos10_skip_array[@]}")
+SKIPPED_TESTTYPES_RHEL8_DAILY=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel8_daily_skip_array[@]}")
 # Tests run on an anaconda pull request by comment
-SKIP_TESTTYPES_ANACONDA_PR=$(_join_args_by_comma "${common_skip_array[@]}" "${anaconda_pr_skip_array[@]}")
+SKIPPED_TESTTYPES_ANACONDA_PR=$(_join_args_by_comma "${common_skip_array[@]}" "${anaconda_pr_skip_array[@]}")
+
+DISABLED_TESTTYPES_DAILY_ISO=$(_join_args_by_comma "${fedora_disabled_array[@]}" "${daily_iso_disabled_array[@]}")
+DISABLED_TESTTYPES_RAWHIDE=$(_join_args_by_comma "${fedora_disabled_array[@]}" "${rawhide_disabled_array[@]}")
+DISABLED_TESTTYPES_RHEL8=$(_join_args_by_comma "${rhel8_disabled_array[@]}")
+DISABLED_TESTTYPES_RHEL9=$(_join_args_by_comma "${rhel9_disabled_array[@]}")
+DISABLED_TESTTYPES_RHEL10=$(_join_args_by_comma "${rhel10_centos10_disabled_array[@]}")
+DISABLED_TESTTYPES_CENTOS10=$(_join_args_by_comma "${rhel10_centos10_disabled_array[@]}" "${centos10_disabled_array[@]}")
+
+# Keeping for scripts/run-ci.sh
+SKIP_TESTTYPES_RAWHIDE="${SKIPPED_TESTTYPES_RAWHIDE},${DISABLED_TESTTYPES_RAWHIDE}"

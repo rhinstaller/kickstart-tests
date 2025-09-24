@@ -73,7 +73,6 @@ def get_arguments_for_branch(branch, skip_file):
 def parse_args():
     _parser = argparse.ArgumentParser(
         description="Generate kickstart tests launch script arguments for given os variant or git branch. "
-                    "Determines the platform and updates the skipped tests."
     )
     _parser.add_argument("--skip-testtypes", "-s", type=str, metavar="TYPE[,TYPE..]",
                          help="skip tests with TYPE (tag)")

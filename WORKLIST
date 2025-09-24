@@ -48,8 +48,6 @@ MEDIUM TESTS
       be able to calculate that ahead of time given control over the VM and verify the created partition matches.
     - Tweaking the amount of memory/disk in the VM to be numbers that fall on boundaries of the recommended size algorithm can also be useful.
     - Add this to an existing test that does custom partitioning.
-* volgroup --reserved-space/--reserved-percent
-    - These options specify that space should be left free in a volgroup.  This can likely be verified somehow.
 
 HARD TESTS
 ==========

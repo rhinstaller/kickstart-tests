@@ -408,6 +408,14 @@ Service jobs
 These jobs don't have any particular infrastructure requirements. They run on
 GitHub's infrastructure and can be run manually by a developer.
 
+External test data
+------------------
+Some of the tests use content not covered by the common `*.ks.in`, `*.sh` and
+fragment files. Namely `preexisting-btrfs.tar.xz` and `raid-ddf.tar.xz` contain
+disk images with a specific content and `modular-repo.tar.gz` contains a repository
+with package modules. Content of the modular repo has been generated from
+https://gitlab.cee.redhat.com/rtt/rpm-test-repos.
+
 .. _runner documentation: ./containers/runner/README.md
 .. _containers: ./containers
 .. _self-hosted GitHub action runners: https://docs.github.com/en/free-pro-team@latest/actions/hosting-your-own-runners

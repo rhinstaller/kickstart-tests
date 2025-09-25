@@ -57,7 +57,7 @@ jobs:
     - name: Run the tests
       uses: sclorg/testing-farm-as-github-action@main
       with:
-        compose: Fedora-39
+        compose: Fedora-42
         api_key: ${{ secrets.TF_API_KEY }}
         git_url: "https://github.com/${{ github.repository }}"
         git_ref: "refs/pull/${{ github.event.issue.number }}/head"

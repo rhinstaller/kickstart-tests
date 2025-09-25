@@ -145,7 +145,7 @@ jobs:
           PYTHONPATH=${PYTHONPATH:-}:${{ github.workspace }}/tplib \
           ./run_subset --debug-log permian.log \
             --settings settings.ini \
-            --override workflows.dry_run=False \
+            --override workflows.dry_run=True \
             --testcase-query '${{ steps.generate_query.outputs.query }}' \
             run_event '{
               "type":"everything",

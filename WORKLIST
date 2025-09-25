@@ -74,3 +74,4 @@ INFRASTRUCTURE CHANGES
     - Add a TESTTYPE for specifying architecture?
     - Are some tests inherently architecture-specific? 
     - Add options to run_kickstart_tests.sh to run on a given architecture.
+

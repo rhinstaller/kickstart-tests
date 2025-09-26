@@ -15,7 +15,6 @@ fedora_skip_array=(
   gh641       # packages-multilib failing on systemd conflict
   gh774       # autopart-luks-1 failing
   gh777       # raid-1-reqpart failing
-  gh910       # stage2-from-ks test needs to be fixed for daily-iso
   gh890       # default-systemd-target-vnc-graphical-provides flaking too much
   rhbz1853668 # multipath device not constructed back after installation
   gh975       # packages-default failing
@@ -27,6 +26,7 @@ fedora_skip_array=(
 
 daily_iso_skip_array=(
   gh1434      # reboot-inital-setup-* failing
+  gh910       # stage2-from-ks test needs to be fixed for daily-iso
 )
 
 rawhide_skip_array=(

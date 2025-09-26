@@ -41,6 +41,11 @@ if [ -n "${TESTTYPE}" ]; then
     TESTTYPE_ARG="-t ${TESTTYPE}"
 fi
 
+TESTTYPES_ARG=""
+if [ -n "${TESTTYPES}" ]; then
+    TESTTYPES_ARG="-T ${TESTTYPES}"
+fi
+
 SKIP_TESTTYPES_ARG=""
 if [ -n "${SKIP_TESTTYPES}" ]; then
     SKIP_TESTTYPES_ARG="-s ${SKIP_TESTTYPES}"
@@ -81,7 +86,7 @@ fi
 TEST_LOG=/var/tmp/kstest.log
 pushd ${KSTESTS_DIR}
 set +e
-scripts/run_kickstart_tests.sh -x ${TIMEOUT} ${DRY_RUN_ARG} -k ${KSTESTS_KEEP} -i ${ISO_DIR}/${BOOT_ISO} ${UPDATES_IMAGE_ARG} ${PLATFORM_ARG} ${TESTTYPE_ARG} ${SKIP_TESTTYPES_ARG} ${RETRY_ARG} ${KSTESTS_TEST} 2>&1 | tee $TEST_LOG
+scripts/run_kickstart_tests.sh -x ${TIMEOUT} ${DRY_RUN_ARG} -k ${KSTESTS_KEEP} -i ${ISO_DIR}/${BOOT_ISO} ${UPDATES_IMAGE_ARG} ${PLATFORM_ARG} ${TESTTYPE_ARG} ${TESTTYPES_ARG} ${SKIP_TESTTYPES_ARG} ${RETRY_ARG} ${KSTESTS_TEST} 2>&1 | tee $TEST_LOG
 RC=$?
 set -e
 popd

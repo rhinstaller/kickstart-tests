@@ -22,6 +22,24 @@ import argparse
 import subprocess
 from jinja2 import Template
 
+OS_VARIANT_TO_SKIPPED = {
+    'daily-iso': 'SKIPPED_TESTTYPES_DAILY_ISO',
+    'rawhide': 'SKIPPED_TESTTYPES_RAWHIDE',
+    'rhel8': 'SKIPPED_TESTTYPES_RHEL8',
+    'rhel9': 'SKIPPED_TESTTYPES_RHEL9',
+    'rhel10': 'SKIPPED_TESTTYPES_RHEL10',
+    'centos10': 'SKIPPED_TESTTYPES_CENTOS10',
+}
+
+OS_VARIANT_TO_DISABLED = {
+    'daily-iso': 'DISABLED_TESTTYPES_DAILY_ISO',
+    'rawhide': 'DISABLED_TESTTYPES_RAWHIDE',
+    'rhel8': 'DISABLED_TESTTYPES_RHEL8',
+    'rhel9': 'DISABLED_TESTTYPES_RHEL9',
+    'rhel10': 'DISABLED_TESTTYPES_RHEL10',
+    'centos10': 'DISABLED_TESTTYPES_CENTOS10',
+}
+
 
 def parse_args():
     _parser = argparse.ArgumentParser(description="Generate testplan for scenario from template and skip-test tags")
@@ -31,9 +49,8 @@ def parse_args():
     _parser.add_argument("--skiptest-file", "-f", type=str, required=True,
                          metavar="SKIP_TEST_FILE",
                          help="File with skip test variables")
-    _parser.add_argument("--skiptest-variable", "-s", type=str, required=True,
-                         metavar="SKIP_TEST_VARIABLE",
-                         help="Variable from the file to be used.")
+    _parser.add_argument("--os-variant", "-r", type=str, metavar="OS_VARIANT",
+                         help="os variant of the boot.iso to be tested (for example rhel9)")
     _parser.add_argument("--output", "-o", type=str,
                          metavar="OUTPUT_FILE",
                          help="Output file.")
@@ -53,14 +70,17 @@ if __name__ == "__main__":
 
     args = parse_args()
 
-    var_value = get_variable_from_shell_file(args.skiptest_variable, args.skiptest_file)
-    tag_list = var_value.split(',')
+    skipped_testtypes = get_variable_from_shell_file(OS_VARIANT_TO_SKIPPED[args.os_variant],
+                                                     args.skiptest_file)
+    disabled_testtypes = get_variable_from_shell_file(OS_VARIANT_TO_DISABLED[args.os_variant],
+                                                      args.skiptest_file)
+    tag_list = skipped_testtypes.split(',') + disabled_testtypes.split(',')
 
     with open(args.template_file, 'r') as f:
         template_tp = f.read()
 
     template = Template(template_tp, trim_blocks=True)
-    header = f"# Query generated from {args.skiptest_variable} of {args.skiptest_file}"
+    header = f"# Query generated for {args.os_variant} from {args.skiptest_file}"
     tp = template.render(skiptags=tag_list)
 
     if args.output:

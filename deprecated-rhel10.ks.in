@@ -1,0 +1,44 @@
+# Check that expected RHEL-10 commands and command options are deprecated
+
+%ksappend repos/default.ks
+%ksappend common/common_no_storage_and_payload.ks
+%ksappend storage/default.ks
+%ksappend payload/default_packages.ks
+
+# Deprecated commands - repo, module, vnc
+repo --name modularity_repo --install --baseurl=@MODULAR-REPO-URL@/modular-repo
+module --name=tr-defaults
+vnc
+
+# Deprecated options - network --teamconfig, --teamslaves
+network --device team0 --teamconfig="{"runner": {"name": "activebackup"}}" --teamslaves="enp2s0'{"prio": -10, "sticky": true}',enp1s0'{"prio": 100}'"
+
+
+%post --nochroot
+# Check deprecation of network --teamconfig option
+if ! $(grep -q "KickstartParseWarning: Ignoring deprecated option on line [0-9]*: The --teamconfig option has been deprecated" /tmp/anaconda.log); then
+    echo 'Deprecation warning is missing for network --teamconfig' >> /mnt/sysroot/root/RESULT
+fi
+
+# Check deprecation of network --teamslaves option
+if ! $(grep -q "KickstartParseWarning: Ignoring deprecated option on line [0-9]*: The --teamslaves option has been deprecated" /tmp/anaconda.log); then
+    echo 'Deprecation warning is missing for network --teamslaves' >> /mnt/sysroot/root/RESULT
+fi
+
+# Check deprecation of vnc command
+if ! $(grep -q "KickstartDeprecationWarning: Ignoring deprecated command on line [0-9]*: *The vnc command has been deprecated" /tmp/anaconda.log); then
+    echo 'Deprecation warning is missing for vnc' >> /mnt/sysroot/root/RESULT
+fi
+
+# Check deprecation of module command
+if ! $(grep -q "KickstartParseWarning: The module command is deprecated." /tmp/anaconda.log); then
+    echo 'Deprecation warning is missing for module' >> /mnt/sysroot/root/RESULT
+fi
+%end
+
+%post
+# No error was written to /root/RESULT file, everything is OK
+if [[ ! -e /root/RESULT ]]; then
+    echo SUCCESS > /root/RESULT
+fi
+%end

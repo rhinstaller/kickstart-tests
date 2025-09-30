@@ -1,0 +1,126 @@
+#version=DEVEL
+
+%ksappend repos/default.ks
+network --bootproto=dhcp
+bootloader --timeout=1
+
+mount /dev/vda2 /boot
+mount /dev/vda3 / --reformat=ext4 --mkfsoptions="-L root-test-label"
+mount /dev/vda4 /home --mountoptions="nofail"
+# RHEL-61460
+# Do not reuse one of the swap partitions
+# mount /dev/vda5 none
+mount /dev/vda6 none
+
+keyboard us
+lang en_US.UTF-8
+timezone America/New_York --utc
+rootpw testcase
+shutdown
+
+%packages
+%end
+
+%pre
+
+DISK=/dev/vda
+
+wipefs -a ${DISK}
+sfdisk ${DISK} <<'EOF'
+label: gpt
+size=1MiB,type="BIOS boot"
+size=1024MiB,type="Linux filesystem"
+size=4096MiB,type="Linux filesystem"
+size=1024MiB,type="Linux filesystem"
+size=1024MiB,type="Linux filesystem"
+size=1024MiB,type="Linux filesystem"
+EOF
+
+udevadm settle
+udevadm settle
+
+mkfs.ext4 ${DISK}2
+mkfs.ext4 ${DISK}3
+mkfs.ext4 ${DISK}4
+mkswap ${DISK}5
+mkswap ${DISK}6
+
+%end
+
+%post
+
+# Check the existence of mount points.
+check_mount_point() {
+    local device="$1" mount_point="$2" fstype="$3" options="$4" label="$5"
+
+    found_mount_point="$( lsblk $device -o MOUNTPOINT --noheadings )"
+
+    if [ "$mount_point" != "$found_mount_point" ]; then
+        echo "${device} shouldn't be mounted at ${found_mount_point}" >>/root/RESULT
+    fi
+
+    found_fstype="$( lsblk $device -o FSTYPE --noheadings )"
+
+    if [ "$fstype" != "$found_fstype" ]; then
+        echo "${device} shouldn't have fstype ${found_fstype}" >>/root/RESULT
+    fi
+
+    found_label="$( lsblk $device -o LABEL --noheadings )"
+
+    if [ "$label" != "$found_label" ]; then
+        echo "${device} shouldn't have label ${found_label}" >>/root/RESULT
+    fi
+
+    found_options="$( findmnt --fstab $device -o OPTIONS --noheadings )"
+    record_found=$?
+
+    if [ $record_found -ne 0 ]; then
+        echo "*** ${device} not found in fstab." >>/root/RESULT
+    else
+        if [ "$options" != "$found_options" ]; then
+            echo "${device} shouldn't have options ${found_options}" >>/root/RESULT
+        fi
+    fi
+}
+
+check_not_in_fstab() {
+    local device=$1
+
+    fstab_record="$( findmnt --fstab $device --noheadings )"
+    record_found=$?
+    if [ $record_found -eq 0 ]; then
+        echo "*** ${device} should not be in fstab." >>/root/RESULT
+    fi
+}
+
+check_swap_activated() {
+    local device="$1"
+    swapon -s | grep "${device}"
+    if [[ $? -ne 0 ]]; then
+        echo "*** Swap on ${device} should be activated" >> /root/RESULT
+    fi
+}
+
+check_swap_not_activated() {
+    local device="$1"
+    swapon -s | grep "${device}"
+    if [[ $? -eq 0 ]]; then
+        echo "*** Swap on ${device} should not be activated" >> /root/RESULT
+    fi
+}
+
+check_mount_point "/dev/vda2" "/boot"  "ext4" "defaults" ""
+check_mount_point "/dev/vda3" "/"      "ext4" "defaults" "root-test-label"
+check_mount_point "/dev/vda4" "/home"  "ext4" "nofail"   ""
+check_not_in_fstab "/dev/vda5"
+check_mount_point "/dev/vda6" "[SWAP]" "swap" "defaults" ""
+
+check_swap_activated "/dev/vda6"
+# RHEL-61460
+check_swap_not_activated "/dev/vda5"
+
+if [ ! -e /root/RESULT ]; then
+    echo SUCCESS >/root/RESULT
+fi
+
+%end

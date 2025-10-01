@@ -15,7 +15,7 @@ jobs:
     runs-on: [self-hosted, kstest]
     strategy:
       matrix:
-        scenario: [daily-iso, rhel9, rhel10, centos10]
+        scenario: [daily-iso, rhel9, rhel10, centos10, fedora-eln]
       fail-fast: false
 
     # these settings depend on the infrastructure; on upshift ocp-master-xxl they take about 4 hours
@@ -98,6 +98,8 @@ jobs:
             echo "platform=rhel10" >> $GITHUB_OUTPUT
           elif [ "${{ matrix.scenario }}" == "centos10" ]; then
             echo "platform=centos10" >> $GITHUB_OUTPUT
+          elif [ "${{ matrix.scenario }}" == "fedora-eln" ]; then
+            echo "platform=fedora-eln" >> $GITHUB_OUTPUT
           else
             echo "Scenario ${{ matrix.scenario }} can't be mapped to platform"
             exit 1
@@ -129,7 +131,8 @@ jobs:
           if [ "${{ matrix.scenario }}" == "rhel8" ] || \
              [ "${{ matrix.scenario }}" == "rhel9" ] || \
              [ "${{ matrix.scenario }}" == "rhel10" ] || \
-             [ "${{ matrix.scenario }}" == "centos10" ]; then
+             [ "${{ matrix.scenario }}" == "centos10" ] || \
+             [ "${{ matrix.scenario }}" == "fedora-eln" ]; then
             source ./scripts/defaults-${{ matrix.scenario }}.sh
             echo "installation_tree=${KSTEST_URL}" >> $GITHUB_OUTPUT
             echo "modular_url=${KSTEST_MODULAR_URL}" >> $GITHUB_OUTPUT

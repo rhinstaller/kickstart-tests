@@ -19,7 +19,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="initial-setup skip-on-rhel-10 skip-on-centos-10"
+TESTTYPE="initial-setup skip-on-rhel-10 skip-on-centos-10 skip-on-fedora-eln"
 
 . ${KSTESTDIR}/functions.sh
 . ${KSTESTDIR}/validate-lib-initial-setup.sh

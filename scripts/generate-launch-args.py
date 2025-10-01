@@ -15,13 +15,22 @@ OS_VARIANT_TO_PLATFORM = {
     'centos10': 'centos10',
 }
 
+OS_VARIANT_TO_SKIPPED = {
+    'daily-iso': 'SKIPPED_TESTTYPES_DAILY_ISO',
+    'rawhide': 'SKIPPED_TESTTYPES_RAWHIDE',
+    'rhel8': 'SKIPPED_TESTTYPES_RHEL8',
+    'rhel9': 'SKIPPED_TESTTYPES_RHEL9',
+    'rhel10': 'SKIPPED_TESTTYPES_RHEL10',
+    'centos10': 'SKIPPED_TESTTYPES_CENTOS10',
+}
+
 OS_VARIANT_TO_DISABLED = {
-    'daily-iso': 'SKIP_TESTTYPES_DAILY_ISO',
-    'rawhide': 'SKIP_TESTTYPES_RAWHIDE',
-    'rhel8': 'SKIP_TESTTYPES_RHEL8',
-    'rhel9': 'SKIP_TESTTYPES_RHEL9',
-    'rhel10': 'SKIP_TESTTYPES_RHEL10',
-    'centos10': 'SKIP_TESTTYPES_CENTOS10',
+    'daily-iso': 'DISABLED_TESTTYPES_DAILY_ISO',
+    'rawhide': 'DISABLED_TESTTYPES_RAWHIDE',
+    'rhel8': 'DISABLED_TESTTYPES_RHEL8',
+    'rhel9': 'DISABLED_TESTTYPES_RHEL9',
+    'rhel10': 'DISABLED_TESTTYPES_RHEL10',
+    'centos10': 'DISABLED_TESTTYPES_CENTOS10',
 }
 
 RE_MASTER = re.compile('^main$')
@@ -44,40 +53,43 @@ def get_skip_testtypes(skip_file, variable):
 def get_arguments_for_branch(branch, skip_file):
     platform = None
     skip_testtypes = []
+    disabled_testtypes = []
 
     if RE_MASTER.match(branch):
         platform = "fedora_rawhide"
-        skipvar = 'SKIP_TESTTYPES_RAWHIDE'
+        os_variant = "rawhide"
     elif RE_FEDORA.match(branch):
         platform = "fedora_rawhide"
-        skipvar = 'SKIP_TESTTYPES_RAWHIDE'
+        os_variant = "rawhide"
     elif RE_RHEL8.match(branch):
         platform = "rhel8"
-        skipvar = 'SKIP_TESTTYPES_RHEL8'
+        os_variant = "rhel8"
     elif RE_RHEL9.match(branch):
         platform = "rhel9"
-        skipvar = 'SKIP_TESTTYPES_RHEL9'
+        os_variant = "rhel9"
     elif RE_RHEL10.match(branch):
         platform = "rhel10"
-        skipvar = 'SKIP_TESTTYPES_RHEL10'
+        os_variant = "rhel10"
     else:
         platform = None
-        skipvar = None
+        os_variant = None
 
-    if skipvar:
-        skip_testtypes = get_skip_testtypes(skip_file, skipvar)
+    if platform:
+        skip_testtypes = get_skip_testtypes(skip_file, OS_VARIANT_TO_SKIPPED[os_variant])
+        disabled_testtypes = get_skip_testtypes(skip_file, OS_VARIANT_TO_DISABLED[os_variant])
 
-    return (platform, skip_testtypes)
+    return (platform, skip_testtypes, disabled_testtypes)
 
 
 def parse_args():
     _parser = argparse.ArgumentParser(
         description="Generate kickstart tests launch script arguments for given os variant or git branch. "
-                    "Determines the platform and updates the skipped tests."
     )
     _parser.add_argument("--skip-testtypes", "-s", type=str, metavar="TYPE[,TYPE..]",
                          help="skip tests with TYPE (tag)")
     _parser.add_argument("--testtype", "-t", type=str, metavar="TYPE",
+                         help="only run tests with TYPE (tag)")
+    _parser.add_argument("--testtypes", "-T", type=str, metavar="TYPE[,TYPE..]",
                          help="only run tests with TYPE (tag)")
     _parser.add_argument("tests", nargs='*', metavar="TESTNAME",
                          help="names of test to be run")
@@ -92,6 +104,8 @@ def parse_args():
                          help="file containing data about disabled tests")
     _parser.add_argument("--anaconda-pr", "-p", action="store_true",
                          help="skip tests not working on anaconda PR")
+    _parser.add_argument("--disabled", "-d", action="store_true",
+                         help="run disabled tests")
     return _parser.parse_args()
 
 
@@ -105,19 +119,22 @@ if __name__ == "__main__":
     platform_args = []
     testtype_args = []
     skip_testtypes_args = []
+    testtypes_args = []
 
     platform = None
+    skipped_testtypes = []
     disabled_testtypes = []
     if args.os_variant:
         platform = OS_VARIANT_TO_PLATFORM[args.os_variant]
+        skipped_testtypes = get_skip_testtypes(skip_file, OS_VARIANT_TO_SKIPPED[args.os_variant])
         disabled_testtypes = get_skip_testtypes(skip_file, OS_VARIANT_TO_DISABLED[args.os_variant])
     elif args.branch:
-        platform, disabled_testtypes = get_arguments_for_branch(args.branch, skip_file)
+        platform, skipped_testtypes, disabled_testtypes = get_arguments_for_branch(args.branch, skip_file)
         if not platform:
             raise ValueError("Platform for branch {} is not defined".format(args.branch))
 
     if args.anaconda_pr:
-        disabled_testtypes.extend(get_skip_testtypes(skip_file, "SKIP_TESTTYPES_ANACONDA_PR"))
+        skipped_testtypes.extend(get_skip_testtypes(skip_file, "SKIPPED_TESTTYPES_ANACONDA_PR"))
 
     if platform:
         platform_args = ["--platform", platform]
@@ -125,13 +142,21 @@ if __name__ == "__main__":
     if args.testtype:
         testtype_args = ["--testtype", args.testtype]
 
-    skip_testtypes = [] if args.force else disabled_testtypes
+    testtypes = disabled_testtypes if args.disabled else []
+    if args.testtypes:
+        testtypes.extend(args.testtypes.split(','))
+    if testtypes:
+        testtypes_args = ["--testtypes", ",".join(testtypes)]
+
+    skip_testtypes = [] if args.force else skipped_testtypes
+    if not args.disabled:
+        skip_testtypes.extend(disabled_testtypes)
     if args.skip_testtypes:
         skip_testtypes.extend(args.skip_testtypes.split(','))
     if skip_testtypes:
         skip_testtypes_args = ["--skip-testtypes", ",".join(skip_testtypes)]
 
-    launch_args = platform_args + skip_testtypes_args + testtype_args + args.tests
+    launch_args = platform_args + skip_testtypes_args + testtype_args + args.tests + testtypes_args
 
     print(
         " ".join(launch_args)

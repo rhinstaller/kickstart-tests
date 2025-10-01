@@ -13,6 +13,8 @@ def parse_args():
                          nargs=1, action="append", help="skip tests with TYPE (tag)")
     _parser.add_argument("--testtype", "-t", type=str, metavar="TYPE",
                          help="only run tests with TYPE (tag)")
+    _parser.add_argument("--testtypes", "-T", type=str, metavar="TYPE[,TYPE..]",
+                         nargs=1, action="append", help="only run tests with TYPE (tag)")
     _parser.add_argument("--platform", "-p", type=str, metavar="PLATFORM", default="",
                          help="platform to be used for tests")
     _parser.add_argument("--print-platform", action="store_true",
@@ -49,6 +51,11 @@ if __name__ == "__main__":
         if args.skip_testtypes:
             skiptypes = ','.join(itertools.chain(*args.skip_testtypes)).split(',')
             conditions.extend(['"{}" not in tc.tags'.format(skiptype) for skiptype in skiptypes])
+        if args.testtypes:
+            testtypes = ','.join(itertools.chain(*args.testtypes)).split(',')
+            testtype_conditions = ['"{}" in tc.tags'.format(testtype) for testtype in testtypes]
+            testtypes_condition = "( " + " or ".join(testtype_conditions) + " )"
+            conditions.append(testtypes_condition)
 
     if not conditions:
         query = "True"

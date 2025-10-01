@@ -86,8 +86,11 @@ echo "PACKAGES=$(cat $ISO_TMP/lorax-packages.log | tr '\n' ' ')"
 #    x86_64
 DISCINFO_VER=$(isoinfo -R -x /.discinfo -i "$IMAGE" | sed -n '2 p')
 if [ -n "$DISCINFO_VER" ]; then
-    # make sure it looks like a Fedora version name/number
-    if [ "$DISCINFO_VER" = "Rawhide" ] || [ $(echo $DISCINFO_VER | cut -d. -f1) -gt 30 ]; then
+    # make sure it looks like a Fedora version name/number, however we have a separate platform for ELN
+    if [ "$DISCINFO_VER" = "Rawhide" ] || \
+        grep -q "^[0-9]$" <<< "${DISCINFO_VER}" && \
+        [ "$(echo $DISCINFO_VER | cut -d. -f1)" -gt 30 ]
+    then
         echo "NAME=fedora"
         echo "VERSION=$DISCINFO_VER"
         exit 0
@@ -96,5 +99,9 @@ fi
 
 
 # Return useful information to stdout
-echo "NAME=$(. "$ISO_TMP/os-release"; echo "$ID")"
+if [ "$DISCINFO_VER" = "eln" ]; then
+    echo "NAME=fedora-eln"
+else
+    echo "NAME=$(. "$ISO_TMP/os-release"; echo "$ID")"
+fi
 echo "VERSION=$(. "$ISO_TMP/os-release"; echo "$VERSION_ID")"

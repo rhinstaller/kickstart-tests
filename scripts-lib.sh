@@ -14,9 +14,10 @@ function get_platform {
        if [ -n "${os_major}" ] ; then
            platform="${os_name}${os_major}"
        fi
-   fi
-   if [ ${os_name} == "fedora" ] ; then
-       platform=fedora
+   elif [ ${os_name} == "fedora" ] ; then
+       platform="fedora"
+   elif [ ${os_name} == "fedora-eln" ] ; then
+       platform="fedora-eln"
    fi
 
    echo ${platform}

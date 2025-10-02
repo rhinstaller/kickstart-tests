@@ -24,7 +24,7 @@ jobs:
         run: |
           PATH=./scripts/:$PATH \
           ./scripts/weekly-summary --rebuild --flake-details \
-          --artifacts=logs-daily-iso,logs-rhel9,logs-rhel10,logs-centos10 \
+          --artifacts=logs-daily-iso,logs-rhel9,logs-rhel10,logs-centos10,logs-fedora-eln \
           --archive-logs /var/tmp/kstest-archive/
 
       - name: Collect logs

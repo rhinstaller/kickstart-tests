@@ -13,6 +13,7 @@ OS_VARIANT_TO_PLATFORM = {
     'rhel9': 'rhel9',
     'rhel10': 'rhel10',
     'centos10': 'centos10',
+    'fedora-eln': 'fedora-eln',
 }
 
 OS_VARIANT_TO_SKIPPED = {
@@ -22,6 +23,7 @@ OS_VARIANT_TO_SKIPPED = {
     'rhel9': 'SKIPPED_TESTTYPES_RHEL9',
     'rhel10': 'SKIPPED_TESTTYPES_RHEL10',
     'centos10': 'SKIPPED_TESTTYPES_CENTOS10',
+    'fedora-eln': 'SKIPPED_TESTTYPES_FEDORA_ELN',
 }
 
 OS_VARIANT_TO_DISABLED = {
@@ -31,6 +33,7 @@ OS_VARIANT_TO_DISABLED = {
     'rhel9': 'DISABLED_TESTTYPES_RHEL9',
     'rhel10': 'DISABLED_TESTTYPES_RHEL10',
     'centos10': 'DISABLED_TESTTYPES_CENTOS10',
+    'fedora-eln': 'DISABLED_TESTTYPES_FEDORA_ELN',
 }
 
 RE_MASTER = re.compile('^main$')

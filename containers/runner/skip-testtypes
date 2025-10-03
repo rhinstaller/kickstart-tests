@@ -87,6 +87,13 @@ centos10_disabled_array=(
   gh1474      # proxy-cmdline failing
 )
 
+fedora_eln_skip_array=(
+  skip-on-fedora-eln
+)
+
+fedora_eln_disabled_array=(
+)
+
 # used in workflows/daily-boot-iso-rhel8.yml
 rhel8_daily_skip_array=(
   skip-on-rhel
@@ -111,6 +118,8 @@ SKIPPED_TESTTYPES_RHEL9=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel9
 SKIPPED_TESTTYPES_RHEL10=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel10_skip_array[@]}")
 SKIPPED_TESTTYPES_CENTOS10=$(_join_args_by_comma "${common_skip_array[@]}" "${centos10_skip_array[@]}")
 SKIPPED_TESTTYPES_RHEL8_DAILY=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel8_daily_skip_array[@]}")
+SKIPPED_TESTTYPES_FEDORA_ELN=$(_join_args_by_comma "${common_skip_array[@]}" "${fedora_eln_skip_array[@]}")
+
 # Tests run on an anaconda pull request by comment
 SKIPPED_TESTTYPES_ANACONDA_PR=$(_join_args_by_comma "${common_skip_array[@]}" "${anaconda_pr_skip_array[@]}")
 
@@ -120,6 +129,7 @@ DISABLED_TESTTYPES_RHEL8=$(_join_args_by_comma "${rhel8_disabled_array[@]}")
 DISABLED_TESTTYPES_RHEL9=$(_join_args_by_comma "${rhel9_disabled_array[@]}")
 DISABLED_TESTTYPES_RHEL10=$(_join_args_by_comma "${rhel10_centos10_disabled_array[@]}")
 DISABLED_TESTTYPES_CENTOS10=$(_join_args_by_comma "${rhel10_centos10_disabled_array[@]}" "${centos10_disabled_array[@]}")
+DISABLED_TESTTYPES_FEDORA_ELN=$(_join_args_by_comma "${common_skip_array[@]}" "${fedora_eln_disabled_array[@]}")
 
 # Keeping for scripts/run-ci.sh
 SKIP_TESTTYPES_RAWHIDE="${SKIPPED_TESTTYPES_RAWHIDE},${DISABLED_TESTTYPES_RAWHIDE}"

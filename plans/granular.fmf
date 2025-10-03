@@ -1,9 +1,24 @@
 summary: Run anaconda tests granurally on CentOS stream images
+description: |
+   Execute TMT test each test alone, without running whole testsuire.
+   example how to run it:
+   tmt -vv run \
+   -e ISO_URL=https://composes.stream.centos.org/stream-10/production/latest-CentOS-Stream/compose/BaseOS/x86_64/iso/CentOS-Stream-10-20251003.0-x86_64-boot.iso \
+   -e PLATFORM_PARAM="--platform rhel10"
+    plan --name granular test --name keyboard
+   possible to pass
+
 provision:
   hardware:
       virtualization:
           is-supported: true
       memory: '>= 8 GB'
+
+environment:
+    DATA_DIR: /opt/anaconda_data_dir
+    ISO_URL: https://composes.stream.centos.org/stream-10/production/latest-CentOS-Stream/compose/BaseOS/x86_64/iso/CentOS-Stream-10-20251003.0-x86_64-boot.iso
+    # PLATFORM_PARAM is passed to TMT tests for launch script. It could be empty in case of fedora.
+    PLATFORM_PARAM: "--platform rhel10"
 
 discover:
     - how: fmf
@@ -20,9 +35,22 @@ prepare:
         - qemu-kvm
         - libvirt
         - git
-#    - how: shell
-#      script:
-#        - curl --insecure -o ./data/images/boot-rhel10.iso http://ftp.sh.cvut.cz/centos-stream/10-stream/BaseOS/x86_64/iso/CentOS-Stream-10-20250707.0-x86_64-boot.iso
+    - how: shell
+      name: prepare directory structure
+      script:
+        - mkdir -p $DATA_DIR/{logs,images}
+        - chmod a+rwx $DATA_DIR
+    - how: shell
+      name: download image to proper location
+      script: |
+        FILE_NAME=$(basename $ISO_URL)
+        IMAGE_DEST="$DATA_DIR/images/$FILE_NAME"
+        TARGET_FILE="boot-${PLATFORM_PARAM##* }.iso"
+        if [ ! -e $IMAGE_DEST ]; then
+          curl --insecure -o "$IMAGE_DEST" "$ISO_URL"
+        fi 
+        # file has to be hardlink or direct file, symlink does not work well here.
+        ln -f "$IMAGE_DEST" "$(dirname $IMAGE_DEST)/$TARGET_FILE"
 
 report:
     how: html

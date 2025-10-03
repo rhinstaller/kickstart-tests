@@ -199,9 +199,10 @@ $CRUN run -it --rm --device=/dev/kvm --publish 127.0.0.1::16509 $PODMAN_SELINUX_
     -v "$DATA_DIR:/opt/kstest/data:z" \
     -v "$BASEDIR:/kickstart-tests:ro,z" \
     $CONTAINER $RUN_COMMAND
-set +x
-# Store the exit status of the CRUN command
 CRUN_EXIT_STATUS=$?
+# Store the exit status of the CRUN command
+set +x
+
 
 # If executed via TMT, store results and logs to proper TMT dir
 # Store logs to TMT_TEST_DATA directory if set

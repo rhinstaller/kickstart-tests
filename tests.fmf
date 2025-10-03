@@ -1940,5 +1940,4 @@
       - network
       test+: vlan-pre.sh
 duration: 50m
-test: './containers/runner/launch '
-# test: './containers/runner/launch --data /var/tmp/ks_data --platform rhel10 '
+test: './containers/runner/launch --data "$DATA_DIR" $PLATFORM_PARAM '

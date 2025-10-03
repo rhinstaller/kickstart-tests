@@ -38,9 +38,7 @@ if __name__ == "__main__":
     conditions = []
     if args.tests:
         conditions = [
-            "("
-            + " or ".join(['tc.name == "{}"'.format(test) for test in args.tests])
-            + ")"
+            "(tc.name in " + str(args.tests).replace('\'', '"') + ")"
         ]
         if args.skip_testtypes:
             skiptypes = ','.join(itertools.chain(*args.skip_testtypes)).split(',')

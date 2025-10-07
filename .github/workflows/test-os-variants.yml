@@ -110,7 +110,7 @@ jobs:
       GITHUB_TOKEN: /home/github/github-token
     strategy:
       matrix:
-        os-variant: [daily-iso, rawhide, rhel9, rhel10, centos10]
+        os-variant: [daily-iso, rawhide, fedora-eln, rhel9, rhel10, centos10]
       fail-fast: false
 
     steps:
@@ -240,6 +240,7 @@ jobs:
           if [ "${{ matrix.os-variant }}" == "rhel8" ] || \
              [ "${{ matrix.os-variant }}" == "rhel9" ] || \
              [ "${{ matrix.os-variant }}" == "rhel10" ] || \
+             [ "${{ matrix.os-variant }}" == "fedora-eln" ] || \
              [ "${{ matrix.os-variant }}" == "centos10" ]; then
             source ./scripts/defaults-${{ matrix.os-variant }}.sh
             echo "installation_tree=${KSTEST_URL}" >> $GITHUB_OUTPUT

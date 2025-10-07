@@ -3,7 +3,7 @@ name: Run disabled tests
 on:
   schedule:
     # run after daily-boot-iso.yml
-    - cron: 0 4 * * *
+    - cron: 0 4 * * 0,1
   workflow_dispatch:
 
 permissions:

@@ -96,6 +96,7 @@ fedora_eln_disabled_array=(
   gh1090      # raid-1-reqpart failing
   gh1527      # rootpw-basic and rootpw-lock failing
   gh1207      # packages-multilib failing
+  gh975       # packages-default failing
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

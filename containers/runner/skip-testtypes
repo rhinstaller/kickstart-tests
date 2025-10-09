@@ -104,6 +104,7 @@ fedora_eln_disabled_array=(
   gh1532      # dns failing
   gh1335      # image-deployment-2 failing
   gh1533      # rpm-ostree-container-* tests failing
+  gh1534      # proxy-cmdline
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

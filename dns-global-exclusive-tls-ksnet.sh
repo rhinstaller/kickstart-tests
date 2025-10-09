@@ -19,7 +19,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE=${TESTTYPE:-"network dns stage2-from-compose gh1493"}
+TESTTYPE=${TESTTYPE:-"network dns stage2-from-compose gh1530"}
 
 . ${KSTESTDIR}/functions.sh
 

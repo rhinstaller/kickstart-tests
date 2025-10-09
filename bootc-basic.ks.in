@@ -1,5 +1,5 @@
-# Substitute something in for REPO or this will all come crashing down.
-bootc --source-imgref=registry:quay.io/fedora-testing/fedora-bootc:rawhide-standard --stateroot=default
+# Substitute something in for KSTEST_OSTREECONTAINER_URL or this will all come crashing down.
+bootc --source-imgref=registry:@KSTEST_OSTREECONTAINER_URL@ --stateroot=default
 
 network --bootproto=dhcp
 

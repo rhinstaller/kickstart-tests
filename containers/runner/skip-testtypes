@@ -62,6 +62,7 @@ rhel9_disabled_array=(
   gh604       # packages-weakdeps: "gnupg2 --recommends has changed, test needs to be updated"
   gh641       # packages-multilib failing on systemd conflict
   gh804       # tests requiring dvd iso failing
+  rhel16355   # mountpoint-assigment-plain waiting for feature release
 )
 
 rhel10_centos10_disabled_array=(

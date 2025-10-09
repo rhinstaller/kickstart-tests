@@ -103,6 +103,7 @@ fedora_eln_disabled_array=(
   gh804       # tests requiring dvd iso failing
   gh1532      # dns failing
   gh1335      # image-deployment-2 failing
+  gh1533      # rpm-ostree-container-* tests failing
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

@@ -64,6 +64,7 @@ rhel9_disabled_array=(
   gh641       # packages-multilib failing on systemd conflict
   gh804       # tests requiring dvd iso failing
   rhel16355   # mountpoint-assigment-plain waiting for feature release
+  gh1536      # groups-and-envs-* failing
 )
 
 rhel10_centos10_disabled_array=(
@@ -72,6 +73,7 @@ rhel10_centos10_disabled_array=(
   gh1090      # raid-1-reqpart failing
   gh1207      # packages-multilib failing
   gh1213      # harddrive-iso-single failing
+  gh1536      # groups-and-envs-* failing
 )
 
 rhel10_skip_array=(
@@ -105,6 +107,7 @@ fedora_eln_disabled_array=(
   gh1335      # image-deployment-2 failing
   gh1533      # rpm-ostree-container-* tests failing
   gh1534      # proxy-cmdline
+  gh1536      # groups-and-envs-* failing
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

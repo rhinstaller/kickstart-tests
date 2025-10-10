@@ -100,6 +100,11 @@ fedora_eln_disabled_array=(
   gh1207      # packages-multilib failing
   gh975       # packages-default failing
   gh1530      # dns-global-exclusive-tls-* stage2-from-compose failing
+  gh804       # tests requiring dvd iso failing
+  gh1532      # dns failing
+  gh1335      # image-deployment-2 failing
+  gh1533      # rpm-ostree-container-* tests failing
+  gh1534      # proxy-cmdline
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

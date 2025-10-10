@@ -20,7 +20,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="payload proxy gh1474"
+TESTTYPE="payload proxy gh1474 gh1534"
 
 . ${KSTESTDIR}/functions.sh
 . ${KSTESTDIR}/functions-proxy.sh

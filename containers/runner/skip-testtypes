@@ -111,6 +111,7 @@ fedora_eln_disabled_array=(
   gh1534      # proxy-cmdline
   gh1536      # groups-and-envs-* failing
   gh1538      # packages-ignorebroken not implemented
+  gh1541      # flatpak-preinstall-* not implemented
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

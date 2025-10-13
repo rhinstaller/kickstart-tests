@@ -8,7 +8,7 @@
 #
 # Alternatively it is also possible to specify tests to run explicitly:
 #
-#  /test-os-variants --testtype TESTTYPE --skip-testtypes TYPE[,TYPE..] TEST1 TEST2
+#  /test-os-variants --testtype TESTTYPE --testtypes TYPE[,TYPE..] --skip-testtypes TYPE[,TYPE..] TEST1 TEST2
 #
 # Examples:
 #
@@ -26,6 +26,9 @@
 #
 # /test-os-variants --skip-testtypes gh123,gh765
 # ... run all the tests while skipping tests with given types (comma separated)
+
+# /test-os-variants --testtypes packaging,payload
+# ... run all the tests of type packaging and payload
 #
 #
 # Lastly there is a dry-run mode, that just indicates which tests would be run

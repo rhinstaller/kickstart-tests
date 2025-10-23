@@ -20,6 +20,6 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="knownfailure payload"
+TESTTYPE="skip-on-rhel-9 payload bootc"
 
 . ${KSTESTDIR}/functions.sh

@@ -1,0 +1,10 @@
+# Test that the bootc kickstart command can install in a common, out-of-the-box
+# scenario.
+
+%ksappend common/common_no_payload.ks
+
+# Setup the bootc image source.
+# Substitute something in for KSTEST_OSTREECONTAINER_URL or this will all come crashing down.
+bootc --source-imgref=registry:@KSTEST_OSTREECONTAINER_URL@ --stateroot=default
+
+%ksappend validation/success_if_result_empty_standalone.ks

@@ -17,7 +17,8 @@
 #
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="image-deployment skip-on-rhel-8 skip-on-rhel-9 gh1335"
+TESTTYPE="image-deployment skip-on-fedora skip-on-rhel-8 skip-on-rhel-10 skip-on-centos-10 skip-on-fedora-eln"
+KICKSTART_NAME=image-deployment-2
 
 . ${KSTESTDIR}/functions.sh
 
@@ -37,7 +38,6 @@ activatable_modules =
      org.fedoraproject.Anaconda.Modules.Network
      org.fedoraproject.Anaconda.Modules.Payloads
      org.fedoraproject.Anaconda.Modules.Storage
-     org.fedoraproject.Anaconda.Modules.Runtime
 
 [Installation Target]
 # Should we install the network configuration?

@@ -20,16 +20,28 @@ shutdown
 
 %post --nochroot
 
+@KSINCLUDE@ scripts-lib.sh
+platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
+
 # Get the activated Anaconda DBus modules.
 less /tmp/syslog | grep "Starting org.fedoraproject.Anaconda.Modules" | \
 cut -d" " -f4 | sort > /tmp/generated.out
 
 # Generate the expected output.
+if [ "${platform}" == "rhel9" ]; then
 cat > /tmp/expected.out <<EOF
 org.fedoraproject.Anaconda.Modules.Network.
 org.fedoraproject.Anaconda.Modules.Payloads.
 org.fedoraproject.Anaconda.Modules.Storage.
 EOF
+else
+cat > /tmp/expected.out <<EOF
+org.fedoraproject.Anaconda.Modules.Network.
+org.fedoraproject.Anaconda.Modules.Payloads.
+org.fedoraproject.Anaconda.Modules.Runtime.
+org.fedoraproject.Anaconda.Modules.Storage.
+EOF
+fi
 
 # Check the output
 diff /tmp/expected.out /tmp/generated.out

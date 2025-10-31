@@ -26,7 +26,7 @@ if ! $(grep -q "KickstartParseWarning: Ignoring deprecated option on line [0-9]*
 fi
 
 # Check deprecation of vnc command
-if ! $(grep -q "KickstartDeprecationWarning: Ignoring deprecated command on line [0-9]*: *The vnc command has been deprecated" /tmp/anaconda.log); then
+if ! $(grep -q "KickstartParseWarning: Ignoring deprecated command on line [0-9]*: *The vnc command has been deprecated" /tmp/anaconda.log); then
     echo 'Deprecation warning is missing for vnc' >> /mnt/sysroot/root/RESULT
 fi
 

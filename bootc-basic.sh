@@ -50,25 +50,22 @@ copy_interesting_files_from_system() {
         list-filesystems
         " 2>/dev/null | awk -F'[:/]' '/btrfsvol:.*root/ {print "/" $3 "/" $4}')"
 
-    # List directories and find the one ending in .0, then construct full path
-    deployname=$(guestfish ${args} <<< "
-        launch
-        mount ${root_device} /
-        ls /root/ostree/deploy/test-stateroot/deploy
-        " 2>/dev/null | grep '\.0$' | head -1)
-
-    deploydir="/root/ostree/deploy/test-stateroot/deploy/${deployname}"
-
-    for item in /var/roothome/original-ks.cfg \
-                /var/roothome/anaconda-ks.cfg \
-                /var/roothome/anabot.log \
-                /var/log/anaconda/ \
-                /var/roothome/RESULT
+    for item in /root/ostree/deploy/test-stateroot/var/roothome/original-ks.cfg \
+                /root/ostree/deploy/test-stateroot/var/roothome/anaconda-ks.cfg \
+                /root/ostree/deploy/test-stateroot/var/roothome/anabot.log \
+                /root/ostree/deploy/test-stateroot/var/log/anaconda/ \
+                /root/ostree/deploy/test-stateroot/var/roothome/RESULT
     do
         guestfish ${args} <<< "
             launch
             mount ${root_device} /
-            copy-out '${deploydir}${item}' '${disksdir}'
+            copy-out '${item}' '${disksdir}'
             "
     done
+}
+
+additional_runner_args() {
+   # Wait for reboot and shutdown of the VM,
+   # but exit after the specified timeout.
+   echo "--wait $(get_timeout)"
 }

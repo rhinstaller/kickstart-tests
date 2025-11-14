@@ -8,7 +8,7 @@
 
 %post
 # detect if the system uses ostree and change path prefix if needed
-if ostree admin status &> /dev/null; then
+if [ -f /.ostree.cfs ]; then
     # based on info from https://www.reddit.com/r/Fedora/comments/wir3cq/comment/ijhjfah
     mkdir -p /var/lib/extensions/kickstart-tests/usr/lib/extension-release.d \
         /var/lib/extensions/kickstart-tests/usr/libexec

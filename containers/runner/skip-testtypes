@@ -71,6 +71,7 @@ rhel10_centos10_disabled_array=(
   gh1213      # harddrive-iso-single failing
   gh1536      # groups-and-envs-* failing
   gh1538      # packages-ignorebroken not implemented
+  rhel58215   # bootc-basic waiting for feature backport
 )
 
 rhel10_skip_array=(

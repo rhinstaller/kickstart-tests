@@ -59,7 +59,6 @@ rhel9_disabled_array=(
   gh595       # proxy-cmdline failing on all scenarios
   gh604       # packages-weakdeps: "gnupg2 --recommends has changed, test needs to be updated"
   gh804       # tests requiring dvd iso failing
-  rhel16355   # mountpoint-assigment-plain waiting for feature release
   gh1536      # groups-and-envs-* failing
   gh1538      # packages-ignorebroken not implemented
 )

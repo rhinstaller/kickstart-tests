@@ -33,7 +33,7 @@ validate() {
     success_count=$(grep -c "SUCCESS" "${disksdir}/virt-install.log")
 
     if [[ $success_count -ne 3 ]]; then
-        echo "*** ERROR: Expected 2 SUCCESS messages, but found ${success_count}."
+        echo "*** ERROR: Expected 3 SUCCESS messages, but found ${success_count}."
         status=1
     fi
 

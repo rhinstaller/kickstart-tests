@@ -67,7 +67,7 @@ USER_NET_HOST_IP=10.0.2.2
 COPY_FROM_IMAGE_TIMEOUT=300s
 
 # The RAM required in case stage2_from_ks is used
-export STAGE2_FROM_COMPOSE_RAM_SIZE=3400
+export STAGE2_FROM_COMPOSE_RAM_SIZE=3700
 
 kernel_args() {
     echo $DEFAULT_BOOTOPTS

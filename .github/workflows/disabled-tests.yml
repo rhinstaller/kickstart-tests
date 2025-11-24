@@ -15,7 +15,7 @@ jobs:
     runs-on: [self-hosted, kstest]
     strategy:
       matrix:
-        scenario: [daily-iso, rawhide, rhel9, rhel10, centos10]
+        scenario: [daily-iso, rawhide, rhel9, rhel10, centos10, fedora-eln]
       fail-fast: false
 
     timeout-minutes: 140

@@ -1,20 +1,20 @@
-# for bootc/bootupd, remote and stateroot ostreecontainer options
-# depends on the referenced ostree container being bootable
+# Test that the bootc kickstart command can install in an encrypted scenario.
 
 # Use the default settings.
 %ksappend common/common_no_storage_and_payload.ks
 
+# Default storage configuration with LUKS
+%ksappend storage/ostreecontainer_autopart_encrypted.ks
+
 # Validate on the first boot.
 %ksappend validation/success_on_first_boot.ks
 
-# Set up RPM ostree container image as installation payload
-ostreecontainer --no-signature-verification --remote=test-remote --stateroot=test-stateroot --url=@KSTEST_OSTREECONTAINER_URL@
+# Setup the bootc image source.
+# Substitute something in for KSTEST_OSTREECONTAINER_URL or this will all come crashing down.
+bootc --source-imgref=registry:@KSTEST_OSTREECONTAINER_URL@ --stateroot=test-stateroot
 
 # Reboot the installed system.
 reboot
-
-# On Fedora enforce lvm scheme (overriding btrfs default)
-%ksappend storage/ostreecontainer_autopart_encrypted.ks
 
 %ksappend storage/luks_auto_unlock_post.ks
 
@@ -31,3 +31,4 @@ fi
 
 EOF
 %end
+

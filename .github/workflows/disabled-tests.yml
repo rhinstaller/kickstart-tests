@@ -114,7 +114,8 @@ jobs:
           if [ "${{ matrix.scenario }}" == "rhel8" ] || \
              [ "${{ matrix.scenario }}" == "rhel9" ] || \
              [ "${{ matrix.scenario }}" == "rhel10" ] || \
-             [ "${{ matrix.scenario }}" == "centos10" ]; then
+             [ "${{ matrix.scenario }}" == "centos10" ] || \
+             [ "${{ matrix.scenario }}" == "fedora-eln" ]; then
             source ./scripts/defaults-${{ matrix.scenario }}.sh
             echo "installation_tree=${KSTEST_URL}" >> $GITHUB_OUTPUT
             echo "modular_url=${KSTEST_MODULAR_URL}" >> $GITHUB_OUTPUT

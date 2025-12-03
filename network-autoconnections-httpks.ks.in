@@ -1,10 +1,18 @@
 # Test assumptions about connections and config files created in initramfs (by NM)
-# Also test consolidating of the connections by anaconda.
+# Also test handling of the connections by anaconda.
 # And test autoconnection configuration per platform.
+# 4 devices:
+# @KSTEST_NETDEV1@ - configured in initramfs
+# @KSTEST_NETDEV2@ - configured by ks
+# @KSTEST_NETDEV3@ - not configured
+# @KSTEST_NETDEV4@ - configured in initramfs, configured by ks
 %ksappend repos/default.ks
 
 # Use nameserver as a difference from default autoconnection for checking
+# Configure a connection
 network --device=@KSTEST_NETDEV2@ --bootproto=dhcp --no-activate  --nameserver 10.43.26.2
+# Reconfigure connection configured in initramfs
+network --device=@KSTEST_NETDEV4@ --bootproto=dhcp --no-activate  --nameserver 10.43.26.2
 
 bootloader --timeout=1
 zerombr
@@ -33,37 +41,48 @@ check_config_exists @KSTEST_NETDEV1@ no
 # In RHEL8 ifcfg files are created from kickstart already in initramfs
 if [ "${platform}" == "rhel8" ]; then
     check_config_exists @KSTEST_NETDEV2@ yes
+    check_config_exists @KSTEST_NETDEV4@ yes
 else
     check_config_exists @KSTEST_NETDEV2@ no
+    check_config_exists @KSTEST_NETDEV4@ no
 fi
 check_config_exists @KSTEST_NETDEV3@ no
 
 check_device_connected @KSTEST_NETDEV1@ yes
 check_connection_device @KSTEST_NETDEV1@ @KSTEST_NETDEV1@
+check_device_connected @KSTEST_NETDEV4@ yes
+check_connection_device @KSTEST_NETDEV4@ @KSTEST_NETDEV4@
 if [ "${platform}" == "rhel8" ]; then
     check_connection_device "System @KSTEST_NETDEV2@"
+    check_connection_device "System @KSTEST_NETDEV4@"
 fi
 
+# Values of a connection configured in initramfs
 check_connection_setting "@KSTEST_NETDEV1@" ipv4.method auto
 check_connection_setting "@KSTEST_NETDEV1@" ipv6.method auto
 check_connection_setting "@KSTEST_NETDEV1@" connection.interface-name @KSTEST_NETDEV1@
 check_connection_setting "@KSTEST_NETDEV1@" connection.autoconnect yes
 check_connection_setting "@KSTEST_NETDEV1@" 802-3-ethernet.mac-address --
+check_connection_setting "@KSTEST_NETDEV4@" ipv4.method auto
+check_connection_setting "@KSTEST_NETDEV4@" ipv6.method auto
+check_connection_setting "@KSTEST_NETDEV4@" connection.interface-name @KSTEST_NETDEV4@
+check_connection_setting "@KSTEST_NETDEV4@" connection.autoconnect yes
+check_connection_setting "@KSTEST_NETDEV4@" 802-3-ethernet.mac-address --
 
 detect_nm_has_autoconnections_off
 nm_has_autoconnections_off=$?
 if [[ $nm_has_autoconnections_off -eq 0 ]]; then
     if [ "${platform}" == "rhel8" ]; then
-        check_number_of_connections 2
+        check_number_of_connections 3
     else
         # includes "lo" connection
-        check_number_of_connections 2
+        check_number_of_connections 3
     fi
     check_device_connected @KSTEST_NETDEV3@ no
     check_device_connected @KSTEST_NETDEV2@ no
 else
     # includes "lo" connection
-    check_number_of_connections 4
+    check_number_of_connections 5
     check_device_connected @KSTEST_NETDEV3@ yes
     # This is no more prevented by ifcfg file created in initramfs
     check_device_connected @KSTEST_NETDEV2@ yes
@@ -86,7 +105,7 @@ fi
 copy_pre_stage_result
 pass_autoconnections_info_to_chroot
 
-check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@
+check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@ @KSTEST_NETDEV3@ @KSTEST_NETDEV4@
 
 %end
 
@@ -99,34 +118,39 @@ platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
 check_device_config_value @KSTEST_NETDEV1@ ONBOOT yes connection autoconnect __NONE
 check_device_config_value @KSTEST_NETDEV2@ ONBOOT yes connection autoconnect __NONE
 check_device_config_value @KSTEST_NETDEV2@ DNS1 10.43.26.2 ipv4 dns "10.43.26.2;"
+check_device_config_value @KSTEST_NETDEV4@ DNS1 10.43.26.2 ipv4 dns "10.43.26.2;"
 
 detect_nm_has_autoconnections_off
 nm_has_autoconnections_off=$?
 if [[ $nm_has_autoconnections_off -eq 0 ]]; then
     check_device_config_value @KSTEST_NETDEV3@ ONBOOT no connection autoconnect false
     if [ "${platform}" == "rhel8" ]; then
-        check_number_of_connections 3
+        check_number_of_connections 4
     else
         # includes "lo" connection
-        check_number_of_connections 4
+        check_number_of_connections 5
     fi
     check_device_connected @KSTEST_NETDEV1@ yes
     check_device_connected @KSTEST_NETDEV2@ no
     check_device_connected @KSTEST_NETDEV3@ no
+    check_device_connected @KSTEST_NETDEV4@ yes
     check_connection_device @KSTEST_NETDEV1@ @KSTEST_NETDEV1@
     check_connection_device @KSTEST_NETDEV3@
     check_connection_device @KSTEST_NETDEV2@
+    check_connection_device @KSTEST_NETDEV4@ @KSTEST_NETDEV4@
 else
     check_device_config_value @KSTEST_NETDEV3@ ONBOOT yes connection autoconnect __NONE
     # includes "lo" connection
-    check_number_of_connections 5
+    check_number_of_connections 6
     check_device_connected @KSTEST_NETDEV1@ yes
     # This is no more prevented by ifcfg file created in initramfs
     check_device_connected @KSTEST_NETDEV2@ yes
     check_device_connected @KSTEST_NETDEV3@ yes
+    check_device_connected @KSTEST_NETDEV4@ yes
     check_connection_device @KSTEST_NETDEV1@ @KSTEST_NETDEV1@
     check_connection_device "Wired connection 1" @KSTEST_NETDEV2@
     check_connection_device @KSTEST_NETDEV3@ @KSTEST_NETDEV3@
+    check_connection_device @KSTEST_NETDEV4@ @KSTEST_NETDEV4@
 fi
 
 # Test per-platform autoconnection configuration

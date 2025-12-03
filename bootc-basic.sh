@@ -20,7 +20,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="skip-on-rhel-9 payload bootc rhel58215 gh1574"
+TESTTYPE="skip-on-rhel-9 payload bootc gh1574"
 
 . ${KSTESTDIR}/functions.sh
 
@@ -45,16 +45,29 @@ copy_interesting_files_from_system() {
     # The location of aforementioned files is different in an ostree system
 
     # Find root device - use list-filesystems to find filesystem mounted at /
+
+    # First try btrfs root subvolume
     root_device="$(guestfish ${args} <<< "
         launch
         list-filesystems
         " 2>/dev/null | awk -F'[:/]' '/btrfsvol:.*root/ {print "/" $3 "/" $4}')"
+    path_prefix="/ostree/deploy/test-stateroot"
 
-    for item in /root/ostree/deploy/test-stateroot/var/roothome/original-ks.cfg \
-                /root/ostree/deploy/test-stateroot/var/roothome/anaconda-ks.cfg \
-                /root/ostree/deploy/test-stateroot/var/roothome/anabot.log \
-                /root/ostree/deploy/test-stateroot/var/log/anaconda/ \
-                /root/ostree/deploy/test-stateroot/var/roothome/RESULT
+    if [ -n "${root_device}" ]; then
+        path_prefix="/root$path_prefix"
+    else
+        # Fallback to standard root device on XFS
+        root_device="$(guestfish ${args} <<< "
+            launch
+            list-filesystems
+            " 2>/dev/null | grep root | awk -F: '{print $1}')"
+    fi
+
+    for item in ${path_prefix}/var/roothome/original-ks.cfg \
+                ${path_prefix}/var/roothome/anaconda-ks.cfg \
+                ${path_prefix}/var/roothome/anabot.log \
+                ${path_prefix}/var/log/anaconda/ \
+                ${path_prefix}/var/roothome/RESULT
     do
         guestfish ${args} <<< "
             launch

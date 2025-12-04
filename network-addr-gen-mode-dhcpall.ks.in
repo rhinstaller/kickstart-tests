@@ -42,10 +42,13 @@ check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@
 
 @KSINCLUDE@ post-lib-network.sh
 
-check_device_config_value @KSTEST_NETDEV1@ IPV6_ADDR_GEN_MODE eui64 ipv6 addr-gen-mode eui64
-check_connection_setting "@KSTEST_NETDEV1@" ipv6.addr-gen-mode eui64
-check_device_config_value @KSTEST_NETDEV2@ IPV6_ADDR_GEN_MODE eui64 ipv6 addr-gen-mode eui64
-check_connection_setting "@KSTEST_NETDEV2@" ipv6.addr-gen-mode eui64
+@KSINCLUDE@ scripts-lib.sh
+if [[ "$(dumps_default_cons @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)" == "yes" ]]; then
+    check_device_config_value @KSTEST_NETDEV1@ IPV6_ADDR_GEN_MODE eui64 ipv6 addr-gen-mode eui64
+    check_connection_setting "@KSTEST_NETDEV1@" ipv6.addr-gen-mode eui64
+    check_device_config_value @KSTEST_NETDEV2@ IPV6_ADDR_GEN_MODE eui64 ipv6 addr-gen-mode eui64
+    check_connection_setting "@KSTEST_NETDEV2@" ipv6.addr-gen-mode eui64
+fi
 
 # No error was written to /root/RESULT file, everything is OK
 if [[ ! -e /root/RESULT ]]; then

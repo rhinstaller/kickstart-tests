@@ -55,7 +55,11 @@ check_device_config_value bridge0 ONBOOT no connection autoconnect false
 check_device_config_value bridge0_slave_1 ONBOOT no connection autoconnect false
 # Configuration from boot options
 if [ "${platform}" != "rhel8" ]; then
-    check_config_exists @KSTEST_NETDEV1@ yes
+    if [[ "$(dumps_default_cons @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)" == "yes" ]]; then
+       check_config_exists @KSTEST_NETDEV1@ yes
+    else
+       check_config_exists @KSTEST_NETDEV1@ no
+    fi
 fi
 
 check_device_config_bound_to_mac bridge0_slave_1

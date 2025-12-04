@@ -63,7 +63,9 @@ else
     check_connection_setting "@KSTEST_NETDEV2@" ipv6.addr-gen-mode eui64
 fi
 check_device_config_value @KSTEST_NETDEV2@ IPV6_ADDR_GEN_MODE __NONE ipv6 addr-gen-mode eui64
-check_connection_setting "@KSTEST_NETDEV3@" ipv6.addr-gen-mode eui64
+if [[ "$(dumps_default_cons @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)" == "yes" ]]; then
+    check_connection_setting "@KSTEST_NETDEV3@" ipv6.addr-gen-mode eui64
+fi
 check_device_config_value @KSTEST_NETDEV2@ IPV6_ADDR_GEN_MODE __NONE ipv6 addr-gen-mode eui64
 check_connection_setting "@KSTEST_NETDEV4@" ipv6.addr-gen-mode eui64
 

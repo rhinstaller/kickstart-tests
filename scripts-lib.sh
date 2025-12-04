@@ -22,3 +22,19 @@ function get_platform {
 
    echo ${platform}
 }
+
+# dumps_default_cons KSTEST_OS_NAME KSTEST_OS_VERSION
+# Does the os variant dump default device connections?
+# Anaconda stopped doing it in INSTALLER-3088 (F44)
+function dumps_default_cons {
+    platform=$(get_platform "$@")
+    if [ "${platform}" == "rhel8" ] || \
+            [ "${platform}" == "rhel9" ] || \
+            [ "${platform}" == "rhel10" ] || \
+            [ "${platform}" == "centos9" ] || \
+            [ "${platform}" == "centos10" ]; then
+        echo "yes"
+    else
+        echo "no"
+    fi
+}

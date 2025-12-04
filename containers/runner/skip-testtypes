@@ -23,7 +23,6 @@ fedora_disabled_array=(
   gh1437      # lvm-cache-* failing
   gh1493      # dns-global-exclusive-tls-* failing
   gh1530      # dns-global-exclusive-tls-* stage2-from-compose failing
-  gh1559      # bootc-basic failing
 )
 
 daily_iso_disabled_array=(
@@ -32,6 +31,7 @@ daily_iso_disabled_array=(
 )
 
 rawhide_disabled_array=(
+  gh1559      # bootc-basic failing
 )
 
 rawhide_text_disabled_array=(

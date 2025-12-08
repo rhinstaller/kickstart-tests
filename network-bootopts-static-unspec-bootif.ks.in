@@ -40,12 +40,21 @@ else
     check_device_connected @KSTEST_NETDEV1@ yes
 fi
 
+@KSINCLUDE@ scripts-lib.sh
+if [[ "$(dumps_default_cons @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)" == "yes" ]]; then
+    check_device_config_value @KSTEST_NETDEV1@ IPADDR __NONE ipv4 method auto
+    check_device_config_value @KSTEST_NETDEV2@ IPADDR @KSTEST_STATIC_IP@ ipv4 address1 @KSTEST_STATIC_IP@/@KSTEST_STATIC_PREFIX@
+    check_device_config_value @KSTEST_NETDEV2@ PREFIX @KSTEST_STATIC_PREFIX@ ipv4 address1 @KSTEST_STATIC_IP@/@KSTEST_STATIC_PREFIX@
+    check_device_config_value @KSTEST_NETDEV2@ GATEWAY @KSTEST_STATIC_GATEWAY@ ipv4 gateway @KSTEST_STATIC_GATEWAY@
+    check_device_config_value @KSTEST_NETDEV2@ DNS1 @KSTEST_STATIC_DNS1@ ipv4 dns "@KSTEST_STATIC_DNS1@;"
+else
+    # BOOTIF bound connection was made persistent
+    check_device_config_value "Wired Connection" IPADDR @KSTEST_STATIC_IP@ ipv4 address1 @KSTEST_STATIC_IP@/@KSTEST_STATIC_PREFIX@
+    check_device_config_value "Wired Connection" PREFIX @KSTEST_STATIC_PREFIX@ ipv4 address1 @KSTEST_STATIC_IP@/@KSTEST_STATIC_PREFIX@
+    check_device_config_value "Wired Connection" GATEWAY @KSTEST_STATIC_GATEWAY@ ipv4 gateway @KSTEST_STATIC_GATEWAY@
+    check_device_config_value "Wired Connection" DNS1 @KSTEST_STATIC_DNS1@ ipv4 dns "@KSTEST_STATIC_DNS1@;"
+fi
 
-check_device_config_value @KSTEST_NETDEV1@ IPADDR __NONE ipv4 method auto
-check_device_config_value @KSTEST_NETDEV2@ IPADDR @KSTEST_STATIC_IP@ ipv4 address1 @KSTEST_STATIC_IP@/@KSTEST_STATIC_PREFIX@
-check_device_config_value @KSTEST_NETDEV2@ PREFIX @KSTEST_STATIC_PREFIX@ ipv4 address1 @KSTEST_STATIC_IP@/@KSTEST_STATIC_PREFIX@
-check_device_config_value @KSTEST_NETDEV2@ GATEWAY @KSTEST_STATIC_GATEWAY@ ipv4 gateway @KSTEST_STATIC_GATEWAY@
-check_device_config_value @KSTEST_NETDEV2@ DNS1 @KSTEST_STATIC_DNS1@ ipv4 dns "@KSTEST_STATIC_DNS1@;"
 check_device_ipv4_address @KSTEST_NETDEV2@ @KSTEST_STATIC_IP@
 
 # No error was written to /root/RESULT file, everything is OK

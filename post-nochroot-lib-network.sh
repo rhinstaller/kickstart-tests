@@ -87,6 +87,7 @@ function check_gui_configurations() {
         IFS=$old_IFS
     fi
 
+    echo "Device configurations: ${dev_cons}"
     # check that all requested devices supplied as arguments were added to GUI
     # and if configuration file exists it corresponds to the connection added
     for devname in "$@"
@@ -97,31 +98,27 @@ function check_gui_configurations() {
         for dev_con in ${dev_cons}; do
             local con=${dev_con##${devname}:}
             if [[ ${con} != ${dev_con} ]]; then
+                echo "Checking device ${devname}"
                 # Do not require ifcfg when there is no connection, eg bond configuration from boot options.
                 found="yes"
                 if [[ ${con} != "" && ${con} != "None" ]]; then
                     local ifcfg_file="$SYSROOT/etc/sysconfig/network-scripts/ifcfg-${devname}"
                     if [[ -e ${ifcfg_file} ]]; then
+                        echo "Checking if ${ifcfg_file} is ${con}"
                         egrep -q '^UUID="?'${con}'"?$' ${ifcfg_file}
                         ifcfg_result=$?
+                        if [[ ${ifcfg_result} != 0 ]]; then
+                            echo "*** Failed check: ${devname}:${con} added in GUI corresponds to ${ifcfg_file}" >> $SYSROOT/root/RESULT
+                        fi
                     fi
                     local keyfile_file="$SYSROOT/etc/NetworkManager/system-connections/${devname}.nmconnection"
                     if [[ -e ${keyfile_file} ]]; then
+                        echo "Checking if ${keyfile_file} is ${con}"
                         egrep -q '^uuid="?'${con}'"?$' ${keyfile_file}
                         keyfile_result=$?
-                    fi
-                    # Using device-specific connection created in intramfs is
-                    # acceptable as well even if there is no persistent
-                    # connection (ifcfg_file or keyfile_file above) created
-                    # from it by Anaconda for various reasons (eg for a bridge
-                    # slave device)
-                    local temporary_keyfile_file="$SYSROOT/run/NetworkManager/system-connections/${devname}.nmconnection"
-                    if [[ -e ${temporary_keyfile_file} ]]; then
-                        egrep -q '^uuid="?'${con}'"?$' ${temporary_keyfile_file}
-                        temporary_keyfile_result=$?
-                    fi
-                    if [[ ${ifcfg_result} != 0 && ${keyfile_result} != 0 && ${temporary_keyfile_result} != 0 ]]; then
-                        echo "*** Failed check: ${devname}:${con} added in GUI corresponds to ${ifcfg_file} or ${keyfile_file} or ${temporary_keyfile_file}" >> $SYSROOT/root/RESULT
+                        if [[ ${keyfile_result} != 0 ]]; then
+                            echo "*** Failed check: ${devname}:${con} added in GUI corresponds to ${keyfile_file}" >> $SYSROOT/root/RESULT
+                        fi
                     fi
                 fi
                 break

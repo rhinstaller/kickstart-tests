@@ -10,6 +10,10 @@
 #
 #  /test-os-variants --testtype TESTTYPE --testtypes TYPE[,TYPE..] --skip-testtypes TYPE[,TYPE..] TEST1 TEST2
 #
+# In this case disabled or platform-skipped tests are not excluded
+# automatically.  To exclude them you can generate respective --skip-testtypes
+# update by generate-launch-args script.
+#
 # Examples:
 #
 # /test-os-variants keyboard lang

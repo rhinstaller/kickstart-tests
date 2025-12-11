@@ -12,7 +12,7 @@ jobs:
           pip install pylint==3.3.0 ruff==0.3.7 pyyaml
           
       - name: Clone repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 

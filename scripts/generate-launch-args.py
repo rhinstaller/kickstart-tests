@@ -151,9 +151,11 @@ if __name__ == "__main__":
     if testtypes:
         testtypes_args = ["--testtypes", ",".join(testtypes)]
 
-    skip_testtypes = [] if args.force else skipped_testtypes
+    skip_testtypes = skipped_testtypes
     if not args.disabled:
         skip_testtypes.extend(disabled_testtypes)
+    if args.force:
+        skip_testtypes = []
     if args.skip_testtypes:
         skip_testtypes.extend(args.skip_testtypes.split(','))
     if skip_testtypes:

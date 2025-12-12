@@ -31,7 +31,6 @@ daily_iso_disabled_array=(
 )
 
 rawhide_disabled_array=(
-  gh1559      # bootc-basic failing
 )
 
 rawhide_text_disabled_array=(
@@ -109,7 +108,7 @@ fedora_eln_disabled_array=(
   gh1536      # groups-and-envs-* failing
   gh1538      # packages-ignorebroken not implemented
   gh1541      # flatpak-preinstall-* not implemented
-  gh1559      # bootc-basic failing
+  gh1574      # bootc-* failing
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

@@ -29,6 +29,7 @@ check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@
 %post
 
 @KSINCLUDE@ post-lib-network.sh
+@KSINCLUDE@ scripts-lib.sh
 
 check_device_connected @KSTEST_NETDEV2@ yes
 
@@ -38,13 +39,23 @@ if [[ $nm_has_autoconnections_off -eq 0 ]]; then
     check_device_connected @KSTEST_NETDEV1@ no
 else
     check_device_connected @KSTEST_NETDEV1@ yes
+    if [[ "$(dumps_default_cons @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)" != "yes" ]]; then
+        check_connection_device "Wired connection 1" @KSTEST_NETDEV1@
+    fi
 fi
 
-check_device_config_value @KSTEST_NETDEV1@ IPADDR __NONE ipv4 method auto
-check_device_config_value @KSTEST_NETDEV2@ IPADDR @KSTEST_STATIC_IP@ ipv4 address1 @KSTEST_STATIC_IP@/@KSTEST_STATIC_PREFIX@
-check_device_config_value @KSTEST_NETDEV2@ PREFIX @KSTEST_STATIC_PREFIX@ ipv4 address1 @KSTEST_STATIC_IP@/@KSTEST_STATIC_PREFIX@
-check_device_config_value @KSTEST_NETDEV2@ GATEWAY @KSTEST_STATIC_GATEWAY@ ipv4 gateway @KSTEST_STATIC_GATEWAY@
-check_device_config_value @KSTEST_NETDEV2@ DNS1 @KSTEST_STATIC_DNS1@ ipv4 dns "@KSTEST_STATIC_DNS1@;"
+if [[ "$(dumps_default_cons @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)" == "yes" ]]; then
+    check_device_config_value @KSTEST_NETDEV1@ IPADDR __NONE ipv4 method auto
+    check_device_config_value @KSTEST_NETDEV2@ IPADDR @KSTEST_STATIC_IP@ ipv4 address1 @KSTEST_STATIC_IP@/@KSTEST_STATIC_PREFIX@
+    check_device_config_value @KSTEST_NETDEV2@ PREFIX @KSTEST_STATIC_PREFIX@ ipv4 address1 @KSTEST_STATIC_IP@/@KSTEST_STATIC_PREFIX@
+    check_device_config_value @KSTEST_NETDEV2@ GATEWAY @KSTEST_STATIC_GATEWAY@ ipv4 gateway @KSTEST_STATIC_GATEWAY@
+    check_device_config_value @KSTEST_NETDEV2@ DNS1 @KSTEST_STATIC_DNS1@ ipv4 dns "@KSTEST_STATIC_DNS1@;"
+else
+    check_device_config_value @KSTEST_NETDEV2_MAC@ IPADDR @KSTEST_STATIC_IP@ ipv4 address1 @KSTEST_STATIC_IP@/@KSTEST_STATIC_PREFIX@
+    check_device_config_value @KSTEST_NETDEV2_MAC@ PREFIX @KSTEST_STATIC_PREFIX@ ipv4 address1 @KSTEST_STATIC_IP@/@KSTEST_STATIC_PREFIX@
+    check_device_config_value @KSTEST_NETDEV2_MAC@ GATEWAY @KSTEST_STATIC_GATEWAY@ ipv4 gateway @KSTEST_STATIC_GATEWAY@
+    check_device_config_value @KSTEST_NETDEV2_MAC@ DNS1 @KSTEST_STATIC_DNS1@ ipv4 dns "@KSTEST_STATIC_DNS1@;"
+fi
 check_device_ipv4_address @KSTEST_NETDEV2@ @KSTEST_STATIC_IP@
 
 # No error was written to /root/RESULT file, everything is OK

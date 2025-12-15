@@ -31,7 +31,11 @@ check_gui_configurations @KSTEST_NETDEV1@ @KSTEST_NETDEV2@
 
 @KSINCLUDE@ post-lib-network.sh
 
-check_device_config_value @KSTEST_NETDEV1@ ONBOOT yes connection autoconnect __NONE
+@KSINCLUDE@ scripts-lib.sh
+
+if [[ "$(dumps_default_cons @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)" == "yes" ]]; then
+    check_device_config_value @KSTEST_NETDEV1@ ONBOOT yes connection autoconnect __NONE
+fi
 check_device_config_value @KSTEST_NETDEV2@ ONBOOT no connection autoconnect false
 check_device_connected @KSTEST_NETDEV1@ yes
 check_device_connected @KSTEST_NETDEV2@ yes

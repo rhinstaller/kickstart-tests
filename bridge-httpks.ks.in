@@ -57,7 +57,11 @@ check_device_config_value bridge0_slave_1 ONBOOT no connection autoconnect false
 
 # Configuration from boot options
 if [ "${platform}" != "rhel8" ]; then
-    check_config_exists @KSTEST_NETDEV1@ yes
+    if [[ "$(dumps_default_cons @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)" == "yes" ]]; then
+       check_config_exists @KSTEST_NETDEV1@ yes
+    else
+       check_config_exists @KSTEST_NETDEV1@ no
+    fi
 fi
 
 # WARNING: this depends on assumption of running %post scripts in order they

@@ -42,15 +42,24 @@ check_config_exists ifname0-1 no
 # check_device_config_value @KSTEST_NETDEV2@ HWADDR __NONE ethernet mac-address __NONE
 # check_device_config_value @KSTEST_NETDEV2@ ONBOOT no connection autoconnect false
 # check_device_connected @KSTEST_NETDEV2@ no
-check_device_config_value ifname1 HWADDR 52:54:00:12:34:43 ethernet mac-address 52:54:00:12:34:43
-check_device_config_value ifname1 DEVICE ifname1 connection interface-name ifname1
+
+@KSINCLUDE@ scripts-lib.sh
+if [[ "$(dumps_default_cons @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)" == "yes" ]]; then
+    check_device_config_value ifname1 HWADDR 52:54:00:12:34:43 ethernet mac-address 52:54:00:12:34:43
+    check_device_config_value ifname1 DEVICE ifname1 connection interface-name ifname1
+fi
+
 detect_nm_has_autoconnections_off
 nm_has_autoconnections_off=$?
 if [[ $nm_has_autoconnections_off -eq 0 ]]; then
-    check_device_config_value ifname1 ONBOOT no connection autoconnect false
+    if [[ "$(dumps_default_cons @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)" == "yes" ]]; then
+        check_device_config_value ifname1 ONBOOT no connection autoconnect false
+    fi
     check_device_connected ifname1 no
 else
-    check_device_config_value ifname1 ONBOOT yes connection autoconnect __NONE
+    if [[ "$(dumps_default_cons @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)" == "yes" ]]; then
+        check_device_config_value ifname1 ONBOOT yes connection autoconnect __NONE
+    fi
     check_device_connected ifname1 yes
 fi
 

@@ -34,19 +34,28 @@ check_device_config_value @KSTEST_NETDEV1@ ONBOOT yes connection autoconnect __N
 check_device_config_value @KSTEST_NETDEV1@ HWADDR __NONE ethernet mac-address __NONE
 check_device_connected @KSTEST_NETDEV1@ yes
 
-# @KSTEST_NETDEV2@ is configured neither via boot options nor via kickstart so anaconda
-# creates default config file (rhel) or dumps it from default connection created
-# by NM on Fedora
-check_device_config_value @KSTEST_NETDEV2@ DEVICE @KSTEST_NETDEV2@ connection interface-name @KSTEST_NETDEV2@
-check_device_config_value @KSTEST_NETDEV2@ HWADDR __NONE ethernet mac-address __NONE
+@KSINCLUDE@ scripts-lib.sh
+if [[ "$(dumps_default_cons @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)" == "yes" ]]; then
+    # @KSTEST_NETDEV2@ is configured neither via boot options nor via kickstart so anaconda
+    # creates default config file (rhel) or dumps it from default connection created
+    # by NM on Fedora
+    check_device_config_value @KSTEST_NETDEV2@ DEVICE @KSTEST_NETDEV2@ connection interface-name @KSTEST_NETDEV2@
+    check_device_config_value @KSTEST_NETDEV2@ HWADDR __NONE ethernet mac-address __NONE
+else
+    check_config_exists @KSTEST_NETDEV2@ no
+fi
 
 detect_nm_has_autoconnections_off
 nm_has_autoconnections_off=$?
 if [[ $nm_has_autoconnections_off -eq 0 ]]; then
-    check_device_config_value @KSTEST_NETDEV2@ ONBOOT no connection autoconnect false
+    if [[ "$(dumps_default_cons @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)" == "yes" ]]; then
+        check_device_config_value @KSTEST_NETDEV2@ ONBOOT no connection autoconnect false
+    fi
     check_device_connected @KSTEST_NETDEV2@ no
 else
-    check_device_config_value @KSTEST_NETDEV2@ ONBOOT yes connection autoconnect __NONE
+    if [[ "$(dumps_default_cons @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)" == "yes" ]]; then
+        check_device_config_value @KSTEST_NETDEV2@ ONBOOT yes connection autoconnect __NONE
+    fi
     check_device_connected @KSTEST_NETDEV2@ yes
 fi
 

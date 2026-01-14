@@ -41,7 +41,7 @@ prepare() {
     local ks=$1
 
     # This is a private slirp network, so we can pick any config we like
-    sed -i -e 's#@KSTEST_STATIC_IP@#10.0.2.200#g' -e 's#@KSTEST_STATIC_PREFIX@#24#g' -e 's#@KSTEST_STATIC_GATEWAY@#10.0.2.2#g' -e 's#@KSTEST_STATIC_DNS1@#10.0.2.3#g' ${ks}
+    sed -i -e 's#@KSTEST_STATIC_IP@#10.0.2.200#g' -e 's#@KSTEST_STATIC_PREFIX@#24#g' -e 's#@KSTEST_STATIC_GATEWAY@#10.0.2.2#g' -e 's#@KSTEST_STATIC_DNS1@#10.0.2.3#g' -e 's#@KSTEST_NETDEV2_MAC@#52:54:00:12:34:62#g' ${ks}
     echo "ip_static_boot_config=ip=10.0.2.200::10.0.2.2:255.255.255.0::52-54-00-12-34-62:none:10.0.2.3" > ${tmpdir}/ip_static_boot_config
 
     echo ${ks}

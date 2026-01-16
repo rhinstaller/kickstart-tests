@@ -1,0 +1,49 @@
+# Test the UEFI entry is created correctly and the system is bootable with bootc.
+#
+
+# Use the default settings.
+%ksappend common/common_no_storage_and_payload.ks
+# On Fedora enforce lvm scheme (overriding btrfs default)
+%ksappend storage/ostreecontainer_autopart.ks
+
+# Setup the bootc image source.
+bootc --source-imgref=registry:@KSTEST_OSTREECONTAINER_URL@ --stateroot=test-stateroot
+
+# Reboot the installed system.
+reboot
+
+# Validate on the first boot.
+%ksappend validation/success_on_first_boot.ks
+
+%post
+# Checks after boot
+cat >> /var/lib/extensions/kickstart-tests/usr/libexec/kickstart-test.sh << 'EOF'
+
+# propagate any errors from %post validations
+if [ -e /root/RESULT ]; then
+    cat /root/RESULT
+fi
+
+# Check that state root 'test-stateroot' exists
+if [ ! -d /ostree/deploy/test-stateroot ]; then
+    echo "Couldn't find 'test-stateroot' stateroot"
+fi
+
+# Check that bootupd information is present
+if [ ! -e /boot/bootupd-state.json ]; then
+    echo "/boot/bootupd-state.json not found on installed system after booting"
+fi
+
+bootupctl --help &> /dev/null || echo "bootupctl command not available after booting"
+bootc --help &> /dev/null || echo "bootc command not available after booting"
+
+# We need to use tr because sometimes there is newline inside of the efibootmgr entry line :(
+# Normalize whitespace (tabs/newlines) to spaces, then squeeze multiple spaces to single space
+efibootmgr | tr '\n\t' ' ' | tr -s ' ' | grep -qiE 'Boot0001.*(Fedora|Red Hat Enterprise Linux|CentOS Stream)'
+if [ $? -ne 0 ]; then
+    echo -e "EFI boot entry wasn't created properly:\n$(efibootmgr)"
+fi
+
+EOF
+%end
+

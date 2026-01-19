@@ -87,6 +87,11 @@ centos10_disabled_array=(
   gh1474      # proxy-cmdline failing
 )
 
+rhel10_disabled_array=(
+  gh604       # packages-weakdeps: "gnupg2 --recommends has changed, test needs to be updated"
+)
+
+
 fedora_eln_skip_array=(
   skip-on-fedora-eln
 )
@@ -142,7 +147,7 @@ DISABLED_TESTTYPES_DAILY_ISO=$(_join_args_by_comma "${fedora_disabled_array[@]}"
 DISABLED_TESTTYPES_RAWHIDE=$(_join_args_by_comma "${fedora_disabled_array[@]}" "${rawhide_disabled_array[@]}")
 DISABLED_TESTTYPES_RHEL8=$(_join_args_by_comma "${rhel8_disabled_array[@]}")
 DISABLED_TESTTYPES_RHEL9=$(_join_args_by_comma "${rhel9_disabled_array[@]}")
-DISABLED_TESTTYPES_RHEL10=$(_join_args_by_comma "${rhel10_centos10_disabled_array[@]}")
+DISABLED_TESTTYPES_RHEL10=$(_join_args_by_comma "${rhel10_centos10_disabled_array[@]}" "${rhel10_disabled_array[@]}")
 DISABLED_TESTTYPES_CENTOS10=$(_join_args_by_comma "${rhel10_centos10_disabled_array[@]}" "${centos10_disabled_array[@]}")
 DISABLED_TESTTYPES_FEDORA_ELN=$(_join_args_by_comma "${common_skip_array[@]}" "${fedora_eln_disabled_array[@]}")
 

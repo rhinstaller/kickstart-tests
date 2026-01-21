@@ -70,6 +70,7 @@ rhel10_centos10_disabled_array=(
   gh1213      # harddrive-iso-single failing
   gh1536      # groups-and-envs-* failing
   gh1538      # packages-ignorebroken not implemented
+  gh604       # packages-weakdeps: "gnupg2 --recommends has changed, test needs to be updated"
 )
 
 rhel10_skip_array=(
@@ -88,7 +89,6 @@ centos10_disabled_array=(
 )
 
 rhel10_disabled_array=(
-  gh604       # packages-weakdeps: "gnupg2 --recommends has changed, test needs to be updated"
 )
 
 

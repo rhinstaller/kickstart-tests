@@ -309,7 +309,7 @@ jobs:
 
       - name: Collect anaconda logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: 'logs-${{ matrix.os-variant }}'
           # skip the /anaconda subdirectories, too large
@@ -322,7 +322,7 @@ jobs:
 
       - name: Collect Permian logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: 'logs-permian-${{ matrix.os-variant }}'
           path: |

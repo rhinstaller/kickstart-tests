@@ -173,6 +173,15 @@ copy_out ${file} ${dir}
 "
 }
 
+# Find the device with the rootfs label. The by-label symlink may not
+# be available in libguestfs appliance until after mounting, so we need to
+# find the device directly. Use virt-filesystems to list filesystems with
+# labels, which doesn't require mounting.
+find_rootfs_device() {
+    local args="$1"
+    run_with_timeout ${COPY_FROM_IMAGE_TIMEOUT} "virt-filesystems --long ${args}" 2>&1 | awk '/rootfs/ {print $1}' | head -1
+}
+
 copy_interesting_files_from_system() {
     local disksdir="$1"
 

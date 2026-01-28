@@ -169,6 +169,48 @@ TEST_ENV_VARS=$(printenv | while read line; do
     fi
     done)
 
+
+# Set up container routing bypass for VPN in background
+# This ensures virt-viewer connections work when VPN is active
+(
+    sleep 1  # Wait for container network to be established
+    # Get the podman network range (typically 10.88.0.0/16)
+    PODMAN_NETWORK=$(podman network inspect podman 2>/dev/null | grep -o '"subnet": "[^"]*' | cut -d'"' -f4 | head -n1)
+    if [ -n "$PODMAN_NETWORK" ]; then
+        # Extract first IP in the network to test routing (e.g., 10.88.0.2)
+        NETWORK_BASE=$(echo "$PODMAN_NETWORK" | cut -d'/' -f1)
+        TEST_IP=$(echo "$NETWORK_BASE" | awk -F. '{printf "%s.%s.%s.2", $1, $2, $3}')
+
+        # Check current routing for the container network
+        CURRENT_ROUTE=$(ip route get "$TEST_IP" 2>/dev/null | head -n1)
+
+        if echo "$CURRENT_ROUTE" | grep -q "dev.*podman"; then
+            echo "Container network $PODMAN_NETWORK already routes via podman device"
+        elif echo "$CURRENT_ROUTE" | grep -q "via.*dev tun"; then
+            echo "Container network traffic currently routes via VPN, adding bypass rule..."
+            PRIO=16300
+            if ip rule add to "$PODMAN_NETWORK" lookup main priority "$PRIO" 2>/dev/null; then
+                echo "Added routing rule with priority $PRIO for Podman network $PODMAN_NETWORK to bypass VPN"
+
+                # Verify the fix worked
+                sleep 0.5  # Brief delay for route cache to clear
+                NEW_ROUTE=$(ip route get "$TEST_IP" 2>/dev/null | head -n1)
+                if echo "$NEW_ROUTE" | grep -q "dev.*podman"; then
+                    echo "Routing rule successfully applied - container traffic now bypasses VPN"
+                else
+                    echo "WARNING: Routing rule added but traffic may still go through VPN"
+                    echo "WARNING: Maybe use higher priority than $PRIO, or check 'ip rule show'"
+                    echo "  Current route: $NEW_ROUTE"
+                fi
+            else
+                echo "WARNING: Could not add routing rule (rule may already exist)"
+            fi
+        else
+            echo "Container network routing: $CURRENT_ROUTE"
+        fi
+    fi
+) &
+
 # Run container against the local repository, to test changes easily
 # Expose the container's libvirt to the host; check "podman ps" for the port, and use e.g.:
 # virsh -c qemu+tcp://localhost:<port>/session list

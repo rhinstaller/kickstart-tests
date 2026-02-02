@@ -20,7 +20,6 @@ fedora_disabled_array=(
   rhbz1853668 # multipath device not constructed back after installation
   gh975       # packages-default failing
   gh1023      # rpm-ostree failing
-  gh1437      # lvm-cache-* failing
   gh1530      # dns-global-exclusive-tls-* stage2-from-compose failing
   gh1586      # raid tests failing
 )

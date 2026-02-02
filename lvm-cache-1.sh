@@ -19,15 +19,13 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="lvm storage gh1437"
+TESTTYPE="lvm storage"
 
 . ${KSTESTDIR}/functions.sh
 
 prepare_disks() {
     tmpdir=$1
 
-    qemu-img create -q -f qcow2 ${tmpdir}/disk-a.img 10G
-    qemu-img create -q -f qcow2 ${tmpdir}/disk-b.img 10G
+    qemu-img create -q -f qcow2 ${tmpdir}/disk-a.img 11G
     echo ${tmpdir}/disk-a.img
-    echo ${tmpdir}/disk-b.img
 }

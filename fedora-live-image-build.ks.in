@@ -14,7 +14,7 @@ xconfig  --startxonboot
 # Keyboard layouts
 keyboard 'us'
 # Root password
-rootpw --iscrypted --lock locked
+rootpw --lock
 # System language
 lang en_US.UTF-8
 # Shutdown after installation

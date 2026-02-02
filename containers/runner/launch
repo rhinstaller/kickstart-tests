@@ -159,6 +159,11 @@ if [ "${CRUN%podman*}" != "$CRUN" ] && [ $(id -u) -ne 0 ]; then
     PODMAN_SELINUX_FIX="--security-opt label=disable"
 fi
 
+# Add SYS_RESOURCE capability for podman to allow ulimit -c unlimited to work
+if [ "${CRUN%podman*}" != "$CRUN" ]; then
+    PODMAN_CAP_ADD="--cap-add SYS_RESOURCE"
+fi
+
 # Build up a list of KSTEST_* environment variables to be passed into the container
 TEST_ENV_VARS=$(printenv | while read line; do
     key="$(echo $line | cut -d'=' -f1)"
@@ -215,7 +220,7 @@ TEST_ENV_VARS=$(printenv | while read line; do
 # Expose the container's libvirt to the host; check "podman ps" for the port, and use e.g.:
 # virsh -c qemu+tcp://localhost:<port>/session list
 set -x
-$CRUN run -it --rm --device=/dev/kvm --publish 127.0.0.1::16509 $PODMAN_SELINUX_FIX \
+$CRUN run -it --rm --device=/dev/kvm --publish 127.0.0.1::16509 $PODMAN_SELINUX_FIX ${PODMAN_CAP_ADD:-} \
     --env SCENARIO="${SCENARIO:-unknown}" \
     --env DRY_RUN="${DRY_RUN:-}" \
     --env KSTESTS_TEST="$KSTESTS_TEST" --env TESTTYPE="${TESTTYPE:-}" --env TESTTYPES="${TESTTYPES:-}" --env SKIP_TESTTYPES="${SKIP_TESTTYPES:-}" \

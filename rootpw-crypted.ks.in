@@ -14,7 +14,7 @@ lang en
 timezone America/New_York
 
 # let's consider this password to be an laready crypted string
-rootpw --iscrypted qweqwe
+rootpw --iscrypted $6$s81m..s71YQx7ynQ$v.iLP4CEzCduq4X.L2ALM6XfjTk0GrBrAi3q1Eiqhaimvlf5jjCfiE5uzz4EzaKQcu1NtB/bSchcxexrQez4U1
 
 shutdown
 
@@ -38,7 +38,8 @@ with open("/root/RESULT", "wt") as result:
             print("Unable to find root password", file=result)
             sys.exit(0)
 
-    if "qweqwe" != shadow_fields[1]:
+    expected_hash = "$6$s81m..s71YQx7ynQ$v.iLP4CEzCduq4X.L2ALM6XfjTk0GrBrAi3q1Eiqhaimvlf5jjCfiE5uzz4EzaKQcu1NtB/bSchcxexrQez4U1"
+    if expected_hash != shadow_fields[1]:
         print("Root password is not correct: %s" % shadow_fields[1], file=result)
         sys.exit(0)
 

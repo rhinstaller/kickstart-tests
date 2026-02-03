@@ -27,6 +27,7 @@ fedora_disabled_array=(
 daily_iso_disabled_array=(
   gh1434      # reboot-inital-setup-* failing
   gh910       # stage2-from-ks test needs to be fixed for daily-iso
+  gh1596      # selinux-contexts failing
 )
 
 rawhide_disabled_array=(

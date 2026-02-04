@@ -35,10 +35,12 @@ validate() {
     disksdir=$1
     args=$(for d in ${disksdir}/disk-*img; do echo -a ${d}; done)
 
+    rootfs_device=$(find_rootfs_device "${args}")
+
     # There should be a /root/RESULT file with results in it.  Check
     # its contents and decide whether the test finally succeeded or
     # not.
-    result=$(run_with_timeout ${COPY_FROM_IMAGE_TIMEOUT} "virt-cat ${args} -m /dev/disk/by-label/rootfs /root/RESULT")
+    result=$(run_with_timeout ${COPY_FROM_IMAGE_TIMEOUT} "virt-cat ${args} -m ${rootfs_device} /root/RESULT")
     if [[ $? != 0 ]]; then
         status=1
         echo '*** /root/RESULT does not exist in VM image.'

@@ -35,3 +35,19 @@ prepare_disks() {
     echo ${tmpdir}/disk-b.img
     echo ${tmpdir}/disk-c.img
 }
+
+validate() {
+    disksdir=$1
+    args=$(for d in ${disksdir}/disk-*img; do echo -a ${d}; done)
+
+    rootfs_device=$(find_rootfs_device "${args}")
+
+    # Use virt-copy-out with explicit mount point since inspection mode may fail
+    # to find the root filesystem on RAID+LVM setups.
+    if [[ -n "$rootfs_device" ]]; then
+        run_with_timeout ${COPY_FROM_IMAGE_TIMEOUT} "virt-copy-out ${args} -m ${rootfs_device} /root/RESULT ${disksdir}" 2>/dev/null
+    fi
+
+    validate_RESULT ${disksdir}
+    return $?
+}

@@ -11,7 +11,8 @@ jobs:
     name: Build boot.iso
     runs-on: [self-hosted, kstest]
     env:
-      LORAX_BUILD_CONTAINER: fedora:rawhide
+      ISO_BUILD_CONTAINER_NAME: quay.io/rhinstaller/anaconda-iso-creator
+      CI_TAG: fedora-rawhide
 
     steps:
       - name: Clean up previous run
@@ -30,10 +31,6 @@ jobs:
       - name: Ensure http proxy is running
         run: sudo kickstart-tests/containers/squid.sh start
 
-      - name: Update container image used here
-        run: |
-          sudo podman pull ${{ env.LORAX_BUILD_CONTAINER }}
-
       - name: Set up host loop devices
         run: |
           # We have to pre-create loop devices because they are not namespaced in kernel so
@@ -46,37 +43,19 @@ jobs:
         run: |
           mkdir -p /tmp/lorax-images
           # /var/tmp tmpfs speeds up lorax and avoids https://bugzilla.redhat.com/show_bug.cgi?id=1906364
-          sudo podman run -i --rm --privileged --tmpfs /var/tmp:rw,mode=1777 -v /tmp/lorax-images:/images:z ${{ env.LORAX_BUILD_CONTAINER }} <<EOF
-          set -eux
-          echo "::group::Install lorax"
-          # Replace standalone systemd package with systemd as these are conflicting
-          dnf swap -y systemd-standalone-sysusers systemd
-          dnf install -y lorax
-          echo "::endgroup::"
-
-          # build boot.iso with our rpms
+          # The container's /lorax-build script already includes the base Fedora rawhide repo
+          # We pass additional COPR repos as arguments
           echo "::group::Build boot.iso with the RPMs"
-          . /etc/os-release
-          # Workaround for dracut xattr issues in containers
-          # See https://bugzilla.redhat.com/show_bug.cgi?id=2358683#c14
-          # and https://github.com/dracut-ng/dracut-ng/issues/443
-          export DRACUT_NO_XATTR=1
-          # The download.fedoraproject.org automatic redirector often selects download-ib01.f.o. for GitHub's cloud, which is too unreliable; use a mirror
-          # The --volid argument can cause different network interface naming: https://github.com/rhinstaller/kickstart-tests/issues/448
-          # FIXME: remove the dnf5-unstable when the stuff goes into stable repo
-          lorax -p Fedora -v \$VERSION_ID -r \$VERSION_ID --volid Fedora-S-dvd-x86_64-rawh \
-            -s http://dl.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/x86_64/os/ \
+          sudo podman run -i --rm --privileged --env CI_TAG=${{ env.CI_TAG }} \
+            --tmpfs /var/tmp:rw,mode=1777 \
+            -v /tmp/lorax-images:/images:z \
+            ${{ env.ISO_BUILD_CONTAINER_NAME }}:${{ env.CI_TAG }} \
             -s https://download.copr.fedorainfracloud.org/results/rpmsoftwaremanagement/dnf-nightly/fedora-rawhide-x86_64/ \
             -s https://download.copr.fedorainfracloud.org/results/rpmsoftwaremanagement/dnf5-unstable/fedora-rawhide-x86_64/ \
             -s https://download.copr.fedorainfracloud.org/results/@rhinstaller/Anaconda/fedora-rawhide-x86_64/ \
             -s https://copr-be.cloud.fedoraproject.org/results/@storage/blivet-daily/fedora-rawhide-x86_64/ \
-            -s https://copr-be.cloud.fedoraproject.org/results/@storage/udisks-daily/fedora-rawhide-x86_64/ \
-            lorax
-          cp lorax/images/boot.iso /images/
-          cp *.txt /images/
-          cp *.log /images/
+            -s https://copr-be.cloud.fedoraproject.org/results/@storage/udisks-daily/fedora-rawhide-x86_64/
           echo "::endgroup::"
-          EOF
 
       - name: Tear down loop devices
         if: always()

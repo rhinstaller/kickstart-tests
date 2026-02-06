@@ -10,14 +10,24 @@
 %ksappend payload/packages_weakdeps.ks
 
 %post
-# Make sure the --recommends packages from gnupg2 are not installed
+@KSINCLUDE@ scripts-lib.sh
+platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
+
+# Make sure the weak dependencies from gnupg2 are not installed
 if rpm -q pinentry ; then
     echo "pinentry was installed" >> /root/RESULT
 fi
 
-# Check that gnupg2's --recommends did not change unexpectedly
-if ! ( rpm -q --recommends gnupg2 | grep -q pinentry ) ; then
-    echo "gnupg2 --recommends has changed, test needs to be updated" >> /root/RESULT
+# Check that gnupg2's weak dependencies include pinentry
+if [ "${platform:0:4}" == "rhel" ] || [ "${platform:0:6}" == "centos" ]; then
+    if ! ( rpm -q --suggests gnupg2 | grep -q pinentry ) ; then
+        echo "gnupg2 --suggests has changed, test needs to be updated" >> /root/RESULT
+    fi
+else
+    # Fedora and Fedora ELN
+    if ! ( rpm -q --recommends gnupg2 | grep -q pinentry ) ; then
+        echo "gnupg2 --recommends has changed, test needs to be updated" >> /root/RESULT
+    fi
 fi
 
 %ksappend validation/success_if_result_empty.ks

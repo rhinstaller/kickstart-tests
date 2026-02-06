@@ -12,7 +12,6 @@ RUN dnf -y update && \
     libvirt-daemon-proxy \
     guestfs-tools \
     genisoimage \
-    lorax-lmc-virt \
     parallel \
     python3-libvirt \
     createrepo_c \

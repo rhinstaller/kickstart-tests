@@ -38,7 +38,6 @@ Setting up
 
 First you need to install the needed dependencies:
 
-- livemedia-creator
 - Python bindings for libvirt
 - libguestfs-tools
 - virt-install

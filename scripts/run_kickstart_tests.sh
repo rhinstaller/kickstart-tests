@@ -19,12 +19,10 @@
 # Red Hat Author(s): Chris Lumens <clumens@redhat.com>
 #                    Jiri Konecny <jkonecny@redhat.com>
 
-# This script runs the entire kickstart_tests suite.  It is an interface
-# between "make check" (which is why it takes environment variables instead
-# of arguments) and livemedia-creator.  Each test consists of a kickstart
-# file that specifies most everything about the installation, and a shell
-# script that does validation and specifies kernel boot parameters.  lmc
-# then fires up a VM and watches for tracebacks or stuck installs.
+# This script runs the entire kickstart_tests suite.  Each test consists of a
+# kickstart file that specifies most everything about the installation, and a
+# shell script that does validation and specifies kernel boot parameters.  The
+# launcher then fires up a VM and watches for tracebacks or stuck installs.
 #
 # A boot ISO is required, which should be specified with TEST_BOOT_ISO=.
 #
@@ -154,7 +152,7 @@ if [[ ! -e "${IMAGE}" ]]; then
 fi
 
 # Check for required programs and exit if missing.
-for p in livemedia-creator parallel scp; do
+for p in parallel scp; do
     hash ${p} 2>/dev/null || { echo "Required program ${p} missing; aborting." ; exit 1; }
 done
 

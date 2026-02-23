@@ -34,7 +34,7 @@ else
         dirs=$(find . -type d | grep -v -E "^\.$" | wc -l)
 
         if [ $dirs -eq 0 ]; then
-            echo SUCCESS > /root/result
+            echo SUCCESS > /root/RESULT
         else
             echo "SUCCESS - but directories still exist under /usr/share/doc" > /root/RESULT
         fi

@@ -38,3 +38,18 @@ function dumps_default_cons {
         echo "no"
     fi
 }
+
+# restore_container_file_context PATH
+# Conditionally restore SELinux context if file or directory has container_file_t context.
+# This addresses gh1607 where container builds cause incorrect contexts.
+function restore_container_file_context {
+    local path=$1
+
+    # Check if file or directory exists and has container_file_t context
+    if [ -e "${path}" ]; then
+        current_context=$(stat -c %C "${path}" 2>/dev/null || echo "")
+        if echo "$current_context" | grep -q "container_file_t"; then
+            restorecon -irF "${path}"
+        fi
+    fi
+}

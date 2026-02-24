@@ -23,6 +23,7 @@ fedora_disabled_array=(
   gh1530      # dns-global-exclusive-tls-* stage2-from-compose failing
   gh1586      # raid tests failing
   gh1613      # groups-and-envs-2 failing
+  gh1612      # script-pre-install heavy flaking
 )
 
 daily_iso_disabled_array=(
@@ -112,6 +113,7 @@ fedora_eln_disabled_array=(
   gh1541      # flatpak-preinstall-* not implemented
   gh1574      # bootc-* failing
   gh1586      # raid tests failing
+  gh1612      # script-pre-install heavy flaking
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

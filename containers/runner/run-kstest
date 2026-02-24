@@ -64,6 +64,11 @@ fi
 # work around virt-install TOCTOU race <https://github.com/virt-manager/virt-manager/pull/175>
 mkdir -p ~/.cache/virt-manager/boot
 
+# Set ulimit -c unlimited before starting libvirt
+# This allows libvirt to see unlimited is already set and avoid trying to set it
+# which causes "cannot limit core file size" errors in containers
+ulimit -c unlimited
+
 # Expose libvirt to the outside, so that one can attach virt-viewer easily for debugging
 # Disable TLS; we don't have a certificate setup, and this is all local anyway
 mkdir -p ~/.config/libvirt

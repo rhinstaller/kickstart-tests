@@ -45,11 +45,13 @@ jobs:
           # /var/tmp tmpfs speeds up lorax and avoids https://bugzilla.redhat.com/show_bug.cgi?id=1906364
           # The container's /lorax-build script already includes the base Fedora rawhide repo
           # We pass additional COPR repos as arguments
-          echo "::group::Build boot.iso with the RPMs"
+          echo "::group::Pull build container and build boot.iso"
+          CONTAINER_IMAGE=${{ env.ISO_BUILD_CONTAINER_NAME }}:${{ env.CI_TAG }}
+          sudo podman pull ${CONTAINER_IMAGE}
           sudo podman run -i --rm --privileged --env CI_TAG=${{ env.CI_TAG }} \
             --tmpfs /var/tmp:rw,mode=1777 \
             -v /tmp/lorax-images:/images:z \
-            ${{ env.ISO_BUILD_CONTAINER_NAME }}:${{ env.CI_TAG }} \
+            ${CONTAINER_IMAGE} \
             -s https://download.copr.fedorainfracloud.org/results/rpmsoftwaremanagement/dnf-nightly/fedora-rawhide-x86_64/ \
             -s https://download.copr.fedorainfracloud.org/results/rpmsoftwaremanagement/dnf5-unstable/fedora-rawhide-x86_64/ \
             -s https://download.copr.fedorainfracloud.org/results/@rhinstaller/Anaconda/fedora-rawhide-x86_64/ \

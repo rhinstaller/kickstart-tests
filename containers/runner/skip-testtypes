@@ -24,6 +24,7 @@ fedora_disabled_array=(
   gh1586      # raid tests failing
   gh1613      # groups-and-envs-2 failing
   gh1612      # script-pre-install heavy flaking
+  gh1618      # packages-multilib failing on daily-iso
 )
 
 daily_iso_disabled_array=(

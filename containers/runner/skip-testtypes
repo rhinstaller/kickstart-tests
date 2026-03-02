@@ -22,7 +22,6 @@ fedora_disabled_array=(
   gh1023      # rpm-ostree failing
   gh1530      # dns-global-exclusive-tls-* stage2-from-compose failing
   gh1586      # raid tests failing
-  gh1613      # groups-and-envs-2 failing
   gh1612      # script-pre-install heavy flaking
 )
 

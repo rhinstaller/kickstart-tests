@@ -113,6 +113,7 @@ fedora_eln_disabled_array=(
   gh1574      # bootc-* failing
   gh1586      # raid tests failing
   gh1612      # script-pre-install heavy flaking
+  gh1622      # packages-and-groups-1 failing
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

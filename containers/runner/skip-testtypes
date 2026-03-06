@@ -22,7 +22,6 @@ fedora_disabled_array=(
   gh1023      # rpm-ostree failing
   gh1530      # dns-global-exclusive-tls-* stage2-from-compose failing
   gh1586      # raid tests failing
-  gh1612      # script-pre-install heavy flaking
   gh1618      # packages-multilib failing on daily-iso
 )
 
@@ -112,7 +111,6 @@ fedora_eln_disabled_array=(
   gh1541      # flatpak-preinstall-* not implemented
   gh1574      # bootc-* failing
   gh1586      # raid tests failing
-  gh1612      # script-pre-install heavy flaking
   gh1622      # packages-and-groups-1 failing
 )
 

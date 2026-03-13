@@ -3,25 +3,31 @@
 
 %ksappend repos/default.ks
 %ksappend common/common_no_payload.ks
-
-%packages
-@core
-@c-development
-@^cloud-server-environment
-%end
+%ksappend payload/groups_and_envs_1_packages.ks
 
 %post
+
+@KSINCLUDE@ scripts-lib.sh
+platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
+
 # We don't have a way of determining if a group/env is installed or not.
-# These sentinel packages will have to do.
-rpm -q fedora-release-cloud
-if [[ $? != 0 ]]; then
-    echo '*** cloud-server-environment was not installed' > /root/RESULT
+# These sentinel packages (mandatory in mandatory group) will have to do.
+if [ "${platform:0:4}" == "rhel" ] || [ "${platform:0:6}" == "centos" ] || [ "${platform}" == "fedora-eln" ]; then
+    SENTINEL_PACKAGE=qemu-kvm
 else
-    rpm -q gcc
-    if [[ $? != 0 ]]; then
-        echo '*** c-development was not installed' > /root/RESULT
-    else
-        echo SUCCESS > /root/RESULT
-    fi
+    SENTINEL_PACKAGE=fedora-release-cloud
 fi
+
+rpm -q ${SENTINEL_PACKAGE}
+if [[ $? != 0 ]]; then
+    echo "*** package ${SENTINEL_PACKAGE} mandatory for the environment was not installed" >> /root/RESULT
+fi
+
+# gcc is mandatory in development group
+rpm -q gcc
+if [[ $? != 0 ]]; then
+    echo "*** development group was not installed" >> /root/RESULT
+fi
+
+%ksappend validation/success_if_result_empty.ks
 %end

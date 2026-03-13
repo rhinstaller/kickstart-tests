@@ -10,64 +10,68 @@
 
 %packages
 # (1) Test that you can remove a group that's part of an environment.
-@^xfce-desktop-environment
--@dial-up
+%ksappend payload/environment2.ks
 
 # (2) Test that you can add and then remove a group.
-@3d-printing
--@3d-printing
+@dns-server
+-@dns-server
 
 # (3) Test that --optional works.
 @container-management --optional
 
 # (4) Test that --nodefaults works.
-@rpm-development-tools --nodefaults
+@web-server --nodefaults
 %end
 
 %post
+
+@KSINCLUDE@ scripts-lib.sh
+platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
+
 # We don't have a way of determining if a group/env is installed or not.
 # These sentinel packages will have to do.
 
-# Testing #1 - lrzsz is only part of dial-up, and should not be installed.
-rpm -q lrzsz
-if [[ $? == 0 ]]; then
-    echo '*** dial-up group should not have been installed' >> /root/RESULT
-fi
-
-# Testing #2 - meshlab is only part of 3d-printing, and should not
-# be installed.
-rpm -q meshlab
-if [[ $? == 0 ]]; then
-    echo '*** 3d-printing group should not have been installed' >> /root/RESULT
-fi
-
-# Testing #3 - buildah, podman, origin-clients are optional part of container-management,
-# so should be installed when the --optional flag is passed for the group spec
-rpm -q buildah
-if [[ $? != 0 ]]; then
-    echo '*** buildah was not installed for @container-management --optional' >> /root/RESULT
-fi
-
-rpm -q podman
-if [[ $? != 0 ]]; then
-    echo '*** podman was not installed for @container-management --optional' >> /root/RESULT
-fi
-
-# Testing #4 - rpm-build is mandatory so it should be installed.  rpmdevtools is
-# default so it should not.  rpmlint is optional so it should not.
-rpm -q rpm-build
-if [[ $? != 0 ]]; then
-    echo '*** Mandatory package from rpm-development-tools was not installed' >> /root/RESULT
+# Testing #1 - a package which is part of a group removed from environment should not be installed.
+if [ "${platform:0:4}" == "rhel" ] || [ "${platform:0:6}" == "centos" ] || [ "${platform}" == "fedora-eln" ]; then
+    SENTINEL_PACKAGE=libguestfs
 else
-    rpm -q rpmdevtools
-    if [[ $? == 0 ]]; then
-        echo '*** Default package from rpm-development-tools should not have been installed' >> /root/RESULT
-    else
-        rpm -q rpmlint
-        if [[ $? == 0 ]]; then
-            echo '*** Optional package from rpm-development-tools should not have been installed' >> /root/RESULT
-        fi
-    fi
+    SENTINEL_PACKAGE=dnsmasq
+fi
+
+rpm -q ${SENTINEL_PACKAGE}
+if [[ $? == 0 ]]; then
+    echo "*** package ${SENTINEL_PACKAGE} from a group removed from the environment was installed" >> /root/RESULT
+fi
+
+# Testing #2 - bind-chroot is part of the tested group, and should not be installed.
+# bind-chroot being part of the group is checked in groups-and-envs-1
+rpm -q bind-chroot
+if [[ $? == 0 ]]; then
+    echo '*** group containing bind-chroot should not have been installed' >> /root/RESULT
+fi
+
+# Testing #3 - toolbox is optional part of container-management,
+# so should be installed when the --optional flag is passed for the group spec
+rpm -q toolbox
+if [[ $? != 0 ]]; then
+    echo '*** toolbox was not installed for @container-management --optional' >> /root/RESULT
+fi
+
+# Testing #4 - httpd is mandatory so it should be installed. httpd-maunal is
+# default so it should not. mod_auth_gssapi is optional so it should not.
+rpm -q httpd
+if [[ $? != 0 ]]; then
+    echo '*** Mandatory package httpd was not installed' >> /root/RESULT
+fi
+
+rpm -q httpd-manual
+if [[ $? == 0 ]]; then
+    echo '*** Default package httpd-manual should not have been installed' >> /root/RESULT
+fi
+
+rpm -q mod_auth_gssapi
+if [[ $? == 0 ]]; then
+    echo '*** Optional package mod_auth_gssapi should not have been installed' >> /root/RESULT
 fi
 
 %ksappend validation/success_if_result_empty.ks

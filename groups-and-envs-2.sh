@@ -23,9 +23,3 @@
 TESTTYPE="packaging payload gh1536"
 
 . ${KSTESTDIR}/functions.sh
-
-# The test installs ~1366 packages for which the default timeout is sometimes
-# not enough
-get_timeout() {
-    echo "60"
-}

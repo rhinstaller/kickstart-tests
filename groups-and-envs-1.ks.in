@@ -3,7 +3,12 @@
 
 %ksappend repos/default.ks
 %ksappend common/common_no_payload.ks
-%ksappend payload/groups_and_envs_1_packages.ks
+
+%packages
+%ksappend payload/environment1.ks
+@dns-server
+%end
+
 
 %post
 
@@ -23,10 +28,10 @@ if [[ $? != 0 ]]; then
     echo "*** package ${SENTINEL_PACKAGE} mandatory for the environment was not installed" >> /root/RESULT
 fi
 
-# gcc is mandatory in development group
-rpm -q gcc
+# bind-chroot is mandatory in dns-server group
+rpm -q bind-chroot
 if [[ $? != 0 ]]; then
-    echo "*** development group was not installed" >> /root/RESULT
+    echo "*** dns-server group was not installed" >> /root/RESULT
 fi
 
 %ksappend validation/success_if_result_empty.ks

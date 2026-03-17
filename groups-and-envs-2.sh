@@ -20,12 +20,6 @@
 # FIXME: times out on rhel8
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="packaging payload gh1536"
+TESTTYPE="packaging payload"
 
 . ${KSTESTDIR}/functions.sh
-
-# The test installs ~1366 packages for which the default timeout is sometimes
-# not enough
-get_timeout() {
-    echo "60"
-}

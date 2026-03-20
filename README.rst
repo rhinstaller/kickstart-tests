@@ -323,29 +323,25 @@ Chapter 7. Continuous Integration structure
 
 Regular test runs
 -----------------
-Every night, the `scenarios workflow`_ runs all tests on all our supported
-operating systems/repositories, like "Fedora Rawhide" or "RHEL 9". They
+Every night, the `daily run workflow`_ runs all tests on all our supported
+operating system variants/repositories, like "Fedora Rawhide" or "CentOS 10". They
 essentially call the runner container's ``launch`` script documented above with
 the desired parameters.
 
-The actual set of tests run in a scenario is defined using `TESTTYPE` tags in
-`skip-testtypes file`_.
+The actual set of tests run for a scenario / os variant is defined using ``TESTTYPE`` tags in
+`skip-testtypes file`_.  The tests excluded for a variant are defined by ``skip-on-<VARIANT>`` tag. For example tests having ``skip-on-rhel-10`` in its ``TESTTYPE`` variable set in ``<TEST>.sh``
+file will not be run for ``rhel10`` os variant.
 
-The ``rawhide`` and ``daily-iso`` scenarios can in principle run on any host
-that has enough resources. The ``rhelX`` tests however needs to run on RHEL
-internal infrastructure.
+To see the arguments used for tests for a os variant / platform you can use `generate-launch-args.py`_ script::
 
-Currently all scenarios run on `self-hosted GitHub action runners`_, which are
-running in our upshift cluster. See our internal ``builders.git`` repository
-for details and the launch/setup playbooks. These have little magic, though,
-they mostly just create an OpenStack instance and install/configure the action
-runner binary as a service. All the actual test logic is contained in the
-workflow files and the runner container.
+    $ scripts/generate-launch-args.py --os-variant rhel10
+    --platform rhel10 --skip-testtypes knownfailure,manual,skip-on-rhel,skip-on-rhel-10,gh576,gh804,gh1090,gh1207,gh1213,gh1536,gh1538
+
+Apart from the ``skip-on-X`` tags you can see also ``gh<ISSUE_NUMBER>`` tags which define *disabled tests* (see below).
 
 The results can be viewed on the `GitHub Daily run workflows page`_. Each run
-has an artifact attached with the detailed log files. This is currently not
-very comfortable, and we are actively looking for a better solution how to
-publish the test result history.
+has an artifact attached with the detailed log files. Look for the
+``log-<SCENARIO>`` artifact.
 
 These tests are expected to succeed normally. On failures, rhinstaller
 maintainers get a "failed workflow" notification email and should investigate
@@ -357,6 +353,20 @@ which failed due to an unspecific reason (i.e. not due to a skip or a syntax
 error in the kickstart file, etc.). The test log will still show both results
 right after each other, so that the original failure can be examined; but if
 the retry works, the test as a whole counts as success.
+
+There is also a regular `Weekly Summary`_ workflow run weekly. It processes the results of the daily test runs of the last week into a summary. Its artifact containing logs of failed tests can be further examined with `classify-failures`_ script to see if the failure or flake is already tracked in `issues`_.
+The summary workflow can be triggered also manually which can be useful to get the logs of recent failed daily runs.
+
+The ``rawhide``, ``daily-iso`` and ``centos10`` scenarios can in principle run on any host
+that has enough resources. The ``rhelX`` tests however needs to run on RHEL
+internal infrastructure.
+
+Currently all scenarios run on `self-hosted GitHub action runners`_, which are
+running in our upshift cluster. See our internal ``builders.git`` repository
+for details and the launch/setup playbooks. These have little magic, though,
+they mostly just create an OpenStack instance and install/configure the action
+runner binary as a service. All the actual test logic is contained in the
+workflow files and the runner container.
 
 Pull requests
 -------------
@@ -418,7 +428,7 @@ https://gitlab.cee.redhat.com/rtt/rpm-test-repos.
 .. _runner documentation: ./containers/runner/README.md
 .. _containers: ./containers
 .. _self-hosted GitHub action runners: https://docs.github.com/en/free-pro-team@latest/actions/hosting-your-own-runners
-.. _scenarios workflow: .github/workflows/scenarios-permian.yml
+.. _daily run workflow: .github/workflows/scenarios-permian.yml
 .. _skip-testtypes file: ./containers/runner/skip-testtypes
 .. _GitHub Daily run workflows page: https://github.com/rhinstaller/kickstart-tests/actions?query=workflow%3A%22Daily+run%22
 .. _tmt workflow: ./.github/workflows/testingfarm.yml
@@ -430,3 +440,8 @@ https://gitlab.cee.redhat.com/rtt/rpm-test-repos.
 .. _test-platforms: ./.github/workflows/test-platforms.yml
 .. _quay.io/rhinstaller/kstest-runner: https://quay.io/repository/rhinstaller/kstest-runner
 .. _daily-boot-iso: ./.github/workflows/daily-boot-iso.yml
+.. _generate-launch-args.py: ./scripts/generate-launch-args.py
+.. _Weekly Summary: https://github.com/rhinstaller/kickstart-tests/actions/workflows/weekly-summary.yml
+.. _classify-failures: ./scripts/classify-failures
+.. _issues: https://github.com/rhinstaller/kickstart-tests/issues
+

@@ -368,6 +368,18 @@ they mostly just create an OpenStack instance and install/configure the action
 runner binary as a service. All the actual test logic is contained in the
 workflow files and the runner container.
 
+Disabled tests
+--------------
+
+A failing test can be disabled using a ``TESTTYPE`` tag in its ``<TEST>.sh`` file. The convention for the tag form is ``gh<ISSUE_NUMBER>`` where ``<ISSUE_NUMBER>`` is the number of an issue created in the repository `issues`_. The test is disabled in the `skip-testtypes file`_ for the specific os variants.
+
+To see the disablement tags defined for an os variant / platform you can use `generate-launch-args.py`_ script::
+
+    $ scripts/generate-launch-args.py --os-variant rhel10
+    --platform rhel10 --skip-testtypes knownfailure,manual,skip-on-rhel,skip-on-rhel-10,gh576,gh804,gh1090,gh1207,gh1213,gh1536,gh1538
+
+Some tests are disabled due to environment / dependencies issues and can get fixed externally after some time. To make a review of disabled tests for such fixes easier a regular run of disabled tests is executed by `Run disabled tests`_ workflow.
+
 Pull requests
 -------------
 PRs are gated to avoid introducing broken or unstable tests, and to validate
@@ -444,4 +456,5 @@ https://gitlab.cee.redhat.com/rtt/rpm-test-repos.
 .. _Weekly Summary: https://github.com/rhinstaller/kickstart-tests/actions/workflows/weekly-summary.yml
 .. _classify-failures: ./scripts/classify-failures
 .. _issues: https://github.com/rhinstaller/kickstart-tests/issues
+.. _Run disabled tests: https://github.com/rhinstaller/kickstart-tests/actions/workflows/disabled-tests.yml
 

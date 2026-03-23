@@ -104,7 +104,6 @@ fedora_eln_disabled_array=(
   gh1541      # flatpak-preinstall-* not implemented
   gh1574      # bootc-* failing
   gh1586      # raid tests failing
-  gh1622      # packages-and-groups-1 failing
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

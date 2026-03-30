@@ -19,7 +19,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="storage partition luks"
+TESTTYPE="storage partition luks gh1637"
 
 . ${KSTESTDIR}/functions.sh
 

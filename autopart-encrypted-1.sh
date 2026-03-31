@@ -19,7 +19,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="autopart storage coverage smoke"
+TESTTYPE="autopart storage coverage smoke gh1637"
 
 . ${KSTESTDIR}/functions.sh
 

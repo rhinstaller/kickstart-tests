@@ -20,7 +20,7 @@
 # Check the results on the running VM.
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="storage lvm luks"
+TESTTYPE="storage lvm luks gh1637"
 
 . ${KSTESTDIR}/functions.sh
 

@@ -21,4 +21,6 @@
 # shellcheck disable=SC2034
 TESTTYPE="users coverage smoke"
 
+# /test-os-variants trigger
+
 . ${KSTESTDIR}/functions.sh

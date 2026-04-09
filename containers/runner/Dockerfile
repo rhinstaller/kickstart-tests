@@ -27,7 +27,7 @@ RUN dnf -y update && \
 # Set security_driver = none in /etc/libvirt/qemu.conf when building the
 # kstest-runner image. The libvirt backend used by libguestfs otherwise fails
 # with "Security driver model 'selinux' is not available".
-RUN sed -i 's/^[[:space:]]*security_driver.*/security_driver = "none"/' /etc/libvirt/qemu.conf
+RUN sed -i -E 's/^[[:space:]]*#?[[:space:]]*security_driver.*/security_driver = "none"/' /etc/libvirt/qemu.conf
 
 ENV APP_ROOT=/opt/kstest
 ENV PATH=${APP_ROOT}/bin:${PATH} \

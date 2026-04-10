@@ -24,15 +24,13 @@ RUN dnf -y update && \
     openssh-clients && \
     dnf -y clean all
 
-# Set security_driver = none in /etc/libvirt/qemu.conf when building the
-# kstest-runner image. The libvirt backend used by libguestfs otherwise fails
-# with "Security driver model 'selinux' is not available".
-RUN sed -i -E 's/^[[:space:]]*#?[[:space:]]*security_driver.*/security_driver = "none"/' /etc/libvirt/qemu.conf
-
+# FIXME(workaround): LIBGUESTFS_BACKEND=direct — remove when fixed upstream.
+# https://redhat.atlassian.net/browse/INSTALLER-4682
 ENV APP_ROOT=/opt/kstest
 ENV PATH=${APP_ROOT}/bin:${PATH} \
     APP_DATA=${APP_ROOT}/data \
-    KSTEST_USER=kstest
+    KSTEST_USER=kstest \
+    LIBGUESTFS_BACKEND=direct
 
 RUN groupadd -g 1001 -r ${KSTEST_USER} -f && \
     useradd -u 1001 -r -g ${KSTEST_USER} -m -c "Kickstart test user" ${KSTEST_USER} && \

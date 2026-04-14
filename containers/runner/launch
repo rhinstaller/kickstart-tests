@@ -16,6 +16,7 @@ PODMAN_SELINUX_FIX=
 RUN_COMMAND=/kickstart-tests/containers/runner/run-kstest
 SCENARIO=${SCENARIO:-unknown}
 BOOT_ISO="boot.iso"
+CONTAINER_RUN_ARGS=()
 
 # Get number of jobs to be run in parallel based on number of CPUs and amount of RAM
 recommended_jobs() {
@@ -63,7 +64,9 @@ Options:
  --defaults DEFAULTS_SH_FILE          Path to a file with custom shell script to override
                                       defaults. The base defaults will be platform
                                       specific (scripts/defaults*.sh).
- --run-args ARGUMENTS                 Extra $CRUN options/arguments (space separated)
+ --run-args ARGUMENTS                 Extra $CRUN options/arguments (space separated, legacy)
+ --run-arg  ARGUMENT                  Extra $CRUN option/argument (can be repeated, supports
+                                      values with spaces; use --run-arg=--flag for each flag)
  --recommended-jobs                   Print the number of jobs (--jobs option) used
                                       by default and exit. It is calulated from the number
                                       of CPUs and the size of RAM.
@@ -75,7 +78,7 @@ EOF
 }
 
 # parse options
-eval set -- "$(getopt -o j:p:t:T:s:u:rch --long jobs:,platform:,testtype:,testtypes:,skip-testtypes:,updates:,retry,connect-shell,daily-iso:,defaults:,run-args:,recommended-jobs,scenario:,timeout:,dry-run,help -- "$@")"
+eval set -- "$(getopt -o j:p:t:T:s:u:rch --long jobs:,platform:,testtype:,testtypes:,skip-testtypes:,updates:,retry,connect-shell,daily-iso:,defaults:,run-args:,run-arg:,recommended-jobs,scenario:,timeout:,dry-run,help -- "$@")"
 
 while true; do
     case "${1:-}" in
@@ -89,7 +92,8 @@ while true; do
         -c|--connect-shell) RUN_COMMAND=/bin/bash ;;
         --daily-iso) shift; DAILY_ISO_TOKEN="$1" ;;
         --defaults) shift; DEFAULTS_SH="$1" ;;
-        --run-args) shift; CONTAINER_RUN_ARGS="$1" ;;
+        --run-args) shift; IFS=' ' read -ra _args <<< "$1"; CONTAINER_RUN_ARGS+=("${_args[@]}") ;;
+        --run-arg)  shift; CONTAINER_RUN_ARGS+=("$1") ;;
         --recommended-jobs) recommended_jobs; exit 0 ;;
         --timeout) shift; TIMEOUT="$1" ;;
         --scenario) shift; SCENARIO="$1" ;;
@@ -225,7 +229,7 @@ $CRUN run -it --rm --device=/dev/kvm --publish 127.0.0.1::16509 $PODMAN_SELINUX_
     --env DRY_RUN="${DRY_RUN:-}" \
     --env KSTESTS_TEST="$KSTESTS_TEST" --env TESTTYPE="${TESTTYPE:-}" --env TESTTYPES="${TESTTYPES:-}" --env SKIP_TESTTYPES="${SKIP_TESTTYPES:-}" \
     --env KSTESTS_RUN_TIMEOUT="${TIMEOUT:-}" \
-    --env TEST_JOBS="$TEST_JOBS" --env PLATFORM_NAME="${PLATFORM:-}" --env TEST_RETRY="${TEST_RETRY:-}" ${UPDATES_IMG_ARGS:-} ${CONTAINER_RUN_ARGS:-} \
+    --env TEST_JOBS="$TEST_JOBS" --env PLATFORM_NAME="${PLATFORM:-}" --env TEST_RETRY="${TEST_RETRY:-}" ${UPDATES_IMG_ARGS:-} ${CONTAINER_RUN_ARGS[@]+"${CONTAINER_RUN_ARGS[@]}"} \
     --env KSTESTS_KEEP=${KSTESTS_KEEP:-1} \
     --env BOOT_ISO=${BOOT_ISO} \
     ${TEST_ENV_VARS} \

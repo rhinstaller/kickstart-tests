@@ -147,8 +147,20 @@ the graphical console for a virtual machine with a command:
 
     virt-viewer -c qemu+tcp://<IP>/session
 
-To change of the boot options for the tests (for example to add `inst.text`), please use
-`--run-args="--env KSTEST_EXTRA_BOOTOPTS=inst.text"` parameter for the `launch` script.
+To change the boot options for the tests (for example to add `inst.text`), please use
+the `--run-arg` parameter for the `launch` script:
+
+    containers/runner/launch --run-arg="--env=KSTEST_EXTRA_BOOTOPTS=inst.text" keyboard
+
+Several options belong in one variable separated by **semicolons** (not spaces), as
+documented for `KSTEST_EXTRA_BOOTOPTS` above—for example text mode and sshd on the
+installer:
+
+    containers/runner/launch --run-arg="--env=KSTEST_EXTRA_BOOTOPTS=inst.text;inst.sshd" keyboard
+
+Use `--run-arg` (can be repeated) when the extra container argument must not be split on
+spaces; the legacy `--run-args` option splits its value on spaces, so it is only suitable
+for simple values without spaces in the full `--env=...` string.
 
 ## Running test manually from the container
 

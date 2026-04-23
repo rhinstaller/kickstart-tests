@@ -13,7 +13,6 @@ fedora_skip_array=(
 )
 
 fedora_disabled_array=(
-  gh576       # clearpart-4 test is flaky on all scenarios
   gh595       # proxy-cmdline failing on all scenarios
   gh777       # raid-1-reqpart failing
   rhbz1853668 # multipath device not constructed back after installation
@@ -42,7 +41,6 @@ rhel8_skip_array=(
 )
 
 rhel8_disabled_array=(
-  gh576       # clearpart-4 test is flaky on all scenarios
   gh595       # proxy-cmdline failing on all scenarios
   gh1018      # bridge-no-bootopts-net failing
   gh804       # tests requiring dvd iso failing
@@ -54,7 +52,6 @@ rhel9_skip_array=(
 )
 
 rhel9_disabled_array=(
-  gh576       # clearpart-4 test is flaky on all scenarios
   gh595       # proxy-cmdline failing on all scenarios
   gh804       # tests requiring dvd iso failing
   gh1633      # rpm-ostree-container-uefi failing with Fedora 44 runner container
@@ -62,7 +59,6 @@ rhel9_disabled_array=(
 )
 
 rhel10_centos10_disabled_array=(
-  gh576       # clearpart-4 test is flaky on all scenarios
   gh804       # tests requiring dvd iso failing
   gh1090      # raid-1-reqpart failing
   gh1207      # packages-multilib failing

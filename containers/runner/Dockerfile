@@ -1,4 +1,4 @@
-FROM fedora:44
+FROM registry.fedoraproject.org/fedora:44
 LABEL maintainer='anaconda-devel-list@redhat.com'
 
 RUN dnf -y update && \

@@ -24,7 +24,7 @@ jobs:
         run: |
           TAG=$(date --iso-8601)
           NAME=quay.io/rhinstaller/kstest-runner
-          docker build -t $NAME:$TAG containers/runner
+          docker build --pull -t $NAME:$TAG containers/runner
           docker tag $NAME:$TAG $NAME:latest
 
           docker push $NAME:$TAG

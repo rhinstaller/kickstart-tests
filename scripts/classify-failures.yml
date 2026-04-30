@@ -109,6 +109,9 @@ issues:
   - description: "[1402] https://github.com/rhinstaller/kickstart-tests/issues/1402"
     first_grep: "^[0-9][0-9]:.*Thread AnaTaskThread-RunInstallationTask-1 has failed: Traceback.*IsRunning"
 
+  - description: "[1657] https://github.com/rhinstaller/kickstart-tests/issues/1657"
+    first_grep: "libguestfs: error: guestfs_launch failed"
+
 closed_issues:
   # Tracked in [1311]
   - description: "[1202] https://github.com/rhinstaller/kickstart-tests/issues/1202"

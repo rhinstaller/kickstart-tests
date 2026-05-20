@@ -40,7 +40,10 @@ prepare_disks() {
     echo ""
 }
 
-prepare() {
+# Shared setup for all iSCSI tests: create the target VM and substitute
+# common kickstart placeholders. Sets $iscsi_wwn for use by callers that
+# need additional substitutions.
+_prepare_iscsi_target() {
     local ks=$1
     local tmpdir=$2
 
@@ -48,20 +51,23 @@ prepare() {
     test_id=$(basename "${tmpdir}")
     local lc_test_id
     lc_test_id=$(echo "${test_id,,}" | tr -c 'a-z0-9\n' '-')
-    local wwn=iqn.2003-01.kickstart.test:${lc_test_id}
+    iscsi_wwn=iqn.2003-01.kickstart.test:${lc_test_id}
     local initiator=iqn.2009-02.com.example:${lc_test_id}
     local logfile=${tmpdir}/iscsi-target.log
 
-    create_iscsi_target_vm ${wwn} ${initiator} ${tmpdir} ${logfile} || return 1
+    create_iscsi_target_vm ${iscsi_wwn} ${initiator} ${tmpdir} ${logfile} || return 1
 
     sed -i \
         -e "s#@KSTEST_ISCSI_IP@#10.10.10.1#g" \
         -e "s#@KSTEST_ISCSI_PORT@#3260#g" \
-        -e "s#@KSTEST_ISCSI_TARGET@#${wwn}#g" \
+        -e "s#@KSTEST_ISCSI_TARGET@#${iscsi_wwn}#g" \
         -e "s#@KSTEST_ISCSINAME@#${initiator}#g" \
         ${ks}
+}
 
-    echo ${ks}
+prepare() {
+    _prepare_iscsi_target "$1" "$2" || return 1
+    echo "$1"
 }
 
 additional_runner_args() {

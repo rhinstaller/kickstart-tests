@@ -4,9 +4,11 @@
 iscsiname @KSTEST_ISCSINAME@
 iscsi --ipaddr @KSTEST_ISCSI_IP@ --port @KSTEST_ISCSI_PORT@ --target @KSTEST_ISCSI_TARGET@ --iface=@KSTEST_NETDEV1@
 
+# --location=none: non-iBFT iSCSI disks can't serve as boot devices
 bootloader --location=none
 zerombr
 clearpart --all
+# --nohome: keep layout simple on the iSCSI disk
 autopart --nohome
 
 # for non-offload iSCSI /boot can be on iSCSI only when using iBFT,
@@ -20,6 +22,8 @@ keyboard us
 lang en
 timezone America/New_York
 rootpw qweqwe
+# poweroff instead of shutdown: explicit ACPI power-off avoids systemd
+# hanging on iSCSI session disconnect during the shutdown sequence
 poweroff
 
 %packages

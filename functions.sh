@@ -370,6 +370,30 @@ remove_iscsi_target() {
 
 ISCSI_TARGET_SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=2 -o PubkeyAuthentication=no"
 
+# Boot a VM that serves an iSCSI target over QEMU mcast socket networking.
+#
+# The target VM uses a Fedora cloud image prepared with virt-customize
+# (targetcli + sshd). The base image is cached so subsequent calls only
+# create a qcow2 overlay and SSH in to configure the target (~30s).
+#
+# Two NICs: a mcast socket NIC for iSCSI traffic (10.10.10.1) and a
+# SLIRP NIC for SSH access (hostfwd on a deterministic port).
+#
+# Args:
+#   $1 (wwn)       - iSCSI target IQN, e.g. iqn.2003-01.kickstart.test:foo
+#   $2 (initiator) - iSCSI initiator IQN (unused by target, reserved)
+#   $3 (tmpdir)    - test working directory; state files written here
+#   $4 (logfile)   - all stdout/stderr from setup is appended here
+#
+# State files written to $tmpdir:
+#   iscsi-target-domain  - libvirt domain name (for cleanup)
+#   iscsi-target-disk    - qcow2 overlay path (for cleanup)
+#   iscsi-mcast-port     - UDP port for mcast group (for additional_runner_args)
+#   iscsi-ssh-port       - TCP port for SSH hostfwd (for validate)
+#
+# Environment:
+#   KSTEST_ISCSI_CACHE        - cache dir (default: /var/tmp/kstest-iscsi-cache)
+#   KSTEST_ISCSI_TARGET_IMAGE - cloud image URL or local path (default: Fedora 42)
 create_iscsi_target_vm() {
     local wwn=$1
     local initiator=$2

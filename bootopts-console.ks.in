@@ -1,0 +1,24 @@
+# Test coverage for https://redhat.atlassian.net/browse/RHEL-101787
+# and https://redhat.atlassian.net/browse/RHEL-101789
+# Verify that all console= boot options are passed to the installed system
+# kernel boot configuration.
+
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+%post
+
+grub_cmdline="$(grep "^GRUB_CMDLINE_LINUX=" /etc/default/grub)"
+
+for console_opt in console=ttyS0,115200 console=tty1; do
+    echo "${grub_cmdline}" | grep -q "${console_opt}"
+    if [[ $? -ne 0 ]]; then
+        echo "*** Failed check: ${console_opt} is not passed to installed system boot arguments" >> /root/RESULT
+        echo "*** GRUB_CMDLINE_LINUX=${grub_cmdline}" >> /root/RESULT
+    fi
+done
+
+%ksappend validation/success_if_result_empty.ks
+
+%end

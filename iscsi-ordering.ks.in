@@ -31,7 +31,7 @@ function check_iscsi_session_nochroot() {
     local transport="$1"
     local target="$2"
 
-    iscsiadm -m session | egrep -q '^'${transport}':.*'${target}
+    iscsiadm -m session | grep -Eq '^'${transport}':.*'${target}
     if [[ $? -ne 0 ]]; then
         echo "*** Failed check: ${target} session using ${transport} exists" >> $SYSROOT/root/RESULT
     fi

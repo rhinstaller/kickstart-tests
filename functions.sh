@@ -392,41 +392,47 @@ create_iscsi_target_vm() {
     local base_img="${cache_dir}/iscsi-target-base.qcow2"
 
     if [ ! -f "${base_img}" ]; then
-        local image_url=${KSTEST_ISCSI_TARGET_IMAGE:-"https://download.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-42-1.1.x86_64.qcow2"}
-
         mkdir -p "${cache_dir}"
+        (
+            flock -x 9
+            # Re-check after acquiring lock (another process may have created it)
+            if [ -f "${base_img}" ]; then
+                exit 0
+            fi
+            local image_url=${KSTEST_ISCSI_TARGET_IMAGE:-"https://download.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-42-1.1.x86_64.qcow2"}
 
-        if [[ "${image_url}" == http* ]]; then
-            echo "Downloading iSCSI target base image..." >&2
-            curl -f -L --retry 3 -o "${cache_dir}/download.tmp" "${image_url}" &>> ${logfile} || {
-                echo "ERROR: Failed to download iSCSI target image from ${image_url}" >&2
-                return 1
+            if [[ "${image_url}" == http* ]]; then
+                echo "Downloading iSCSI target base image..." >&2
+                curl -f -L --retry 3 -o "${cache_dir}/download.tmp.$$" "${image_url}" &>> ${logfile} || {
+                    echo "ERROR: Failed to download iSCSI target image from ${image_url}" >&2
+                    rm -f "${cache_dir}/download.tmp.$$"
+                    exit 1
+                }
+                mv "${cache_dir}/download.tmp.$$" "${cache_dir}/downloaded.$$.qcow2"
+            else
+                cp "${image_url}" "${cache_dir}/downloaded.$$.qcow2" || {
+                    echo "ERROR: Failed to copy iSCSI target image from ${image_url}" >&2
+                    exit 1
+                }
+            fi
+
+            echo "Preparing iSCSI target base image with virt-customize..." >&2
+            virt-customize -a "${cache_dir}/downloaded.$$.qcow2" \
+                --root-password password:testcase \
+                --install targetcli,NetworkManager \
+                --run-command 'systemctl enable sshd target' \
+                --run-command 'echo "PermitRootLogin yes" >> /etc/ssh/sshd_config.d/99-kstest.conf' \
+                --run-command 'systemctl disable cloud-init cloud-init-local cloud-config cloud-final 2>/dev/null; true' \
+                --selinux-relabel \
+                &>> ${logfile} || {
+                echo "ERROR: virt-customize failed" >&2
+                rm -f "${cache_dir}/downloaded.$$.qcow2"
+                exit 1
             }
-            mv "${cache_dir}/download.tmp" "${cache_dir}/downloaded.qcow2"
-        else
-            cp "${image_url}" "${cache_dir}/downloaded.qcow2" || {
-                echo "ERROR: Failed to copy iSCSI target image from ${image_url}" >&2
-                return 1
-            }
-        fi
 
-        echo "Preparing iSCSI target base image with virt-customize..." >&2
-        virt-customize -a "${cache_dir}/downloaded.qcow2" \
-            --root-password password:testcase \
-            --install targetcli,NetworkManager \
-            --run-command 'systemctl enable sshd target' \
-            --run-command 'echo "PermitRootLogin yes" >> /etc/ssh/sshd_config.d/99-kstest.conf' \
-            --run-command 'systemctl disable cloud-init cloud-init-local cloud-config cloud-final 2>/dev/null; true' \
-            --selinux-relabel \
-            &>> ${logfile} || {
-            echo "ERROR: virt-customize failed" >&2
-            rm -f "${cache_dir}/downloaded.qcow2"
-            return 1
-        }
-
-        mv "${cache_dir}/downloaded.qcow2" "${base_img}.tmp.$$"
-        mv "${base_img}.tmp.$$" "${base_img}"
-        echo "Cached iSCSI target base image at ${base_img}" >&2
+            mv "${cache_dir}/downloaded.$$.qcow2" "${base_img}"
+            echo "Cached iSCSI target base image at ${base_img}" >&2
+        ) 9>"${cache_dir}/base.lock" || return 1
     fi
 
     qemu-img create -f qcow2 -b "${base_img}" -F qcow2 "${disk_img}" &>> ${logfile}

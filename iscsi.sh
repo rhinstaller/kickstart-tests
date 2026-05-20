@@ -91,12 +91,12 @@ validate() {
     # on the host side (no SSH needed after shutdown).
     ${ssh_cmd} 'sync; poweroff' &>/dev/null
 
-    # Wait for target VM to fully shut down (max 30s)
+    # Wait for target VM to fully shut down (max 60s)
     local domain=$(cat ${disksdir}/iscsi-target-domain 2>/dev/null)
     local target_disk=$(cat ${disksdir}/iscsi-target-disk 2>/dev/null)
-    for i in $(seq 1 30); do
+    for i in $(seq 1 60); do
         virsh domstate "${domain}" 2>/dev/null | grep -q "shut off" && break
-        virsh domstate "${domain}" 2>/dev/null | grep -q "error:" && break
+        virsh dominfo "${domain}" &>/dev/null || break
         sleep 1
     done
     virsh destroy "${domain}" &>/dev/null || true
@@ -110,22 +110,21 @@ validate() {
     # Extract the iSCSI backing store from the target VM's disk
     local backing_store=${disksdir}/iscsi-backing.img
     LIBGUESTFS_BACKEND=direct guestfish --ro -a "${target_disk}" -i \
-        download /root/disk "${backing_store}" &>/dev/null
+        download /root/disk "${backing_store}" 2>>${disksdir}/guestfish.log
 
-    if [ ! -f "${backing_store}" ]; then
-        echo "*** Failed to extract iSCSI backing store from target VM"
+    if [ ! -f "${backing_store}" ] || [ ! -s "${backing_store}" ]; then
+        echo "*** Failed to extract iSCSI backing store from target VM (see guestfish.log)"
         return 1
     fi
 
     # Extract RESULT and logs from the backing store
-    local anaconda_dir=${disksdir}/anaconda
-    mkdir -p ${anaconda_dir}
-
     LIBGUESTFS_BACKEND=direct virt-cat -a "${backing_store}" /root/RESULT \
-        > ${disksdir}/RESULT 2>/dev/null
+        > ${disksdir}/RESULT.tmp 2>/dev/null \
+        && mv ${disksdir}/RESULT.tmp ${disksdir}/RESULT \
+        || echo "*** Failed to extract /root/RESULT from iSCSI backing store"
 
     LIBGUESTFS_BACKEND=direct virt-copy-out -a "${backing_store}" \
-        /var/log/anaconda/ ${anaconda_dir}/ 2>/dev/null
+        /var/log/anaconda/ ${disksdir}/ 2>/dev/null
 
     rm -f "${backing_store}"
 

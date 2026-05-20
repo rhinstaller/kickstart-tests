@@ -12,6 +12,7 @@ RUN dnf -y update && \
     libvirt-daemon-proxy \
     guestfs-tools \
     genisoimage \
+    jq \
     lorax-lmc-virt \
     parallel \
     python3-libvirt \

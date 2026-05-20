@@ -432,8 +432,8 @@ create_iscsi_target_vm() {
             local image_url=${KSTEST_ISCSI_TARGET_IMAGE:-""}
             if [ -z "${image_url}" ]; then
                 image_url=$(curl -sfL https://getfedora.org/releases.json | \
-                    python3 -c "import json,sys;print(next(r['link'] for r in json.load(sys.stdin) if 'Cloud' in r.get('subvariant','') and 'Generic' in r.get('subvariant','') and 'qcow2' in r.get('link','') and 'x86_64' in r.get('link','')))" 2>/dev/null) || true
-                if [ -z "${image_url}" ]; then
+                    jq -r '[.[] | select(.subvariant=="Cloud_Base" and (.link | test("x86_64.*Generic.*qcow2")))] | first | .link' 2>/dev/null) || true
+                if [ -z "${image_url}" ] || [ "${image_url}" = "null" ]; then
                     echo "ERROR: Could not resolve Fedora Cloud image URL. Set KSTEST_ISCSI_TARGET_IMAGE." >&2
                     exit 1
                 fi

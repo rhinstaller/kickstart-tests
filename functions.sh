@@ -368,6 +368,150 @@ remove_iscsi_target() {
     fi
 }
 
+ISCSI_TARGET_SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=2 -o PubkeyAuthentication=no"
+
+create_iscsi_target_vm() {
+    local wwn=$1
+    local initiator=$2
+    local tmpdir=$3
+    local logfile=$4
+
+    local port_seed=$(echo "${tmpdir}" | cksum | awk '{print $1}')
+    local mcast_port=$((10000 + port_seed % 20000))
+    local ssh_port=$((30000 + (port_seed + 1) % 20000))
+    local target_ip=10.10.10.1
+    local disk_img=${tmpdir}/iscsi-target.qcow2
+    local domain_name="iscsi-target-$(basename ${tmpdir})"
+
+    echo ${domain_name} > ${tmpdir}/iscsi-target-domain
+    echo ${disk_img} > ${tmpdir}/iscsi-target-disk
+    echo ${mcast_port} > ${tmpdir}/iscsi-mcast-port
+    echo ${ssh_port} > ${tmpdir}/iscsi-ssh-port
+
+    local cache_dir=${KSTEST_ISCSI_CACHE:-/var/tmp/kstest-iscsi-cache}
+    local base_img="${cache_dir}/iscsi-target-base.qcow2"
+
+    if [ ! -f "${base_img}" ]; then
+        local image_url=${KSTEST_ISCSI_TARGET_IMAGE:-"https://download.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-42-1.1.x86_64.qcow2"}
+
+        mkdir -p "${cache_dir}"
+
+        if [[ "${image_url}" == http* ]]; then
+            echo "Downloading iSCSI target base image..." >&2
+            curl -f -L --retry 3 -o "${cache_dir}/download.tmp" "${image_url}" &>> ${logfile} || {
+                echo "ERROR: Failed to download iSCSI target image from ${image_url}" >&2
+                return 1
+            }
+            mv "${cache_dir}/download.tmp" "${cache_dir}/downloaded.qcow2"
+        else
+            cp "${image_url}" "${cache_dir}/downloaded.qcow2" || {
+                echo "ERROR: Failed to copy iSCSI target image from ${image_url}" >&2
+                return 1
+            }
+        fi
+
+        echo "Preparing iSCSI target base image with virt-customize..." >&2
+        virt-customize -a "${cache_dir}/downloaded.qcow2" \
+            --root-password password:testcase \
+            --install targetcli,NetworkManager \
+            --run-command 'systemctl enable sshd target' \
+            --run-command 'echo "PermitRootLogin yes" >> /etc/ssh/sshd_config.d/99-kstest.conf' \
+            --run-command 'systemctl disable cloud-init cloud-init-local cloud-config cloud-final 2>/dev/null; true' \
+            --selinux-relabel \
+            &>> ${logfile} || {
+            echo "ERROR: virt-customize failed" >&2
+            rm -f "${cache_dir}/downloaded.qcow2"
+            return 1
+        }
+
+        mv "${cache_dir}/downloaded.qcow2" "${base_img}.tmp.$$"
+        mv "${base_img}.tmp.$$" "${base_img}"
+        echo "Cached iSCSI target base image at ${base_img}" >&2
+    fi
+
+    qemu-img create -f qcow2 -b "${base_img}" -F qcow2 "${disk_img}" &>> ${logfile}
+
+    virt-install \
+        --name ${domain_name} \
+        --ram 2048 --vcpus 1 \
+        --disk path=${disk_img},bus=virtio \
+        --import --graphics none --noautoconsole \
+        --osinfo detect=on,require=off \
+        --seclabel type=none \
+        --network none \
+        --qemu-commandline="-netdev" \
+        "--qemu-commandline=socket,id=net0,mcast=230.0.0.1:${mcast_port},localaddr=127.0.0.1" \
+        --qemu-commandline="-device" \
+        "--qemu-commandline=virtio-net-pci,netdev=net0,addr=0x10" \
+        --qemu-commandline="-netdev" \
+        "--qemu-commandline=user,id=net1,hostfwd=tcp::${ssh_port}-:22" \
+        --qemu-commandline="-device" \
+        "--qemu-commandline=virtio-net-pci,netdev=net1,addr=0x11" \
+        &>> ${logfile}
+
+    local ssh_cmd="sshpass -p testcase ssh ${ISCSI_TARGET_SSH_OPTS} -p ${ssh_port} root@127.0.0.1"
+    local ssh_ok=false
+    for i in $(seq 1 120); do
+        if ${ssh_cmd} 'echo ready' &>/dev/null; then
+            ssh_ok=true
+            break
+        fi
+        sleep 1
+    done
+
+    if ! ${ssh_ok}; then
+        echo "ERROR: iSCSI target VM did not become reachable in 120s" >&2
+        return 1
+    fi
+
+    ${ssh_cmd} << SSHEOF &>> ${logfile}
+        set -e
+        IFACE=\$(ls /sys/bus/pci/devices/0000:00:10.0/net/ 2>/dev/null | head -1)
+        if [ -z "\$IFACE" ]; then
+            IFACE=\$(ip -o link show | grep -v lo | head -1 | awk -F': ' '{print \$2}')
+        fi
+        nmcli connection add type ethernet con-name iscsi-net ifname \$IFACE \
+            ipv4.method manual ipv4.addresses ${target_ip}/24 ipv6.method disabled
+        nmcli connection up iscsi-net
+
+        dd if=/dev/zero of=/root/disk bs=1M count=1 seek=10240
+
+        targetcli "/backstores/fileio create file_or_dev=/root/disk name=disk write_back=false"
+        targetcli "/iscsi create wwn=${wwn}"
+        targetcli "/iscsi/${wwn}/tpg1/luns create /backstores/fileio/disk"
+        targetcli "/iscsi/${wwn}/tpg1 set attribute authentication=0 demo_mode_write_protect=0 generate_node_acls=1 cache_dynamic_acls=1"
+        targetcli "/iscsi/${wwn}/tpg1/portals delete 0.0.0.0 3260" 2>/dev/null || true
+        targetcli "/iscsi/${wwn}/tpg1/portals delete ::0 3260" 2>/dev/null || true
+        targetcli "/iscsi/${wwn}/tpg1/portals create ${target_ip} 3260"
+        targetcli "/ saveconfig"
+
+        firewall-cmd --permanent --add-service=iscsi-target 2>/dev/null && \
+            firewall-cmd --reload 2>/dev/null || true
+SSHEOF
+
+    if [ $? -ne 0 ]; then
+        echo "ERROR: iSCSI target VM setup failed" >&2
+        return 1
+    fi
+
+    ${ssh_cmd} 'ss -tlnp | grep -q 3260' &>> ${logfile} || {
+        echo "ERROR: iSCSI target not listening on port 3260" >&2
+        return 1
+    }
+}
+
+remove_iscsi_target_vm() {
+    local domain_name=$1
+    local disk_img=$2
+    local logfile=$3
+
+    if [ -n "${domain_name}" ]; then
+        virsh destroy ${domain_name} &>> ${logfile} || true
+        virsh undefine ${domain_name} &>> ${logfile} || true
+    fi
+    rm -f ${disk_img}
+}
+
 apply_updates_image() {
     local image_url="${1}"
     local updates_dir="${2}"

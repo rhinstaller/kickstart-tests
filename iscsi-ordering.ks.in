@@ -1,20 +1,18 @@
 
 %ksappend repos/default.ks
 
+# INSTALLER-4044 reproducer: ignoredisk BEFORE iscsi
+# On unfixed builds, this fails with "Disk sda does not exist"
+# On fixed builds (deferred device resolution), this works
+ignoredisk --only-use=@KSTEST_ISCSI_DISK@
+
 iscsiname @KSTEST_ISCSINAME@
-iscsi --ipaddr @KSTEST_ISCSI_IP@ --port @KSTEST_ISCSI_PORT@ --target @KSTEST_ISCSI_TARGET@ --iface=@KSTEST_NETDEV1@
+iscsi --ipaddr @KSTEST_ISCSI_IP@ --port @KSTEST_ISCSI_PORT@ --target @KSTEST_ISCSI_TARGET@
 
 bootloader --location=none
 zerombr
 clearpart --all
 autopart --nohome
-
-# for non-offload iSCSI /boot can be on iSCSI only when using iBFT,
-# so put it to local disk
-#reqpart
-#part /boot --size=500 --ondisk=vda
-#part / --size=5000 --ondisk=vdb --grow
-#part swap --size=1000 --ondisk=vdb
 
 keyboard us
 lang en

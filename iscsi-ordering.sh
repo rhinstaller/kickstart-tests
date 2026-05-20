@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015  Red Hat, Inc.
+# Copyright (C) 2025  Red Hat, Inc.
 #
 # This copyrighted material is made available to anyone wishing to use,
 # modify, copy, or redistribute it subject to the terms and conditions of
@@ -14,8 +14,9 @@
 # source code or documentation are not subject to the GNU General Public
 # License and may only be used or replicated with the express permission of
 # Red Hat, Inc.
-#
-# Red Hat Author(s): Radek Vykydal <rvykydal@redhat.com>
+
+# INSTALLER-4044: ignoredisk before iscsi ordering test
+# Requires the anaconda fix that defers device resolution to process_kickstart()
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
@@ -35,13 +36,13 @@ prepare() {
 
     create_iscsi_target_vm ${wwn} ${initiator} ${tmpdir} ${logfile} || return 1
 
-    # eth0 is the mcast NIC (PCI addr=0x10, iSCSI network)
+    # sda is the expected device name for the first SCSI disk from iSCSI on x86_64
     sed -i \
         -e "s#@KSTEST_ISCSI_IP@#10.10.10.1#g" \
         -e "s#@KSTEST_ISCSI_PORT@#3260#g" \
         -e "s#@KSTEST_ISCSI_TARGET@#${wwn}#g" \
         -e "s#@KSTEST_ISCSINAME@#${initiator}#g" \
-        -e "s#@KSTEST_NETDEV1@#eth0#g" \
+        -e "s#@KSTEST_ISCSI_DISK@#sda#g" \
         ${ks}
 
     echo ${ks}

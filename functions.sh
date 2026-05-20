@@ -376,6 +376,11 @@ create_iscsi_target_vm() {
     local tmpdir=$3
     local logfile=$4
 
+    if ! type sshpass &>/dev/null; then
+        echo "ERROR: sshpass not found. Install it: dnf install -y sshpass" >&2
+        return 1
+    fi
+
     local port_seed=$(echo "${tmpdir}" | cksum | awk '{print $1}')
     local mcast_port=$((10000 + port_seed % 20000))
     local ssh_port=$((30000 + (port_seed + 1) % 20000))

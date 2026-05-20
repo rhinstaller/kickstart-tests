@@ -44,8 +44,10 @@ prepare() {
     local ks=$1
     local tmpdir=$2
 
-    local test_id=$(basename ${tmpdir})
-    local lc_test_id=$(echo "${test_id,,}" | tr -c 'a-z0-9\n' '-')
+    local test_id
+    test_id=$(basename "${tmpdir}")
+    local lc_test_id
+    lc_test_id=$(echo "${test_id,,}" | tr -c 'a-z0-9\n' '-')
     local wwn=iqn.2003-01.kickstart.test:${lc_test_id}
     local initiator=iqn.2009-02.com.example:${lc_test_id}
     local logfile=${tmpdir}/iscsi-target.log
@@ -63,7 +65,8 @@ prepare() {
 }
 
 additional_runner_args() {
-    local mcast_port=$(cat ${tmpdir}/iscsi-mcast-port 2>/dev/null)
+    local mcast_port
+    mcast_port=$(cat ${tmpdir}/iscsi-mcast-port 2>/dev/null)
     if [ -n "${mcast_port}" ]; then
         echo "--qemu-commandline=-netdev"
         echo "--qemu-commandline=socket,id=iscsi0,mcast=230.0.0.1:${mcast_port},localaddr=127.0.0.1"
@@ -77,14 +80,14 @@ additional_runner_args() {
 validate() {
     local disksdir=$1
 
-    local ssh_port=$(cat ${disksdir}/iscsi-ssh-port 2>/dev/null)
+    local ssh_port
+    ssh_port=$(cat ${disksdir}/iscsi-ssh-port 2>/dev/null)
     if [ -z "${ssh_port}" ]; then
         echo '*** No SSH port file — cannot extract RESULT from iSCSI target VM'
         return 1
     fi
 
     local ssh_cmd="sshpass -p testcase ssh ${ISCSI_TARGET_SSH_OPTS} -p ${ssh_port} root@127.0.0.1"
-    local scp_cmd="sshpass -p testcase scp ${ISCSI_TARGET_SSH_OPTS} -P ${ssh_port}"
 
     # Stop target VM cleanly so its disk image contains flushed data,
     # then extract /root/RESULT from the iSCSI backing store using guestfish
@@ -92,9 +95,11 @@ validate() {
     ${ssh_cmd} 'sync; poweroff' &>/dev/null
 
     # Wait for target VM to fully shut down (max 60s)
-    local domain=$(cat ${disksdir}/iscsi-target-domain 2>/dev/null)
-    local target_disk=$(cat ${disksdir}/iscsi-target-disk 2>/dev/null)
-    for i in $(seq 1 60); do
+    local domain
+    domain=$(cat ${disksdir}/iscsi-target-domain 2>/dev/null)
+    local target_disk
+    target_disk=$(cat ${disksdir}/iscsi-target-disk 2>/dev/null)
+    for _retry in $(seq 1 60); do
         virsh domstate "${domain}" 2>/dev/null | grep -q "shut off" && break
         virsh dominfo "${domain}" &>/dev/null || break
         sleep 1
@@ -135,8 +140,10 @@ validate() {
 cleanup() {
     local tmpdir=$1
     # Target VM may already be destroyed by validate(); handle gracefully
-    local domain=$(cat ${tmpdir}/iscsi-target-domain 2>/dev/null)
-    local disk=$(cat ${tmpdir}/iscsi-target-disk 2>/dev/null)
+    local domain
+    domain=$(cat ${tmpdir}/iscsi-target-domain 2>/dev/null)
+    local disk
+    disk=$(cat ${tmpdir}/iscsi-target-disk 2>/dev/null)
     local logfile=${tmpdir}/iscsi-target.log
     remove_iscsi_target_vm "${domain}" "${disk}" "${logfile}"
 }

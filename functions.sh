@@ -393,19 +393,23 @@ ISCSI_TARGET_SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/nu
 #
 # Environment:
 #   KSTEST_ISCSI_CACHE        - cache dir (default: /var/tmp/kstest-iscsi-cache)
-#   KSTEST_ISCSI_TARGET_IMAGE - cloud image URL or local path (default: Fedora 42)
+#   KSTEST_ISCSI_TARGET_IMAGE - cloud image URL or local path
+#                               (default: latest Fedora Cloud from getfedora.org)
 create_iscsi_target_vm() {
     local wwn=$1
+    # shellcheck disable=SC2034  # initiator reserved for future ACL use
     local initiator=$2
     local tmpdir=$3
     local logfile=$4
 
-    local port_seed=$(echo "${tmpdir}" | cksum | awk '{print $1}')
+    local port_seed
+    port_seed=$(echo "${tmpdir}" | cksum | awk '{print $1}')
     local mcast_port=$((10000 + port_seed % 20000))
     local ssh_port=$((30000 + (port_seed + 1) % 20000))
     local target_ip=10.10.10.1
     local disk_img=${tmpdir}/iscsi-target.qcow2
-    local domain_name="iscsi-target-$(basename ${tmpdir})"
+    local domain_name
+    domain_name="iscsi-target-$(basename "${tmpdir}")"
 
     echo ${domain_name} > ${tmpdir}/iscsi-target-domain
     echo ${disk_img} > ${tmpdir}/iscsi-target-disk
@@ -423,7 +427,17 @@ create_iscsi_target_vm() {
             if [ -f "${base_img}" ]; then
                 exit 0
             fi
-            local image_url=${KSTEST_ISCSI_TARGET_IMAGE:-"https://download.fedoraproject.org/pub/fedora/linux/releases/42/Cloud/x86_64/images/Fedora-Cloud-Base-Generic-42-1.1.x86_64.qcow2"}
+            # Resolve the cloud image URL: use env override, or find the latest
+            # Fedora Cloud image from getfedora.org releases API
+            local image_url=${KSTEST_ISCSI_TARGET_IMAGE:-""}
+            if [ -z "${image_url}" ]; then
+                image_url=$(curl -sfL https://getfedora.org/releases.json | \
+                    python3 -c "import json,sys;print(next(r['link'] for r in json.load(sys.stdin) if 'Cloud' in r.get('subvariant','') and 'Generic' in r.get('subvariant','') and 'qcow2' in r.get('link','') and 'x86_64' in r.get('link','')))" 2>/dev/null) || true
+                if [ -z "${image_url}" ]; then
+                    echo "ERROR: Could not resolve Fedora Cloud image URL. Set KSTEST_ISCSI_TARGET_IMAGE." >&2
+                    exit 1
+                fi
+            fi
 
             if [[ "${image_url}" == http* ]]; then
                 echo "Downloading iSCSI target base image..." >&2
@@ -481,7 +495,7 @@ create_iscsi_target_vm() {
 
     local ssh_cmd="sshpass -p testcase ssh ${ISCSI_TARGET_SSH_OPTS} -p ${ssh_port} root@127.0.0.1"
     local ssh_ok=false
-    for i in $(seq 1 120); do
+    for _retry in $(seq 1 120); do
         if ${ssh_cmd} 'echo ready' &>/dev/null; then
             ssh_ok=true
             break

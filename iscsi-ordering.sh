@@ -28,8 +28,10 @@ prepare() {
     local ks=$1
     local tmpdir=$2
 
-    local test_id=$(basename ${tmpdir})
-    local lc_test_id=$(echo "${test_id,,}" | tr -c 'a-z0-9\n' '-')
+    local test_id
+    test_id=$(basename "${tmpdir}")
+    local lc_test_id
+    lc_test_id=$(echo "${test_id,,}" | tr -c 'a-z0-9\n' '-')
     local wwn=iqn.2003-01.kickstart.test:${lc_test_id}
     local initiator=iqn.2009-02.com.example:${lc_test_id}
     local logfile=${tmpdir}/iscsi-target.log

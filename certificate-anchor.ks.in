@@ -1,0 +1,62 @@
+# Test the %certificate --type=anchor feature
+# Tests certificate presence in trust store in:
+# - %pre script
+# - %pre-install script
+# - %post script
+# - installed system
+
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+%certificate --filename rtt1.usersys.redhat.com.crt --type anchor
+%ksappend data/rtt1.usersys.redhat.com.crt
+%end
+
+# Validate on the first boot.
+%ksappend validation/success_on_first_boot.ks
+
+%pre
+trust list | grep rtt1.usersys.redhat.com
+if [[ $? -ne 0 ]]; then
+    echo "*** Failed check: certificate found in trust store in %pre" >> /root/RESULT
+fi
+%end
+
+%pre-install
+trust list | grep rtt1.usersys.redhat.com
+if [[ $? -ne 0 ]]; then
+    echo "*** Failed check: certificate found in trust store in %pre-install" >> /root/RESULT
+fi
+%end
+
+%post --nochroot
+@KSINCLUDE@ post-nochroot-lib-network.sh
+# Copy result from %pre stage to chroot
+copy_pre_stage_result
+%end
+
+%post
+trust list | grep rtt1.usersys.redhat.com
+if [[ $? -ne 0 ]]; then
+    echo "*** Failed check: certificate found in trust store in %post" >> /root/RESULT
+fi
+
+%ksappend validation/success_if_result_empty.ks
+%end
+
+
+# Set up the post-reboot test.
+%post
+
+# Write the code to run after reboot.
+cat > /usr/libexec/kickstart-test.sh << 'EOF'
+
+trust list | grep rtt1.usersys.redhat.com &> /dev/null
+if [[ $? -ne 0 ]]; then
+    echo "*** Failed check: certificate found in trust store in installed system"
+fi
+
+EOF
+
+%end

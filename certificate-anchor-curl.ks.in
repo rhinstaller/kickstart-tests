@@ -1,0 +1,85 @@
+# Test the %certificate --type=anchor feature
+# Tests https GET in:
+# - intiramfs
+# - %pre script
+# - %pre-install script
+# - %post script
+# - installed system
+# The certified server URL for GET requests is configured via fragments
+# included via %ksappend (HTTPS_RESOURCE variable)
+
+# This tests the certificate availability in initramfs
+%ksappend security/certificate-anchor-curl-updates.ks
+
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+%certificate --filename rtt1.usersys.redhat.com.crt --type anchor
+%ksappend data/rtt1.usersys.redhat.com.crt
+%end
+
+# Validate on the first boot.
+%ksappend validation/success_on_first_boot.ks
+
+%pre
+%ksappend section-data/certificate-anchor-curl.ks
+curl --verbose ${HTTPS_RESOURCE}
+if [[ $? -ne 0 ]]; then
+    echo "*** Failed check: https download in %pre" >> /root/RESULT
+fi
+%end
+
+%pre-install
+%ksappend section-data/certificate-anchor-curl.ks
+curl --verbose ${HTTPS_RESOURCE}
+if [[ $? -ne 0 ]]; then
+    echo "*** Failed check: https download in %pre-install" >> /root/RESULT
+fi
+%end
+
+%post --nochroot
+@KSINCLUDE@ post-nochroot-lib-network.sh
+# Copy result from %pre stage to chroot
+copy_pre_stage_result
+%end
+
+%post
+%ksappend section-data/certificate-anchor-curl.ks
+curl --verbose ${HTTPS_RESOURCE}
+if [[ $? -ne 0 ]]; then
+    echo "*** Failed check: https download in %post" >> /root/RESULT
+fi
+
+%ksappend validation/success_if_result_empty.ks
+%end
+
+
+# Set up the post-reboot test.
+%post
+
+# Write the code to run after reboot.
+cat > /usr/libexec/kickstart-test.sh << 'EOF'
+
+%ksappend section-data/certificate-anchor-curl.ks
+succeeded="no"
+i=0
+# The anaconda service running this test is not waiting for network-online
+# target so let's give it some time here.
+while [ $i -le 15 ] && [ ${succeeded} != "yes" ];
+do
+    curl --verbose ${HTTPS_RESOURCE} &> /dev/null
+    if [[ $? -eq 0 ]]; then
+        succeeded=yes
+    fi
+    sleep 1
+    (( i++ ))
+done
+
+if [ ${succeeded} != "yes" ]; then
+    echo "*** Failed check: https download in installed system"
+fi
+
+EOF
+
+%end

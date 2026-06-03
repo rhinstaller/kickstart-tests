@@ -1,0 +1,104 @@
+# Reusable job: build Rawhide boot.iso with the daily COPR stack.
+# Called from daily-boot-iso-rawhide.yml and daily-boot-iso-webui-rawhide.yml.
+name: daily-boot-iso-rawhide-reusable
+on:
+  workflow_call:
+    inputs:
+      webui:
+        description: Build webui-boot.iso with /lorax-build-webui instead of boot.iso
+        required: false
+        type: boolean
+        default: false
+      images_artifact_name:
+        description: Name of the uploaded ISO artifact
+        required: false
+        type: string
+        default: images
+      logs_artifact_name:
+        description: Name of the uploaded lorax log artifact
+        required: false
+        type: string
+        default: logs
+
+jobs:
+  boot_iso:
+    name: Build boot.iso
+    runs-on: [self-hosted, kstest]
+    env:
+      ISO_BUILD_CONTAINER_NAME: quay.io/rhinstaller/anaconda-iso-creator
+      CI_TAG: fedora-rawhide
+
+    steps:
+      - name: Clean up previous run
+        run: |
+          sudo podman ps -q --all --filter='ancestor=kstest-runner' | xargs -tr sudo podman rm -f
+          sudo podman volume rm --all || true
+          sudo rm -rf * .git
+
+      - name: Check out kickstart-tests
+        uses: actions/checkout@v6
+        with:
+          repository: rhinstaller/kickstart-tests
+          path: kickstart-tests
+          fetch-depth: 0
+
+      - name: Ensure http proxy is running
+        run: sudo kickstart-tests/containers/squid.sh start
+
+      - name: Set up host loop devices
+        run: |
+          # We have to pre-create loop devices because they are not namespaced in kernel so
+          # podman can't access newly created ones. That caused failures of tests when runners
+          # were rebooted.
+          sudo mknod -m 0660 /dev/loop0 b 7 0  2> /dev/null || true
+          sudo mknod -m 0660 /dev/loop1 b 7 1  2> /dev/null || true
+
+      - name: Build boot.iso
+        run: |
+          rm -rf /tmp/lorax-images
+          mkdir -p /tmp/lorax-images
+          # /var/tmp tmpfs speeds up lorax and avoids https://bugzilla.redhat.com/show_bug.cgi?id=1906364
+          # The container's /lorax-build script already includes the base Fedora rawhide repo
+          # We pass additional COPR repos as arguments
+          echo "::group::Pull build container and build boot.iso"
+          CONTAINER_IMAGE=${{ env.ISO_BUILD_CONTAINER_NAME }}:${{ env.CI_TAG }}
+          ENTRYPOINT=""
+          if [ "${{ inputs.webui }}" = "true" ]; then
+            ENTRYPOINT="--entrypoint /lorax-build-webui"
+          fi
+          sudo podman pull ${CONTAINER_IMAGE}
+          sudo podman run -i --rm --privileged --env CI_TAG=${{ env.CI_TAG }} \
+            --tmpfs /var/tmp:rw,mode=1777 \
+            -v /tmp/lorax-images:/images:z \
+            ${ENTRYPOINT} \
+            ${CONTAINER_IMAGE} \
+            -s https://download.copr.fedorainfracloud.org/results/rpmsoftwaremanagement/dnf-nightly/fedora-rawhide-x86_64/ \
+            -s https://download.copr.fedorainfracloud.org/results/rpmsoftwaremanagement/dnf5-unstable/fedora-rawhide-x86_64/ \
+            -s https://download.copr.fedorainfracloud.org/results/@rhinstaller/Anaconda/fedora-rawhide-x86_64/ \
+            -s https://copr-be.cloud.fedoraproject.org/results/@storage/blivet-daily/fedora-rawhide-x86_64/ \
+            -s https://copr-be.cloud.fedoraproject.org/results/@storage/udisks-daily/fedora-rawhide-x86_64/
+          if [ "${{ inputs.webui }}" = "true" ]; then
+            mv /tmp/lorax-images/boot.iso /tmp/lorax-images/webui-boot.iso
+          fi
+          echo "::endgroup::"
+
+      - name: Tear down loop devices
+        if: always()
+        run: |
+          sudo losetup -d /dev/loop0 2> /dev/null || true
+          sudo losetup -d /dev/loop1 2> /dev/null || true
+
+      - name: Upload log artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ inputs.logs_artifact_name }}
+          path: |
+            /tmp/lorax-images/*.log
+            /tmp/lorax-images/*.txt
+
+      - name: Upload image artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ inputs.images_artifact_name }}
+          path: |
+            /tmp/lorax-images/*.iso

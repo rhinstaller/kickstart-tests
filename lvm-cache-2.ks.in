@@ -58,7 +58,7 @@ fi
 # verify size of home lv
 home_lv_size=$(lvs --noheadings -o size --unit=m --nosuffix fedora/home | sed -r 's/\s*([0-9]+)\..*/\1/')
 if [ $home_lv_size -le 1000 ]; then
-    echo "*** home lv has incorrect size" >> /result/RESULT
+    echo "*** home lv has incorrect size" >> /root/RESULT
 fi
 
 # verify swap on lvm is active

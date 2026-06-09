@@ -12,6 +12,7 @@ RUN dnf -y update && \
     libvirt-daemon-proxy \
     guestfs-tools \
     genisoimage \
+    jq \
     lorax-lmc-virt \
     parallel \
     python3-libvirt \
@@ -21,7 +22,8 @@ RUN dnf -y update && \
     python3-rpm \
     squid \
     make \
-    openssh-clients && \
+    openssh-clients \
+    sshpass && \
     dnf -y clean all
 
 # FIXME(workaround): LIBGUESTFS_BACKEND=direct — remove when fixed upstream.

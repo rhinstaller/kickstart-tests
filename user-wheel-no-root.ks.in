@@ -35,8 +35,8 @@ id -u user1 || echo "*** expected user1 has not been created" >> /root/RESULT
 [ -d "/home/user1" ] || echo "*** home for user1 has not been created" >> /root/RESULT
 egrep -i "^user1" /etc/group || echo "*** expected group user1 has not been created" >> /root/RESULT
 
-# check wheel group is not empty
-grep 'wheel' /etc/group || echo "** wheel group should not be empty" >> /root/RESULT
+# check user1 is a member of the wheel group
+id --groups --name user1 | grep wheel || echo "*** user1 should be a member of the wheel group" >> /root/RESULT
 %end
 
 %ksappend validation/success_if_result_empty_standalone.ks

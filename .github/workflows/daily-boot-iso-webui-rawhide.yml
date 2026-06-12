@@ -1,5 +1,5 @@
-# Build Rawhide boot.iso daily
-name: Build daily Rawhide+COPR boot.iso
+# Build Rawhide WebUI boot.iso daily (Anaconda COPR stack + inst.webui templates)
+name: Build daily Rawhide+COPR WebUI boot.iso
 on:
   schedule:
     - cron: 0 22 * * *
@@ -9,3 +9,5 @@ on:
 jobs:
   boot_iso:
     uses: ./.github/workflows/daily-boot-iso-rawhide-reusable.yml
+    with:
+      webui: true

@@ -8,6 +8,12 @@
 
 %post
 # detect if the system uses ostree and change path prefix if needed
+
+# It's not necessary to prefix paths on the running system with ${script_prefix} because:
+# * we are not running ostree system OR
+# * we are running ostree system and the content under /var/lib/extensions/kickstart-tests
+#   has been merged to / using the systemd-sysext service
+
 if [ -f /.ostree.cfs ]; then
     # based on info from https://www.reddit.com/r/Fedora/comments/wir3cq/comment/ijhjfah
     mkdir -p /var/lib/extensions/kickstart-tests/usr/lib/extension-release.d \
@@ -31,7 +37,7 @@ After=graphical.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/sh ${script_prefix}/usr/libexec/kickstart-service.sh
+ExecStart=/bin/sh /usr/libexec/kickstart-service.sh
 
 [Install]
 WantedBy=graphical.target
@@ -47,7 +53,7 @@ touch ${script_prefix}/usr/libexec/kickstart-test.sh
 cat > ${script_prefix}/usr/libexec/kickstart-service.sh << 'EOF'
 
 # Check error messages in the syslog.
-error_messages="$(/bin/sh ${script_prefix}/usr/libexec/kickstart-test.sh)"
+error_messages="$(/bin/sh /usr/libexec/kickstart-test.sh)"
 
 if [[ ! -z "${error_messages}" ]]; then
     echo "*** System has started with errors:" >> /root/RESULT

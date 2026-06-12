@@ -55,7 +55,7 @@ jobs:
 
       - name: Build boot.iso
         run: |
-          rm -rf /tmp/lorax-images
+          sudo rm -rf /tmp/lorax-images
           mkdir -p /tmp/lorax-images
           # /var/tmp tmpfs speeds up lorax and avoids https://bugzilla.redhat.com/show_bug.cgi?id=1906364
           # The container's /lorax-build script already includes the base Fedora rawhide repo

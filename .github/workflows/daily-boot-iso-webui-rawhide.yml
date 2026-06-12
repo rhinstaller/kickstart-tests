@@ -11,3 +11,5 @@ jobs:
     uses: ./.github/workflows/daily-boot-iso-rawhide-reusable.yml
     with:
       webui: true
+      images_artifact_name: images-webui
+      logs_artifact_name: logs-webui

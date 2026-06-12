@@ -78,7 +78,7 @@ jobs:
             -s https://copr-be.cloud.fedoraproject.org/results/@storage/blivet-daily/fedora-rawhide-x86_64/ \
             -s https://copr-be.cloud.fedoraproject.org/results/@storage/udisks-daily/fedora-rawhide-x86_64/
           if [ "${{ inputs.webui }}" = "true" ]; then
-            mv /tmp/lorax-images/boot.iso /tmp/lorax-images/webui-boot.iso
+            sudo mv /tmp/lorax-images/boot.iso /tmp/lorax-images/webui-boot.iso
           fi
           echo "::endgroup::"
 

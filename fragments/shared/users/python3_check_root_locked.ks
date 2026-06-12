@@ -13,7 +13,7 @@ with open("/etc/shadow", "r") as f:
         errors.append("Unable to find root password")
 
 if shadow_fields[1][0] != "!":
-    error.append("Root password is not locked: %s" % shadow_fields[1])
+    errors.append("Root password is not locked: %s" % shadow_fields[1])
 
 # write errors, if any, to RESULT file
 if errors:

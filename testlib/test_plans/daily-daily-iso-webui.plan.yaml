@@ -1,0 +1,12 @@
+name: daily daily-iso-webui
+description: Daily run on WebUI boot.iso built from Rawhide with Anaconda and anaconda-webui COPR stacks
+point_person: kkoukiou@redhat.com
+artifact_type: github.scheduled.daily.kstest.daily-iso-webui
+verified_by:
+  test_cases:
+    direct_list:
+      - container
+configurations:
+  - architecture: x86_64
+reporting:
+  - type: xunit

@@ -15,7 +15,7 @@ jobs:
     runs-on: [self-hosted, kstest]
     strategy:
       matrix:
-        scenario: [daily-iso, rhel9, rhel10, centos10, fedora-eln]
+        scenario: [daily-iso, daily-iso-webui, rhel9, rhel10, centos10, fedora-eln]
       fail-fast: false
 
     # these settings depend on the infrastructure; on upshift ocp-master-xxl they take about 4 hours
@@ -88,7 +88,7 @@ jobs:
         id: platform_from_scenario
         run: |
           set -eux
-          if [ "${{ matrix.scenario }}" == "daily-iso" ] || [ "${{ matrix.scenario }}" == "minimal" ]; then
+          if [ "${{ matrix.scenario }}" == "daily-iso" ] || [ "${{ matrix.scenario }}" == "daily-iso-webui" ] || [ "${{ matrix.scenario }}" == "minimal" ]; then
             echo "platform=fedora_rawhide" >> $GITHUB_OUTPUT
           elif [ "${{ matrix.scenario }}" == "rhel8" ]; then
             echo "platform=rhel8" >> $GITHUB_OUTPUT
@@ -112,7 +112,10 @@ jobs:
           set -eux
           BOOT_ISO_PATH="${{ github.workspace }}/${{ matrix.scenario }}.boot.iso"
           BOOT_ISO_URL="file://$BOOT_ISO_PATH"
-          if [ "${{ matrix.scenario }}" == "daily-iso" ] || [ "${{ matrix.scenario }}" == "minimal" ]; then
+          if [ "${{ matrix.scenario }}" == "daily-iso-webui" ]; then
+            ${{ github.workspace }}/kickstart-tests/containers/runner/fetch_daily_iso.sh $GITHUB_TOKEN $BOOT_ISO_PATH images-webui webui-boot.iso
+            echo "boot_iso=\"bootIso\":{\"x86_64\":\"${BOOT_ISO_URL}\"}," >> $GITHUB_OUTPUT
+          elif [ "${{ matrix.scenario }}" == "daily-iso" ] || [ "${{ matrix.scenario }}" == "minimal" ]; then
             ${{ github.workspace }}/kickstart-tests/containers/runner/fetch_daily_iso.sh $GITHUB_TOKEN $BOOT_ISO_PATH
             echo "boot_iso=\"bootIso\":{\"x86_64\":\"${BOOT_ISO_URL}\"}," >> $GITHUB_OUTPUT
           else

@@ -63,8 +63,10 @@ jobs:
           echo "::group::Pull build container and build boot.iso"
           CONTAINER_IMAGE=${{ env.ISO_BUILD_CONTAINER_NAME }}:${{ env.CI_TAG }}
           ENTRYPOINT=""
+          WEBUI_COPR=""
           if [ "${{ inputs.webui }}" = "true" ]; then
             ENTRYPOINT="--entrypoint /lorax-build-webui"
+            WEBUI_COPR="-s https://download.copr.fedorainfracloud.org/results/@rhinstaller/Anaconda-webui/fedora-rawhide-x86_64/"
           fi
           sudo podman pull ${CONTAINER_IMAGE}
           sudo podman run -i --rm --privileged --env CI_TAG=${{ env.CI_TAG }} \
@@ -76,7 +78,8 @@ jobs:
             -s https://download.copr.fedorainfracloud.org/results/rpmsoftwaremanagement/dnf5-unstable/fedora-rawhide-x86_64/ \
             -s https://download.copr.fedorainfracloud.org/results/@rhinstaller/Anaconda/fedora-rawhide-x86_64/ \
             -s https://copr-be.cloud.fedoraproject.org/results/@storage/blivet-daily/fedora-rawhide-x86_64/ \
-            -s https://copr-be.cloud.fedoraproject.org/results/@storage/udisks-daily/fedora-rawhide-x86_64/
+            -s https://copr-be.cloud.fedoraproject.org/results/@storage/udisks-daily/fedora-rawhide-x86_64/ \
+            ${WEBUI_COPR}
           if [ "${{ inputs.webui }}" = "true" ]; then
             sudo mv /tmp/lorax-images/boot.iso /tmp/lorax-images/webui-boot.iso
           fi

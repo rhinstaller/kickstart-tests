@@ -426,6 +426,11 @@ Service jobs
   anaconda, dnf, or blivet before they get released. This is consumed by the
   ``daily-iso`` scenario.
 
+* The `daily-boot-iso-webui`_ workflow creates a WebUI ``boot.iso`` with the
+  same COPR stacks plus ``anaconda-webui``. This is consumed by the
+  ``daily-iso-webui`` scenario and the ``daily-iso-webui`` matrix job in
+  `test-os-variants`_.
+
 These jobs don't have any particular infrastructure requirements. They run on
 GitHub's infrastructure and can be run manually by a developer.
 
@@ -452,6 +457,7 @@ https://gitlab.cee.redhat.com/rtt/rpm-test-repos.
 .. _test-platforms: ./.github/workflows/test-platforms.yml
 .. _quay.io/rhinstaller/kstest-runner: https://quay.io/repository/rhinstaller/kstest-runner
 .. _daily-boot-iso: ./.github/workflows/daily-boot-iso.yml
+.. _daily-boot-iso-webui: ./.github/workflows/daily-boot-iso-webui-rawhide.yml
 .. _generate-launch-args.py: ./scripts/generate-launch-args.py
 .. _Weekly Summary: https://github.com/rhinstaller/kickstart-tests/actions/workflows/weekly-summary.yml
 .. _classify-failures: ./scripts/classify-failures

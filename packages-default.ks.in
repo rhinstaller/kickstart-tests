@@ -11,7 +11,14 @@
 %post
 
 # Check that there is any environment installed
-dnf group list --installed | egrep -q "Installed Environment Groups"
+if dnf --version 2>/dev/null | grep -q '^dnf5 '; then
+    # DNF5: "dnf environment list" without --installed only lists available
+    # environments from repos. The core group is uservisible=false.
+    dnf environment list --installed | grep -q 'yes$'
+else
+    # DNF4: installed environments appear under "Installed Environment Groups".
+    dnf group list --installed | egrep -q "Installed Environment Groups"
+fi
 if [ $? -eq 0 ]; then
     echo SUCCESS > /root/RESULT
 else

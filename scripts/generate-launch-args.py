@@ -8,6 +8,7 @@ import os
 
 OS_VARIANT_TO_PLATFORM = {
     'daily-iso': 'fedora_rawhide',
+    'daily-iso-webui': 'fedora_rawhide',
     'rawhide': 'fedora_rawhide',
     'rhel8': 'rhel8',
     'rhel9': 'rhel9',
@@ -18,6 +19,7 @@ OS_VARIANT_TO_PLATFORM = {
 
 OS_VARIANT_TO_SKIPPED = {
     'daily-iso': 'SKIPPED_TESTTYPES_DAILY_ISO',
+    'daily-iso-webui': 'SKIPPED_TESTTYPES_DAILY_ISO_WEBUI',
     'rawhide': 'SKIPPED_TESTTYPES_RAWHIDE',
     'rhel8': 'SKIPPED_TESTTYPES_RHEL8',
     'rhel9': 'SKIPPED_TESTTYPES_RHEL9',
@@ -28,6 +30,7 @@ OS_VARIANT_TO_SKIPPED = {
 
 OS_VARIANT_TO_DISABLED = {
     'daily-iso': 'DISABLED_TESTTYPES_DAILY_ISO',
+    'daily-iso-webui': 'DISABLED_TESTTYPES_DAILY_ISO_WEBUI',
     'rawhide': 'DISABLED_TESTTYPES_RAWHIDE',
     'rhel8': 'DISABLED_TESTTYPES_RHEL8',
     'rhel9': 'DISABLED_TESTTYPES_RHEL9',

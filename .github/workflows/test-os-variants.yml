@@ -117,7 +117,7 @@ jobs:
       GITHUB_TOKEN: /home/github/github-token
     strategy:
       matrix:
-        os-variant: [daily-iso, rawhide, fedora-eln, rhel9, rhel10, centos10]
+        os-variant: [daily-iso, daily-iso-webui, rawhide, fedora-eln, rhel9, rhel10, centos10]
       fail-fast: false
 
     steps:
@@ -227,6 +227,9 @@ jobs:
           BOOT_ISO_URL="file://$BOOT_ISO_PATH"
           if [ "${{ matrix.os-variant }}" == "daily-iso" ]; then
             ${{ github.workspace }}/kickstart-tests/containers/runner/fetch_daily_iso.sh $GITHUB_TOKEN $BOOT_ISO_PATH
+            echo "boot_iso=\"bootIso\":{\"x86_64\":\"${BOOT_ISO_URL}\"}," >> $GITHUB_OUTPUT
+          elif [ "${{ matrix.os-variant }}" == "daily-iso-webui" ]; then
+            ${{ github.workspace }}/kickstart-tests/containers/runner/fetch_daily_iso.sh $GITHUB_TOKEN $BOOT_ISO_PATH images-webui webui-boot.iso
             echo "boot_iso=\"bootIso\":{\"x86_64\":\"${BOOT_ISO_URL}\"}," >> $GITHUB_OUTPUT
           elif [ "${{ matrix.os-variant }}" == "rawhide" ]; then
             curl -L https://download.fedoraproject.org/pub/fedora/linux/development/rawhide/Everything/x86_64/os/images/boot.iso --output $BOOT_ISO_PATH

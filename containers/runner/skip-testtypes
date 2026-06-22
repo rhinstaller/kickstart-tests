@@ -113,7 +113,6 @@ centos10_skip_array=(
 centos10_disabled_array=(
   gh1466      # ftp source tests failing
   gh1474      # proxy-cmdline failing
-  rhel143387  # certificate-anchor* waiting for feature in centos 10
 )
 
 rhel10_disabled_array=(

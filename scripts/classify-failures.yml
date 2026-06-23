@@ -18,9 +18,6 @@ issues:
   - description: "[6] - for rebooting tests it can be rather [675] or something else, so check. Look at kstest.log, libvirt log."
     first_grep: "RESULT.*Problem starting virtual install"
 
-  - description: "[694] ([4]) https://github.com/rhinstaller/kickstart-tests/issues/694"
-    first_grep: "Nothing useful found for Hard drive ISO"
-
   - description: "[767] ([758]) https://github.com/rhinstaller/kickstart-tests/issues/767"
     first_grep: "Payload error.*Failed to download metadata for repo"
 
@@ -29,9 +26,6 @@ issues:
 
   - description: "[857] resource to create this format lvmpv is unavailable https://github.com/rhinstaller/kickstart-tests/issues/857"
     first_grep: "ERROR.*resource to create this format lvmpv is unavailable"
-
-  - description: "[894] rpm-ostree https://github.com/rhinstaller/kickstart-tests/issues/894"
-    first_grep: "PayloadInstallationError: Failed to pull from repository.*Timeout was reached"
 
   - description: "[TODO1] The DNF payload failed https://github.com/rhinstaller/kickstart-tests/issues/"
     first_grep: "The DNF payload failed"
@@ -89,16 +83,8 @@ issues:
   - description: "[1318] https://github.com/rhinstaller/kickstart-tests/issues/1318"
     first_grep: "anaconda:anaconda: display: X or window manager startup failed: systemd exited with status 1"
 
-  - description: "[1346] https://github.com/rhinstaller/kickstart-tests/issues/1346"
-    last_matching_re:
-      - ".*org.fedoraproject.Anaconda.Modules.*"
-      - ".*grub2-mkconfig.*"
-
   - description: "[1438] https://github.com/rhinstaller/kickstart-tests/issues/1438"
     first_grep: "blivet.errors.DependencyError: device type btrfs volume requires unavailable_dependencies: libblockdev btrfs plugin:"
-
-  - description: "[1453] https://github.com/rhinstaller/kickstart-tests/issues/1453"
-    first_grep: "*** ERROR: Expected 2 SUCCESS messages, but found 2."
 
   - description: "[1489] https://github.com/rhinstaller/kickstart-tests/issues/1489"
     first_grep: "PayloadInstallationError: Failed to download the following packages: Cannot set CURLOPT_MAX_RECV_SPEED_LARGE option"
@@ -199,3 +185,17 @@ closed_issues:
 
   - description: "[886] https://github.com/rhinstaller/kickstart-tests/issues/886"
     first_grep: "/dev/vda4 shouldn't be mounted at"
+
+  - description: "[694] ([4]) https://github.com/rhinstaller/kickstart-tests/issues/694"
+    first_grep: "Nothing useful found for Hard drive ISO"
+
+  - description: "[894] rpm-ostree https://github.com/rhinstaller/kickstart-tests/issues/894"
+    first_grep: "PayloadInstallationError: Failed to pull from repository.*Timeout was reached"
+
+  - description: "[1346] https://github.com/rhinstaller/kickstart-tests/issues/1346"
+    last_matching_re:
+      - ".*org.fedoraproject.Anaconda.Modules.*"
+      - ".*grub2-mkconfig.*"
+
+  - description: "[1453] https://github.com/rhinstaller/kickstart-tests/issues/1453"
+    first_grep: "*** ERROR: Expected 2 SUCCESS messages, but found 2."

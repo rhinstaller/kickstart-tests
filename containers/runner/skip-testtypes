@@ -17,7 +17,6 @@ fedora_disabled_array=(
   gh595       # proxy-cmdline failing on all scenarios
   gh777       # raid-1-reqpart failing
   rhbz1853668 # multipath device not constructed back after installation
-  gh975       # packages-default failing
   gh1023      # rpm-ostree failing
   gh1530      # dns-global-exclusive-tls-* stage2-from-compose failing
   gh1618      # packages-multilib failing on daily-iso
@@ -127,7 +126,6 @@ fedora_eln_disabled_array=(
   gh1213      # harddrive-iso-single failing
   gh1090      # raid-1-reqpart failing
   gh1207      # packages-multilib failing
-  gh975       # packages-default failing
   gh1530      # dns-global-exclusive-tls-* stage2-from-compose failing
   gh804       # tests requiring dvd iso failing
   gh1533      # rpm-ostree-container-* tests failing

@@ -55,6 +55,10 @@ daily_iso_webui_only_skip_array=(
   skip-on-daily-iso-webui
 )
 
+daily_iso_webui_disabled_array=(
+  gh1683      # lvm-thinp-1 times out on WebUI boot.iso
+)
+
 rawhide_disabled_array=(
 )
 

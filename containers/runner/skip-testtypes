@@ -57,6 +57,7 @@ daily_iso_webui_only_skip_array=(
 
 daily_iso_webui_disabled_array=(
   gh1682      # multi-disk tests not supported on WebUI (INSTALLER-4781)
+  gh1683      # lvm-thinp-1 times out on WebUI boot.iso
 )
 
 rawhide_disabled_array=(

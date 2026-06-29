@@ -23,6 +23,12 @@ function check_bridge_has_slave_nochroot() {
     fi
 }
 
+# anaconda_uses_webui
+# Return success if anaconda ran the WebUI instead of the GTK UI.
+function anaconda_uses_webui() {
+    grep -qE 'cockpit web view has been started' /tmp/anaconda.log
+}
+
 # check_gui_configurations
 # Works only for gui installations.
 # Checks that the connections configurable in Network Spoke are those corresponding to configuration files of devices
@@ -35,6 +41,10 @@ function check_gui_configurations() {
     # Pass the test if not in graphical mode
     grep -q "Display mode is set to.* graphical mode" /tmp/anaconda.log
     if [[ $? -ne 0 ]]; then
+        return
+    fi
+
+    if anaconda_uses_webui; then
         return
     fi
 

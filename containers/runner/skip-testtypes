@@ -38,25 +38,26 @@ daily_iso_webui_skip_array=(
   driverdisk
   image-deployment
   initial-setup
-  keyboard
   kickstart
   ksscript
   logs
   modularity
-  network
-  packaging
-  payload
-  reboot
   repo
   security
   selinux
   services
   stage2-from-compose
-  storage
   time
-  ui
   url
-  users
+)
+
+daily_iso_webui_only_skip_array=(
+  skip-on-daily-iso-webui
+)
+
+daily_iso_webui_disabled_array=(
+  gh1682      # multi-disk tests not supported on WebUI (INSTALLER-4781)
+  gh1683      # lvm-thinp-1 times out on WebUI boot.iso
 )
 
 rawhide_disabled_array=(
@@ -153,7 +154,7 @@ _join_args_by_comma(){
 SKIPPED_TESTTYPES_RAWHIDE=$(_join_args_by_comma "${common_skip_array[@]}" "${fedora_skip_array[@]}")
 SKIPPED_TESTTYPES_RAWHIDE_TEXT=$(_join_args_by_comma "${common_skip_array[@]}" "${fedora_skip_array[@]}")
 SKIPPED_TESTTYPES_DAILY_ISO=$(_join_args_by_comma "${common_skip_array[@]}" "${fedora_skip_array[@]}")
-SKIPPED_TESTTYPES_DAILY_ISO_WEBUI=$(_join_args_by_comma "${common_skip_array[@]}" "${fedora_skip_array[@]}" "${daily_iso_webui_skip_array[@]}")
+SKIPPED_TESTTYPES_DAILY_ISO_WEBUI=$(_join_args_by_comma "${common_skip_array[@]}" "${fedora_skip_array[@]}" "${daily_iso_webui_skip_array[@]}" "${daily_iso_webui_only_skip_array[@]}")
 SKIPPED_TESTTYPES_RHEL8=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel8_skip_array[@]}")
 SKIPPED_TESTTYPES_RHEL9=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel9_skip_array[@]}")
 SKIPPED_TESTTYPES_RHEL10=$(_join_args_by_comma "${common_skip_array[@]}" "${rhel10_skip_array[@]}")
@@ -165,7 +166,7 @@ SKIPPED_TESTTYPES_FEDORA_ELN=$(_join_args_by_comma "${common_skip_array[@]}" "${
 SKIPPED_TESTTYPES_ANACONDA_PR=$(_join_args_by_comma "${common_skip_array[@]}" "${anaconda_pr_skip_array[@]}")
 
 DISABLED_TESTTYPES_DAILY_ISO=$(_join_args_by_comma "${fedora_disabled_array[@]}" "${daily_iso_disabled_array[@]}")
-DISABLED_TESTTYPES_DAILY_ISO_WEBUI=$(_join_args_by_comma "${fedora_disabled_array[@]}" "${daily_iso_disabled_array[@]}")
+DISABLED_TESTTYPES_DAILY_ISO_WEBUI=$(_join_args_by_comma "${fedora_disabled_array[@]}" "${daily_iso_disabled_array[@]}" "${daily_iso_webui_disabled_array[@]}")
 DISABLED_TESTTYPES_RAWHIDE=$(_join_args_by_comma "${fedora_disabled_array[@]}" "${rawhide_disabled_array[@]}")
 DISABLED_TESTTYPES_RHEL8=$(_join_args_by_comma "${rhel8_disabled_array[@]}")
 DISABLED_TESTTYPES_RHEL9=$(_join_args_by_comma "${rhel9_disabled_array[@]}")

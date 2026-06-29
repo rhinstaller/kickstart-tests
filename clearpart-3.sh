@@ -19,7 +19,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="clearpart storage coverage"
+TESTTYPE="clearpart storage coverage gh1682"
 
 . ${KSTESTDIR}/functions.sh
 

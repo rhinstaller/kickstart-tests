@@ -22,3 +22,7 @@
 TESTTYPE="mount storage coverage"
 
 . ${KSTESTDIR}/functions.sh
+
+enable_uefi() {
+    echo "false"
+}

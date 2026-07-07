@@ -23,6 +23,10 @@ TESTTYPE=${TESTTYPE:-"raid storage coverage smoke"}
 
 . ${KSTESTDIR}/functions.sh
 
+enable_uefi() {
+    echo "false"
+}
+
 prepare_disks() {
     tmpdir=$1
 

@@ -23,6 +23,10 @@ TESTTYPE="bootloader storage"
 
 . ${KSTESTDIR}/functions.sh
 
+enable_uefi() {
+    echo "false"
+}
+
 prepare_disks() {
     tmpdir=$1
 

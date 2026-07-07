@@ -30,6 +30,10 @@ TESTTYPE="knownfailure iscsi"
 
 . ${KSTESTDIR}/functions.sh
 
+enable_uefi() {
+    echo "false"
+}
+
 iscsi_disk_img=iscsi-disk.img
 ipxe_image="/usr/share/ipxe/ipxe.lkrn"
 ipxe_script="ibft.ipxe"

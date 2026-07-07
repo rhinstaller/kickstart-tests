@@ -22,10 +22,6 @@ TESTTYPE="payload uefi ostree bootc keyboard reboot skip-on-rhel-8 gh1533 gh1633
 
 . ${KSTESTDIR}/functions.sh
 
-enable_uefi() {
-    echo "true"
-}
-
 copy_interesting_files_from_system() {
     local disksdir
     disksdir="${1}"

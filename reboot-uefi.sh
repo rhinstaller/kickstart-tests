@@ -21,10 +21,6 @@ TESTTYPE="reboot uefi coverage smoke"
 
 . ${KSTESTDIR}/functions.sh
 
-enable_uefi() {
-    echo "true"
-}
-
 additional_runner_args() {
     # Wait for reboot and shutdown of the VM,
     # but exit after the specified timeout.

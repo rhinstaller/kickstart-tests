@@ -22,3 +22,7 @@
 TESTTYPE="snapshot lvm storage"
 
 . ${KSTESTDIR}/functions.sh
+
+enable_uefi() {
+    echo "false"
+}

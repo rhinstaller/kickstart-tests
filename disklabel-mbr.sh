@@ -24,6 +24,10 @@ TESTTYPE="storage disklabel skip-on-rhel-8 skip-on-rhel-9"
 
 . ${KSTESTDIR}/functions.sh
 
+enable_uefi() {
+    echo "false"
+}
+
 kernel_args() {
     echo ${DEFAULT_BOOTOPTS} inst.disklabel=mbr
 }

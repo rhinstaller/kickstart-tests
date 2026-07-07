@@ -50,7 +50,7 @@ enable_uefi() {
     # Run the VM in the UEFI mode.
     # This will add '--boot uefi' argument to the virt-install script
     # returns: "true" or "false"
-    echo "false"
+    echo "true"
 }
 
 EXTRA_BOOTOPTS=$(echo "${KSTEST_EXTRA_BOOTOPTS}" | tr ';' ' ')

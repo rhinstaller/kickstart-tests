@@ -23,10 +23,6 @@ TESTTYPE="skip-on-rhel-9 payload uefi bootc reboot gh1574"
 
 . ${KSTESTDIR}/functions.sh
 
-enable_uefi() {
-    echo "true"
-}
-
 copy_interesting_files_from_system() {
     local disksdir
     disksdir="${1}"

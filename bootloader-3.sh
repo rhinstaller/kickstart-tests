@@ -26,3 +26,7 @@ TESTTYPE="bootloader storage"
 enable_uefi() {
     echo "false"
 }
+
+kernel_args() {
+    echo ${DEFAULT_BOOTOPTS} inst.disklabel=mbr
+}

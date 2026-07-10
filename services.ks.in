@@ -13,7 +13,7 @@ timezone America/New_York --utc
 rootpw testcase
 
 # Test services
-services --disabled=sshd --enabled=radvd
+services --disabled=sshd --enabled=radvd,rpcbind.socket
 
 # Test SELinux
 selinux --enforcing
@@ -22,6 +22,7 @@ shutdown
 
 %packages
 radvd
+rpcbind
 %end
 
 %post
@@ -30,6 +31,12 @@ radvd
 systemctl is-enabled radvd
 if [[ $? -ne 0 ]]; then
     echo "*** radvd is disabled, not enabled" >> /root/RESULT
+fi
+
+# Test enabled socket unit
+systemctl is-enabled rpcbind.socket
+if [[ $? -ne 0 ]]; then
+    echo "*** rpcbind.socket is disabled, not enabled" >> /root/RESULT
 fi
 
 # Test disabled

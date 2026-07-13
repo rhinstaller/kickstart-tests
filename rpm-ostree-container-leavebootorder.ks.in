@@ -19,7 +19,7 @@ timezone America/New_York
 rootpw testcase
 
 # On Fedora enforce lvm scheme (overriding btrfs default)
-%ksappend storage/ostreecontainer_autopart.ks
+%ksappend storage/autopart.ks
 
 # Test if UEFI entry is not created!
 bootloader --leavebootorder --timeout 1

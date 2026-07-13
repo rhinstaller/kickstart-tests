@@ -4,7 +4,7 @@
 # Use the default settings.
 %ksappend common/common_no_storage_and_payload.ks
 # On Fedora enforce lvm scheme (overriding btrfs default)
-%ksappend storage/ostreecontainer_autopart.ks
+%ksappend storage/autopart.ks
 
 # Setup the bootc image source.
 bootc --source-imgref=registry:@KSTEST_OSTREECONTAINER_URL@ --stateroot=test-stateroot

@@ -479,5 +479,9 @@ stage2_from_ks() {
 
 # RAM size of VM for the test in MiB
 get_required_ram() {
-    echo "2048"
+    if [ "${KSTEST_WEBUI}" = "true" ]; then
+        echo "2560"
+    else
+        echo "2048"
+    fi
 }

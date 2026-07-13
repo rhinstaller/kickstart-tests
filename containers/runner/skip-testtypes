@@ -56,7 +56,6 @@ daily_iso_webui_only_skip_array=(
 )
 
 daily_iso_webui_disabled_array=(
-  gh1683      # lvm-thinp-1 times out on WebUI boot.iso
   gh1716      # tests failing on not enough free space
 )
 

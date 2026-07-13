@@ -115,6 +115,7 @@ jobs:
       TARGET_BRANCH: ${{ needs.pr-info.outputs.base_ref }}
       TEST_JOBS: 16
       GITHUB_TOKEN: /home/github/github-token
+      KSTEST_OS_VARIANT: ${{ matrix.os-variant }}
     strategy:
       matrix:
         os-variant: [daily-iso, daily-iso-webui, rawhide, fedora-eln, rhel9, rhel10, centos10]

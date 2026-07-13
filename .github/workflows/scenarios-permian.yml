@@ -26,8 +26,7 @@ jobs:
       # The timeout should be ~20 minutes less then the job's timeout-minutes
       # so that we get partial results and logs in case of the timeout.
       LAUNCHER_TIMEOUT_MINUTES: 540
-      # Webui tests need more resources
-      KSTEST_WEBUI: ${{ matrix.scenario == 'daily-iso-webui' && 'true' || '' }}
+      KSTEST_OS_VARIANT: ${{ matrix.scenario }}
 
     steps:
       # self-hosted runners don't do this automatically; also useful to keep stuff around for debugging

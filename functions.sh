@@ -235,6 +235,32 @@ validate() {
     return $?
 }
 
+validate_stratis() {
+    disksdir=$1
+    args=$(for d in ${disksdir}/disk-*img; do echo -a ${d}; done)
+
+    local boot_dev
+    boot_dev=$(run_with_timeout ${COPY_FROM_IMAGE_TIMEOUT} \
+        "guestfish --ro ${args} run : list-filesystems" \
+        | grep "ext\|xfs" | awk -F: '{ print $1 }')
+
+    if [[ -z "$boot_dev" ]]; then
+        echo '*** could not find boot partition in VM image.'
+        return 1
+    fi
+
+    run_with_timeout ${COPY_FROM_IMAGE_TIMEOUT} \
+        "guestfish --ro ${args} run : mount-ro ${boot_dev} / : copy-out /kstest-results ${disksdir}/" 2>/dev/null
+
+    if [[ -d ${disksdir}/kstest-results ]]; then
+        mv ${disksdir}/kstest-results/* ${disksdir}/ 2>/dev/null
+        rm -rf ${disksdir}/kstest-results
+    fi
+
+    check_result_file "${disksdir}"
+    return $?
+}
+
 validate_journal_contains() {
     # Check if journal from the installation contains a regexp,
     # write error message and return with 1 if the message has

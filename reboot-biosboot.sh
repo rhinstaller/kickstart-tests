@@ -17,9 +17,13 @@
 #
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="reboot uefi coverage smoke"
+TESTTYPE="reboot biosboot"
 
 . ${KSTESTDIR}/functions.sh
+
+enable_uefi() {
+    echo "false"
+}
 
 additional_runner_args() {
     # Wait for reboot and shutdown of the VM,

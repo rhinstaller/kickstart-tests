@@ -279,7 +279,7 @@ jobs:
       - name: Run kickstart tests in container
         working-directory: ./permian
         run: |
-          sudo --preserve-env=TEST_JOBS \
+          sudo --preserve-env=TEST_JOBS,KSTEST_OS_VARIANT \
           PYTHONPATH=${PYTHONPATH:-}:${{ github.workspace }}/tplib \
           ./run_subset --debug-log permian.log \
             --settings settings.ini \

@@ -167,7 +167,7 @@ jobs:
       - name: Run scenario ${{ matrix.scenario }} in container
         working-directory: ./permian
         run: |
-          sudo --preserve-env=TEST_JOBS \
+          sudo --preserve-env=TEST_JOBS,KSTEST_OS_VARIANT \
           PYTHONPATH=${PYTHONPATH:-}:${{ github.workspace }}/tplib \
           ./pipeline --debug-log permian.log \
             --settings settings.ini \

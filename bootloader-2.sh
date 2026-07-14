@@ -19,7 +19,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="bootloader storage"
+TESTTYPE="bootloader storage biosboot"
 
 . ${KSTESTDIR}/functions.sh
 

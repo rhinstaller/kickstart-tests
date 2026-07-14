@@ -19,7 +19,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="snapshot lvm storage"
+TESTTYPE="snapshot lvm storage biosboot"
 
 . ${KSTESTDIR}/functions.sh
 

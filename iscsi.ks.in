@@ -4,10 +4,12 @@
 iscsiname @KSTEST_ISCSINAME@
 iscsi --ipaddr @KSTEST_ISCSI_IP@ --port @KSTEST_ISCSI_PORT@ --target @KSTEST_ISCSI_TARGET@
 
-bootloader --timeout=1
+# --location=none: non-iBFT iSCSI disks can't serve as boot devices
+bootloader --location=none
 zerombr
 clearpart --all
-autopart
+# --nohome: keep layout simple on the iSCSI disk
+autopart --nohome
 
 # for non-offload iSCSI /boot can be on iSCSI only when using iBFT,
 # so put it to local disk
@@ -20,7 +22,9 @@ keyboard us
 lang en
 timezone America/New_York
 rootpw qweqwe
-shutdown
+# poweroff instead of shutdown: explicit ACPI power-off avoids systemd
+# hanging on iSCSI session disconnect during the shutdown sequence
+poweroff
 
 %packages
 %end
@@ -33,7 +37,7 @@ function check_iscsi_session_nochroot() {
     local transport="$1"
     local target="$2"
 
-    iscsiadm -m session | egrep -q '^'${transport}':.*'${target}
+    iscsiadm -m session | grep -Eq '^'${transport}':.*'${target}
     if [[ $? -ne 0 ]]; then
         echo "*** Failed check: ${target} session using ${transport} exists" >> $SYSROOT/root/RESULT
     fi

@@ -5,18 +5,20 @@ network --bootproto=dhcp
 bootloader --timeout=1
 clearpart --all --initlabel
 
-%ksappend storage/raid_biosboot.ks
 part raid.01 --size=500 --ondisk=vda --asprimary
 part raid.02 --size=500 --ondisk=vdb --asprimary
 part raid.11 --size=4000 --ondisk=vda
 part raid.12 --size=4000 --ondisk=vdb
 part raid.21 --size=1024 --ondisk=vda
 part raid.22 --size=1024 --ondisk=vdb
+part raid.31 --size=500 --ondisk=vda
+part raid.32 --size=500 --ondisk=vdb
 
-# Yes, using 0,1,2 is wrong, but /proc/mounts uses /dev/mdX not /dev/md/X
+# Yes, using 0,1,2,3 is wrong, but /proc/mounts uses /dev/mdX not /dev/md/X
 raid /boot --level=1 --device=0 --fstype=ext4 raid.01 raid.02
 raid swap  --level=1 --device=1 --fstype=swap raid.21 raid.22
 raid /     --level=0 --device=2 --fstype=ext4 --label=rootfs --fsoptions=loud,noatime --chunksize=4 raid.11 raid.12
+raid /boot/efi --level=1 --device=3 --fstype=efi raid.31 raid.32
 
 keyboard us
 lang en_US.UTF-8
@@ -28,89 +30,82 @@ shutdown
 %end
 
 %post
-# Verify the / raid level
-root_raidlevel="$(grep ^md2.*active\\sraid0 /proc/mdstat)"
-if [ -z  "$root_raidlevel" ]; then
-    echo "*** mdraid 'root' is not a RAID0" >> /root/RESULT
-fi
 
-# Verify the / chunk size
+check_raid_level() {
+    local md_num="$1" level="$2" label="$3"
+    if [ -z "$(grep ^md${md_num}.*active\\sraid${level} /proc/mdstat)" ]; then
+        echo "*** mdraid '${label}' is not a RAID${level}" >> /root/RESULT
+    fi
+}
+
+check_mount() {
+    local md_dev="$1" mountpoint="$2" expected_fstype="$3" label="$4"
+    local mount_entry fstype
+    mount_entry="$(grep ^${md_dev}\\s${mountpoint}\\s /proc/mounts)"
+    if [ -z "$mount_entry" ]; then
+        echo "*** mdraid '${label}' is not mounted at ${mountpoint}" >> /root/RESULT
+        return
+    fi
+    fstype="$(echo $mount_entry | cut -d' ' -f3)"
+    if [ "$fstype" != "$expected_fstype" ]; then
+        echo "*** mdraid '${label}' does not contain an ${expected_fstype} fs" >> /root/RESULT
+    fi
+}
+
+check_fstab_entry() {
+    local md_dev="$1" mountpoint="$2" label="$3"
+    local uuid="UUID=$(blkid -o value -s UUID ${md_dev})"
+    if [ -z "$(grep ^${md_dev}\\s\\+${mountpoint}\\s /etc/fstab)" -a \
+         -z "$(grep ^${uuid}\\s\\+${mountpoint}\\s /etc/fstab)" ]; then
+        echo "*** ${label} md is not the ${mountpoint} entry in /etc/fstab" >> /root/RESULT
+    fi
+}
+
+check_fstab_fsoptions() {
+    local md_dev="$1" mountpoint="$2" options="$3"
+    local uuid="UUID=$(blkid -o value -s UUID ${md_dev})"
+    local uuid_entry="$(grep ^${uuid}\\s\\+${mountpoint}\\s /etc/fstab)"
+    if [ -z "$(echo $uuid_entry | grep ${options})" ]; then
+        echo "*** ${mountpoint} md did not preserve --fsoptions" >> /root/RESULT
+    fi
+}
+
+check_swap() {
+    local md_dev="$1"
+    local uuid="UUID=$(blkid -o value -s UUID ${md_dev})"
+    if ! grep -q ${md_dev} /proc/swaps ; then
+        echo "*** mdraid 'swap' is not active as swap space" >> /root/RESULT
+    fi
+    if [ -z "$(grep ^${md_dev}\\s\\+none\\s\\+swap\\s /etc/fstab)" -a \
+         -z "$(grep ^${uuid}\\s\\+none\\s\\+swap\\s /etc/fstab)" ]; then
+        echo "*** swap md is not in /etc/fstab" >> /root/RESULT
+    fi
+}
+
+# Verify root (md2, RAID0)
+check_raid_level 2 0 root
 cat /proc/mdstat | grep -A 2 ^md2 | grep " 4k chunks"
 if [[ $? != 0 ]]; then
     echo "*** mdraid 'root' doesn't have 4k chunks" >> /root/RESULT
 fi
+check_mount /dev/md2 / ext4 root
+check_fstab_entry /dev/md2 / root
+check_fstab_fsoptions /dev/md2 / loud,noatime
 
-root_md="/dev/md2"
-root_uuid="UUID=$(blkid -o value -s UUID $root_md)"
+# Verify swap (md1, RAID1)
+check_raid_level 1 1 swap
+check_swap /dev/md1
 
-# verify root md is mounted at /mnt/sysimage
-root_mount="$(grep ^$root_md\\s/\\s /proc/mounts)"
-if [ -z  "$root_mount" ]; then
-    echo "*** mdraid 'root' is not mounted at /" >> /root/RESULT
-fi
+# Verify boot (md0, RAID1)
+check_raid_level 0 1 boot
+check_mount /dev/md0 /boot ext4 boot
+check_fstab_entry /dev/md0 /boot boot
 
-root_fstype="$(echo $root_mount | cut -d' ' -f3)"
-if [ $root_fstype != "ext4" ]; then
-    echo "*** mdraid 'root' does not contain an ext4 fs" >> /root/RESULT
-fi
-
-# verify root entry in /etc/fstab is correct
-root_md_entry="$(grep ^$root_md\\s/\\s /etc/fstab)"
-root_uuid_entry="$(grep ^$root_uuid\\s/\\s /etc/fstab)"
-if [ -z "$root_md_entry" -a -z "$root_uuid_entry" ] ; then
-    echo "*** root md is not the root entry in /etc/fstab" >> /root/RESULT
-fi
-
-if [ -z "$(echo $root_uuid_entry | grep loud,noatime)" ]; then
-    echo "*** root md did not preserve --fsoptions" >> /root/RESULT
-fi
-
-# Verify the swap raid level
-swap_raidlevel="$(grep ^md1.*active\\sraid1 /proc/mdstat)"
-if [ -z  "$swap_raidlevel" ]; then
-    echo "*** mdraid 'swap' is not a RAID1" >> /root/RESULT
-fi
-
-# verify swap on md is active
-swap_md="/dev/md1"
-swap_uuid="UUID=$(blkid -o value -s UUID $swap_md)"
-if ! grep -q $swap_md /proc/swaps ; then
-    echo "*** mdraid 'swap' is not active as swap space" >> /root/RESULT
-fi
-
-# verify swap entry in /etc/fstab is correct
-swap_md_entry="$(grep ^$swap_md\\s\\+none\\s\\+swap\\s /etc/fstab)"
-swap_uuid_entry="$(grep ^$swap_uuid\\s\\+none\\s\\+swap\\s /etc/fstab)"
-if [ -z "$swap_md_entry" -a -z "$swap_uuid_entry" ] ; then
-    echo "*** swap md is not in /etc/fstab" >> /root/RESULT
-fi
-
-# Verify the boot raid level
-boot_raidlevel="$(grep ^md0.*active\\sraid1 /proc/mdstat)"
-if [ -z  "$boot_raidlevel" ]; then
-    echo "*** mdraid 'boot' is not a RAID1" >> /root/RESULT
-fi
-
-boot_md="/dev/md0"
-boot_uuid="UUID=$(blkid -o value -s UUID $boot_md)"
-
-# verify boot md is mounted at /mnt/sysimage/boot
-boot_mount="$(grep ^$boot_md\\s/boot\\s /proc/mounts)"
-if [ -z "$boot_mount" ]; then
-    echo "*** mdraid 'boot' is not mounted at /boot" >> /root/RESULT
-fi
-
-boot_fstype="$(echo $boot_mount | cut -d' ' -f3)"
-if [ $boot_fstype != "ext4" ]; then
-    echo "*** mdraid 'boot' does not contain an ext4 fs" >> /root/RESULT
-fi
-
-# verify boot entry in /etc/fstab is correct
-boot_md_entry="$(grep ^$boot_md\\s/boot\\s /etc/fstab)"
-boot_uuid_entry="$(grep ^$boot_uuid\\s/boot\\s /etc/fstab)"
-if [ -z "$boot_md_entry" -a -z "$boot_uuid_entry" ] ; then
-    echo "*** boot md is not the root entry in /etc/fstab" >> /root/RESULT
-fi
+# Verify efi (md3, RAID1)
+check_raid_level 3 1 efi
+check_mount /dev/md3 /boot/efi vfat efi
+check_fstab_entry /dev/md3 /boot/efi efi
+check_fstab_fsoptions /dev/md3 /boot/efi umask=0077,shortname=winnt
 
 if [ ! -e /root/RESULT ]; then
     echo SUCCESS > /root/RESULT

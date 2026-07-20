@@ -18,13 +18,9 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="payload uefi ostree bootc reboot skip-on-rhel-8 gh1533"
+TESTTYPE="payload ostree bootc reboot skip-on-rhel-8 gh1533"
 
 . ${KSTESTDIR}/functions.sh
-
-enable_uefi() {
-    echo "true"
-}
 
 copy_interesting_files_from_system() {
     local disksdir

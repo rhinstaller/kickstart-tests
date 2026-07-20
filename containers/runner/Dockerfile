@@ -21,6 +21,7 @@ RUN dnf -y update && \
     python3-rpm \
     squid \
     make \
+    edk2-ovmf \
     openssh-clients && \
     dnf -y clean all
 

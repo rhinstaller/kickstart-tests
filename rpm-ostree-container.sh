@@ -1,6 +1,5 @@
-#!/bin/bash
 #
-# Copyright (C) 2025  Red Hat, Inc.
+# Copyright (C) 2023  Red Hat, Inc.
 #
 # This copyrighted material is made available to anyone wishing to use,
 # modify, copy, or redistribute it subject to the terms and conditions of
@@ -19,13 +18,9 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="skip-on-rhel-9 payload uefi bootc reboot gh1574"
+TESTTYPE="payload ostree bootc keyboard reboot skip-on-rhel-8 gh1533 gh1633"
 
 . ${KSTESTDIR}/functions.sh
-
-enable_uefi() {
-    echo "true"
-}
 
 copy_interesting_files_from_system() {
     local disksdir
@@ -52,30 +47,16 @@ copy_interesting_files_from_system() {
     #
     # The location of aforementioned files is different in an ostree system
 
-    # Find root device - use list-filesystems to find filesystem mounted at /
-
-    # First try btrfs root subvolume
-    root_device="$(guestfish ${args} <<< "
+    root_device=$(guestfish ${args} <<< "
         launch
-        list-filesystems
-        " 2>/dev/null | awk -F'[:/]' '/btrfsvol:.*root/ {print "/" $3 "/" $4}')"
-    path_prefix="/ostree/deploy/test-stateroot"
+        lvs" | \
+        grep root)
 
-    if [ -n "${root_device}" ]; then
-        path_prefix="/root$path_prefix"
-    else
-        # Fallback to standard root device on XFS
-        root_device="$(guestfish ${args} <<< "
-            launch
-            list-filesystems
-            " 2>/dev/null | grep root | awk -F: '{print $1}')"
-    fi
-
-    for item in ${path_prefix}/var/roothome/original-ks.cfg \
-                ${path_prefix}/var/roothome/anaconda-ks.cfg \
-                ${path_prefix}/var/roothome/anabot.log \
-                ${path_prefix}/var/log/anaconda/ \
-                ${path_prefix}/var/roothome/RESULT
+    for item in /ostree/deploy/test-stateroot/var/roothome/original-ks.cfg \
+                /ostree/deploy/test-stateroot/var/roothome/anaconda-ks.cfg \
+                /ostree/deploy/test-stateroot/var/roothome/anabot.log \
+                /ostree/deploy/test-stateroot/var/log/anaconda/ \
+                /ostree/deploy/test-stateroot/var/roothome/RESULT
     do
         guestfish ${args} <<< "
             launch
@@ -90,4 +71,3 @@ additional_runner_args() {
    # but exit after the specified timeout.
    echo "--wait $(get_timeout)"
 }
-

@@ -10,15 +10,3 @@ reboot
 
 # Validate on the first boot.
 %ksappend validation/success_on_first_boot.ks
-
-# Set up the actual test.
-%post
-
-efibootmgr
-rc=$?
-
-if [ $rc -ne 0 ]; then
-    echo "*** efibootmgr call failed." | tee -a /root/RESULT
-fi
-
-%end

@@ -184,7 +184,7 @@ class VirtualConfiguration(BaseConfiguration):
         self._timeout = None
         self._runner_args = []
         self._stage2_from_ks = False
-        self._enable_uefi = False
+        self._enable_uefi = True
 
     @property
     def test_name(self):

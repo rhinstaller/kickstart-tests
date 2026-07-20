@@ -20,9 +20,13 @@
 # The inst.disklabel boot option is supported since Fedora 37.
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="storage disklabel skip-on-rhel-8 skip-on-rhel-9"
+TESTTYPE="storage disklabel biosboot skip-on-rhel-8 skip-on-rhel-9"
 
 . ${KSTESTDIR}/functions.sh
+
+enable_uefi() {
+    echo "false"
+}
 
 kernel_args() {
     echo ${DEFAULT_BOOTOPTS} inst.disklabel=mbr

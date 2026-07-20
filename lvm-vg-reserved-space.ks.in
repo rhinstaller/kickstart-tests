@@ -10,7 +10,7 @@ clearpart --all --initlabel
 
 reqpart --add-boot
 part pv.01 --size=6000
-part pv.02 --size=2000
+part pv.02 --size=1500
 volgroup vg1 pv.01 --reserved-percent=10
 volgroup vg2 pv.02 --reserved-space=100
 logvol swap --fstype=swap --name=swap --vgname=vg1 --size=1000
@@ -26,7 +26,7 @@ python3
 vg1_free_expected_pct=10 # 10 %
 vg2_free_expected=100    # 100 MiB
 vg1_size=6000
-vg2_size=2000
+vg2_size=1500
 
 vg1_free=$(vgs --noheadings -o free --unit=m --nosuffix vg1)
 vg2_free=$(vgs --noheadings -o free --unit=m --nosuffix vg2)

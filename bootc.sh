@@ -16,11 +16,10 @@
 # License and may only be used or replicated with the express permission of
 # Red Hat, Inc.
 #
-# Red Hat Author(s): Paweł Poławski <ppolawsk@redhat.com>
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="skip-on-rhel-9 payload bootc gh1574"
+TESTTYPE="skip-on-rhel-9 payload bootc reboot gh1574"
 
 . ${KSTESTDIR}/functions.sh
 
@@ -31,6 +30,11 @@ copy_interesting_files_from_system() {
     # Find disks.
     local args
     args=$(for d in ${disksdir}/disk-*img; do echo -a ${d}; done)
+
+    # Use also iscsi disk if there is any.
+    if [[ -n ${iscsi_disk_img} ]]; then
+        args="${args} -a ${disksdir}/${iscsi_disk_img}"
+    fi
 
     # Grab files out of the installed system while it still exists.
     # Grab these files:
@@ -73,7 +77,7 @@ copy_interesting_files_from_system() {
             launch
             mount ${root_device} /
             copy-out '${item}' '${disksdir}'
-            "
+            " 2>/dev/null
     done
 }
 
@@ -82,3 +86,4 @@ additional_runner_args() {
    # but exit after the specified timeout.
    echo "--wait $(get_timeout)"
 }
+

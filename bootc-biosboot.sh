@@ -1,5 +1,6 @@
+#!/bin/bash
 #
-# Copyright (C) 2023  Red Hat, Inc.
+# Copyright (C) 2025  Red Hat, Inc.
 #
 # This copyrighted material is made available to anyone wishing to use,
 # modify, copy, or redistribute it subject to the terms and conditions of
@@ -15,15 +16,16 @@
 # License and may only be used or replicated with the express permission of
 # Red Hat, Inc.
 #
+# Red Hat Author(s): Paweł Poławski <ppolawsk@redhat.com>
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="payload uefi ostree bootc keyboard reboot skip-on-rhel-8 gh1533 gh1633"
+TESTTYPE="skip-on-rhel-9 payload bootc biosboot gh1574"
 
 . ${KSTESTDIR}/functions.sh
 
 enable_uefi() {
-    echo "true"
+    echo "false"
 }
 
 copy_interesting_files_from_system() {
@@ -33,11 +35,6 @@ copy_interesting_files_from_system() {
     # Find disks.
     local args
     args=$(for d in ${disksdir}/disk-*img; do echo -a ${d}; done)
-
-    # Use also iscsi disk if there is any.
-    if [[ -n ${iscsi_disk_img} ]]; then
-        args="${args} -a ${disksdir}/${iscsi_disk_img}"
-    fi
 
     # Grab files out of the installed system while it still exists.
     # Grab these files:
@@ -51,22 +48,36 @@ copy_interesting_files_from_system() {
     #
     # The location of aforementioned files is different in an ostree system
 
-    root_device=$(guestfish ${args} <<< "
-        launch
-        lvs" | \
-        grep root)
+    # Find root device - use list-filesystems to find filesystem mounted at /
 
-    for item in /ostree/deploy/test-stateroot/var/roothome/original-ks.cfg \
-                /ostree/deploy/test-stateroot/var/roothome/anaconda-ks.cfg \
-                /ostree/deploy/test-stateroot/var/roothome/anabot.log \
-                /ostree/deploy/test-stateroot/var/log/anaconda/ \
-                /ostree/deploy/test-stateroot/var/roothome/RESULT
+    # First try btrfs root subvolume
+    root_device="$(guestfish ${args} <<< "
+        launch
+        list-filesystems
+        " 2>/dev/null | awk -F'[:/]' '/btrfsvol:.*root/ {print "/" $3 "/" $4}')"
+    path_prefix="/ostree/deploy/test-stateroot"
+
+    if [ -n "${root_device}" ]; then
+        path_prefix="/root$path_prefix"
+    else
+        # Fallback to standard root device on XFS
+        root_device="$(guestfish ${args} <<< "
+            launch
+            list-filesystems
+            " 2>/dev/null | grep root | awk -F: '{print $1}')"
+    fi
+
+    for item in ${path_prefix}/var/roothome/original-ks.cfg \
+                ${path_prefix}/var/roothome/anaconda-ks.cfg \
+                ${path_prefix}/var/roothome/anabot.log \
+                ${path_prefix}/var/log/anaconda/ \
+                ${path_prefix}/var/roothome/RESULT
     do
         guestfish ${args} <<< "
             launch
             mount ${root_device} /
             copy-out '${item}' '${disksdir}'
-            " 2>/dev/null
+            "
     done
 }
 

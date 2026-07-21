@@ -114,8 +114,8 @@ jobs:
             done
             OS_VARIANTS="${OS_VARIANTS%,}]"
             if [ "$OS_VARIANTS" == "[]" ]; then
-              echo "ERROR: No valid os variants specified. Falling back to defaults."
-              OS_VARIANTS="$DEFAULT_VARIANTS"
+              echo "ERROR: No valid os variants specified. Allowed variants: ${ALLOWED_VARIANTS[*]}"
+              exit 1
             fi
             # remove --os-variants option from ARGS
             ARGS=$(echo "$ARGS" | sed 's/--os-variants[= ][^ ]*//' | sed 's/^ *//;s/ *$//' | sed 's/  */ /g')

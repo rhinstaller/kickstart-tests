@@ -414,18 +414,6 @@ the repository). If the test should not be run on the variant at all it can be
 disabled explicitly for the variant
 (`example <https://github.com/rhinstaller/kickstart-tests/pull/1444>`__).
 
-To run all tests excluding disabled ones on a single variant use the
-`kickstart-test
-<https://github.com/rhinstaller/anaconda/actions/workflows/kickstart-tests.yml>`__
-workflow in anaconda repository on a dummy testing pull request. The variant
-will depend on the pull request's target branch (like ``rawhide`` or ``rhel-10``).
-(You may prefer this way because (1) running on all variants with
-`test-os-variants`_ would be too resource expensive and (2) running
-`test-os-variants`_ with arguments runs also disabled tests.)
-For example::
-
-    /kickstart-test --kstest-pr 1690 --skip-testtypes none
-
 
 Service jobs
 ------------

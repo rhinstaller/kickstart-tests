@@ -98,11 +98,25 @@ jobs:
           echo "comment arguments are: $ARGS"
 
           # extract --os-variants option and remove it from ARGS
-          DEFAULT_VARIANTS='["daily-iso","daily-iso-webui","rawhide","fedora-eln","rhel9","rhel10","centos10"]'
+          ALLOWED_VARIANTS=(daily-iso daily-iso-webui rawhide fedora-eln rhel9 rhel10 centos10)
+          DEFAULT_VARIANTS=$(printf ',"%s"' "${ALLOWED_VARIANTS[@]}")
+          DEFAULT_VARIANTS="[${DEFAULT_VARIANTS:1}]"
           OS_VARIANTS_VALUE=$(echo "$ARGS" | grep -oP '(?<=--os-variants[ =])[^ ]+' || true)
           if [ -n "$OS_VARIANTS_VALUE" ]; then
-            # convert comma-separated list to JSON array
-            OS_VARIANTS=$(echo "$OS_VARIANTS_VALUE" | sed 's/,/","/g; s/^/["/; s/$/"]/')
+            # validate variants and filter out invalid ones
+            OS_VARIANTS="["
+            for variant in $(echo "$OS_VARIANTS_VALUE" | tr ',' ' '); do
+              if printf '%s\n' "${ALLOWED_VARIANTS[@]}" | grep -qx "$variant"; then
+                OS_VARIANTS+="\"$variant\","
+              else
+                echo "WARNING: Ignoring unknown os variant '$variant'. Allowed variants: ${ALLOWED_VARIANTS[*]}"
+              fi
+            done
+            OS_VARIANTS="${OS_VARIANTS%,}]"
+            if [ "$OS_VARIANTS" == "[]" ]; then
+              echo "ERROR: No valid os variants specified. Falling back to defaults."
+              OS_VARIANTS="$DEFAULT_VARIANTS"
+            fi
             # remove --os-variants option from ARGS
             ARGS=$(echo "$ARGS" | sed 's/--os-variants[= ][^ ]*//' | sed 's/^ *//;s/ *$//' | sed 's/  */ /g')
           else

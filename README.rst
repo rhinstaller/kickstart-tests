@@ -414,6 +414,7 @@ the repository). If the test should not be run on the variant at all it can be
 disabled explicitly for the variant
 (`example <https://github.com/rhinstaller/kickstart-tests/pull/1444>`__).
 
+TODO: remove after --force
 To run all tests excluding disabled ones on a single variant use the
 `kickstart-test
 <https://github.com/rhinstaller/anaconda/actions/workflows/kickstart-tests.yml>`__

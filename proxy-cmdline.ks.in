@@ -1,6 +1,8 @@
 %ksappend repos/default.ks
 network --bootproto=dhcp
 
+cmdline
+
 bootloader --timeout=1
 zerombr
 clearpart --all

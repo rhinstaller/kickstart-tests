@@ -8,7 +8,7 @@
 #
 # Alternatively it is also possible to specify tests to run explicitly:
 #
-#  /test-os-variants --testtype TESTTYPE --testtypes TYPE[,TYPE..] --skip-testtypes TYPE[,TYPE..] TEST1 TEST2
+#  /test-os-variants --testtype TESTTYPE --testtypes TYPE[,TYPE..] --skip-testtypes TYPE[,TYPE..] --os-variants VARIANT[,VARIANT..] TEST1 TEST2
 #
 # In this case disabled or platform-skipped tests are not excluded
 # automatically.  To exclude them you can generate respective --skip-testtypes
@@ -33,6 +33,12 @@
 
 # /test-os-variants --testtypes packaging,payload
 # ... run all the tests of type packaging and payload
+#
+# /test-os-variants --os-variants=rhel10,daily-iso
+# ... run tests only on selected os variants (comma separated)
+#
+# /test-os-variants --os-variants=rhel10 --testtype network
+# ... run all the tests of type network only on rhel10
 #
 #
 # Lastly there is a dry-run mode, that just indicates which tests would be run
@@ -90,6 +96,21 @@ jobs:
           # extract first line and cut out the "/test-os-variants" first word
           ARGS=$(echo "$BODY" | sed -n '1 s/^[^ ]* *//p' | sed 's/[[:space:]]*$//')
           echo "comment arguments are: $ARGS"
+
+          # extract --os-variants option and remove it from ARGS
+          DEFAULT_VARIANTS='["daily-iso","daily-iso-webui","rawhide","fedora-eln","rhel9","rhel10","centos10"]'
+          OS_VARIANTS_VALUE=$(echo "$ARGS" | grep -oP '(?<=--os-variants[ =])[^ ]+' || true)
+          if [ -n "$OS_VARIANTS_VALUE" ]; then
+            # convert comma-separated list to JSON array
+            OS_VARIANTS=$(echo "$OS_VARIANTS_VALUE" | sed 's/,/","/g; s/^/["/; s/$/"]/')
+            # remove --os-variants option from ARGS
+            ARGS=$(echo "$ARGS" | sed 's/--os-variants[= ][^ ]*//' | sed 's/^ *//;s/ *$//' | sed 's/  */ /g')
+          else
+            OS_VARIANTS="$DEFAULT_VARIANTS"
+          fi
+          echo "os variants: $OS_VARIANTS"
+          echo "os_variants=${OS_VARIANTS}" >> $GITHUB_OUTPUT
+
           echo "comment_args=${ARGS}" >> $GITHUB_OUTPUT
           # check for dry run mode
           DRY_RUN=False
@@ -103,6 +124,7 @@ jobs:
       sha: ${{ fromJson(steps.pr_api.outputs.data).head.sha }}
       comment_args: ${{ steps.parse_comment_args.outputs.comment_args }}
       dry_run: ${{ steps.parse_comment_args.outputs.dry_run }}
+      os_variants: ${{ steps.parse_comment_args.outputs.os_variants }}
 
 
   os-variant:
@@ -118,7 +140,7 @@ jobs:
       KSTEST_OS_VARIANT: ${{ matrix.os-variant }}
     strategy:
       matrix:
-        os-variant: [daily-iso, daily-iso-webui, rawhide, fedora-eln, rhel9, rhel10, centos10]
+        os-variant: ${{ fromJson(needs.pr-info.outputs.os_variants) }}
       fail-fast: false
 
     steps:

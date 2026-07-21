@@ -98,6 +98,7 @@ rhel10_centos10_disabled_array=(
   gh1207      # packages-multilib failing
   gh1213      # harddrive-iso-single failing
   gh1633      # rpm-ostree-container-uefi failing with Fedora 44 runner container
+  gh1700      # raid-ddf failing after migration to UEFI
 )
 
 rhel10_skip_array=(

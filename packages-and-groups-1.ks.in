@@ -21,11 +21,17 @@ tmux
 google-noto*
 
 # (4) Test that you can remove packages with a glob.
--grub2-efi*
+# libblockdev-loop, libblockdev-lvm
+-libblockdev-l*
 
 # Skip kmod-kvdo to avoid conflicts with kernel (gh#686).
 -vdo
 -kmod-kvdo
+
+# Require removed libblockdev-l*
+-cockpit-storaged
+-udisks2-lvm2
+-udisks2-iscsi
 %end
 
 %post
@@ -55,10 +61,10 @@ if [[ $count -lt 5 ]]; then
     echo '*** google-noto* glob was not installed' >> /root/RESULT
 fi
 
-# Testing #4 - grub2-efi stuff should not be installed.
-count=$(rpm -qa grub2-efi\* | wc -l)
+# Testing #4 - libblockdev-l stuff should not be installed.
+count=$(rpm -qa libblockdev-l\* | wc -l)
 if [[ $count -gt 0 ]]; then
-    echo '*** grub2-efi* glob should not have been installed' >> /root/RESULT
+    echo '*** libblockdev-l* glob should not have been installed' >> /root/RESULT
 fi
 
 %ksappend validation/success_if_result_empty.ks

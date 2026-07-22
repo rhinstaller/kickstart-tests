@@ -10,6 +10,7 @@
 #
 #  /test-os-variants --force --testtype TESTTYPE --testtypes TYPE[,TYPE..] --skip-testtypes TYPE[,TYPE..] --os-variants VARIANT[,VARIANT..] TEST1 TEST2
 #
+# TEST THIS
 # When --force is used, disabled or platform-skipped tests are not excluded
 # automatically.  To exclude them you can generate respective --skip-testtypes
 # update by generate-launch-args script.

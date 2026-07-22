@@ -8,11 +8,12 @@
 #
 # Alternatively it is also possible to specify tests to run explicitly:
 #
-#  /test-os-variants --testtype TESTTYPE --testtypes TYPE[,TYPE..] --skip-testtypes TYPE[,TYPE..] --os-variants VARIANT[,VARIANT..] TEST1 TEST2
+#  /test-os-variants --force --testtype TESTTYPE --testtypes TYPE[,TYPE..] --skip-testtypes TYPE[,TYPE..] --os-variants VARIANT[,VARIANT..] TEST1 TEST2
 #
-# In this case disabled or platform-skipped tests are not excluded
+# When --force is used, disabled or platform-skipped tests are not excluded
 # automatically.  To exclude them you can generate respective --skip-testtypes
 # update by generate-launch-args script.
+# Without --force, disabled tests are excluded automatically.
 #
 # Examples:
 #
@@ -218,7 +219,6 @@ jobs:
 
           if [ -n "${COMMENT_ARGS}" ]; then
             echo "description=Running tests required by the PR comment explicitly." >> $GITHUB_OUTPUT
-            COMMENT_ARGS="--force ${COMMENT_ARGS}"
           elif [ -n "${CHANGED_TESTS}" ]; then
             echo "description=Running tests affected by changes (excluding disabled)." >> $GITHUB_OUTPUT
             COMMENT_ARGS="${CHANGED_TESTS}"

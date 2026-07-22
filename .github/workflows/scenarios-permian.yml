@@ -167,6 +167,9 @@ jobs:
       - name: Run scenario ${{ matrix.scenario }} in container
         working-directory: ./permian
         run: |
+          if [ "${{ matrix.scenario }}" == "daily-iso-webui" ]; then
+            TEST_JOBS=12
+          fi
           sudo --preserve-env=TEST_JOBS,KSTEST_OS_VARIANT \
           PYTHONPATH=${PYTHONPATH:-}:${{ github.workspace }}/tplib \
           ./pipeline --debug-log permian.log \

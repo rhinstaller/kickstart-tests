@@ -19,4 +19,5 @@
 # shellcheck disable=SC2034
 TESTTYPE="ui smoke skip-on-daily-iso-webui"
 
+# Modify the test so it is run by /test-os-variants
 . ${KSTESTDIR}/functions.sh

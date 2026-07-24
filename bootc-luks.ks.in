@@ -4,7 +4,7 @@
 %ksappend common/common_no_storage_and_payload.ks
 
 # Default storage configuration with LUKS
-%ksappend storage/ostreecontainer_autopart_encrypted.ks
+%ksappend storage/autopart_encrypted.ks
 
 # Validate on the first boot.
 %ksappend validation/success_on_first_boot.ks

@@ -14,7 +14,7 @@ ostreecontainer --no-signature-verification --remote=test-remote --stateroot=tes
 reboot
 
 # On Fedora enforce lvm scheme (overriding btrfs default)
-%ksappend storage/ostreecontainer_autopart_encrypted.ks
+%ksappend storage/autopart_encrypted.ks
 
 %ksappend storage/luks_auto_unlock_post.ks
 

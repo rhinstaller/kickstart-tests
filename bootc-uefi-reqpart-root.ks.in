@@ -1,10 +1,8 @@
-# Test the UEFI entry is created correctly and the system is bootable with bootc.
-#
+# Test bootc installation on UEFI without a separate /boot partition.
 
 # Use the default settings.
 %ksappend common/common_no_storage_and_payload.ks
-# On Fedora enforce lvm scheme (overriding btrfs default)
-%ksappend storage/autopart.ks
+%ksappend storage/reqpart_root.ks
 
 # Setup the bootc image source.
 bootc --source-imgref=registry:@KSTEST_OSTREECONTAINER_URL@ --stateroot=test-stateroot
@@ -37,6 +35,19 @@ fi
 bootupctl --help &> /dev/null || echo "bootupctl command not available after booting"
 bootc --help &> /dev/null || echo "bootc command not available after booting"
 
+# /boot must not be a separate partition (only /boot/efi from reqpart)
+boot_part="$( \
+    lsblk -o TYPE,MOUNTPOINT,KNAME --noheadings \
+    | awk '$1 ~ /^part$/ && $2 ~ /^\/boot$/ { print $3; }' \
+)"
+if [ -n "${boot_part}" ]; then
+    echo "/boot partition shouldn't exist: ${boot_part}"
+fi
+
+if ! findmnt -n /boot/efi >/dev/null 2>&1; then
+    echo "/boot/efi is not mounted"
+fi
+
 # We need to use tr because sometimes there is newline inside of the efibootmgr entry line :(
 # Normalize whitespace (tabs/newlines) to spaces, then squeeze multiple spaces to single space
 efibootmgr | tr '\n\t' ' ' | tr -s ' ' | grep -qiE 'Boot0001.*(Fedora|Red Hat Enterprise Linux|CentOS Stream)'
@@ -46,4 +57,3 @@ fi
 
 EOF
 %end
-

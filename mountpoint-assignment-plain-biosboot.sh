@@ -19,7 +19,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="mount storage biosboot"
+TESTTYPE="mount storage biosboot gh1716"
 
 . ${KSTESTDIR}/functions.sh
 

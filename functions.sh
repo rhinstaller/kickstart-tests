@@ -467,7 +467,11 @@ append_additional_repo_to_kernel_args() {
 }
 
 get_timeout() {
-    echo "30"
+    if [ "${KSTEST_OS_VARIANT}" = "daily-iso-webui" ]; then
+        echo "40"
+    else
+        echo "30"
+    fi
 }
 
 stage2_from_ks() {

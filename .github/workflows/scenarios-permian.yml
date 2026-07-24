@@ -19,13 +19,13 @@ jobs:
       fail-fast: false
 
     # these settings depend on the infrastructure; on upshift ocp-master-xxl they take about 4 hours
-    timeout-minutes: 560
+    timeout-minutes: 620
     env:
       TEST_JOBS: 16
       GITHUB_TOKEN: /home/github/github-token
       # The timeout should be ~20 minutes less then the job's timeout-minutes
       # so that we get partial results and logs in case of the timeout.
-      LAUNCHER_TIMEOUT_MINUTES: 540
+      LAUNCHER_TIMEOUT_MINUTES: 600
       KSTEST_OS_VARIANT: ${{ matrix.scenario }}
 
     steps:

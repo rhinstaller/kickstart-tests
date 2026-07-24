@@ -167,7 +167,7 @@ SKIPPED_TESTTYPES_FEDORA_ELN=$(_join_args_by_comma "${common_skip_array[@]}" "${
 SKIPPED_TESTTYPES_ANACONDA_PR=$(_join_args_by_comma "${common_skip_array[@]}" "${anaconda_pr_skip_array[@]}")
 
 DISABLED_TESTTYPES_DAILY_ISO=$(_join_args_by_comma "${fedora_disabled_array[@]}" "${daily_iso_disabled_array[@]}")
-DISABLED_TESTTYPES_DAILY_ISO_WEBUI=$(_join_args_by_comma "${fedora_disabled_array[@]}" "${daily_iso_disabled_array[@]}")
+DISABLED_TESTTYPES_DAILY_ISO_WEBUI=$(_join_args_by_comma "${fedora_disabled_array[@]}" "${daily_iso_webui_disabled_array[@]}")
 DISABLED_TESTTYPES_RAWHIDE=$(_join_args_by_comma "${fedora_disabled_array[@]}" "${rawhide_disabled_array[@]}")
 DISABLED_TESTTYPES_RHEL8=$(_join_args_by_comma "${rhel8_disabled_array[@]}")
 DISABLED_TESTTYPES_RHEL9=$(_join_args_by_comma "${rhel9_disabled_array[@]}")

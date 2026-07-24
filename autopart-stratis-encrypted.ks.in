@@ -1,0 +1,82 @@
+%ksappend repos/default.ks
+network --bootproto=dhcp
+
+bootloader --timeout=1
+zerombr
+clearpart --all --initlabel
+autopart --type=stratis --encrypted --passphrase="passphrase"
+
+keyboard us
+lang en
+timezone America/New_York
+rootpw qweqwe
+shutdown
+
+%packages
+%end
+
+%post
+# check that root is on stratis
+root_source=$(findmnt -n -o SOURCE /)
+if [[ "$root_source" != /dev/mapper/stratis* ]]; then
+    echo "*** root device is not a Stratis filesystem: $root_source" >> /root/RESULT
+    exit 1
+fi
+
+# check that a stratis pool exists
+if [ ! -d /dev/stratis ] || [ -z "$(ls -A /dev/stratis/)" ]; then
+    echo "*** no Stratis pool found in /dev/stratis/" >> /root/RESULT
+    exit 1
+fi
+
+# get pool name from /dev/stratis
+pool_name=$(ls /dev/stratis/)
+if [[ -z "$pool_name" ]]; then
+    echo "*** failed to get Stratis pool name" >> /root/RESULT
+    exit 1
+fi
+
+# check pool properties
+pool_info=$(stratis pool list --name "$pool_name")
+
+pool_encryption=$(echo "$pool_info" | awk -F: '/Encryption Enabled/ { gsub(/ /,"",$2); print $2 }')
+if [[ "$pool_encryption" != "Yes" ]]; then
+    echo "*** unexpected pool encryption: $pool_encryption (expected Yes)" >> /root/RESULT
+fi
+
+pool_overprov=$(echo "$pool_info" | awk -F: '/Allows Overprovisioning/ { gsub(/ /,"",$2); print $2 }')
+if [[ "$pool_overprov" != "No" ]]; then
+    echo "*** unexpected pool overprovisioning: $pool_overprov (expected No)" >> /root/RESULT
+fi
+
+# check filesystem properties
+fs_info=$(stratis filesystem list "$pool_name" --name root)
+
+fs_name=$(echo "$fs_info" | awk -F: '/^Name/ { gsub(/ /,"",$2); print $2 }')
+if [[ "$fs_name" != "root" ]]; then
+    echo "*** unexpected filesystem name: $fs_name (expected root)" >> /root/RESULT
+fi
+
+fs_pool=$(echo "$fs_info" | awk -F: '/^Pool/ { gsub(/ /,"",$2); print $2 }')
+if [[ "$fs_pool" != "$pool_name" ]]; then
+    echo "*** filesystem pool mismatch: $fs_pool (expected $pool_name)" >> /root/RESULT
+fi
+
+if [ ! -e /root/RESULT ]; then
+    echo SUCCESS > /root/RESULT
+fi
+%end
+
+%post --nochroot
+# libguestfs does not support stratis, copy results and logs to /boot
+SYSROOT=/mnt/sysroot
+RESULTS_DIR=$SYSROOT/boot/kstest-results
+
+mkdir -p $RESULTS_DIR
+cp $SYSROOT/root/RESULT $RESULTS_DIR/RESULT 2>/dev/null
+cp $SYSROOT/root/original-ks.cfg $RESULTS_DIR/ 2>/dev/null
+cp $SYSROOT/root/anaconda-ks.cfg $RESULTS_DIR/ 2>/dev/null
+mkdir -p $RESULTS_DIR/anaconda
+cp /tmp/*.log $RESULTS_DIR/anaconda/ 2>/dev/null
+cp /tmp/syslog $RESULTS_DIR/anaconda/ 2>/dev/null
+%end

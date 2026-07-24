@@ -480,7 +480,7 @@ stage2_from_ks() {
 # RAM size of VM for the test in MiB
 get_required_ram() {
     if [ "${KSTEST_OS_VARIANT}" = "daily-iso-webui" ]; then
-        echo "3072"
+        echo "2560"
     else
         echo "2048"
     fi

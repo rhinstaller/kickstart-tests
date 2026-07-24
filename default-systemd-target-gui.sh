@@ -19,7 +19,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="services"
+TESTTYPE="services textui"
 
 . ${KSTESTDIR}/functions.sh
 . ${KSTESTDIR}/validate-lib-services.sh

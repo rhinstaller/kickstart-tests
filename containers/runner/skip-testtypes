@@ -56,7 +56,6 @@ daily_iso_webui_only_skip_array=(
 )
 
 daily_iso_webui_disabled_array=(
-  gh1716      # tests failing on not enough free space
   gh1715      # tests failing on UknownDeviceError
   gh1727      # tests timeouting because of incomplete accounts screen
 )

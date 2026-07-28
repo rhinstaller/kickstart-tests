@@ -1,0 +1,104 @@
+# Basic test for Stratis with two disks and two separate pools.
+
+%ksappend repos/default.ks
+%ksappend common/common_no_storage_and_payload.ks
+%ksappend payload/default_packages.ks
+
+zerombr
+clearpart --all --initlabel
+
+reqpart
+part /boot --fstype=ext4 --size=500
+part stratis.01 --size=1 --grow --ondisk=vda
+part stratis.02 --size=1 --grow --ondisk=vdb
+stratispool fedora stratis.01
+stratispool secondpool stratis.02
+stratisfs / --name=root --poolname=fedora --size=5000 --grow
+stratisfs none --name=data --poolname=secondpool --size=1 --grow
+
+%post
+
+# check that root is on stratis
+root_source=$(findmnt -n -o SOURCE /)
+if [[ "$root_source" != /dev/mapper/stratis* ]]; then
+    echo "*** root device is not a Stratis filesystem: $root_source" >> /root/RESULT
+    exit 1
+fi
+
+# check that the stratis pool 'fedora' exists
+if [ ! -d /dev/stratis/fedora ]; then
+    echo "*** Stratis pool fedora not found in /dev/stratis/" >> /root/RESULT
+    exit 1
+fi
+
+# check 'fedora' pool properties
+pool_info=$(stratis pool list --name "fedora")
+
+pool_encryption=$(echo "$pool_info" | awk -F: '/Encryption Enabled/ { gsub(/ /,"",$2); print $2 }')
+if [[ "$pool_encryption" != "No" ]]; then
+    echo "*** unexpected pool encryption: $pool_encryption (expected No)" >> /root/RESULT
+fi
+
+pool_overprov=$(echo "$pool_info" | awk -F: '/Allows Overprovisioning/ { gsub(/ /,"",$2); print $2 }')
+if [[ "$pool_overprov" != "No" ]]; then
+    echo "*** unexpected pool overprovisioning: $pool_overprov (expected No)" >> /root/RESULT
+fi
+
+# check root filesystem properties
+root_info=$(stratis filesystem list "fedora" --name root)
+
+root_name=$(echo "$root_info" | awk -F: '/^Name/ { gsub(/ /,"",$2); print $2 }')
+if [[ "$root_name" != "root" ]]; then
+    echo "*** unexpected filesystem name: $root_name (expected root)" >> /root/RESULT
+fi
+
+root_pool=$(echo "$root_info" | awk -F: '/^Pool/ { gsub(/ /,"",$2); print $2 }')
+if [[ "$root_pool" != "fedora" ]]; then
+    echo "*** filesystem pool mismatch: $root_pool (expected fedora)" >> /root/RESULT
+fi
+
+# check that the stratis pool 'secondpool' exists
+if [ ! -d /dev/stratis/secondpool ]; then
+    echo "*** Stratis pool secondpool not found in /dev/stratis/" >> /root/RESULT
+    exit 1
+fi
+
+# check 'secondpool' pool properties
+pool_info=$(stratis pool list --name "secondpool")
+
+pool_encryption=$(echo "$pool_info" | awk -F: '/Encryption Enabled/ { gsub(/ /,"",$2); print $2 }')
+if [[ "$pool_encryption" != "No" ]]; then
+    echo "*** unexpected pool encryption: $pool_encryption (expected No)" >> /root/RESULT
+fi
+
+pool_overprov=$(echo "$pool_info" | awk -F: '/Allows Overprovisioning/ { gsub(/ /,"",$2); print $2 }')
+if [[ "$pool_overprov" != "No" ]]; then
+    echo "*** unexpected pool overprovisioning: $pool_overprov (expected No)" >> /root/RESULT
+fi
+
+# check data filesystem properties
+data_info=$(stratis filesystem list secondpool --name data)
+
+data_name=$(echo "$data_info" | awk -F: '/^Name/ { gsub(/ /,"",$2); print $2 }')
+if [[ "$data_name" != "data" ]]; then
+    echo "*** unexpected filesystem name: $data_name (expected data)" >> /root/RESULT
+fi
+
+data_pool=$(echo "$data_info" | awk -F: '/^Pool/ { gsub(/ /,"",$2); print $2 }')
+if [[ "$data_pool" != "secondpool" ]]; then
+    echo "*** filesystem pool mismatch: $data_pool (expected secondpool)" >> /root/RESULT
+fi
+
+if [ ! -e /root/RESULT ]; then
+    echo SUCCESS > /root/RESULT
+fi
+%end
+
+%post --nochroot
+
+@KSINCLUDE@ post-nochroot-lib-storage.sh
+
+# libguestfs does not support stratis, copy results and logs to /boot
+copy_results_to_boot
+
+%end

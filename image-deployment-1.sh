@@ -17,7 +17,7 @@
 #
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="manual image-deployment"
+TESTTYPE="manual image-deployment textui"
 
 . ${KSTESTDIR}/functions.sh
 

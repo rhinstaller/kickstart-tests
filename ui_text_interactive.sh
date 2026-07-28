@@ -17,6 +17,6 @@
 #
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="ui smoke skip-on-daily-iso-webui"
+TESTTYPE="ui smoke textui skip-on-daily-iso-webui"
 
 . ${KSTESTDIR}/functions.sh

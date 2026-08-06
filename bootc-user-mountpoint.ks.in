@@ -1,0 +1,59 @@
+# Test it is possible to use user defined mountpoint and that it is
+# accessible in %post script.
+
+# Use the default settings.
+%ksappend common/common_no_storage_and_payload.ks
+
+zerombr
+clearpart --all --initlabel
+reqpart
+part /boot --fstype="ext4" --size=1024
+part / --size=1024 --grow --label=rootfs
+part /var/tmp --size=1000
+part /tmp --size=500
+
+# Setup the bootc image source.
+bootc --source-imgref=registry:@KSTEST_OSTREECONTAINER_URL@ --stateroot=test-stateroot
+
+# Reboot the installed system.
+reboot
+
+# Validate on the first boot.
+%ksappend validation/success_on_first_boot.ks
+
+%post
+
+echo "File created in /var/tmp in %post script" >> /var/tmp/post-script-file.txt
+echo "File created in /tmp in %post script" >> /tmp/post-script-file.txt
+
+# Checks after boot
+cat >> /var/lib/extensions/kickstart-tests/usr/libexec/kickstart-test.sh << 'EOF'
+
+# propagate any errors from %post validations
+if [ -e /root/RESULT ]; then
+    cat /root/RESULT
+fi
+
+# Check that state root 'test-stateroot' exists
+if [ ! -d /ostree/deploy/test-stateroot ]; then
+    echo "Couldn't find 'test-stateroot' stateroot"
+fi
+
+# Check that /var/tmp and /tmp are separate mountpoints
+if ! mountpoint -q /var/tmp; then
+    echo "/var/tmp is not a separate mountpoint"
+fi
+if ! mountpoint -q /tmp; then
+    echo "/tmp is not a separate mountpoint"
+fi
+
+# Check the presence of the files created in %post script
+if [ ! -e /var/tmp/post-script-file.txt ]; then
+    echo "Couldn't find /var/tmp/post-script-file.txt file"
+fi
+if [ ! -e /tmp/post-script-file.txt ]; then
+    echo "Couldn't find /tmp/post-script-file.txt file"
+fi
+
+EOF
+%end

@@ -19,7 +19,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="skip-on-rhel-9 payload uefi bootc reboot storage"
+TESTTYPE="skip-on-rhel-9 payload uefi bootc reboot storage rhel191455"
 
 . ${KSTESTDIR}/functions.sh
 

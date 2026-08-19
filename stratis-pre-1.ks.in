@@ -1,0 +1,117 @@
+# Test for Stratis --useexisting: reuse a pool and filesystems created in %pre.
+
+%ksappend repos/default.ks
+%ksappend common/common_no_storage_and_payload.ks
+%ksappend payload/default_packages.ks
+
+zerombr
+clearpart --none
+
+reqpart
+part /boot --fstype=ext4 --size=500
+stratispool fedora --useexisting
+stratisfs / --name=root --poolname=fedora --useexisting
+stratisfs /home --name=home --poolname=fedora --useexisting
+
+%pre
+# partition for the stratis pool
+parted -s /dev/vda mklabel gpt
+parted -s /dev/vda mkpart primary 1MiB 7500MiB
+
+# wait for the partition device to appear
+udevadm settle
+
+# stratis pool and filesystems
+stratis pool create fedora /dev/vda1
+stratis filesystem create fedora root
+stratis filesystem create fedora home
+
+# create file in the home filesystem to verify it survives the installation
+mkdir -p /mnt/test-home
+mount /dev/stratis/fedora/home /mnt/test-home
+echo "HOME_TEST_DATA" > /mnt/test-home/marker.txt
+umount /mnt/test-home
+%end
+
+%post
+pool_name="fedora"
+
+# check that root is on stratis
+root_source=$(findmnt -n -o SOURCE /)
+if [[ "$root_source" != /dev/mapper/stratis* ]]; then
+    echo "*** root device is not a Stratis filesystem: $root_source" >> /root/RESULT
+    exit 1
+fi
+
+# check that home is on stratis
+home_source=$(findmnt -n -o SOURCE /home)
+if [[ "$home_source" != /dev/mapper/stratis* ]]; then
+    echo "*** home device is not a Stratis filesystem: $home_source" >> /root/RESULT
+    exit 1
+fi
+
+# check that the stratis pool 'fedora' exists
+if [ ! -d /dev/stratis/$pool_name ]; then
+    echo "*** Stratis pool $pool_name not found in /dev/stratis/" >> /root/RESULT
+    exit 1
+fi
+
+# check pool properties
+pool_info=$(stratis pool list --name "$pool_name")
+
+pool_encryption=$(echo "$pool_info" | awk -F: '/Encryption Enabled/ { gsub(/ /,"",$2); print $2 }')
+if [[ "$pool_encryption" != "No" ]]; then
+    echo "*** unexpected pool encryption: $pool_encryption (expected No)" >> /root/RESULT
+fi
+
+pool_overprov=$(echo "$pool_info" | awk -F: '/Allows Overprovisioning/ { gsub(/ /,"",$2); print $2 }')
+if [[ "$pool_overprov" != "Yes" ]]; then
+    echo "*** unexpected pool overprovisioning: $pool_overprov (expected No)" >> /root/RESULT
+fi
+
+# check root filesystem properties
+root_info=$(stratis filesystem list "$pool_name" --name root)
+
+root_name=$(echo "$root_info" | awk -F: '/^Name/ { gsub(/ /,"",$2); print $2 }')
+if [[ "$root_name" != "root" ]]; then
+    echo "*** unexpected filesystem name: $root_name (expected root)" >> /root/RESULT
+fi
+
+root_pool=$(echo "$root_info" | awk -F: '/^Pool/ { gsub(/ /,"",$2); print $2 }')
+if [[ "$root_pool" != "$pool_name" ]]; then
+    echo "*** filesystem pool mismatch: $root_pool (expected $pool_name)" >> /root/RESULT
+fi
+
+# check home filesystem properties
+home_info=$(stratis filesystem list "$pool_name" --name home)
+
+home_name=$(echo "$home_info" | awk -F: '/^Name/ { gsub(/ /,"",$2); print $2 }')
+if [[ "$home_name" != "home" ]]; then
+    echo "*** unexpected filesystem name: $home_name (expected home)" >> /root/RESULT
+fi
+
+home_pool=$(echo "$home_info" | awk -F: '/^Pool/ { gsub(/ /,"",$2); print $2 }')
+if [[ "$home_pool" != "$pool_name" ]]; then
+    echo "*** filesystem pool mismatch: $home_pool (expected $pool_name)" >> /root/RESULT
+fi
+
+# check the file in /home
+if [ ! -f /home/marker.txt ]; then
+    echo "*** marker file /home/marker.txt not found -- home filesystem was destroyed" >> /root/RESULT
+elif [ "$(cat /home/marker.txt)" != "HOME_TEST_DATA" ]; then
+    echo "*** marker file has unexpected content: $(cat /home/marker.txt)" >> /root/RESULT
+fi
+
+if [ ! -e /root/RESULT ]; then
+    echo SUCCESS > /root/RESULT
+fi
+%end
+
+%post --nochroot
+
+@KSINCLUDE@ post-nochroot-lib-storage.sh
+
+# libguestfs does not support stratis, copy results and logs to /boot
+copy_results_to_boot
+
+%end

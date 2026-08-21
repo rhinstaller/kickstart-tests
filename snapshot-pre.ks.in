@@ -28,7 +28,7 @@ vgremove -f testvg
 wipefs --all /dev/vda
 
 echo "Create partition"
-parted -s /dev/vda mklabel msdos
+parted -s /dev/vda mklabel gpt
 parted -s /dev/vda mkpart primary 1M 80%
 
 echo "Create pv & vg"

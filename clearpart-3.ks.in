@@ -18,7 +18,7 @@ shutdown
 %pre
 # Doing all this here is a lot easier than trying to make virt tools do
 # what I want on the outside.  Also this'll run before storage.
-parted /dev/vda mklabel msdos
+parted /dev/vda mklabel gpt
 parted --align=none /dev/vda mkpart primary 0 1G
 mkfs.ext4 /dev/vda1
 mkdir /vda
@@ -31,7 +31,7 @@ rmdir /vda
 %pre
 # Doing all this here is a lot easier than trying to make virt tools do
 # what I want on the outside.  Also this'll run before storage.
-parted /dev/vdb mklabel msdos
+parted /dev/vdb mklabel gpt
 parted --align=none /dev/vdb mkpart primary 0 1G
 mkfs.ext4 /dev/vdb1
 mkdir /vdb

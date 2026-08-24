@@ -16,6 +16,7 @@ function check_proxy_settings() {
 
     if [ "$httpslist" ]; then
         # check for CONNECT request to mirrorlist host
+        # shellcheck disable=SC1087  # [: ] is grep regex, not array index
         grep -q "CONNECT ${httpslist}[: ]" $tmpdir/proxy/access.log
         if [[ $? -ne 0 ]]; then
             echo 'Connection to TLS mirrorlist server was not proxied' >> $tmpdir/RESULT
@@ -32,6 +33,7 @@ function check_proxy_settings() {
         fi
     elif [ "$httpsdir" ]; then
         # check for CONNECT request to mirror
+        # shellcheck disable=SC1087  # [: ] is grep regex, not array index
         grep -q "CONNECT ${httpsdir}[: ]" $tmpdir/proxy/access.log
         if [[ $? -ne 0 ]]; then
             echo 'Connection to TLS repository server was not proxied' >> $tmpdir/RESULT

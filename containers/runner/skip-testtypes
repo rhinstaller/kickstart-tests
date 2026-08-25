@@ -56,7 +56,6 @@ daily_iso_webui_only_skip_array=(
 )
 
 daily_iso_webui_disabled_array=(
-  gh1715      # tests failing on UknownDeviceError
 )
 
 rawhide_disabled_array=(

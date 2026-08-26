@@ -10,13 +10,13 @@
 
 %post
 # (1) No http:// Fedora repo sources
-if out=$(grep -r 'http://.*\.fedoraproject' /etc/yum.repos.d/); then
+if out=$(grep -r 'http://.*\.fedoraproject' /usr/share/dnf5/repos.d/); then
     echo "*** Found Fedora http repo: $out" > /root/RESULT
     exit 1
 fi
 
 # (2) Should have at least the default https:// repo source
-if ! grep -r 'https://.*\.fedoraproject' /etc/yum.repos.d/; then
+if ! grep -r 'https://.*\.fedoraproject' /usr/share/dnf5/repos.d/; then
     echo '*** Did not find https default Fedora repo' > /root/RESULT
     exit 1
 fi

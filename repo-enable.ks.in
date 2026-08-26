@@ -15,7 +15,15 @@ optional-package-from-addon-a
 
 # Create additional repositories in the installation environment.
 
-cat > /etc/anaconda.repos.d/addon-a.repo <<EOF
+@KSINCLUDE@ scripts-lib.sh
+platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
+if [ "${platform:0:6}" == "fedora" ]; then
+    REPO_DIR=/etc/yum.repos.d
+else
+    REPO_DIR=/etc/anaconda.repos.d
+fi
+
+cat > ${REPO_DIR}/addon-a.repo <<EOF
 [addon-a]
 name=addon-a
 enabled=0
@@ -23,7 +31,7 @@ baseurl=REPO_A_URL
 cost=50
 EOF
 
-cat > /etc/anaconda.repos.d/addon-b.repo <<EOF
+cat > ${REPO_DIR}/addon-b.repo <<EOF
 [addon-b]
 name=addon-b
 enabled=0

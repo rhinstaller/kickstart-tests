@@ -19,6 +19,6 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE=${TESTTYPE:-"raid storage gh777 gh1090"}
+TESTTYPE=${TESTTYPE:-"raid storage"}
 
 . ${KSTESTDIR}/raid-1.sh

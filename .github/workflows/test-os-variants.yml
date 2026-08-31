@@ -41,6 +41,13 @@
 # /test-os-variants --os-variants=rhel10 --testtype network
 # ... run all the tests of type network only on rhel10
 #
+# /test-os-variants --test-copr=owner/project --os-variants=daily-iso
+# ... build a boot.iso with an additional COPR repo and test against it
+# Multiple COPRs can be specified (comma separated):
+# /test-os-variants --test-copr=owner1/proj1,owner2/proj2 --os-variants=daily-iso
+# The ISO is built on top of the standard daily COPR stack.
+# Requires --os-variants with exactly one of daily-iso or daily-iso-webui.
+#
 #
 # Lastly there is a dry-run mode, that just indicates which tests would be run
 # (useful to check test grouping and overall infra health):
@@ -126,6 +133,33 @@ jobs:
           echo "os variants: $OS_VARIANTS"
           echo "os_variants=${OS_VARIANTS}" >> $GITHUB_OUTPUT
 
+          # extract --test-copr option and remove it from ARGS
+          # Accepts comma-separated values for multiple COPRs.
+          # Only daily-iso and daily-iso-webui os-variants are supported with this option.
+          TEST_PACKAGE_COPR=$(echo "$ARGS" | grep -oP '(?<=--test-copr[ =])[^ ]+' || true)
+          if [ -n "$TEST_PACKAGE_COPR" ]; then
+            echo "Test COPR(s): ${TEST_PACKAGE_COPR}"
+            if [ -z "$OS_VARIANTS_VALUE" ]; then
+              echo "ERROR: --test-copr requires --os-variants with exactly one of: daily-iso, daily-iso-webui"
+              exit 1
+            fi
+            SUPPORTED_COUNT=0
+            for variant in $(echo "$OS_VARIANTS_VALUE" | tr ',' ' '); do
+              if [ "$variant" == "daily-iso" ] || [ "$variant" == "daily-iso-webui" ]; then
+                SUPPORTED_COUNT=$((SUPPORTED_COUNT + 1))
+              else
+                echo "ERROR: --test-copr only supports daily-iso and daily-iso-webui os-variants, got '$variant'"
+                exit 1
+              fi
+            done
+            if [ "$SUPPORTED_COUNT" -ne 1 ]; then
+              echo "ERROR: --test-copr requires exactly one os-variant (daily-iso or daily-iso-webui), got $SUPPORTED_COUNT"
+              exit 1
+            fi
+            ARGS=$(echo "$ARGS" | sed 's/--test-copr[= ][^ ]*//' | sed 's/^ *//;s/ *$//' | sed 's/  */ /g')
+          fi
+          echo "test_copr=${TEST_PACKAGE_COPR}" >> $GITHUB_OUTPUT
+
           echo "comment_args=${ARGS}" >> $GITHUB_OUTPUT
           # check for dry run mode
           DRY_RUN=False
@@ -140,11 +174,21 @@ jobs:
       comment_args: ${{ steps.parse_comment_args.outputs.comment_args }}
       dry_run: ${{ steps.parse_comment_args.outputs.dry_run }}
       os_variants: ${{ steps.parse_comment_args.outputs.os_variants }}
+      test_copr: ${{ steps.parse_comment_args.outputs.test_copr }}
 
+
+  build-iso:
+    needs: pr-info
+    if: needs.pr-info.outputs.allowed_user == 'true' && needs.pr-info.outputs.test_copr != ''
+    uses: ./.github/workflows/daily-boot-iso-rawhide-reusable.yml
+    with:
+      webui: ${{ contains(needs.pr-info.outputs.os_variants, '"daily-iso-webui"') }}
+      test_copr: ${{ needs.pr-info.outputs.test_copr }}
+      images_artifact_name: custom-boot-iso
 
   os-variant:
-    needs: pr-info
-    if: needs.pr-info.outputs.allowed_user == 'true'
+    needs: [pr-info, build-iso]
+    if: always() && needs.pr-info.outputs.allowed_user == 'true' && needs.build-iso.result != 'failure'
     name: Run on os variant
     runs-on: [self-hosted, kstest]
     env:
@@ -255,6 +299,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # Download custom boot.iso if it was built by the build-iso job
+      - name: Download custom boot.iso
+        if: needs.pr-info.outputs.test_copr != ''
+        uses: actions/download-artifact@v7
+        with:
+          name: custom-boot-iso
+          path: ${{ github.workspace }}/custom-boot-iso
+
       # Fetch boot.iso and configure its local location
       - name: Fetch boot.iso if available for os variant ${{ matrix.os-variant }}
         id: boot_iso_for_os_variant
@@ -262,7 +314,17 @@ jobs:
           set -eux
           BOOT_ISO_PATH="${{ github.workspace }}/${{ matrix.os-variant }}.boot.iso"
           BOOT_ISO_URL="file://$BOOT_ISO_PATH"
-          if [ "${{ matrix.os-variant }}" == "daily-iso" ]; then
+          CUSTOM_ISO="${{ github.workspace }}/custom-boot-iso/boot.iso"
+          CUSTOM_WEBUI_ISO="${{ github.workspace }}/custom-boot-iso/webui-boot.iso"
+          if [ -f "$CUSTOM_ISO" ]; then
+            echo "Using custom boot.iso built with COPR(s) ${{ needs.pr-info.outputs.test_copr }}"
+            mv "$CUSTOM_ISO" "$BOOT_ISO_PATH"
+            echo "boot_iso=\"bootIso\":{\"x86_64\":\"${BOOT_ISO_URL}\"}," >> $GITHUB_OUTPUT
+          elif [ -f "$CUSTOM_WEBUI_ISO" ]; then
+            echo "Using custom webui-boot.iso built with COPR(s) ${{ needs.pr-info.outputs.test_copr }}"
+            mv "$CUSTOM_WEBUI_ISO" "$BOOT_ISO_PATH"
+            echo "boot_iso=\"bootIso\":{\"x86_64\":\"${BOOT_ISO_URL}\"}," >> $GITHUB_OUTPUT
+          elif [ "${{ matrix.os-variant }}" == "daily-iso" ]; then
             ${{ github.workspace }}/kickstart-tests/containers/runner/fetch_daily_iso.sh $GITHUB_TOKEN $BOOT_ISO_PATH
             echo "boot_iso=\"bootIso\":{\"x86_64\":\"${BOOT_ISO_URL}\"}," >> $GITHUB_OUTPUT
           elif [ "${{ matrix.os-variant }}" == "daily-iso-webui" ]; then
@@ -372,7 +434,7 @@ jobs:
             permian/permian.log
 
   result:
-    needs: [os-variant, pr-info]
+    needs: [os-variant, pr-info, build-iso]
     if: ${{ always() && needs.pr-info.outputs.allowed_user == 'true' }}
     name: Set result status
     runs-on: ubuntu-latest

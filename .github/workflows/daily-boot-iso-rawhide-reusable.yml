@@ -9,6 +9,11 @@ on:
         required: false
         type: boolean
         default: false
+      test_copr:
+        description: COPR repo name(s) to include in the ISO build (comma-separated, e.g. owner/project or @group/project)
+        required: false
+        type: string
+        default: ''
       images_artifact_name:
         description: Name of the uploaded ISO artifact
         required: false
@@ -68,6 +73,12 @@ jobs:
             ENTRYPOINT="--entrypoint /lorax-build-webui"
             WEBUI_COPR="-s https://download.copr.fedorainfracloud.org/results/@rhinstaller/Anaconda-webui/fedora-rawhide-x86_64/"
           fi
+          EXTRA_COPR=""
+          if [ -n "${{ inputs.test_copr }}" ]; then
+            for copr in $(echo "${{ inputs.test_copr }}" | tr ',' ' '); do
+              EXTRA_COPR="${EXTRA_COPR} -s https://download.copr.fedorainfracloud.org/results/${copr}/fedora-rawhide-x86_64/"
+            done
+          fi
           sudo podman pull ${CONTAINER_IMAGE}
           sudo podman run -i --rm --privileged --env CI_TAG=${{ env.CI_TAG }} \
             --tmpfs /var/tmp:rw,mode=1777 \
@@ -79,7 +90,8 @@ jobs:
             -s https://download.copr.fedorainfracloud.org/results/@rhinstaller/Anaconda/fedora-rawhide-x86_64/ \
             -s https://copr-be.cloud.fedoraproject.org/results/@storage/blivet-daily/fedora-rawhide-x86_64/ \
             -s https://copr-be.cloud.fedoraproject.org/results/@storage/udisks-daily/fedora-rawhide-x86_64/ \
-            ${WEBUI_COPR}
+            ${WEBUI_COPR} \
+            ${EXTRA_COPR}
           if [ "${{ inputs.webui }}" = "true" ]; then
             sudo mv /tmp/lorax-images/boot.iso /tmp/lorax-images/webui-boot.iso
           fi

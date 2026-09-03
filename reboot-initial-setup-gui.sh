@@ -17,7 +17,7 @@
 #
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="reboot initial-setup smoke skip-on-rhel-10 skip-on-centos-10 skip-on-fedora-eln gh1434"
+TESTTYPE="reboot initial-setup smoke skip-on-rhel-10 skip-on-centos-10 skip-on-fedora-eln gh1434 gh1746"
 
 . ${KSTESTDIR}/functions.sh
 

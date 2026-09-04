@@ -20,7 +20,6 @@ fedora_disabled_array=(
   gh1530      # dns-global-exclusive-tls-* stage2-from-compose failing
   gh1618      # packages-multilib failing on daily-iso
   gh1633      # rpm-ostree-container-uefi failing with Fedora 44 runner container
-  gh1746      # reboot-inital-setup-* failing
 )
 
 daily_iso_disabled_array=(

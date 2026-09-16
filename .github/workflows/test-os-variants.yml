@@ -359,7 +359,7 @@ jobs:
       # Download custom boot.iso if it was built by the build-iso job
       - name: Download custom boot.iso
         if: needs.pr-info.outputs.test_copr != ''
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: custom-boot-iso
           path: ${{ github.workspace }}/custom-boot-iso

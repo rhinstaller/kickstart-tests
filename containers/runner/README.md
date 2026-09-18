@@ -95,6 +95,34 @@ To stop the proxy, call
 
 again.
 
+If the host itself reaches the internet only through a proxy, export
+`HTTP_PROXY` before starting squid and it will chain to that proxy instead of
+fetching directly:
+
+    sudo HTTP_PROXY=http://proxy.example.com:3128 containers/squid.sh start
+
+Without this, squid on such a host has no route to the mirrors, and because the
+blocked connections time out rather than being refused, intercepted requests
+hang - which shows up as tests that never finish. Local destinations (RFC1918
+and loopback) are still fetched directly, so the test suite's own repositories
+and proxies keep working.
+
+## Caching the installer's own downloads
+
+Transparent interception only catches plain http, and that is less useful than
+it sounds: `dl.fedoraproject.org` redirects http to https, so the installer's
+repository traffic leaves the cache almost immediately. On a host whose only
+egress is a proxy, it does not just miss the cache - it hangs.
+
+Point the installer at squid explicitly instead. `squid.sh start` prints the
+address to use; it is the podman bridge gateway, which is how a test VM reaches
+the host:
+
+    KSTEST_EXTRA_BOOTOPTS=inst.proxy=http://10.88.0.1:3128
+
+With that, http downloads are cached and https ones are tunnelled (`CONNECT`),
+which is not cacheable but does at least work.
+
 # Hints and tips
 
 ## Updates image

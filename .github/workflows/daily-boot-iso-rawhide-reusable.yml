@@ -71,7 +71,12 @@ jobs:
           WEBUI_COPR=""
           if [ "${{ inputs.webui }}" = "true" ]; then
             ENTRYPOINT="--entrypoint /lorax-build-webui"
-            WEBUI_COPR="-s https://download.copr.fedorainfracloud.org/results/@rhinstaller/Anaconda-webui/fedora-rawhide-x86_64/"
+            # When a custom test COPR is requested, do not also add the default
+            # Anaconda-webui COPR: dnf picks the best EVR candidate and the newer
+            # main build would silently shadow the package under test.
+            if [ -z "${{ inputs.test_copr }}" ]; then
+              WEBUI_COPR="-s https://download.copr.fedorainfracloud.org/results/@rhinstaller/Anaconda-webui/fedora-rawhide-x86_64/"
+            fi
           fi
           EXTRA_COPR=""
           if [ -n "${{ inputs.test_copr }}" ]; then

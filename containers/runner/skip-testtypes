@@ -21,6 +21,7 @@ fedora_disabled_array=(
   gh1618      # packages-multilib failing on daily-iso
   gh1633      # rpm-ostree-container-uefi failing with Fedora 44 runner container
   gh1757      # script-pre* failing
+  gh1758      # rpm-ostree-container-silverblue failing
 )
 
 daily_iso_disabled_array=(

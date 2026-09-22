@@ -1,3 +1,10 @@
+# Creating the table before deleting it makes the delete safe when there is
+# nothing to delete yet. Without this, nft -f adds to whatever is already
+# there, so starting squid over a table left behind by a previous run appends
+# a second copy of every rule instead of replacing it.
+table ip squid-cache
+delete table ip squid-cache
+
 table ip squid-cache {
     chain prerouting {
         type nat hook prerouting priority dstnat; policy accept;

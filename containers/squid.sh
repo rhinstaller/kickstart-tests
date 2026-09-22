@@ -211,22 +211,24 @@ and those tests fail after a 60s timeout each.
 EOF
 }
 
+# Tearing down is deliberately not conditional on the container running. A squid
+# that failed to start leaves everything except the container behind, and the
+# firewall rules are the part that matters: nft -f adds to an existing table
+# rather than replacing it, so each subsequent start appended another copy of
+# every rule. Removing what is already absent is not a failure here.
 stop() {
-    if ! is_running; then
-        echo "Already stopped"
-        return 0
-    fi
+    is_running || echo "Already stopped, removing anything left behind"
 
-    nft delete table squid-cache
+    nft delete table ip squid-cache 2>/dev/null || true
 
-    $CRUN rm -f squid
+    $CRUN rm -f squid >/dev/null 2>&1 || true
 
     rm -f "$PARENT_CONF" "$SPLICE_CONF" "$SPLICE_PEM"
     rm -rf "$SPLICE_SSLDIR"
 
     if firewall-cmd --state >/dev/null 2>&1; then
-        firewall-cmd --remove-port=3129/tcp
-        firewall-cmd --remove-port=3128/tcp
+        firewall-cmd --remove-port=3129/tcp 2>/dev/null || true
+        firewall-cmd --remove-port=3128/tcp 2>/dev/null || true
         firewall-cmd --remove-port=3130/tcp 2>/dev/null || true
     fi
 }

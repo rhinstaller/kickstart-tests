@@ -20,7 +20,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE="ksscript textui"
+TESTTYPE="ksscript textui gh1757"
 
 . ${KSTESTDIR}/functions.sh
 

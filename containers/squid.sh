@@ -14,9 +14,14 @@
 
 set -eu
 
-MYDIR=$(dirname $(realpath "$0"))
+SELF=$(realpath "$0")
+MYDIR=$(dirname "$SELF")
 CRUN=${CRUN:-$(which podman docker 2>/dev/null | head -n1)}
 IMAGE=quay.io/rhinstaller/squid
+
+# Label carrying the fingerprint of the configuration a running container was
+# built from; see config_fingerprint.
+CONFIG_LABEL=kstest.squid.config
 
 # Generated, not checked in: they depend on the environment squid runs in.
 PARENT_CONF=/run/kstest-squid-parent.conf
@@ -35,6 +40,28 @@ KSTEST_SQUID_DEBUG=${KSTEST_SQUID_DEBUG:-}
 
 is_running() {
     [ -n "$($CRUN ps -q -f 'name=^squid$')" ]
+}
+
+# Everything that decides how the container is built, boiled down to one value
+# so that start() can tell whether the squid already running is the squid it
+# would create. This container outlives the job that started it - nothing tears
+# it down between runs, and the runner's own cleanup only removes containers
+# built from the test image - so without this check a squid started once keeps
+# whatever configuration it had until the machine is rebooted, and a fixed
+# script silently has no effect.
+#
+# The script itself is in here deliberately, not just the inputs it reads: it is
+# what generates the configuration files, so changing it is as much a change of
+# configuration as changing $HTTP_PROXY. That is the case that actually went
+# wrong - a runner kept serving a pre-fix squid through several jobs after the
+# fix had landed, with every request timing out and nothing to suggest why.
+config_fingerprint() {
+    {
+        proxy_url
+        echo "$KSTEST_SQUID_DEBUG"
+        echo "$IMAGE"
+        cat "$SELF" "$MYDIR"/squid-cache.conf
+    } | sha256sum | cut -d' ' -f1
 }
 
 # Where hosts that only permit proxied egress (such as the OpenShift runners)
@@ -169,9 +196,21 @@ EOF
 }
 
 start() {
+    want=$(config_fingerprint)
+
     if is_running; then
-        echo "Already running"
-        return 0
+        have=$($CRUN inspect squid --format "{{index .Config.Labels \"$CONFIG_LABEL\"}}" 2>/dev/null) || have=""
+        if [ "$want" = "$have" ]; then
+            echo "Already running"
+            return 0
+        fi
+        # Unlabelled means it predates this check, so it is stale by definition.
+        echo "Squid is running with a different configuration; recreating it"
+        # Before anything is generated, because stop() removes the generated
+        # files - and its nft cleanup has to happen before start() adds the
+        # rules again, as nft -f appends to an existing table rather than
+        # replacing it.
+        stop
     fi
 
     # clean up stopped container from previous boot (usually one does not remember to call "squid.sh stop")
@@ -199,6 +238,7 @@ start() {
     fi
 
     $CRUN run --net host --name squid --detach \
+        --label "$CONFIG_LABEL=$want" \
         --volume "$MYDIR"/squid-cache.conf:/etc/squid/conf.d.tail/cache.conf:ro,z \
         $proxy_volumes $log_volume \
         --volume ks-squid-cache:/var/cache/squid "$IMAGE"

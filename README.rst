@@ -48,6 +48,7 @@ First you need to install the needed dependencies:
 - scp
 - genisoimage
 - make
+- lorax
 
 You also need to start libvirt service to be able to use virt-install::
 
@@ -463,4 +464,3 @@ https://gitlab.cee.redhat.com/rtt/rpm-test-repos.
 .. _classify-failures: ./scripts/classify-failures
 .. _issues: https://github.com/rhinstaller/kickstart-tests/issues
 .. _Run disabled tests: https://github.com/rhinstaller/kickstart-tests/actions/workflows/disabled-tests.yml
-

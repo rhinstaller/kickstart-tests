@@ -21,6 +21,8 @@
 # shellcheck disable=SC2034
 TESTTYPE="storage stratis skip-on-rhel skip-on-centos"
 
+# Try to reproduce test failure
+
 . ${KSTESTDIR}/functions.sh
 
 validate() {

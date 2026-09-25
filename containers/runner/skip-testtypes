@@ -19,7 +19,6 @@ fedora_disabled_array=(
   gh1023      # rpm-ostree failing
   gh1530      # dns-global-exclusive-tls-* stage2-from-compose failing
   gh1618      # packages-multilib failing on daily-iso
-  gh1633      # rpm-ostree-container-uefi failing with Fedora 44 runner container
   gh1757      # script-pre* failing
 )
 
@@ -87,7 +86,6 @@ rhel9_disabled_array=(
   gh576       # clearpart-4 test is flaky on all scenarios
   gh595       # proxy-cmdline failing on all scenarios
   gh804       # tests requiring dvd iso failing
-  gh1633      # rpm-ostree-container-uefi failing with Fedora 44 runner container
   gh1692      # packages-multilib failing
 )
 
@@ -96,7 +94,6 @@ rhel10_centos10_disabled_array=(
   gh804       # tests requiring dvd iso failing
   gh1207      # packages-multilib failing
   gh1213      # harddrive-iso-single failing
-  gh1633      # rpm-ostree-container-uefi failing with Fedora 44 runner container
   gh1700      # raid-ddf failing after migration to UEFI
 )
 

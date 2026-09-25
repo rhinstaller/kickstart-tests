@@ -24,19 +24,8 @@ reboot
 %ksappend validation/success_on_first_boot.ks
 
 %post
-# We need to use tr because sometimes there is newline inside of the efibootmgr entry line :(
-efibootmgr | tr -s '\n' ' ' | grep -E 'Boot0001\* (Fedora|Red Hat Enterprise Linux|CentOS Stream)\s+'
-if [ $? -ne 0 ]; then
-    echo -e "EFI boot entry wasn't created properly:\n$(efibootmgr)"  >> /root/RESULT
-fi
-
 # Checks after boot
 cat >> /var/lib/extensions/kickstart-tests/usr/libexec/kickstart-test.sh << 'EOF'
-
-# propagate any errors from %post validations
-if [ -e /root/RESULT ]; then
-    cat /root/RESULT
-fi
 
 # Check that state root 'test-stateroot' exists
 if [ ! -d /ostree/deploy/test-stateroot ]; then
@@ -50,6 +39,13 @@ fi
 
 bootupctl --help &> /dev/null || echo "bootupctl command not available after booting"
 bootc --help &> /dev/null || echo "bootc command not available after booting"
+
+# We need to use tr because sometimes there is newline inside of the efibootmgr entry line :(
+# Normalize whitespace (tabs/newlines) to spaces, then squeeze multiple spaces to single space
+efibootmgr | tr '\n\t' ' ' | tr -s ' ' | grep -qiE 'Boot0001.*(Fedora|Red Hat Enterprise Linux|CentOS Stream)'
+if [ $? -ne 0 ]; then
+    echo -e "EFI boot entry wasn't created properly:\n$(efibootmgr)"
+fi
 
 expected_url="@KSTEST_OSTREECONTAINER_URL@"
 remote_url="$(ostree remote show-url test-remote)"

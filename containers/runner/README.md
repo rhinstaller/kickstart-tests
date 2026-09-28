@@ -95,6 +95,55 @@ To stop the proxy, call
 
 again.
 
+If the host itself reaches the internet only through a proxy, export
+`HTTP_PROXY` before starting squid and it will chain to that proxy instead of
+fetching directly:
+
+    sudo HTTP_PROXY=http://proxy.example.com:3128 containers/squid.sh start
+
+Without this, squid on such a host has no route to the mirrors, and because the
+blocked connections time out rather than being refused, intercepted requests
+hang - which shows up as tests that never finish. Local destinations (RFC1918
+and loopback) are still fetched directly, so the test suite's own repositories
+and proxies keep working.
+
+When a parent proxy is configured this way, port 443 is intercepted as well and
+tunnelled to it. Chaining alone only fixes plain http, because that is the only
+traffic squid ever sees; an https request goes straight from the test system to
+the mirror, and a host that only permits proxied egress drops it. Squid peeks at
+the ClientHello far enough to read the SNI and then splices the connection - it
+becomes an ordinary CONNECT tunnel to the parent. Nothing is decrypted, the
+mirror's own certificate reaches the test system unchanged, and no CA has to be
+installed there. This buys connectivity, not caching: traffic inside a tunnel
+cannot be cached, and caching it would mean breaking TLS.
+
+## Why the installer is not pointed at squid
+
+Caching only catches plain http, and that is less useful than it sounds:
+`dl.fedoraproject.org` redirects http to https, so the installer's repository
+traffic leaves the cache almost immediately.
+
+The obvious remedy is to hand the installer the proxy directly:
+
+    KSTEST_EXTRA_BOOTOPTS=inst.proxy=http://10.88.0.1:3128   # do not do this
+
+Do not. Anaconda has no proxy-exception mechanism - there is no `inst.noproxy` -
+and `dracut/parse-anaconda-options.sh` deliberately propagates `inst.proxy` into
+stage1 so that the kickstart and stage2 fetches use it too. The tests serve
+their own kickstarts from `http://10.0.2.2:<port>/ks.cfg`, and `10.0.2.2` is
+QEMU's user-mode alias for the container: it exists only inside the guest's
+network stack. Squid runs outside it, so every such fetch fails after a 60s
+connect timeout.
+
+That is not a corner case. The `*-httpks` tests, `upload_updates_image` and
+`export_additional_repo` all build their URLs from `USER_NET_HOST_IP`, so a
+blanket proxy takes out a large part of the suite and makes what remains much
+slower.
+
+Whatever is done about https therefore has to be arranged without the installer
+knowing about it - by intercepting the traffic rather than configuring it, as
+described above.
+
 # Hints and tips
 
 ## Updates image

@@ -5,6 +5,10 @@ on:
     # run after daily-boot-iso.yml
     - cron: 0 23 * * *
   workflow_dispatch:
+    inputs:
+      runner:
+        description: 'Runner label to run on, replacing the default "kstest" one'
+        default: 'kstest'
 
 permissions:
   contents: read
@@ -12,7 +16,8 @@ permissions:
 jobs:
   scenario:
     name: Scenario in Permian
-    runs-on: [self-hosted, kstest]
+    # The scheduled run has no inputs, so it falls back to the "kstest" pool.
+    runs-on: ${{ fromJSON(format('["self-hosted","{0}"]', inputs.runner || 'kstest')) }}
     strategy:
       matrix:
         scenario: [daily-iso, daily-iso-webui, rhel9, rhel10, centos10, fedora-eln]

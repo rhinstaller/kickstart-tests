@@ -495,11 +495,25 @@ append_additional_repo_to_kernel_args() {
     fi
 }
 
+# Minutes passed to virt-install --wait. This is the whole cost of a hung test:
+# anaconda often fails in seconds and then sits on its error dialog until the
+# wait expires, so the timeout is what the suite actually pays for a failure,
+# not how long the test needs.
+#
+# Measured over 2495 successful runs on the OpenShift runners (2026-09-28 and
+# -09-30, all six scenarios): median 6.3 min, p99 10.8 min, slowest single run
+# 15.1 min. Nothing came within 4 minutes of 20, so the values below leave
+# roughly a third in hand. Tests that genuinely need longer declare their own
+# get_timeout() and are unaffected by this.
+#
+# These were 30 and 40, sized for the older and slower OpenStack instances,
+# where the same suite had a p99 of 25.8 min. Raise them again if this ever runs
+# on hardware of that speed - there, 20 would have failed 5% of passing tests.
 get_timeout() {
     if [ "${KSTEST_OS_VARIANT}" = "daily-iso-webui" ]; then
-        echo "40"
+        echo "25"
     else
-        echo "30"
+        echo "20"
     fi
 }
 

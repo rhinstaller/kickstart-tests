@@ -120,12 +120,12 @@ EOF
 # hang rather than reporting an error.
 #
 # The installer cannot be told to use the proxy - see the comment on
-# announce_forward_proxy - so 443 is intercepted too and squid peeks at the
-# ClientHello just far enough to read the SNI, then splices: from that point it
-# is a plain CONNECT tunnel to the parent. Nothing is decrypted, the origin's own
-# certificate reaches the client unchanged, and no CA has to be installed in the
-# test systems. It also means none of this traffic is cached - splicing buys
-# connectivity, not caching, and caching https would require breaking TLS.
+# announce_forward_proxy - so 443 is intercepted too and spliced: squid makes a
+# plain CONNECT tunnel to the parent without looking inside. Nothing is
+# decrypted, the origin's own certificate reaches the client unchanged, and no
+# CA has to be installed in the test systems. It also means none of this traffic
+# is cached - splicing buys connectivity, not caching, and caching https would
+# require breaking TLS.
 #
 # Squid insists on a cert= for an ssl-bump port and starts the certificate
 # generator even when every connection is spliced, so a self-signed certificate
@@ -162,10 +162,29 @@ write_splice_conf() {
 sslcrtd_program /usr/lib/squid/security_file_certgen -s /var/lib/squid/ssl/db -M 4MB
 https_port 3130 intercept ssl-bump cert=/etc/squid/kstest-splice.pem
 
-# Peek only at step 1, which is enough to learn the SNI and therefore which host
-# to ask the parent for, then hand the connection over untouched.
-acl kstest_step1 at_step SslBump1
-ssl_bump peek kstest_step1
+# Splice at step 1, without peeking at the ClientHello first. Peeking reads the
+# SNI, which lets squid ask the parent for a hostname and makes the access log
+# far easier to read - but on an intercepted port squid then checks that the SNI
+# resolves to the address the client actually connected to, and answers a
+# mismatch with an HTTP 409. It has not bumped the connection, so that error
+# goes out as cleartext on a socket the client is still handshaking on: Go
+# reports "server gave HTTP response to HTTPS client", OpenSSL reports "wrong
+# version number", and a bootc install dies on the spot. Squid 5 has no way to
+# turn the check off - the documentation is explicit that a suspicious
+# intercepted CONNECT is always answered with a 409, host_verify_strict
+# notwithstanding.
+#
+# The mismatch is routine rather than an attack. quay.io serves blobs from
+# cdn01.quay.io, which is on Akamai and rotates its answer set within seconds,
+# so the address the test VM resolved is frequently absent from the set squid
+# resolves a moment later. Measured on a runner: two of three addresses changed
+# between queries four seconds apart, while quay.io itself returned the same
+# eight every time - and every 409 in a day of that runner's log was this one
+# host.
+#
+# With no peek there is no SNI, nothing to verify, and squid asks the parent for
+# the raw address instead, which it accepts. The cost is that 443 is logged by
+# address rather than by name.
 ssl_bump splice all
 EOF
     chmod 644 "$SPLICE_CONF"

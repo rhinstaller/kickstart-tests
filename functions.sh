@@ -55,7 +55,10 @@ enable_uefi() {
 
 EXTRA_BOOTOPTS=$(echo "${KSTEST_EXTRA_BOOTOPTS}" | tr ';' ' ')
 
-DEFAULT_BASIC_BOOTOPTS="debug=1 inst.debug ${EXTRA_BOOTOPTS}"
+# Workaround for https://github.com/rhinstaller/kickstart-tests/issues/1763
+GH_1763_WORKAROUND_BOOTOPT="inst.virtiolog=/dev/vport2p1"
+
+DEFAULT_BASIC_BOOTOPTS="debug=1 inst.debug ${GH_1763_WORKAROUND_BOOTOPT} ${EXTRA_BOOTOPTS}"
 
 DEFAULT_DRACUT_BOOTOPTS="rd.shell=0 rd.emergency=poweroff"
 

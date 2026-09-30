@@ -21,6 +21,7 @@ fedora_disabled_array=(
   gh1618      # packages-multilib failing on daily-iso
   gh1633      # rpm-ostree-container-uefi failing with Fedora 44 runner container
   inst-4941     # dns-global-exclusive-tls{,-httpks}-2 need outbound TCP/853, blocked by NetSec
+  inst-4942     # *-ftp need outbound TCP/21 to public mirrors, blocked by NetSec
 )
 
 daily_iso_disabled_array=(
@@ -134,6 +135,7 @@ fedora_eln_disabled_array=(
   gh1541      # flatpak-preinstall-* not implemented
   gh1574      # bootc-* failing
   inst-4941     # dns-global-exclusive-tls{,-httpks}-2 need outbound TCP/853, blocked by NetSec
+  inst-4942     # *-ftp need outbound TCP/21 to public mirrors, blocked by NetSec
 )
 
 # used in workflows/daily-boot-iso-rhel8.yml

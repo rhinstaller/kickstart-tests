@@ -117,6 +117,29 @@ fi
 # prepare data directory
 mkdir -p data/images
 mkdir -p -m 777 data/logs
+
+# Settle on one mirror for the whole run, here on the host, rather than
+# letting each test inside the container resolve its own: the caching proxy
+# keys on URL, so tests that disagree about the mirror share no cache.
+#
+# Done even when nothing has to be downloaded, because most callers bring
+# their own boot.iso - anaconda's /kickstart-test builds one from the PR and
+# hands it to Permian - and deciding only when there was an ISO to fetch left
+# those runs with no mirror at all.
+#
+# Skipped when the caller already named one, which is what the daily workflow
+# does: it chooses before Permian so that the installation_tree it reports and
+# the tests it runs cannot disagree, and that choice must not be second-
+# guessed here.
+if [ -z "${KSTEST_URL:-}" ]; then
+    mirrors=$(scripts/select-mirrors.sh "${PLATFORM}")
+
+    while IFS= read -r assignment; do
+        [ -n "${assignment}" ] || continue
+        export "${assignment?}"
+    done <<< "${mirrors}"
+fi
+
 if ! [ -e "data/images/boot.iso" ]; then
     BOOT_ISO="boot-${PLATFORM}.iso"
     # do not download the ISO if it already exists
@@ -126,10 +149,6 @@ if ! [ -e "data/images/boot.iso" ]; then
             $PWD/containers/runner/fetch_daily_iso.sh ${DAILY_ISO_TOKEN} data/images/boot-${PLATFORM}.iso
         else
             echo "INFO: data/images/${BOOT_ISO} does not exist, downloading current ${PLATFORM} image..."
-            source scripts/defaults-${PLATFORM}.sh
-            # Platforms that name no mirror get one chosen here, so that this
-            # download and the tests inside the container use the same one.
-            eval "$(scripts/check-mirrors.sh)"
             # Under a temporary name, and only renamed once curl is happy: an
             # interrupted download otherwise leaves a short file that every
             # later run treats as the cached ISO, and the only symptom is

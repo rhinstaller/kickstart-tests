@@ -46,17 +46,31 @@ if [ -e "${state}" ]; then
     source "${state}"
 fi
 
-eval "$(./scripts/check-mirrors.sh)"
+# Through a variable rather than straight into eval: eval of an empty string
+# succeeds, so a selector that could not run at all - missing, not executable,
+# killed - would otherwise pass unnoticed and leave the mirrors unset. Which is
+# the one failure that must not be quiet, because the caller goes on to build
+# URLs out of what it finds.
+selection=$(./scripts/check-mirrors.sh)
+eval "${selection}"
 
 : > "${state}"
 for var in KSTEST_URL KSTEST_MODULAR_URL; do
+    repo="MIRROR_REPO_${var}"
+
     if [ -z "${!var:-}" ]; then
+        # Empty is normal for a variable no platform uses. Empty for one a
+        # platform asked to have chosen means the choosing failed, and passing
+        # that on produces URLs like "/images/boot.iso" rather than an error.
+        if [ -n "${!repo:-}" ]; then
+            echo "ERROR: no mirror for ${var} (asked for '${!repo}')" >&2
+            exit 1
+        fi
         continue
     fi
 
     echo "${var}=${!var}"
 
-    repo="MIRROR_REPO_${var}"
     if [ -n "${!repo:-}" ]; then
         echo "export ${var}='${!var}'" >> "${state}"
     fi

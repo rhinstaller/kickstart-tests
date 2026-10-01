@@ -141,38 +141,8 @@ jobs:
       - name: Select payload mirrors
         working-directory: ./kickstart-tests
         run: |
-          set -eu
-          platform="${{ steps.platform_from_scenario.outputs.platform }}"
-          state=~/.kstest-mirrors/${platform}.sh
-          mkdir -p "$(dirname "$state")"
-
-          source ./scripts/defaults.sh
-          if [ -e "./scripts/defaults-${platform}.sh" ]; then
-              source "./scripts/defaults-${platform}.sh"
-          fi
-          # Last run's answer, so that a mirror which still works is kept
-          # rather than rolled for a new one.
-          if [ -e "$state" ]; then
-              source "$state"
-          fi
-
-          eval "$(./scripts/check-mirrors.sh)"
-
-          : > "$state"
-          for var in KSTEST_URL KSTEST_MODULAR_URL; do
-              if [ -z "${!var:-}" ]; then
-                  continue
-              fi
-              echo "${var}=${!var}" >> "$GITHUB_ENV"
-              # Only remember mirrors that were chosen here. A platform that
-              # names its own must not get stuck on a remembered answer when
-              # someone changes the one in the repo.
-              repo="MIRROR_REPO_${var}"
-              if [ -n "${!repo:-}" ]; then
-                  echo "export ${var}='${!var}'" >> "$state"
-              fi
-          done
-          cat "$state"
+          ./scripts/select-mirrors.sh \
+            "${{ steps.platform_from_scenario.outputs.platform }}" | tee -a "$GITHUB_ENV"
 
       - name: Set installation_tree for the scenario
         working-directory: ./kickstart-tests

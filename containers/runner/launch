@@ -127,6 +127,9 @@ if ! [ -e "data/images/boot.iso" ]; then
         else
             echo "INFO: data/images/${BOOT_ISO} does not exist, downloading current ${PLATFORM} image..."
             source scripts/defaults-${PLATFORM}.sh
+            # Platforms that name no mirror get one chosen here, so that this
+            # download and the tests inside the container use the same one.
+            eval "$(scripts/check-mirrors.sh)"
             curl -L  "${KSTEST_URL}/images/boot.iso" --output data/images/boot-${PLATFORM}.iso
         fi
         echo "Using downloaded data/images/${BOOT_ISO}"

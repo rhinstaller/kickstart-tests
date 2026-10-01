@@ -130,7 +130,12 @@ if ! [ -e "data/images/boot.iso" ]; then
             # Platforms that name no mirror get one chosen here, so that this
             # download and the tests inside the container use the same one.
             eval "$(scripts/check-mirrors.sh)"
-            curl -L  "${KSTEST_URL}/images/boot.iso" --output data/images/boot-${PLATFORM}.iso
+            # Under a temporary name, and only renamed once curl is happy: an
+            # interrupted download otherwise leaves a short file that every
+            # later run treats as the cached ISO, and the only symptom is
+            # "isoinfo: Short read on old image" from probe_boot_iso.
+            curl -L  "${KSTEST_URL}/images/boot.iso" --output data/images/boot-${PLATFORM}.iso.part
+            mv data/images/boot-${PLATFORM}.iso.part data/images/boot-${PLATFORM}.iso
         fi
         echo "Using downloaded data/images/${BOOT_ISO}"
     else

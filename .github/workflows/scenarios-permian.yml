@@ -132,6 +132,48 @@ jobs:
       # Configure location of installation repositories for the scenario
       # Also default boot.iso is defined by the value of urls.installation_tree
       # of kstestParams event structure.
+      # Pick the payload mirrors once, here, instead of letting every test
+      # resolve its own. The caching proxy keys on URL, so a mirror that
+      # differs between tests - or between runs - is a cache that is always
+      # cold. The answer is kept in the runner's home rather than in the
+      # workspace, which is wiped at the start of every run, and is only
+      # revisited when the mirror it names stops answering.
+      - name: Select payload mirrors
+        working-directory: ./kickstart-tests
+        run: |
+          set -eu
+          platform="${{ steps.platform_from_scenario.outputs.platform }}"
+          state=~/.kstest-mirrors/${platform}.sh
+          mkdir -p "$(dirname "$state")"
+
+          source ./scripts/defaults.sh
+          if [ -e "./scripts/defaults-${platform}.sh" ]; then
+              source "./scripts/defaults-${platform}.sh"
+          fi
+          # Last run's answer, so that a mirror which still works is kept
+          # rather than rolled for a new one.
+          if [ -e "$state" ]; then
+              source "$state"
+          fi
+
+          eval "$(./scripts/check-mirrors.sh)"
+
+          : > "$state"
+          for var in KSTEST_URL KSTEST_MODULAR_URL; do
+              if [ -z "${!var:-}" ]; then
+                  continue
+              fi
+              echo "${var}=${!var}" >> "$GITHUB_ENV"
+              # Only remember mirrors that were chosen here. A platform that
+              # names its own must not get stuck on a remembered answer when
+              # someone changes the one in the repo.
+              repo="MIRROR_REPO_${var}"
+              if [ -n "${!repo:-}" ]; then
+                  echo "export ${var}='${!var}'" >> "$state"
+              fi
+          done
+          cat "$state"
+
       - name: Set installation_tree for the scenario
         working-directory: ./kickstart-tests
         id: set_installation_urls
@@ -142,7 +184,8 @@ jobs:
              [ "${{ matrix.scenario }}" == "rhel10" ] || \
              [ "${{ matrix.scenario }}" == "centos10" ] || \
              [ "${{ matrix.scenario }}" == "fedora-eln" ]; then
-            source ./scripts/defaults-${{ matrix.scenario }}.sh
+            # KSTEST_URL and KSTEST_MODULAR_URL come from the mirror selection
+            # step, so Permian and the tests are told about the same mirror.
             echo "installation_tree=${KSTEST_URL}" >> $GITHUB_OUTPUT
             echo "modular_url=${KSTEST_MODULAR_URL}" >> $GITHUB_OUTPUT
           else
@@ -175,7 +218,7 @@ jobs:
           if [ "${{ matrix.scenario }}" == "daily-iso-webui" ]; then
             TEST_JOBS=12
           fi
-          sudo --preserve-env=TEST_JOBS,KSTEST_OS_VARIANT \
+          sudo --preserve-env=TEST_JOBS,KSTEST_OS_VARIANT,KSTEST_URL,KSTEST_MODULAR_URL \
           PYTHONPATH=${PYTHONPATH:-}:${{ github.workspace }}/tplib \
           ./pipeline --debug-log permian.log \
             --settings settings.ini \

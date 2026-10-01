@@ -73,7 +73,18 @@ for var in KSTEST_URL KSTEST_MODULAR_URL; do
 
     if [ -n "${!repo:-}" ]; then
         echo "export ${var}='${!var}'" >> "${state}"
+        origin="chosen from ${!repo}"
+    else
+        # Not naming a file: it may come from either scripts/defaults.sh or
+        # the platform's own, and guessing wrong sends people to the wrong one.
+        origin="pinned in the defaults"
     fi
+
+    # Always, not only when it changes: which mirror a run used is the first
+    # thing wanted when that run behaves oddly, and check-mirrors.sh is quiet
+    # by design when it keeps the previous choice - so without this the common
+    # case is the one that says nothing. stdout is the caller's to parse.
+    echo "${platform}: ${var} = ${!var} (${origin})" >&2
 done
 
 echo "${platform}: remembered $(grep -c . "${state}" || true) mirror(s) in ${state}" >&2

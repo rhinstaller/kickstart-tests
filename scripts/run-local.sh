@@ -63,9 +63,16 @@ sudo containers/squid.sh start
 
 # Same selection the workflow makes, remembered in the same place, so that a
 # local run and a CI run on this host agree on the mirror and share the cache.
+#
+# Captured rather than read from a process substitution, which would report
+# nothing at all if the selection failed and let the tests run against unset
+# mirrors.
+selection=$(./scripts/select-mirrors.sh "${PLATFORM}")
+
 while IFS= read -r assignment; do
+    [ -n "${assignment}" ] || continue
     export "${assignment?}"
-done < <(./scripts/select-mirrors.sh "${PLATFORM}")
+done <<< "${selection}"
 
 # sudo keeps nothing by default, and the mirror we just chose is in the
 # environment. launch passes every KSTEST_ variable into the container.

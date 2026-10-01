@@ -92,3 +92,8 @@ while IFS='=' read -r key _; do
     [[ "${key}" =~ ^MIRROR_REPO_ ]] || continue
     choose_mirror "${key#MIRROR_REPO_}"
 done < <(printenv)
+
+# The loop ends on a failed read, which would otherwise be this script's exit
+# status whenever there was nothing to choose - and callers are entitled to
+# treat a non-zero exit as "the selector could not run".
+exit 0

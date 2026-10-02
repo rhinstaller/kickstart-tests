@@ -47,6 +47,7 @@ First you need to install the needed dependencies:
 - squid
 - scp
 - genisoimage
+- erofs-utils
 - make
 - lorax
 

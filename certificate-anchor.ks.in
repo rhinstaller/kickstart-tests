@@ -9,22 +9,22 @@
 %ksappend common/common_no_payload.ks
 %ksappend payload/default_packages.ks
 
-%certificate --filename rtt1.usersys.redhat.com.crt --type anchor
-%ksappend data/rtt1.usersys.redhat.com.crt
+%certificate --filename rtt1.anaconda.redhat.com.crt --type anchor
+%ksappend data/rtt1.anaconda.redhat.com.crt
 %end
 
 # Validate on the first boot.
 %ksappend validation/success_on_first_boot.ks
 
 %pre
-trust list | grep rtt1.usersys.redhat.com
+trust list | grep rtt1.anaconda.redhat.com
 if [[ $? -ne 0 ]]; then
     echo "*** Failed check: certificate found in trust store in %pre" >> /root/RESULT
 fi
 %end
 
 %pre-install
-trust list | grep rtt1.usersys.redhat.com
+trust list | grep rtt1.anaconda.redhat.com
 if [[ $? -ne 0 ]]; then
     echo "*** Failed check: certificate found in trust store in %pre-install" >> /root/RESULT
 fi
@@ -37,7 +37,7 @@ copy_pre_stage_result
 %end
 
 %post
-trust list | grep rtt1.usersys.redhat.com
+trust list | grep rtt1.anaconda.redhat.com
 if [[ $? -ne 0 ]]; then
     echo "*** Failed check: certificate found in trust store in %post" >> /root/RESULT
 fi
@@ -52,7 +52,7 @@ fi
 # Write the code to run after reboot.
 cat > /usr/libexec/kickstart-test.sh << 'EOF'
 
-trust list | grep rtt1.usersys.redhat.com &> /dev/null
+trust list | grep rtt1.anaconda.redhat.com &> /dev/null
 if [[ $? -ne 0 ]]; then
     echo "*** Failed check: certificate found in trust store in installed system"
 fi

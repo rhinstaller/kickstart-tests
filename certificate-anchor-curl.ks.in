@@ -15,8 +15,8 @@
 %ksappend common/common_no_payload.ks
 %ksappend payload/default_packages.ks
 
-%certificate --filename rtt1.usersys.redhat.com.crt --type anchor
-%ksappend data/rtt1.usersys.redhat.com.crt
+%certificate --filename rtt1.anaconda.redhat.com.crt --type anchor
+%ksappend data/rtt1.anaconda.redhat.com.crt
 %end
 
 # Validate on the first boot.

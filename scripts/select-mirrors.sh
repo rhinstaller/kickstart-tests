@@ -1,0 +1,90 @@
+#!/bin/bash
+#
+# Choose the payload mirrors for a platform, once, and remember the answer.
+#
+# Reads the platform's defaults, then whatever was chosen last time, and lets
+# scripts/check-mirrors.sh decide whether that still stands. Mirrors picked
+# here are remembered; mirrors a platform names for itself are not, so that
+# changing one in the repo is not shadowed by a stale file on the runner.
+#
+# The state lives outside the checkout because the workspace is wiped at the
+# start of every CI run, and the whole point is to keep using the same mirror
+# across runs - the caching proxy keys on URL.
+#
+# Prints NAME=value lines on stdout, in the format $GITHUB_ENV wants, and
+# explains itself on stderr. Run it by hand to see what CI would do:
+#
+#   scripts/select-mirrors.sh fedora_rawhide
+#
+# and add a state directory of your own to leave the runner's alone:
+#
+#   scripts/select-mirrors.sh fedora_rawhide /tmp/my-mirrors
+
+set -eu
+
+platform="${1:-}"
+state_dir="${2:-${MIRROR_STATE_DIR:-${HOME}/.kstest-mirrors}}"
+
+if [ -z "${platform}" ]; then
+    echo "usage: $0 PLATFORM [STATE_DIR]" >&2
+    exit 2
+fi
+
+# defaults.sh and the scripts it sources use paths relative to the checkout.
+cd "$(dirname "$0")/.."
+
+state="${state_dir}/${platform}.sh"
+mkdir -p "${state_dir}"
+
+source ./scripts/defaults.sh
+if [ -e "./scripts/defaults-${platform}.sh" ]; then
+    source "./scripts/defaults-${platform}.sh"
+fi
+
+# Last run's answer, so a mirror that still works is kept rather than rolled.
+if [ -e "${state}" ]; then
+    source "${state}"
+fi
+
+# Through a variable rather than straight into eval: eval of an empty string
+# succeeds, so a selector that could not run at all - missing, not executable,
+# killed - would otherwise pass unnoticed and leave the mirrors unset. Which is
+# the one failure that must not be quiet, because the caller goes on to build
+# URLs out of what it finds.
+selection=$(./scripts/check-mirrors.sh)
+eval "${selection}"
+
+: > "${state}"
+for var in KSTEST_URL KSTEST_MODULAR_URL; do
+    repo="MIRROR_REPO_${var}"
+
+    if [ -z "${!var:-}" ]; then
+        # Empty is normal for a variable no platform uses. Empty for one a
+        # platform asked to have chosen means the choosing failed, and passing
+        # that on produces URLs like "/images/boot.iso" rather than an error.
+        if [ -n "${!repo:-}" ]; then
+            echo "ERROR: no mirror for ${var} (asked for '${!repo}')" >&2
+            exit 1
+        fi
+        continue
+    fi
+
+    echo "${var}=${!var}"
+
+    if [ -n "${!repo:-}" ]; then
+        echo "export ${var}='${!var}'" >> "${state}"
+        origin="chosen from ${!repo}"
+    else
+        # Not naming a file: it may come from either scripts/defaults.sh or
+        # the platform's own, and guessing wrong sends people to the wrong one.
+        origin="pinned in the defaults"
+    fi
+
+    # Always, not only when it changes: which mirror a run used is the first
+    # thing wanted when that run behaves oddly, and check-mirrors.sh is quiet
+    # by design when it keeps the previous choice - so without this the common
+    # case is the one that says nothing. stdout is the caller's to parse.
+    echo "${platform}: ${var} = ${!var} (${origin})" >&2
+done
+
+echo "${platform}: remembered $(grep -c . "${state}" || true) mirror(s) in ${state}" >&2

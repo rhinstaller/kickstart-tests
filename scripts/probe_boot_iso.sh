@@ -60,22 +60,53 @@ OS_RELEASE=/etc/os-release
 ROOTFS=/LiveOS/rootfs.img
 LORAX_PACKAGES=/root/lorax-packages.log
 
-unsquashfs -no-xattrs -follow -no-progress -d "$ISO_TMP/stage2" "$ISO_TMP/install.img" $OS_RELEASE $ROOTFS $LORAX_PACKAGES
-rm "$ISO_TMP/install.img"
-chmod -R a+w $ISO_TMP
+# The stage 2 image is either squashfs (lorax based images) or erofs
+# (image-builder based images). Squashfs has the "hsqs" magic at offset 0.
+install_img_magic=$(dd if="$ISO_TMP/install.img" bs=1 count=4 2>/dev/null | od -An -tx1 | tr -d ' \n')
 
-# Extract required information from stage2
-if [ -e "$ISO_TMP/stage2$OS_RELEASE" ]; then
-    cp "$ISO_TMP/stage2$OS_RELEASE" "$ISO_TMP/os-release"
-    cp "$ISO_TMP/stage2$LORAX_PACKAGES" "$ISO_TMP/lorax-packages.log"
-else
-    # On RHEL-8 and RHEL-9 the filesystem is packed in ext4 image (ENGCMP-766)
-    timeout -k 10s 30s virt-cat -a "$ISO_TMP/stage2$ROOTFS" $OS_RELEASE > "$ISO_TMP/os-release"
-    timeout -k 10s 30s virt-cat -a "$ISO_TMP/stage2$ROOTFS" $LORAX_PACKAGES > "$ISO_TMP/lorax-packages.log"
-    if [ $? -eq 124 ]; then
-        echo "Error: virt-cat timed out" >&2
-        exit 4
+if [ "$install_img_magic" = "68737173" ]; then
+    # squashfs
+    unsquashfs -no-xattrs -follow -no-progress -d "$ISO_TMP/stage2" "$ISO_TMP/install.img" $OS_RELEASE $ROOTFS $LORAX_PACKAGES
+    rm "$ISO_TMP/install.img"
+    chmod -R a+w $ISO_TMP
+
+    # Extract required information from stage2
+    if [ -e "$ISO_TMP/stage2$OS_RELEASE" ]; then
+        cp "$ISO_TMP/stage2$OS_RELEASE" "$ISO_TMP/os-release"
+        cp "$ISO_TMP/stage2$LORAX_PACKAGES" "$ISO_TMP/lorax-packages.log"
+    else
+        # On RHEL-8 and RHEL-9 the filesystem is packed in ext4 image (ENGCMP-766)
+        timeout -k 10s 30s virt-cat -a "$ISO_TMP/stage2$ROOTFS" $OS_RELEASE > "$ISO_TMP/os-release"
+        timeout -k 10s 30s virt-cat -a "$ISO_TMP/stage2$ROOTFS" $LORAX_PACKAGES > "$ISO_TMP/lorax-packages.log"
+        if [ $? -eq 124 ]; then
+            echo "Error: virt-cat timed out" >&2
+            exit 4
+        fi
     fi
+else
+    # erofs - extract only the files we need, extracting the whole image is slow
+    # (the /etc/os-release file is usually a symlink to ../usr/lib/os-release)
+    fsck.erofs --extract="$ISO_TMP/os-release" --path="$OS_RELEASE" "$ISO_TMP/install.img" 2>/dev/null || true
+    if [ ! -e "$ISO_TMP/os-release" ] || [ -L "$ISO_TMP/os-release" ]; then
+        rm -f "$ISO_TMP/os-release"
+        fsck.erofs --extract="$ISO_TMP/os-release" --path=/usr/lib/os-release "$ISO_TMP/install.img" 2>/dev/null || true
+    fi
+
+    if [ ! -e "$ISO_TMP/os-release" ]; then
+        echo "Error: Did not find os-release in the erofs image" >&2
+        exit 3
+    fi
+
+    # The erofs based images do not ship a lorax-packages.log. Get the list of
+    # installer packages from the rpm database included in the image instead.
+    : > "$ISO_TMP/lorax-packages.log"
+    for rpmdb in /usr/lib/sysimage/rpm /var/lib/rpm; do
+        if fsck.erofs --extract="$ISO_TMP/rpmdb" --path="$rpmdb" "$ISO_TMP/install.img" 2>/dev/null; then
+            rpm --dbpath="$ISO_TMP/rpmdb" -qa > "$ISO_TMP/lorax-packages.log" 2>/dev/null || true
+            break
+        fi
+    done
+    rm "$ISO_TMP/install.img"
 fi
 
 echo "PACKAGES=$(cat $ISO_TMP/lorax-packages.log | tr '\n' ' ')"

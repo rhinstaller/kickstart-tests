@@ -154,7 +154,8 @@ class VirtualInstall(object):
             args.append("--network")
             args.append(nic+",model=virtio")
 
-        disk_opts = "path={0},device=cdrom,readonly=on,shareable=on".format(self._iso)
+        # FIXME: force SATA bus to avoid IDE fallback from broken osinfo-detect (rhbz#2544660); drop once fixed.
+        disk_opts = "path={0},device=cdrom,bus=sata,readonly=on,shareable=on".format(self._iso)
         args.append("--disk")
         args.append(disk_opts)
 

@@ -124,7 +124,7 @@ class VirtualInstall(object):
         args.append("--osinfo")
         os_info = os.environ.get('KSTEST_OSINFO_NAME')
         if os_info:
-            args.append("require=off,detect=on,name={0}".format(os_info))
+            args.append("require=off,detect=off,name={0}".format(os_info))
         else:
             args.append("require=off,detect=on")
 

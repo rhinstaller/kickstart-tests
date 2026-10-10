@@ -1,0 +1,565 @@
+#!/usr/bin/python3
+#
+# Copyright (C) 2026  Red Hat, Inc.
+#
+# This copyrighted material is made available to anyone wishing to use,
+# modify, copy, or redistribute it subject to the terms and conditions of
+# the GNU General Public License v.2, or (at your option) any later version.
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY expressed or implied, including the implied warranties of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+# Public License for more details.  You should have received a copy of the
+# GNU General Public License along with this program; if not, write to the
+# Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301, USA.  Any Red Hat trademarks that are incorporated in the
+# source code or documentation are not subject to the GNU General Public
+# License and may only be used or replicated with the express permission of
+# Red Hat, Inc.
+#
+# This script turns the per-day JSON summaries produced by weekly-summary
+# (via log2json) into a small static site: duration trends, outcome rates,
+# per-test failure hotspots, and a searchable table of every failure.
+#
+# It reads the <scenario>-<YYYY-MM-DD>.json files weekly-summary leaves in its
+# working directory, so it does not download anything itself.
+
+import argparse
+import glob
+import json
+import os
+import re
+import sys
+
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt       # noqa: E402
+import pandas as pd                   # noqa: E402
+import seaborn as sns                 # noqa: E402
+from jinja2 import Template           # noqa: E402
+
+DEFAULT_TEMPLATE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                "templates", "weekly-summary.html.j2")
+
+# Filenames weekly-summary writes: <scenario>-<YYYY-MM-DD>.json
+DATED_JSON = re.compile(r"^(?P<stem>.+)-(?P<day>\d{4}-\d{2}-\d{2})\.json$")
+
+# log2json writes: "INFO: RESULT:<name>:<digest>:<STATUS>:<message>"
+# The message itself contains colons, so only split off the first four fields.
+RESULT_LINE = re.compile(r"RESULT:[^:]*:[^:]*:(?P<status>[A-Z]+):(?P<message>.*)", re.DOTALL)
+
+# Ordered worst-first; this drives both the stack order and the table sort.
+OUTCOMES = ["FAILED", "TIMEOUT", "FLAKE", "SUCCESS"]
+
+# Outcomes that get their own band in a stacked chart. TIMEOUT is not one of
+# them: it would need a third warm status hue beside critical and warning, and
+# warning/serious measure normal-vision dE 13.6 - under the 15 floor, which
+# secondary encoding does not excuse. So timeouts stack inside FAILED and keep
+# their identity in the duration chart (marker shape) and in the table.
+STACKED = ["FAILED", "FLAKE", "SUCCESS"]
+STACK_LABELS = {"FAILED": "FAILED (incl. timeouts)"}
+
+# Colours are the reserved *status* roles, not categorical series slots.
+# FAILED and TIMEOUT deliberately share a hue: the three warm status steps
+# (critical/serious/warning) do not clear the normal-vision separation floor
+# when shown together, so TIMEOUT is separated by marker shape and by the
+# table instead. See the palette notes in docs, and keep these in sync.
+THEMES = {
+    "light": {
+        "surface": "#fcfcfb",
+        "text": "#0b0b0b",
+        "muted": "#898781",
+        "grid": "#e1e0d9",
+        "axis": "#c3c2b7",
+        # The boxes show distribution, not identity, so they wear the same
+        # neutral as a passing result rather than a series hue - that keeps the
+        # failure dots the only saturated thing on the chart
+        "box": "#c3c2b7",
+        "outcome": {
+            "FAILED": "#d03b3b",
+            "TIMEOUT": "#d03b3b",
+            "FLAKE": "#fab219",
+            "SUCCESS": "#c3c2b7",
+        },
+    },
+    "dark": {
+        "surface": "#1a1a19",
+        "text": "#ffffff",
+        "muted": "#898781",
+        "grid": "#2c2c2a",
+        "axis": "#383835",
+        "box": "#c3c2b7",
+        "outcome": {
+            "FAILED": "#d03b3b",
+            "TIMEOUT": "#d03b3b",
+            "FLAKE": "#fab219",
+            "SUCCESS": "#383835",
+        },
+    },
+}
+
+
+def parse_result(result):
+    """
+    Split a log2json result line into its status and message.
+
+    Returns a (status, message) tuple. Unparseable lines come back as
+    ("UNKNOWN", <the original line>) rather than raising, because a single
+    malformed line should not lose a whole day of results.
+    """
+    m = RESULT_LINE.search(result or "")
+    if not m:
+        return "UNKNOWN", result or ""
+    return m.group("status"), m.group("message")
+
+
+def classify(df):
+    """
+    Add an "outcome" column to a frame of test results.
+
+    SUCCESS  - the test passed
+    TIMEOUT  - failed because it ran out of time
+    FLAKE    - failed, but the same test passed on a retry
+    FAILED   - failed and never passed
+
+    Results log2json marked MISSING are expected to have been dropped before
+    this point - see drop_missing.
+
+    Flakes are resolved per (scenario, day). Doing it over the whole frame -
+    as the original notebook did - lets a pass in one scenario hide a real
+    failure in another, or a pass on Tuesday rewrite Monday's failure.
+    """
+    outcome = pd.Series("FAILED", index=df.index, dtype=object)
+    outcome[df.success] = "SUCCESS"
+    outcome[~df.success & df.message.str.endswith("Test timed out")] = "TIMEOUT"
+
+    # A failure is a flake when the same test also passed in the same run
+    passed = df[df.success].set_index(["scenario", "day", "name"]).index
+    key = pd.MultiIndex.from_frame(df[["scenario", "day", "name"]])
+    retried = pd.Series(key.isin(passed), index=df.index)
+    outcome[~df.success & retried & outcome.isin(["FAILED", "TIMEOUT"])] = "FLAKE"
+
+    df["outcome"] = pd.Categorical(outcome, categories=OUTCOMES, ordered=True)
+    df["stacked"] = pd.Categorical(outcome.replace({"TIMEOUT": "FAILED"}),
+                                   categories=STACKED, ordered=True)
+    return df
+
+
+def short_names(scenarios):
+    """
+    Drop the prefix every scenario shares, so axis labels stay readable.
+
+    Scenarios are named "logs-rhel9" in the weekly pipeline but can be far
+    longer ("github.scheduled.daily.kstest.rhel9") when read straight from a
+    test run. Only the tail distinguishes them either way.
+    """
+    scenarios = list(scenarios)
+    if len(scenarios) < 2:
+        return {s: s for s in scenarios}
+
+    prefix = os.path.commonprefix(scenarios)
+    # Only cut on a separator, so we never slice a word in half
+    cut = max(prefix.rfind("."), prefix.rfind("-"), prefix.rfind("_")) + 1
+    return {s: (s[cut:] or s) for s in scenarios}
+
+
+def load_runs(paths):
+    """
+    Load the per-day JSON summaries into a single frame.
+
+    Each path must be named <something>-<YYYY-MM-DD>.json; the date is the run
+    day. The scenario is read from the file contents, not the filename, because
+    scenario names contain hyphens too.
+    """
+    paths = list(paths)
+    if not paths:
+        raise ValueError("No result files to plot")
+
+    frames = []
+    for path in paths:
+        m = DATED_JSON.match(os.path.basename(path))
+        if not m:
+            raise ValueError(
+                f"{path}: expected a date suffix, as in <scenario>-YYYY-MM-DD.json")
+
+        with open(path) as f:
+            tests = json.load(f)
+        if not tests:
+            print(f"{path}: no results, skipping", file=sys.stderr)
+            continue
+
+        frame = pd.DataFrame(tests)
+        frame["day"] = m.group("day")
+        # A scenario is missing from very old logs; fall back to the filename
+        if "scenario" not in frame:
+            frame["scenario"] = m.group("stem")
+        frame["scenario"] = frame.scenario.fillna(m.group("stem"))
+        frames.append(frame)
+
+    if not frames:
+        raise ValueError("No result files contained any tests")
+
+    df = pd.concat(frames, ignore_index=True)
+    for column, default in (("elapsed_time", 0.0), ("logfile", ""),
+                            ("result", ""), ("success", False)):
+        if column not in df:
+            df[column] = default
+    df["elapsed_time"] = pd.to_numeric(df.elapsed_time, errors="coerce").fillna(0.0)
+    df["logfile"] = df.logfile.fillna("")
+    parsed = df.result.apply(parse_result)
+    df["status"] = [p[0] for p in parsed]
+    df["message"] = [p[1] for p in parsed]
+    df["success"] = df.success.fillna(False).astype(bool)
+
+    df = drop_missing(df)
+    if df.empty:
+        raise ValueError("No results with a recorded outcome to plot")
+
+    return classify(df)
+
+
+def drop_missing(df):
+    """
+    Leave out the results log2json could not find an outcome for
+
+    These are tests that never started, or that started and never recorded a
+    verdict. They are not failures and they have no duration, so on a duration
+    chart they would sit at zero seconds and read as "finished instantly".
+    The text report already lists them per day, so nothing is lost by keeping
+    them off the charts.
+    """
+    missing = df.status == "MISSING"
+    if missing.any():
+        print(f"Leaving out {int(missing.sum())} result(s) with no recorded "
+              f"outcome; see the text report for the list", file=sys.stderr)
+
+    return df[~missing].reset_index(drop=True)
+
+
+def failure_rows(df):
+    """Every non-successful result, worst outcome first, for the table"""
+    rows = df[df.outcome != "SUCCESS"].copy()
+    return rows.sort_values(["outcome", "day", "scenario", "name"],
+                            kind="stable").reset_index(drop=True)
+
+
+def apply_theme(theme):
+    """Set the recessive chrome the charts share"""
+    sns.set_theme(style="whitegrid")
+    sns.set_context("notebook")
+    plt.rcParams.update({
+        "figure.facecolor": theme["surface"],
+        "axes.facecolor": theme["surface"],
+        "savefig.facecolor": theme["surface"],
+        "text.color": theme["text"],
+        "axes.labelcolor": theme["text"],
+        "axes.edgecolor": theme["axis"],
+        "xtick.color": theme["muted"],
+        "ytick.color": theme["muted"],
+        "grid.color": theme["grid"],
+        "grid.linewidth": 0.8,
+        "grid.linestyle": "-",
+        "axes.linewidth": 0.8,
+        "font.family": "sans-serif",
+        "legend.frameon": False,
+    })
+
+
+def save(fig, outdir, name, mode):
+    path = os.path.join(outdir, f"{name}-{mode}.png")
+    fig.savefig(path, dpi=110, bbox_inches="tight")
+    plt.close(fig)
+    return os.path.basename(path)
+
+
+def plot_durations(df, theme, outdir, mode):
+    """Elapsed time per scenario, with each test drawn as a point"""
+    scenarios = sorted(df.scenario.unique())
+    labels = short_names(scenarios)
+    fig, ax = plt.subplots(figsize=(max(9, 2.2 * len(scenarios)), 7))
+
+    sns.boxplot(df, x="scenario", y="elapsed_time", order=scenarios,
+                showfliers=False, fill=False, color=theme["axis"],
+                linewidth=1.2, ax=ax)
+    points = df[df.outcome != "TIMEOUT"]
+    sns.stripplot(points, x="scenario", y="elapsed_time", order=scenarios,
+                  hue="outcome", hue_order=[o for o in OUTCOMES if o != "TIMEOUT"],
+                  palette=theme["outcome"], alpha=0.65, size=4,
+                  linewidth=0, jitter=0.28, ax=ax, legend=True)
+
+    # Timeouts share FAILED's colour, so give them their own marker instead
+    timeouts = df[df.outcome == "TIMEOUT"]
+    if not timeouts.empty:
+        sns.stripplot(timeouts, x="scenario", y="elapsed_time", order=scenarios,
+                      color=theme["outcome"]["TIMEOUT"], marker="X", size=9,
+                      linewidth=0.8, edgecolor=theme["surface"], jitter=0.28,
+                      ax=ax, label="TIMEOUT (shape, not colour)")
+
+    ax.set(xlabel="", ylabel="elapsed time (seconds)")
+    ax.set_xticks(range(len(scenarios)), [labels[s] for s in scenarios])
+    ax.set_title("Test duration by scenario", color=theme["text"], loc="left", pad=14)
+    # Outside the plot, so it never covers a data point
+    dedupe_legend(ax, theme)
+    sns.despine(bottom=True, left=True)
+    return save(fig, outdir, "durations", mode)
+
+
+def plot_durations_by_day(df, theme, outdir, mode):
+    """Duration drift across the week, one panel per scenario"""
+    days = sorted(df.day.unique())
+    scenarios = sorted(df.scenario.unique())
+    labels = short_names(scenarios)
+    # Thin unfilled boxes: a saturated block per day reads loud and says nothing
+    # the outline does not already say
+    g = sns.catplot(df, x="day", y="elapsed_time", order=days,
+                    col="scenario", col_wrap=2, col_order=scenarios,
+                    kind="box", showfliers=False, fill=False,
+                    color=theme["box"],
+                    # The neutral is pale against the surface, so the stroke
+                    # carries the shape - keep it a touch heavier than hairline
+                    linewidth=1.7, height=3.4, aspect=1.7, sharey=True)
+    g.set_axis_labels("", "elapsed time (s)")
+    # Clear seaborn's "scenario = ..." titles before writing the short ones,
+    # otherwise both end up drawn on the same line
+    g.set_titles("")
+
+    # Overlay the results that went wrong. Successes are left to the box: at
+    # several thousand passing tests a point per result would bury the shape,
+    # and the failures are the reason to look at this chart at all.
+    bad = df[df.outcome != "SUCCESS"]
+    dots = [o for o in OUTCOMES if o not in ("SUCCESS", "TIMEOUT")]
+    for ax, scenario in zip(g.axes.flat, scenarios):
+        sub = bad[bad.scenario == scenario]
+        plain = sub[sub.outcome != "TIMEOUT"]
+        if not plain.empty:
+            sns.stripplot(plain, x="day", y="elapsed_time", order=days,
+                          hue="outcome", hue_order=dots, palette=theme["outcome"],
+                          alpha=0.75, size=4.5, linewidth=0, jitter=0.25,
+                          ax=ax, legend=False)
+        timeouts = sub[sub.outcome == "TIMEOUT"]
+        if not timeouts.empty:
+            sns.stripplot(timeouts, x="day", y="elapsed_time", order=days,
+                          color=theme["outcome"]["TIMEOUT"], marker="X", size=7,
+                          linewidth=0.8, edgecolor=theme["surface"], jitter=0.25,
+                          ax=ax, legend=False)
+
+        ax.set_title(labels[scenario], color=theme["text"], loc="left", fontsize=11)
+        ax.tick_params(axis="x", rotation=45)
+        ax.grid(axis="x", visible=False)
+        # stripplot re-adds the column name as an axis label; the dates speak
+        # for themselves
+        ax.set_xlabel("")
+
+    # One legend for the whole grid rather than a box per panel
+    keys = [(o, theme["outcome"][o], "X" if o == "TIMEOUT" else "o")
+            for o in OUTCOMES if o != "SUCCESS" and (df.outcome == o).any()]
+    if keys:
+        handles = [plt.Line2D([], [], linestyle="none", marker=mark, color=colour,
+                              markersize=7 if mark == "X" else 5, label=name)
+                   for name, colour, mark in keys]
+        # The rotated dates hang below the bottom row, so anchor the legend a
+        # fixed distance under the figure rather than at its edge. Expressed in
+        # inches so it holds however many rows of panels there are.
+        drop = 1.0 / g.figure.get_figheight()
+        g.figure.legend(handles=handles, loc="upper center", frameon=False,
+                        ncol=len(handles), bbox_to_anchor=(0.5, -drop),
+                        labelcolor=theme["text"])
+
+    g.figure.suptitle("Duration spread per day", color=theme["text"],
+                      x=0.01, ha="left", y=1.02)
+    g.figure.patch.set_facecolor(theme["surface"])
+    return save(g.figure, outdir, "durations-by-day", mode)
+
+
+def plot_outcomes(df, theme, outdir, mode):
+    """Stacked outcome counts per day, one panel per scenario"""
+    scenarios = sorted(df.scenario.unique())
+    labels = short_names(scenarios)
+    days = sorted(df.day.unique())
+    counts = (df.groupby(["scenario", "day", "stacked"], observed=False)
+                .size().rename("n").reset_index())
+
+    ncols = min(2, len(scenarios))
+    nrows = (len(scenarios) + ncols - 1) // ncols
+    fig, axes = plt.subplots(nrows, ncols, figsize=(7.0 * ncols, 3.6 * nrows),
+                             squeeze=False, sharey=True)
+
+    for ax, scenario in zip(axes.flat, scenarios):
+        sub = counts[counts.scenario == scenario]
+        bottom = [0.0] * len(days)
+        for name in reversed(STACKED):
+            vals = [float(sub[(sub.day == d) & (sub.stacked == name)].n.sum()) for d in days]
+            if not any(vals):
+                continue
+            ax.bar(days, vals, bottom=bottom, color=theme["outcome"][name],
+                   label=STACK_LABELS.get(name, name), width=0.62,
+                   # a surface-coloured gap rather than a border around marks
+                   linewidth=1.0, edgecolor=theme["surface"])
+            bottom = [b + v for b, v in zip(bottom, vals)]
+
+        # Direct-label the failures only; a number on every segment is noise
+        for i, d in enumerate(days):
+            bad = int(sub[(sub.day == d) & (sub.stacked != "SUCCESS")].n.sum())
+            if bad:
+                ax.text(i, bottom[i], f" {bad}", ha="center", va="bottom",
+                        fontsize=9, color=theme["text"])
+
+        ax.set_title(labels[scenario], color=theme["text"], loc="left", fontsize=11)
+        ax.tick_params(axis="x", rotation=45)
+        # Retries add rows, so this counts runs rather than distinct tests
+        ax.set_ylabel("test runs")
+        ax.grid(axis="x", visible=False)
+
+    for ax in axes.flat[len(scenarios):]:
+        ax.set_visible(False)
+
+    handles, labels = axes.flat[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower center", ncol=len(labels),
+               bbox_to_anchor=(0.5, -0.04), frameon=False)
+    fig.suptitle("Outcomes per day", color=theme["text"], x=0.01, ha="left")
+    fig.tight_layout()
+    return save(fig, outdir, "outcomes", mode)
+
+
+def plot_hotspots(df, theme, outdir, top, mode):
+    """The tests that go wrong most often, stacked by how they go wrong"""
+    bad = df[df.outcome != "SUCCESS"]
+    if bad.empty:
+        return None
+
+    ranked = bad.groupby("name", observed=True).size().sort_values(ascending=False)
+    names = list(ranked.head(top).index)[::-1]
+    counts = (bad[bad.name.isin(names)]
+              .groupby(["name", "stacked"], observed=False).size().rename("n").reset_index())
+
+    fig, ax = plt.subplots(figsize=(10, max(4, 0.34 * len(names))))
+    left = [0.0] * len(names)
+    for outcome in STACKED:
+        if outcome == "SUCCESS":
+            continue
+        vals = [float(counts[(counts.name == n) & (counts.stacked == outcome)].n.sum())
+                for n in names]
+        if not any(vals):
+            continue
+        ax.barh(names, vals, left=left, color=theme["outcome"][outcome],
+                label=STACK_LABELS.get(outcome, outcome), height=0.68,
+                linewidth=1.0, edgecolor=theme["surface"])
+        left = [left_ + v for left_, v in zip(left, vals)]
+
+    for i, total in enumerate(left):
+        ax.text(total, i, f" {int(total)}", va="center", fontsize=9, color=theme["text"])
+
+    ax.set_xlabel("failed, timed out or flaked (runs)")
+    ax.set_title(f"Top {len(names)} problem tests", color=theme["text"], loc="left", pad=14)
+    ax.grid(axis="y", visible=False)
+    ax.legend(loc="lower right")
+    sns.despine(left=True)
+    fig.tight_layout()
+    return save(fig, outdir, "hotspots", mode)
+
+
+def dedupe_legend(ax, theme):
+    """Seaborn can emit a handle per call; keep one entry per label"""
+    handles, labels = ax.get_legend_handles_labels()
+    seen = {}
+    for handle, label in zip(handles, labels):
+        seen.setdefault(label, handle)
+    ax.legend(seen.values(), seen.keys(), title="", loc="upper left",
+              bbox_to_anchor=(1.01, 1.0), labelcolor=theme["text"])
+
+
+def table_rows(rows):
+    """Shape the failure frame into plain dicts for the template"""
+    return [{
+        "day": str(r.day),
+        "scenario": str(r.scenario),
+        "name": str(r["name"]),
+        "outcome": str(r.outcome),
+        "seconds": f"{r.elapsed_time:.0f}",
+        "message": str(r.message)[:300],
+        "logdir": os.path.basename(os.path.dirname(str(r.logfile))),
+    } for _, r in rows.iterrows()]
+
+
+def load_template(path):
+    """
+    Read the page template
+
+    Autoescape is on, unlike the YAML templates elsewhere in the tree: test
+    names and failure messages come straight out of the logs and land in HTML.
+    """
+    with open(path) as f:
+        return Template(f.read(), trim_blocks=True, autoescape=True)
+
+
+def render_page(df, report, figures=(), template=DEFAULT_TEMPLATE):
+    """Render the summary page from the results and the chart filenames"""
+    rows = failure_rows(df)
+    days = sorted(df.day.unique())
+
+    return load_template(template).render(
+        window=f"{days[0]} to {days[-1]}" if len(days) > 1 else days[0],
+        runs=df.groupby(["scenario", "day"], observed=True).ngroups,
+        scenarios=df.scenario.nunique(),
+        tests=len(df),
+        failures=len(rows),
+        figures=list(figures),
+        rows=table_rows(rows),
+        report=report,
+    )
+
+
+
+def build_site(df, outdir, report, top, template):
+    os.makedirs(outdir, exist_ok=True)
+
+    charts = {}
+    for mode, theme in THEMES.items():
+        apply_theme(theme)
+        charts[mode] = [
+            ("Test duration by scenario", plot_durations(df, theme, outdir, mode)),
+            ("Duration spread per day", plot_durations_by_day(df, theme, outdir, mode)),
+            ("Outcomes per day", plot_outcomes(df, theme, outdir, mode)),
+            ("Top problem tests", plot_hotspots(df, theme, outdir, top, mode)),
+        ]
+
+    figures = [{"caption": caption, "light": light, "dark": dark}
+               for (caption, light), (_, dark) in zip(charts["light"], charts["dark"])
+               if light and dark]
+
+    index = os.path.join(outdir, "index.html")
+    with open(index, "w") as f:
+        f.write(render_page(df, report, figures, template))
+    return index
+
+
+def main(args):
+    paths = args.files or sorted(glob.glob(os.path.join(args.indir, "*.json")))
+    paths = [p for p in paths if DATED_JSON.match(os.path.basename(p))]
+
+    df = load_runs(paths)
+
+    report = ""
+    if args.report and os.path.exists(args.report):
+        with open(args.report) as f:
+            report = f.read()
+
+    index = build_site(df, args.output_dir, report, args.top, args.template)
+    print(f"Wrote {index} ({len(df)} results, {len(failure_rows(df))} failures)")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Plot kickstart-test results into a static site")
+    parser.add_argument("files", nargs="*",
+                        help="<scenario>-<YYYY-MM-DD>.json files (default: scan --indir)")
+    parser.add_argument("--indir", default=".",
+                        help="Directory to scan for summaries (default: current)")
+    parser.add_argument("--output-dir", default="site",
+                        help="Directory to write the site into (default: site)")
+    parser.add_argument("--report",
+                        help="Text report from weekly-summary to inline in the page")
+    parser.add_argument("--template", "-t", default=DEFAULT_TEMPLATE,
+                        help="Page template (default: %(default)s)")
+    parser.add_argument("--top", type=int, default=30,
+                        help="How many tests to show in the hotspots chart (default: 30)")
+    main(parser.parse_args())

@@ -1,0 +1,195 @@
+{#
+  Page produced by scripts/plot-summary from the per-day JSON summaries that
+  weekly-summary leaves behind.
+
+  Rendered with autoescape on, because failure messages and test names come
+  straight out of the test logs.
+
+  Context:
+    window      - "YYYY-MM-DD to YYYY-MM-DD" covered by the report
+    runs        - number of scenario-days summarized
+    scenarios   - number of distinct scenarios
+    tests       - number of results
+    failures    - number of results that were not a success
+    figures     - [{caption, light, dark}] chart images, one pair per chart
+    rows        - [{day, scenario, name, outcome, seconds, message, logdir}]
+    report      - the weekly-summary text report, or "" if not supplied
+#}<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>kickstart-tests weekly summary</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --surface: #fcfcfb; --plane: #f9f9f7;
+    --text: #0b0b0b; --secondary: #52514e; --muted: #898781;
+    --grid: #e1e0d9; --border: rgba(11,11,11,0.10);
+    --failed: #d03b3b; --flake: #fab219;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --surface: #1a1a19; --plane: #0d0d0d;
+      --text: #ffffff; --secondary: #c3c2b7; --muted: #898781;
+      --grid: #2c2c2a; --border: rgba(255,255,255,0.10);
+    }
+  }
+  body {
+    margin: 0; padding: 2rem clamp(1rem, 4vw, 3rem);
+    background: var(--plane); color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.5;
+  }
+  h1 { font-size: 1.5rem; margin: 0 0 .25rem; }
+  h2 { font-size: 1.1rem; margin: 2.5rem 0 .75rem; font-weight: 600; }
+  .sub { color: var(--secondary); margin: 0 0 2rem; }
+  figure {
+    margin: 0 0 1.5rem; padding: 1rem; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px;
+  }
+  figure img { display: block; width: 100%; height: auto; }
+  .only-light { display: block; }
+  .only-dark { display: none; }
+  @media (prefers-color-scheme: dark) {
+    .only-light { display: none; }
+    .only-dark { display: block; }
+  }
+  .controls { display: flex; gap: 1rem; align-items: baseline; margin-bottom: .75rem; }
+  input[type=search] {
+    flex: 1 1 22rem; max-width: 32rem; padding: .5rem .7rem;
+    background: var(--surface); color: var(--text);
+    border: 1px solid var(--border); border-radius: 6px; font: inherit;
+  }
+  .count { color: var(--secondary); font-size: .9rem; }
+  table {
+    width: 100%; border-collapse: collapse; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px;
+    font-size: .88rem; font-variant-numeric: tabular-nums;
+    table-layout: fixed;
+  }
+  th, td { text-align: left; padding: .45rem .6rem; border-bottom: 1px solid var(--grid); }
+  th {
+    position: sticky; top: 0; background: var(--surface); cursor: pointer;
+    color: var(--secondary); font-weight: 600; white-space: nowrap;
+  }
+  th:focus-visible { outline: 2px solid var(--failed); outline-offset: -2px; }
+  th:nth-child(1), td:nth-child(1) { width: 6.5rem; }
+  th:nth-child(2), td:nth-child(2) { width: 11rem; }
+  th:nth-child(4), td:nth-child(4) { width: 6.5rem; }
+  th:nth-child(5), td:nth-child(5) { width: 5rem; text-align: right; }
+  th:nth-child(7), td:nth-child(7) { width: 10rem; }
+  td:nth-child(2), td:nth-child(3) { overflow-wrap: anywhere; }
+  td:nth-child(6) { color: var(--secondary); overflow-wrap: anywhere; }
+  /* The log directory is long and rarely read in full; keep it on one line
+     and put the whole value in the tooltip */
+  td:nth-child(7) {
+    color: var(--muted); font-size: .8rem;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .pill {
+    display: inline-block; padding: .05rem .45rem; border-radius: 999px;
+    font-size: .78rem; font-weight: 600; color: #0b0b0b; white-space: nowrap;
+  }
+  .FAILED, .TIMEOUT { background: var(--failed); color: #fff; }
+  .FLAKE { background: var(--flake); }
+  pre {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 1rem; overflow-x: auto; font-size: .82rem; line-height: 1.45;
+  }
+</style>
+</head>
+<body>
+<h1>kickstart-tests weekly summary</h1>
+<p class="sub">{{ window }} &middot; {{ runs }} runs across {{ scenarios }} scenarios &middot;
+   {{ tests }} results, {{ failures }} not successful</p>
+
+{% for figure in figures %}
+<figure>
+  <img class="only-light" src="{{ figure.light }}" alt="{{ figure.caption }}">
+  <img class="only-dark" src="{{ figure.dark }}" alt="{{ figure.caption }}">
+</figure>
+{% endfor %}
+
+<h2>Failures, timeouts and flakes</h2>
+<div class="controls">
+  <input type="search" id="filter" placeholder="Filter by test, scenario, outcome or message&hellip;"
+         aria-label="Filter failures">
+  <span class="count"><span id="shown">0</span> of {{ failures }} rows</span>
+</div>
+<table id="failures">
+  <thead>
+    <tr>
+      <th tabindex="0" data-type="text">day</th>
+      <th tabindex="0" data-type="text">scenario</th>
+      <th tabindex="0" data-type="text">test</th>
+      <th tabindex="0" data-type="text">outcome</th>
+      <th tabindex="0" data-type="num">seconds</th>
+      <th tabindex="0" data-type="text">message</th>
+      <th tabindex="0" data-type="text">log directory</th>
+    </tr>
+  </thead>
+  <tbody>
+{% for row in rows %}
+    <tr>
+      <td>{{ row.day }}</td>
+      <td>{{ row.scenario }}</td>
+      <td>{{ row.name }}</td>
+      <td><span class="pill {{ row.outcome }}">{{ row.outcome }}</span></td>
+      <td>{{ row.seconds }}</td>
+      <td>{{ row.message }}</td>
+      <td><span title="{{ row.logdir }}">{{ row.logdir }}</span></td>
+    </tr>
+{% endfor %}
+  </tbody>
+</table>
+
+<h2>Text report</h2>
+<pre>{{ report }}</pre>
+
+<script>
+const table = document.getElementById('failures');
+const rows = () => Array.from(table.tBodies[0].rows);
+const box = document.getElementById('filter');
+const shown = document.getElementById('shown');
+
+function applyFilter() {
+  const q = box.value.toLowerCase().trim();
+  let n = 0;
+  for (const row of rows()) {
+    const hit = !q || row.textContent.toLowerCase().includes(q);
+    row.hidden = !hit;
+    if (hit) n++;
+  }
+  shown.textContent = n;
+}
+box.addEventListener('input', applyFilter);
+
+let sortCol = -1, sortAsc = true;
+function sortBy(index, type) {
+  sortAsc = sortCol === index ? !sortAsc : true;
+  sortCol = index;
+  const dir = sortAsc ? 1 : -1;
+  const sorted = rows().sort((a, b) => {
+    const x = a.cells[index].textContent.trim();
+    const y = b.cells[index].textContent.trim();
+    if (type === 'num') return (parseFloat(x) - parseFloat(y)) * dir;
+    return x.localeCompare(y) * dir;
+  });
+  const body = table.tBodies[0];
+  for (const row of sorted) body.appendChild(row);
+  table.querySelectorAll('th').forEach((th, i) => {
+    th.setAttribute('aria-sort', i === index ? (sortAsc ? 'ascending' : 'descending') : 'none');
+  });
+}
+table.querySelectorAll('th').forEach((th, i) => {
+  const go = () => sortBy(i, th.dataset.type);
+  th.addEventListener('click', go);
+  th.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); }
+  });
+});
+applyFilter();
+</script>
+</body>
+</html>

@@ -40,6 +40,12 @@ import zipfile
 import pycurl
 
 URL = "https://api.github.com/repos/rhinstaller/kickstart-tests/actions/artifacts?per_page=100"
+RUN_URL = "https://api.github.com/repos/rhinstaller/kickstart-tests/actions/runs"
+
+# Only summarize the nightly runs by default. The same artifact names are also
+# produced by manual workflow_dispatch runs and by the PR test runs triggered
+# from an issue comment, and those outnumber the scheduled ones.
+DEFAULT_EVENT = "schedule"
 
 # Defaults list of artifacts
 # For now use the full log artifacts, eventually this will be the json summaries
@@ -56,7 +62,7 @@ else:
     signal.signal(SIGPIPE, SIG_IGN)
 
 
-def get_artifacts(token, artifact_names, start, end):
+def get_artifacts(token, artifact_names, start, end, event=DEFAULT_EVENT):
     """
     get_artifacts retrieves a list of artifacts from the selected date range
     that are listed in artifact_names
@@ -123,7 +129,73 @@ def get_artifacts(token, artifact_names, start, end):
         # Avoid hitting per-second rate limits
         time.sleep(2)
 
-    return sorted(artifacts, key=lambda x: x["updated_at"])
+    if event:
+        artifacts = filter_by_event(artifacts, get_run_events(token, artifacts), event)
+
+    return dedupe_newest(artifacts)
+
+
+def get_run_events(token, artifacts):
+    """
+    Look up the event that triggered the run behind each artifact
+
+    The artifacts API reports the run's branch but not its event, so the run
+    itself has to be fetched. Results are keyed by run id, and several
+    artifacts share a run, so this is a handful of requests per week.
+
+    Runs that cannot be fetched are left out of the map, which means the
+    artifact is treated as being of unknown provenance.
+    """
+    events = {}
+    for run_id in sorted({a["workflow_run"]["id"] for a in artifacts
+                          if a.get("workflow_run")}):
+        req = Request(f"{RUN_URL}/{run_id}")
+        req.add_header("Accept", "application/vnd.github.v3+json")
+        req.add_header("Authorization", f"token {token}")
+        try:
+            with urlopen(req) as r:
+                if r.status != 200:
+                    raise RuntimeError(f"status {r.status}")
+                events[run_id] = json.load(r).get("event")
+        except Exception as e:                      # pylint: disable=broad-except
+            print(f"WARNING: could not read run {run_id}, skipping it - {e}",
+                  file=sys.stderr)
+
+    return events
+
+
+def filter_by_event(artifacts, events, event):
+    """
+    Keep only the artifacts produced by a run triggered by the given event
+
+    Passing event=None keeps everything. Filtering on the event rather than on
+    the branch is deliberate: the PR test runs report a head_branch of "main",
+    so a branch check would let them through.
+    """
+    if not event:
+        return artifacts
+
+    return [a for a in artifacts
+            if a.get("workflow_run")
+            and events.get(a["workflow_run"]["id"]) == event]
+
+
+def dedupe_newest(artifacts):
+    """
+    Keep one artifact per name and day, preferring the most recent
+
+    Downloads are named <artifact>-<YYYY-MM-DD>.zip, so two runs of the same
+    scenario on one day collide. Without this the first one downloaded wins and
+    every later one is silently skipped as "already downloaded", which means an
+    early re-run can mask the real result for that day.
+    """
+    newest = {}
+    for a in sorted(artifacts, key=lambda x: x["updated_at"]):
+        day = datetime.fromisoformat(a["updated_at"][:-1]).strftime("%Y-%m-%d")
+        # Later entries overwrite earlier ones, so the newest survives
+        newest[(a["name"], day)] = a
+
+    return sorted(newest.values(), key=lambda x: x["updated_at"])
 
 
 def run_curl(token, url, filename):
@@ -601,7 +673,7 @@ def test_summary(args, path):
 
 
 def main(args, token):
-    artifacts = get_artifacts(token, args.artifact_names, args.start, args.end)
+    artifacts = get_artifacts(token, args.artifact_names, args.start, args.end, args.event)
     if args.verbose:
         print(json.dumps(artifacts))
     zipfiles = download_artifacts(token, artifacts)
@@ -660,6 +732,11 @@ if __name__ == '__main__':
     parser.add_argument("--end", type=datetime.fromisoformat,
             default=datetime.now(),
             help="end time. eg. 2022-03-03T03:46:11 (default is now)")
+    parser.add_argument("--event", default=DEFAULT_EVENT,
+            type=lambda x: x if x != "any" else None,
+            help="Only summarize runs triggered by this event, or 'any' for all "
+                 "(default: %s). Manual and PR test runs produce the same "
+                 "artifact names as the nightly ones." % DEFAULT_EVENT)
     parser.add_argument("--rebuild",
             default=False, action="store_true",
             help="Rebuild logs with timestamps")

@@ -18,14 +18,28 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v7
-      - name: Install pycurl
-        run: sudo apt-get install -y python3-pycurl
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pycurl python3-pandas python3-matplotlib python3-seaborn python3-jinja2
       - name: Run weekly-summary script
         run: |
           PATH=./scripts/:$PATH \
           ./scripts/weekly-summary --rebuild --flake-details \
           --artifacts=logs-daily-iso,logs-rhel9,logs-rhel10,logs-centos10,logs-fedora-eln,logs-daily-iso-webui \
-          --archive-logs /var/tmp/kstest-archive/
+          --archive-logs /var/tmp/kstest-archive/ \
+          --output summary.txt
+
+      # weekly-summary leaves a <scenario>-<YYYY-MM-DD>.json per run in the
+      # working directory, so the plots are built from those rather than
+      # downloading the artifacts a second time.
+      - name: Plot the results
+        run: ./scripts/plot-summary --indir . --output-dir site/ --report summary.txt
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site/
 
       - name: Collect logs
         if: always()
@@ -33,3 +47,20 @@ jobs:
         with:
           name: 'weekly-logs-archive'
           path: /var/tmp/kstest-archive/*
+
+  publish:
+    name: Publish the summary to GitHub Pages
+    needs: weekly_summary
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v5
+      - name: Link the summary from the run page
+        run: echo "[Weekly test summary](${{ steps.deploy.outputs.page_url }})" >> "$GITHUB_STEP_SUMMARY"

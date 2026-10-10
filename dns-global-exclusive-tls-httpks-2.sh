@@ -22,12 +22,18 @@
 TESTTYPE=${TESTTYPE:-"network dns skip-on-rhel"}
 KICKSTART_NAME=dns-global-exclusive-tls-2
 # FIXME: the test would ideally require name resolution to fetch the kickstart
+# The same variable as dns-global-exclusive-tls-2.sh, so that one override
+# covers both tests. It carries IP#hostname rather than a bare IP because
+# addressing a DoT server by IP alone requires that IP in the certificate's
+# SAN - Cloudflare has one, most resolvers have only a name, so a bare IP is
+# not overridable in practice.
+KSTEST_DNS=${KSTEST_DNS:-"1.1.1.1#one.one.one.one"}
 
 . ${KSTESTDIR}/functions.sh
 
 kernel_args() {
     . ${tmpdir}/ks_url
-    echo ${DEFAULT_BOOTOPTS} rd.net.dns=dns+tls://1.1.1.1 rd.net.dns-resolve-mode=exclusive rd.net.dns-backend=dnsconfd ip=10.0.2.200::10.0.2.2:255.255.255.0:::none inst.ks=${ks_url}
+    echo ${DEFAULT_BOOTOPTS} rd.net.dns=dns+tls://${KSTEST_DNS} rd.net.dns-resolve-mode=exclusive rd.net.dns-backend=dnsconfd ip=10.0.2.200::10.0.2.2:255.255.255.0:::none inst.ks=${ks_url}
 }
 
 additional_runner_args() {

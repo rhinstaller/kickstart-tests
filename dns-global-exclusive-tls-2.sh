@@ -20,11 +20,12 @@
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
 TESTTYPE=${TESTTYPE:-"network dns skip-on-rhel"}
+KSTEST_DNS=${KSTEST_DNS:-"1.1.1.1#one.one.one.one"}
 
 . ${KSTESTDIR}/functions.sh
 
 kernel_args() {
-    echo ${DEFAULT_BOOTOPTS} rd.net.dns=dns+tls://1.1.1.1#one.one.one.one rd.net.dns-resolve-mode=exclusive rd.net.dns-backend=dnsconfd ip=10.0.2.200::10.0.2.2:255.255.255.0:::none
+    echo ${DEFAULT_BOOTOPTS} rd.net.dns=dns+tls://${KSTEST_DNS} rd.net.dns-resolve-mode=exclusive rd.net.dns-backend=dnsconfd ip=10.0.2.200::10.0.2.2:255.255.255.0:::none
 }
 
 additional_runner_args() {

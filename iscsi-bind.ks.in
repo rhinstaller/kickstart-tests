@@ -7,14 +7,14 @@ iscsi --ipaddr @KSTEST_ISCSI_IP@ --port @KSTEST_ISCSI_PORT@ --target @KSTEST_ISC
 bootloader --timeout=1
 zerombr
 clearpart --all
-autopart
 
-# for non-offload iSCSI /boot can be on iSCSI only when using iBFT,
-# so put it to local disk
-#reqpart
-#part /boot --size=500 --ondisk=vda
-#part / --size=5000 --ondisk=vdb --grow
-#part swap --size=1000 --ondisk=vdb
+# For non-offload iSCSI, /boot cannot reside on iSCSI (no iBFT),
+# so keep it on the local virtio disk (vda).
+# Root and swap go on the iSCSI target (sda).
+reqpart
+part /boot --size=500 --ondisk=vda
+part / --size=5000 --ondisk=sda --grow
+part swap --size=1000 --ondisk=sda
 
 keyboard us
 lang en

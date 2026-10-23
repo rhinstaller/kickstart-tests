@@ -19,7 +19,7 @@
 
 # Ignore unused variable parsed out by tooling scripts as test tags metadata
 # shellcheck disable=SC2034
-TESTTYPE=${TESTTYPE:-"knownfailure iscsi"}
+TESTTYPE=${TESTTYPE:-"iscsi"}
 
 . ${KSTESTDIR}/functions.sh
 
@@ -41,21 +41,22 @@ prepare() {
 
     ### Bring up iscsi target
 
-    if ! type targetcli &> /dev/null; then
-        echo "ENVIRONMENT: missing targetcli tools required by the test"
+    if ! type tgtd &> /dev/null; then
+        echo "ENVIRONMENT: missing scsi-target-utils tools required by the test"
         exit 1
     fi
 
     local imgfile=${tmpdir}/${iscsi_disk_img}
     local test_id=$(basename ${tmpdir})
-    # use only lower case in target name
-    local lc_test_id=${test_id,,}
-    local backstore=${lc_test_id}
+    # lowercase and strip characters invalid in IQN names
+    local lc_test_id
+    lc_test_id=$(echo "${test_id,,}" | tr -c 'a-z0-9\n' '-')
     local wwn=iqn.2003-01.kickstart.test:${lc_test_id}
 
     local target_port=3260
-    local logfile=${tmpdir}/targetcli.log
-    local target_ip=$(create_iscsi_target ${wwn} ${backstore} ${imgfile} ${logfile})
+    local logfile=${tmpdir}/tgtd.log
+    local target_ip
+    target_ip=$(create_iscsi_target ${wwn} ${imgfile} ${logfile})
     local initiator=iqn.2009-02.com.example:${lc_test_id}
 
     # Substitute values of created target in kickstart
@@ -70,10 +71,10 @@ cleanup() {
     ### Tear down iscsi target
     local imgfile=${tmpdir}/${iscsi_disk_img}
     local test_id=$(basename ${tmpdir})
-    # use only lower case in target name
-    local lc_test_id=${test_id,,}
-    local backstore=${lc_test_id}
+    # lowercase and strip characters invalid in IQN names
+    local lc_test_id
+    lc_test_id=$(echo "${test_id,,}" | tr -c 'a-z0-9\n' '-')
     local wwn=iqn.2003-01.kickstart.test:${lc_test_id}
-    local logfile=${tmpdir}/targetcli.log
-    remove_iscsi_target $wwn $backstore $imgfile $logfile
+    local logfile=${tmpdir}/tgtd.log
+    remove_iscsi_target $wwn $imgfile $logfile
 }

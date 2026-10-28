@@ -297,9 +297,29 @@ jobs:
         run: sudo containers/squid.sh start
         working-directory: ./kickstart-tests
 
+      - name: Check if runner container rebuild is needed
+        id: check_container_rebuild
+        working-directory: ./kickstart-tests
+        run: |
+          BASE_COMMIT=$(git merge-base ${{ needs.pr-info.outputs.sha }} origin/${{ env.TARGET_BRANCH }})
+          changed=$(git diff --name-only ${BASE_COMMIT} HEAD -- containers/runner/)
+          if [ -n "$changed" ]; then
+            echo -e "Container-related files changed:\n$changed"
+            echo "rebuild=true" >> $GITHUB_OUTPUT
+          else
+            echo "rebuild=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Update container images used here
+        if: steps.check_container_rebuild.outputs.rebuild != 'true'
         run: |
           sudo podman pull quay.io/rhinstaller/kstest-runner:latest
+
+      - name: Rebuild runner container
+        if: steps.check_container_rebuild.outputs.rebuild == 'true'
+        working-directory: ./kickstart-tests
+        run: |
+          sudo podman build --pull -t quay.io/rhinstaller/kstest-runner:latest containers/runner
 
       - name: Get changed tests
         working-directory: ./kickstart-tests

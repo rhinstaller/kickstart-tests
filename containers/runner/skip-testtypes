@@ -34,8 +34,6 @@ daily_iso_webui_skip_array=(
   addons
   anabot
   anaconda
-  disklabel
-  driverdisk
   image-deployment
   initial-setup
   kickstart

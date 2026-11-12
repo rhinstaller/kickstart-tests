@@ -38,8 +38,6 @@ daily_iso_webui_skip_array=(
   driverdisk
   image-deployment
   initial-setup
-  kickstart
-  ksscript
   logs
   modularity
   repo

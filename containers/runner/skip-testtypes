@@ -42,12 +42,10 @@ daily_iso_webui_skip_array=(
   ksscript
   logs
   modularity
-  repo
   security
   selinux
   services
   stage2-from-compose
-  url
 )
 
 daily_iso_webui_only_skip_array=(

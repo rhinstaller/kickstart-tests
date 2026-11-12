@@ -32,7 +32,7 @@ import libvirt
 
 from time import sleep
 
-# Use the Lorax treebuilder branch for iso creation
+# Use the  Lorax treebuilder branch for iso creation
 from pylorax.treebuilder import udev_escape
 from pylorax.executils import execWithRedirect
 

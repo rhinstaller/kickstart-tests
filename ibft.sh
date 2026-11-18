@@ -96,12 +96,12 @@ prepare() {
     local test_id=$(basename ${tmpdir})
     # use only lower case in target name
     local lc_test_id=${test_id,,}
-    local backstore=${lc_test_id}
     local wwn=iqn.2003-01.kickstart.test:${lc_test_id}
 
     local target_port=3260
     local logfile=${tmpdir}/targetcli.log
-    local target_ip=$(create_iscsi_target ${wwn} ${backstore} ${imgfile} ${logfile})
+    local target_ip
+    target_ip=$(create_iscsi_target ${wwn} ${imgfile} ${logfile})
 
     ### Run http server serving kickstart
 
@@ -181,10 +181,9 @@ cleanup() {
     local test_id=$(basename ${tmpdir})
     # use only lower case in target name
     local lc_test_id=${test_id,,}
-    local backstore=${lc_test_id}
     local wwn=iqn.2003-01.kickstart.test:${lc_test_id}
     local logfile=${tmpdir}/targetcli.log
-    remove_iscsi_target $wwn $backstore $imgfile $logfile
+    remove_iscsi_target $wwn $imgfile $logfile
     local http_dir=${tmpdir}/http
 
     # Remove images fetched by ipxe

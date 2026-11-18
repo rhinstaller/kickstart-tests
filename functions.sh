@@ -367,31 +367,37 @@ udev_escape() {
 
 create_iscsi_target() {
     local wwn=$1
-    local backstore=$2
-    local imgfile=$3
-    local logfile=$4
+    local imgfile=$2
+    local logfile=$3
 
-    targetcli backstores/fileio create ${backstore} ${imgfile} 10G &>> ${logfile}
-    # we assume adding portal by targetcli by default
-    targetcli iscsi/ create ${wwn} &>> ${logfile}
-    targetcli iscsi/${wwn}/tpg1/luns create /backstores/fileio/${backstore} &>> ${logfile}
-    # ACLs - disable, use demo mode
-    targetcli /iscsi/${wwn}/tpg1/ set attribute authentication=0 demo_mode_write_protect=0 generate_node_acls=1 cache_dynamic_acls=1 &>> ${logfile}
+    # Create a sparse 10G file as the iSCSI backing store
+    truncate -s 10G ${imgfile}
 
-    local scriptdir=${PWD}/scripts
-    local target_ip=${USER_NET_HOST_IP}
+    # Start the userspace iSCSI target daemon
+    systemctl start tgtd &>> ${logfile}
+    # Remove any stale target from a previous run
+    tgtadm --lld iscsi --op delete --mode target --tid 1 --force &>> ${logfile} || true
+    # Create an iSCSI target with the given IQN
+    tgtadm --lld iscsi --op new --mode target --tid 1 -T ${wwn} &>> ${logfile}
+    # Attach the backing store file as LUN 1
+    tgtadm --lld iscsi --op new --mode logicalunit --tid 1 --lun 1 -b ${imgfile} &>> ${logfile}
+    # Allow any initiator to connect (no ACL)
+    tgtadm --lld iscsi --op bind --mode target --tid 1 -I ALL &>> ${logfile}
+
+    # Use the host's real IP so that tgtd's SendTargets portal address
+    # matches what the VM can reach
+    local target_ip
+    target_ip=$(hostname -I | awk '{print $1}')
     echo ${target_ip}
 }
 
 
 remove_iscsi_target() {
     local wwn=$1
-    local backstore=$2
-    local imgfile=$3
-    local logfile=$4
+    local imgfile=$2
+    local logfile=$3
 
-    targetcli /iscsi/ delete ${wwn} &>> ${logfile}
-    targetcli /backstores/fileio/ delete ${backstore} &>> ${logfile}
+    tgtadm --lld iscsi --op delete --mode target --tid 1 --force &>> ${logfile} || true
     if [[ ${KEEPIT} == 1 ]]; then
         rm ${imgfile}
     fi

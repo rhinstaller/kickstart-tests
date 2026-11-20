@@ -57,8 +57,6 @@ EOF
 # Print errors to stdout.
 cat > /usr/libexec/kickstart-test.sh << EOF
 
-%ksappend validation/check_rebooted_anaconda_version.ks
-
 journalctl | grep -q "Starting Initial Setup GUI" \
 || echo "Failed to start Initial Setup GUI."
 
@@ -72,3 +70,8 @@ journalctl -u initial-setup -g "Traceback" --quiet
 EOF
 
 %end
+
+# Verify that the installed anaconda-core matches the installer's version.
+# Ensures anaconda CI tests the right version via additional_repo. Without it
+# the ISO and repo versions can legitimately differ (known flake) — see gh#1606.
+%ksappend validation/check_rebooted_anaconda_version.ks

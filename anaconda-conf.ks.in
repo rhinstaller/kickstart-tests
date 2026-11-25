@@ -37,7 +37,7 @@ if [[ $? != 0 ]]; then
     echo "*** the configuration file wasn't loaded:" >> /mnt/sysroot/root/RESULT
 fi
 
-cat /tmp/syslog \
+journalctl -b --no-pager \
 | grep "Storage check started with constraints" \
 | grep "'req_partition_sizes': {'/boot': Size (1024 MiB)}"
 

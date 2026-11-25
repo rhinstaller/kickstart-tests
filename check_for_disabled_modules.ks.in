@@ -6,9 +6,9 @@
 %ksappend payload/default_packages.ks
 
 %post --nochroot
-# Check the syslog for Addons, which should have been disabled
+# Check the journal for Addons, which should have been disabled
  
-errors=$( grep "Anaconda.Addons*" /tmp/syslog | grep -v forbidden )
+errors=$( journalctl -b --no-pager | grep "Anaconda.Addons*" | grep -v forbidden )
 
 if [[ -n "${errors}" ]]; then
     echo "Addons are still enabled:" > /mnt/sysroot/root/RESULT

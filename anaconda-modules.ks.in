@@ -13,7 +13,7 @@
 platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
 
 # Get the activated Anaconda DBus modules.
-cat /tmp/syslog | grep "Activating service name" | \
+journalctl -b --no-pager | grep "Activating service name" | \
 grep "org.fedoraproject.Anaconda.Modules" | cut -d"'" -f2 \
 | sort > /tmp/generated.out
 

@@ -1,0 +1,33 @@
+#version=DEVEL
+
+# Use defaults.
+%ksappend repos/default.ks
+%ksappend common/common_no_payload.ks
+%ksappend payload/default_packages.ks
+
+# Run the installation in the RDP mode via the kickstart command.
+rdp --username=user --password=12345
+
+%post --nochroot
+
+# Check that the rdp command was dispatched from the kickstart.
+# The "RDP requested via kickstart" log message cannot be used here - it is
+# only logged when Anaconda needs to switch to the graphical mode, which
+# does not happen when the graphical mode is already the default.
+if ! grep -q "Command rdp will be parsed in DBus module" /tmp/anaconda.log; then
+    echo "*** the rdp kickstart command was not processed" >> /mnt/sysroot/root/RESULT
+fi
+
+@KSINCLUDE@ post-nochroot-lib-ui.sh
+
+# Check the installation mode.
+check_display_mode "interactive graphical mode"
+
+# Check the RDP server.
+check_rdp_server_is_running
+
+%end
+
+# this needs to be separate so that checking /root/RESULT works as
+# expected due to the main %post section using --nochroot
+%ksappend validation/success_if_result_empty_standalone.ks

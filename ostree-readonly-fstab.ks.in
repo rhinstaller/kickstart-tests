@@ -1,0 +1,43 @@
+# Test that RPM OSTree installations get read-only mount options
+# in /etc/fstab for root and boot filesystems.
+
+# Use the default settings.
+%ksappend common/common_no_storage_and_payload.ks
+# On Fedora enforce lvm scheme (overriding btrfs default)
+%ksappend storage/ostreecontainer_autopart.ks
+
+ostreecontainer --no-signature-verification --remote=test-remote --stateroot=test-stateroot --url=@KSTEST_OSTREECONTAINER_URL@
+
+# Reboot the installed system.
+reboot
+
+# Validate on the first boot.
+%ksappend validation/success_on_first_boot.ks
+
+%post
+# Checks after boot
+cat >> /var/lib/extensions/kickstart-tests/usr/libexec/kickstart-test.sh << 'EOF'
+
+# Check that / is mounted read-only in fstab
+root_opts=$(awk '$2 == "/" {print $4}' /etc/fstab)
+if ! echo "${root_opts}" | grep -q '\bro\b'; then
+    echo "Root (/) fstab options missing 'ro': ${root_opts}"
+fi
+
+# Check that /boot is mounted read-only in fstab (if separate)
+boot_line=$(awk '$2 == "/boot"' /etc/fstab)
+if [ -n "${boot_line}" ]; then
+    boot_opts=$(echo "${boot_line}" | awk '{print $4}')
+    if ! echo "${boot_opts}" | grep -q '\bro\b'; then
+        echo "Boot (/boot) fstab options missing 'ro': ${boot_opts}"
+    fi
+fi
+
+# Verify the system actually booted with root read-only
+root_mount_opts=$(awk '$2 == "/" {print $4}' /proc/mounts | head -1)
+if ! echo "${root_mount_opts}" | grep -q '\bro\b'; then
+    echo "Root is not mounted read-only at runtime: ${root_mount_opts}"
+fi
+
+EOF
+%end

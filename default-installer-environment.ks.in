@@ -1,8 +1,13 @@
 #version=DEVEL
 
-# Verify that only the enabled Anaconda DBus modules are started.
+# Test the default installation environment.
+#
+# IMPORTANT: Do not modify the installation environment in this test!
+# The default environment is tested here, so any modification of it
+# (extra boot options, updates image, %pre scripts, non-default
+# kickstart options, etc.) would invalidate the tested defaults.
+# Only add new checks of the environment below when needed.
 
-# Use defaults.
 %ksappend repos/default.ks
 %ksappend common/common_no_payload.ks
 %ksappend payload/default_packages.ks
@@ -11,6 +16,11 @@
 
 @KSINCLUDE@ scripts-lib.sh
 platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
+
+###############################################################################
+# CHECK 1: Anaconda DBus modules
+# Verify that only the enabled Anaconda DBus modules are started.
+###############################################################################
 
 # Get the activated Anaconda DBus modules.
 cat /tmp/syslog | grep "Activating service name" | \
@@ -73,6 +83,10 @@ if [[ $? != 0 ]]; then
     echo "*** The following modules were generated:" >> /mnt/sysroot/root/RESULT
     cat /tmp/generated.out >> /mnt/sysroot/root/RESULT
 fi
+
+###############################################################################
+# END OF CHECK 1
+###############################################################################
 
 %end
 

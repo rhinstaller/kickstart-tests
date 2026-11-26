@@ -1,8 +1,13 @@
 #version=DEVEL
 
-# Verify that only the enabled Anaconda DBus modules are started.
+# Test the default installation environment.
+#
+# IMPORTANT: Do not modify the installation environment in this test!
+# The default environment is tested here, so any modification of it
+# (extra boot options, updates image, %pre scripts, non-default
+# kickstart options, etc.) would invalidate the tested defaults.
+# Only add new checks of the environment below when needed.
 
-# Use defaults.
 %ksappend repos/default.ks
 %ksappend common/common_no_payload.ks
 %ksappend payload/default_packages.ks
@@ -11,6 +16,11 @@
 
 @KSINCLUDE@ scripts-lib.sh
 platform="$(get_platform @KSTEST_OS_NAME@ @KSTEST_OS_VERSION@)"
+
+###############################################################################
+# CHECK 1: Anaconda DBus modules
+# Verify that only the enabled Anaconda DBus modules are started.
+###############################################################################
 
 # Get the activated Anaconda DBus modules.
 cat /tmp/syslog | grep "Activating service name" | \
@@ -73,6 +83,41 @@ if [[ $? != 0 ]]; then
     echo "*** The following modules were generated:" >> /mnt/sysroot/root/RESULT
     cat /tmp/generated.out >> /mnt/sysroot/root/RESULT
 fi
+
+###############################################################################
+# END OF CHECK 1
+###############################################################################
+
+
+###############################################################################
+# CHECK 2: zram swap
+# Verify that the zram device is used as swap in the installer environment.
+# Test coverage for https://redhat.atlassian.net/browse/RHEL-117685
+###############################################################################
+
+# The /dev/zram0 device should exist in the installer environment
+# and it should be activated there as swap by zram-generator.
+if [ ! -e /dev/zram0 ]; then
+    echo "*** The /dev/zram0 device does not exist in the installer environment!" >> /mnt/sysroot/root/RESULT
+elif ! swapon --noheadings | grep -q "^/dev/zram0[[:space:]]"; then
+    echo "*** The /dev/zram0 device is not used as swap in the installer environment!" >> /mnt/sysroot/root/RESULT
+fi
+
+# Save debug information in case of a failure.
+if [ -s /mnt/sysroot/root/RESULT ]; then
+    {
+        echo "*** Active swap devices:"
+        swapon
+        echo "*** The zram-generator configuration:"
+        cat /usr/lib/systemd/zram-generator.conf
+        echo "*** Status of the zram setup service and the swap unit:"
+        systemctl status systemd-zram-setup@zram0.service dev-zram0.swap --no-pager
+    } >> /mnt/sysroot/root/RESULT 2>&1
+fi
+
+###############################################################################
+# END OF CHECK 2
+###############################################################################
 
 %end
 

@@ -36,8 +36,6 @@ daily_iso_webui_skip_array=(
   anaconda
   image-deployment
   initial-setup
-  kickstart
-  ksscript
   logs
   modularity
   security

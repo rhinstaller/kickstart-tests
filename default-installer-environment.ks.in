@@ -88,6 +88,37 @@ fi
 # END OF CHECK 1
 ###############################################################################
 
+
+###############################################################################
+# CHECK 2: zram swap
+# Verify that the zram device is used as swap in the installer environment.
+# Test coverage for https://redhat.atlassian.net/browse/RHEL-117685
+###############################################################################
+
+# The /dev/zram0 device should exist in the installer environment
+# and it should be activated there as swap by zram-generator.
+if [ ! -e /dev/zram0 ]; then
+    echo "*** The /dev/zram0 device does not exist in the installer environment!" >> /mnt/sysroot/root/RESULT
+elif ! swapon --noheadings | grep -q "^/dev/zram0[[:space:]]"; then
+    echo "*** The /dev/zram0 device is not used as swap in the installer environment!" >> /mnt/sysroot/root/RESULT
+fi
+
+# Save debug information in case of a failure.
+if [ -s /mnt/sysroot/root/RESULT ]; then
+    {
+        echo "*** Active swap devices:"
+        swapon
+        echo "*** The zram-generator configuration:"
+        cat /usr/lib/systemd/zram-generator.conf
+        echo "*** Status of the zram setup service and the swap unit:"
+        systemctl status systemd-zram-setup@zram0.service dev-zram0.swap --no-pager
+    } >> /mnt/sysroot/root/RESULT 2>&1
+fi
+
+###############################################################################
+# END OF CHECK 2
+###############################################################################
+
 %end
 
 %ksappend validation/success_if_result_empty_standalone.ks

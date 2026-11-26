@@ -23,7 +23,8 @@ RUN dnf -y update && \
     squid \
     make \
     edk2-ovmf \
-    openssh-clients && \
+    openssh-clients \
+    scsi-target-utils && \
     dnf -y clean all
 
 # FIXME(workaround): LIBGUESTFS_BACKEND=direct — remove when fixed upstream.

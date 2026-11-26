@@ -12,5 +12,5 @@ function copy_results_to_boot() {
     cp $SYSROOT/root/anaconda-ks.cfg $RESULTS_DIR/ 2>/dev/null
     mkdir -p $RESULTS_DIR/anaconda
     cp /tmp/*.log $RESULTS_DIR/anaconda/ 2>/dev/null
-    cp /tmp/syslog $RESULTS_DIR/anaconda/ 2>/dev/null
+    journalctl -b --no-pager > $RESULTS_DIR/anaconda/journal.log 2>/dev/null
 }

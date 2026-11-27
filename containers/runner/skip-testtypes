@@ -21,6 +21,7 @@ fedora_disabled_array=(
   gh1618      # packages-multilib failing on daily-iso
   inst-4941     # dns-global-exclusive-tls{,-httpks}-2 need outbound TCP/853, blocked by NetSec
   inst-4942     # *-ftp need outbound TCP/21 to public mirrors, blocked by NetSec
+  gh1801      # /tmp/syslog missing on image-builder ISOs
 )
 
 daily_iso_disabled_array=(
